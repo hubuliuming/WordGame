@@ -11,7 +11,6 @@ using QFramework;
 using UnityEngine;
 using UnityEngine.UI;
 using YFramework.UI;
-using MsgDispatcher = YFramework.Kit.MsgDispatcher;
 
 namespace Code_01
 {
@@ -75,8 +74,9 @@ namespace Code_01
             go.transform.Find("TxtName").GetComponent<Text>().text = goodName;
             go.GetComponent<Button>().onClick.AddListener(() =>
             {
-                // todo 
-                MsgDispatcher.Send(Msg.Register.UseGoods,null);
+                // todo data需要完善
+                var data = new ItemBase.ItemData();
+                StringEventSystem.Global.Send(Msg.Register.UseGoods,data);
             });
         }
 

@@ -6,6 +6,7 @@
     功能：Nothing
 *****************************************************/
 
+using QFramework;
 using UnityEngine.UI;
 using YFramework.Kit;
 using YFramework.UI;
@@ -18,9 +19,9 @@ namespace Code_01.Controller
         public void Init()
         {
             transform.Find("Text").GetComponent<Text>().text = Inform;
-            transform.Find("BtnUse").GetComponent<Button>().onClick.AddListener(()=>MsgDispatcher.Register(Msg.Register.UseGoods, o =>
+            transform.Find("BtnUse").GetComponent<Button>().onClick.AddListener(()=>StringEventSystem.Global.Register<ItemBase.ItemData>(Msg.Register.UseGoods, o =>
             {
-                var itemData = o is ItemBase.ItemData ? (ItemBase.ItemData) o : default;
+                var itemData = (ItemBase.ItemData) o;
                 //player.ChangeAll(itemData);
             }));
         }

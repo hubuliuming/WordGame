@@ -14,7 +14,7 @@ using YFramework.UI;
 
 namespace Code_01.Controller
 {
-    public class PlayerDetails : UIBase,IController
+    public class PlayerDetailsControl : UIBase,IController
     {
         private Text _showText;
         private PlayerModel _playerModel;

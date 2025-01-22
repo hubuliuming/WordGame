@@ -14,7 +14,7 @@ using YFramework.UI;
 
 namespace Code_01
 {
-    public class Knapsack : UIBase,IController
+    public class KnapsackControl : UIBase,IController
     {
         private PlayerModel _playerModel;
         public RectTransform contextRect;

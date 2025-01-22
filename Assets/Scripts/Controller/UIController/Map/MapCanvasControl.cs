@@ -1,30 +1,27 @@
-/****************************************************
-    文件：StartGame.cs
-    作者：Y
-    邮箱: 916111418@qq.com
-    日期：#CreateTime#
-    功能：Nothing
-*****************************************************/
-
-
-using QFramework;
 using UnityEngine;
-
+using QFramework;
+using YFramework.Extension;
+using YFramework.UI;
 
 namespace Code_01.Controller
 {
-    public class GameStart : MonoBehaviour,IController
+    public class MapCanvasControl : UIBase
     {
-        private GameObject _knapsack;
-        public Transform UIShow;
+      
+        #region 成员变量
+
+        public PlayerDetailsControl PlayerDetails;
+        public KnapsackControl KnapsackControl;
+
+        #endregion
+        
         private void Start()
         {
             //WriteItemJson();
             //WriteEnemyJson();
-        
-            UIShow.Find("PlayerDetails").GetComponent<PlayerDetails>().Init();
-            _knapsack = UIShow.Find("Knapsack").gameObject;
-            _knapsack.GetComponent<Knapsack>().Init();
+
+            PlayerDetails.Init();
+            KnapsackControl.Init();
         }
 
         private void Update()
@@ -39,10 +36,17 @@ namespace Code_01.Controller
             {
                 CreateItem();
             }
+
             if (Input.GetKeyDown(KeyCode.B))
             {
-                _knapsack.SetActive(!_knapsack.activeSelf);
+                KnapsackControl.gameObject.ActiveSelfInverse();
             }
+
+            if (Input.GetKeyDown(KeyCode.Tab))
+            {
+                PlayerDetails.gameObject.ActiveSelfInverse();
+            }
+            
         }
 
         #region TestMeoth
@@ -50,12 +54,12 @@ namespace Code_01.Controller
         private void CreateEnemy()
         {
             var go = FactoryUISystem.Get(Msg.EnemyName.野猪);
-            go.transform.localPosition =Vector3.zero;
+            go.transform.localPosition = Vector3.zero;
         }
 
         private void CreateItem()
         {
-            var go =FactoryUISystem.Get(Msg.ItemName.活力苹果);
+            var go = FactoryUISystem.Get(Msg.ItemName.活力苹果);
             go.transform.localPosition = new Vector3(300, 0, 0);
         }
 

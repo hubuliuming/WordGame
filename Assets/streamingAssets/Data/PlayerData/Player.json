@@ -1,10 +1,10 @@
 {
   "property": {
     "Name": "小明",
-    "Hp": 90,
-    "Power": 100,
+    "Hp": 50,
+    "Power": 60,
     "Level": 2,
-    "Exp": 532,
+    "Exp": 572,
     "Attack": 24,
     "Defence": 8,
     "Speed": 10,
@@ -17,6 +17,6 @@
   "goodsDict": {
     "Coin": 480,
     "馒头": 5,
-    "小块肉": 35
+    "小块肉": 40
   }
 }

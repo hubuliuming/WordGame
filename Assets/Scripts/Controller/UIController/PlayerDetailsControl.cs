@@ -7,10 +7,12 @@
 *****************************************************/
 
 using Code_01.Mode;
+using Framework.UI;
 using QFramework;
 using UnityEngine.UI;
 
 using YFramework.UI;
+using NotImplementedException = System.NotImplementedException;
 
 namespace Code_01.Controller
 {
@@ -19,7 +21,7 @@ namespace Code_01.Controller
         private Text _showText;
         private PlayerModel _playerModel;
     
-        public void Init()
+        public override void OnStart()
         {
             _showText = transform.Find("Text").GetComponent<Text>();
             _playerModel = this.GetModel<PlayerModel>();
@@ -45,5 +47,7 @@ namespace Code_01.Controller
         {
             return Game.Interface;
         }
+
+    
     }
 }

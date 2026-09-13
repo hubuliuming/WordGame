@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace YFramework.Kit.Singleton
 {
-    public  class MonoSingleton<T> : YMonoBehaviour where T : MonoBehaviour
+    public class MonoSingleton<T> : YMonoBehaviour where T : MonoBehaviour
     {
         private static T _instance;
         public static T Instance
@@ -19,7 +19,7 @@ namespace YFramework.Kit.Singleton
             {
                 if (_instance == null)
                 {
-                    _instance = FindFirstObjectByType<T>();
+                    _instance = FindObjectOfType<T>();
                 }
                 if (_instance == null)
                 {
@@ -35,6 +35,11 @@ namespace YFramework.Kit.Singleton
         {
             DontDestroyOnLoad(gameObject);
             if (_instance == null) _instance = this as T;
+        }
+
+        public override void OnStart()
+        {
+            
         }
     }
 }

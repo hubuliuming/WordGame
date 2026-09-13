@@ -1,7 +1,9 @@
+using Framework.UI;
 using UnityEngine;
 using QFramework;
 using YFramework.Extension;
 using YFramework.UI;
+using NotImplementedException = System.NotImplementedException;
 
 namespace Code_01.Controller
 {
@@ -20,8 +22,13 @@ namespace Code_01.Controller
             //WriteItemJson();
             //WriteEnemyJson();
 
-            PlayerDetails.Init();
-            KnapsackControl.Init();
+            PlayerDetails.OnStart();
+            KnapsackControl.OnStart();
+        }
+
+        public override void OnStart()
+        {
+            
         }
 
         private void Update()
@@ -69,5 +76,7 @@ namespace Code_01.Controller
         {
             return Game.Interface;
         }
+
+   
     }
 }

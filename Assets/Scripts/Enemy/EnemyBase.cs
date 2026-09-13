@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using Code_01.Command;
 using Code_01.System;
+using Framework.UI;
 using QFramework;
 using UnityEngine;
 using UnityEngine.Pool;
@@ -60,7 +61,11 @@ namespace Code_01.Enemy
         private ObjectPool<GameObject> _enemyPool;
 
         private PlayerEventSystem _playerEventSystem;
-        public void Init(string enemyName)
+        public override void OnStart()
+        {
+           
+        }
+        public  void Init(string enemyName)
         {
             var datas = JsonUti.ReadFromJson<Dictionary<string, EnemyData>>(MsgPaths.Config.Enemy);
        
@@ -82,5 +87,7 @@ namespace Code_01.Enemy
         {
             return Game.Interface;
         }
+
+  
     }
 }

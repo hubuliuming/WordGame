@@ -65,6 +65,75 @@ namespace YFramework.Extension
         public static void SetLocalPosZ(this MonoBehaviour mono, float target) => SetLocalPosZ(mono.transform, target);
         public static void SetIdentity(this MonoBehaviour mono ) => SetIdentity(mono.transform);
 
+        public static void SetEulerAnglesX(this MonoBehaviour mono, float target) => SetEulerAnglesX(mono.transform, target);
+        public static void SetEulerAnglesY(this MonoBehaviour mono, float target) => SetEulerAnglesY(mono.transform, target);
+        public static void SetEulerAnglesZ(this MonoBehaviour mono, float target) => SetEulerAnglesZ(mono.transform, target);
+        public static void SetEulerAnglesX(this Transform trans, float target)
+        {
+            var euler = trans.eulerAngles;
+            euler.x = target;
+            trans.eulerAngles = euler;
+        }
+        public static void SetEulerAnglesY(this Transform trans, float target)
+        {
+            var euler = trans.eulerAngles;
+            euler.y = target;
+            trans.eulerAngles = euler;
+        }
+        public static void SetEulerAnglesZ(this Transform trans, float target)
+        {
+            var euler = trans.eulerAngles;
+            euler.z = target;
+            trans.eulerAngles = euler;
+        }
+        
+        public static void SetLocalEulerAnglesX(this MonoBehaviour mono, float target) => SetLocalEulerAnglesX(mono.transform, target);
+        public static void SetLocalEulerAnglesY(this MonoBehaviour mono, float target) => SetLocalEulerAnglesY(mono.transform, target);
+        public static void SetLocalEulerAnglesZ(this MonoBehaviour mono, float target) => SetLocalEulerAnglesZ(mono.transform, target);
+        
+        public static void SetLocalEulerAnglesX(this Transform trans, float target)
+        {
+            var euler = trans.localEulerAngles;
+            euler.x = target;
+            trans.localEulerAngles = euler;
+        }
+        
+        public static void SetLocalEulerAnglesY(this Transform trans, float target)
+        {
+            var euler = trans.localEulerAngles;
+            euler.y = target;
+            trans.localEulerAngles = euler;
+        }
+        public static void SetLocalEulerAnglesZ(this Transform trans, float target)
+        {
+            var euler = trans.localEulerAngles;
+            euler.z = target;
+            trans.localEulerAngles = euler;
+        }
+
+        public static void SetScaleX(this Transform trans, float target)
+        {
+            var scale = trans.localScale;
+            scale.x = target;
+            trans.localScale = scale;
+        }
+        public static void SetScaleY(this Transform trans, float target)
+        {
+            var scale = trans.localScale;
+            scale.y = target;
+            trans.localScale = scale;
+        }
+        public static void SetScaleZ(this Transform trans, float target)
+        {
+            var scale = trans.localScale;
+            scale.z = target;
+            trans.localScale = scale;
+        }
+        
+        public static void SetScaleX(this MonoBehaviour mono, float target) => SetScaleX(mono.transform, target);
+        public static void SetScaleY(this MonoBehaviour mono, float target) => SetScaleY(mono.transform, target);
+        public static void SetScaleZ(this MonoBehaviour mono, float target) => SetScaleZ(mono.transform, target);
+        
         public static void AddPosX(this Transform trans, float target)
         {
             var pos = trans.position;
@@ -107,6 +176,32 @@ namespace YFramework.Extension
         public static void AddLocalPosX(this MonoBehaviour mono, float target) => AddLocalPosX(mono.transform,target);
         public static void AddLocalPosY(this MonoBehaviour mono, float target) => AddLocalPosY(mono.transform,target);
         public static void AddLocalPosZ(this MonoBehaviour mono, float target) => AddLocalPosZ(mono.transform,target);
+
+        public static void AddScaleX(this Transform trans, float target)
+        {
+            var scale = trans.localScale;
+            scale.x += target;
+            trans.localScale = scale;
+        }
+        public static void AddScaleY(this Transform trans, float target)
+        {
+            var scale = trans.localScale;
+            scale.y += target;
+            trans.localScale = scale;
+        }
+
+        public static void AddScaleZ(this Transform trans, float target)
+        {
+            var scale = trans.localScale;
+            scale.z += target;
+            trans.localScale = scale;
+        }
+        public static void Reset(this Transform trans)
+        {
+            trans.localPosition = Vector3.zero;
+            trans.localScale = Vector3.one;
+            trans.localRotation = Quaternion.identity;
+        }
         public static void GetOrAddComponent<T>(this MonoBehaviour mono) where T: Component => GetOrAddComponent<T>(mono.gameObject);
         public static T GetOrAddComponent<T>(this GameObject go) where T: Component
         {
@@ -124,7 +219,7 @@ namespace YFramework.Extension
             List<Transform> activeGos = new List<Transform>();
             for (int i = 0; i < trans.childCount; i++)
             {
-                if (trans.transform.GetChild(i).gameObject.activeSelf)
+                if (trans.transform.GetChild(i).gameObject.activeInHierarchy)
                 {
                     activeGos.Add(trans.GetChild(i));
                 }
@@ -134,7 +229,7 @@ namespace YFramework.Extension
         }
         public static GameObject[] GetActiveGameObjectsInChildren(this GameObject go)
         {
-            var activeTrans =GetActiveGameObjectsInChildren(go.transform);
+            var activeTrans = GetActiveGameObjectsInChildren(go.transform);
             var activeGos = new GameObject[activeTrans.Length];
             for (int i = 0; i < activeTrans.Length; i++)
             {
@@ -173,6 +268,54 @@ namespace YFramework.Extension
             float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
             //设置旋转
             self.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+        }
+        
+        public static Transform FindRecursive(this Transform parent, string goName)
+        {
+            Transform child = null;
+            foreach (Transform c in parent)
+            {
+                if (c.name.Equals(goName))
+                {
+                    child = c;
+                    break;
+                }
+
+                if (child == null && c.childCount > 0)
+                    child = FindRecursive(c, goName);
+            }
+            return child;
+        }
+        
+        public static List<Transform> FindsRecursive(this Transform parent, string goName)
+        {
+            List<Transform> childs = new List<Transform>();
+            foreach (Transform c in parent)
+            {
+                if (c.name.Equals(goName))
+                {
+                    childs.Add(c);
+                }
+
+                childs.AddRange(FindsRecursive(c, goName));
+            }
+            return childs;
+        }
+        
+        public static void FindRecursiveWithStart(this Transform parent, string startWithStr, List<GameObject> resultList)
+        {
+            foreach (Transform child in parent)
+            {
+                if (child.name.StartsWith(startWithStr))
+                {
+                    resultList.Add(child.gameObject);
+                }
+
+                if (child.childCount > 0)
+                {
+                    FindRecursiveWithStart(child, startWithStr, resultList);
+                }
+            }
         }
     }
 }

@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using Code_01;
 using Code_01.Command;
+using Framework.UI;
 using QFramework;
 using UnityEngine.UI;
 using YFramework.UI;
@@ -54,5 +55,10 @@ public class ItemBase : UIBase,IController,IInit
     public IArchitecture GetArchitecture()
     {
         return Game.Interface;
+    }
+
+    public override void OnStart()
+    {
+       
     }
 }

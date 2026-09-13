@@ -18,4 +18,9 @@ public class ShowTime : YMonoBehaviour
     {
         text.text = DateTime.Now.ToString("hh:HH:mm:ss");
     }
+
+    public override void OnStart()
+    {
+        
+    }
 }

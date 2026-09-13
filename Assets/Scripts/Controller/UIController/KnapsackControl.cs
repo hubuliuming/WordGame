@@ -7,10 +7,12 @@
 *****************************************************/
 
 using Code_01.Mode;
+using Framework.UI;
 using QFramework;
 using UnityEngine;
 using UnityEngine.UI;
 using YFramework.UI;
+using NotImplementedException = System.NotImplementedException;
 
 namespace Code_01
 {
@@ -23,7 +25,7 @@ namespace Code_01
         private const int Column = 10;
         private const int MaxGirdNum = 99;
 
-        public void Init()
+        public override void OnStart()
         {
             _playerModel = this.GetModel<PlayerModel>();
             // todo fix

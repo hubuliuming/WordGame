@@ -6,17 +6,18 @@
     功能：Nothing
 *****************************************************/
 
+using Framework.UI;
 using QFramework;
 using UnityEngine.UI;
-using YFramework.Kit;
-using YFramework.UI;
+using NotImplementedException = System.NotImplementedException;
+
 
 namespace Code_01.Controller
 {
     public class DetailInform : UIBase
     {
         public string Inform;
-        public void Init()
+        public override void OnStart()
         {
             transform.Find("Text").GetComponent<Text>().text = Inform;
             transform.Find("BtnUse").GetComponent<Button>().onClick.AddListener(()=>StringEventSystem.Global.Register<ItemBase.ItemData>(Msg.Register.UseGoods, o =>

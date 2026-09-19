@@ -1,0 +1,5 @@
+[mcp_servers.unityMCP]
+url = "http://127.0.0.1:9321/mcp"
+startup_timeout_sec = 60
+tool_timeout_sec = 60
+enabled_tools = ["read_console", "find_gameobjects", "find_in_file", "set_active_instance"]

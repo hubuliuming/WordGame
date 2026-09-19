@@ -10,3 +10,10 @@
 - 修改范围仅为 Doc 下新增文件，未修改代码、Scene、Prefab、Animator、meta、依赖或构建配置；未读取图片内容。
 - 未运行逻辑单元测试、GamePlayer PlayMode、命令行构建或平台发布；无运行通过结论。
 - 文档只读审计已完成：UTF-8、相对文件链接、入口可达性与体量检查未发现问题；逐份查看新增文件 Git diff，中文正常。该检查不代表工程运行验收。
+
+## 2026-09-19：同步 Codex UnityMCP 连接端口
+
+- 将项目级 `.codex/config.toml` 与用户级 Codex 配置中的 `unityMCP` 地址从 `http://127.0.0.1:8765/mcp` 同步为 `http://127.0.0.1:9321/mcp`。
+- 已核实 `9321` 由当前 UnityMCP 服务监听，MCP `initialize` 返回成功，并可读取唯一 Unity 实例 `Code_01` 及工具列表。
+- 当前任务的 MCP 工具目录不会在配置修改后热刷新；需要重启 Codex 或新建任务后确认 `read_console`、`find_gameobjects`、`find_in_file`、`set_active_instance` 已注入。
+- 未修改代码、Scene、Prefab、Animator、meta、依赖或构建配置，未运行逻辑单元测试、GamePlayer PlayMode、命令行构建或平台发布。

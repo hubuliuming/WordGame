@@ -64,7 +64,7 @@ namespace Code_01
                     () =>
                     {
                         var go = OnCreate(path, objName, parent);
-                        go.GetComponent<IInit>().Init(objName);
+                        go.GetComponent<IBaseLife>().Init(objName);
                         return go;
                     },
                     go =>
@@ -85,7 +85,7 @@ namespace Code_01
                     () =>
                     {
                         var go = OnCreate(path, objName, parent);
-                        go.GetComponent<IInit>().Init(objName);
+                        go.GetComponent<IBaseLife>().Init(objName);
                         return go;
                     },
                     go => OnGet(go),

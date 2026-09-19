@@ -20,7 +20,7 @@ public interface IItem
 {
     void Init(string itemName);
 }
-public class ItemBase : UIBase,IController,IInit
+public class ItemBase : UIBase,IController,IBaseLife
 {
     [Serializable]
     public struct ItemData

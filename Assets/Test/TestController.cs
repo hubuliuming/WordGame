@@ -35,12 +35,12 @@ public class TestController : MonoBehaviour,IController
     
     private void CreateEnemy()
     {
-        var go = FactoryUISystem.Get(Msg.EnemyName.野猪);
+        var go = this.GetSystem<FactoryUISystem>().Get(Msg.EnemyName.野猪);
         go.transform.localPosition =Vector3.zero;
     }
     private void CreateItem()
     {
-        var go =FactoryUISystem.Get(Msg.ItemName.活力苹果);
+        var go = this.GetSystem<FactoryUISystem>().Get(Msg.ItemName.活力苹果);
         go.transform.localPosition = new Vector3(300, 0, 0);
     }
 

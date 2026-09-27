@@ -17,6 +17,7 @@ namespace Code_01
     {
         protected override void Init()
         {
+            RegisterUtility(new PlayerDataStore());
             RegisterModel(new PlayerModel());
             RegisterUtility(new LogUtility());
             RegisterModel(new GoodsModel());

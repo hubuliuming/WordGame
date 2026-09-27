@@ -5,64 +5,68 @@
 ## 入口文件
 
 - [PlayerData.cs](../../Assets/Scripts/Features/Player/Data/PlayerData.cs)：数据结构、下限常量。
-- [PlayerModel.cs](../../Assets/Scripts/Features/Player/Data/PlayerModel.cs)：读取数据、属性 setter、保存与刷新事件。
-- [PlayerEventSystem.cs](../../Assets/Scripts/Features/Player/System/PlayerEventSystem.cs)：增量属性修改、升级、物品字典变更。
+- [PlayerModel.cs](../../Assets/Scripts/Features/Player/Data/PlayerModel.cs)：状态、只读属性/库存与数值约束。
+- [PlayerDataStore.cs](../../Assets/Scripts/Features/Player/Data/PlayerDataStore.cs)：玩家 JSON 的 Load / Save。
+- [PlayerEventSystem.cs](../../Assets/Scripts/Features/Player/System/PlayerEventSystem.cs)：统一准备、校验、应用、保存与通知；Change* 返回 bool。
 - [PlayerDetailsControl.cs](../../Assets/Scripts/Controller/UIController/PlayerDetailsControl.cs)：监听类型事件并更新 Text。
 - [GoodsModel.cs](../../Assets/Scripts/Model/GoodsModel.cs)：另一个已注册的空物品字典模型。
-- [Msg.cs](../../Assets/Scripts/Msg/Msg.cs)：UpdateShowData 类型事件与字符串消息名。
+- [Msg.cs](../../Assets/Scripts/Msg/Msg.cs)：UpdateShowData、InventoryChanged 类型事件与字符串消息名。
 
 ## 【FACT】状态归属
 
 `PlayerData.property` 保存 Name、Hp、Power、Level、Exp、Attack、Defence、Speed，以及 UpperHp、UpperPower、UpperAttack、UpperDefence、UpperSpeed。`Exp` 为 long，其余数值为 int。`goodsDict` 是物品名到数量的字典，金币以 `"Coin"` 为键。
 
-PlayerModel.OnInit 通过 JsonUti 读取 PlayerData。当前背包和金币均使用 PlayerModel 内部的 goodsDict；GoodsModel 虽在 Game 注册，但自己的 GoodsDict 仅被初始化为空字典，不能把它写成背包主数据源。
+PlayerModel.OnInit 通过 Game 注册的 PlayerDataStore 读取 PlayerData。当前背包和金币均使用 PlayerModel 内部唯一的 goodsDict，对外提供 ReadOnlyDictionary 包装的 IReadOnlyDictionary；全部公开属性只读。GoodsModel 虽在 Game 注册，但自己的 GoodsDict 仅被初始化为空字典，未接入背包主数据源。
 
-`IsDied`、`IsEmptyPower` 是 PlayerModel 的布尔属性，不在 PlayerData JSON 结构中，OnInit 没有从已读 Hp / Power 重新计算它们。
+`IsDied`、`IsEmptyPower` 不写入 JSON，分别由当前 Hp <= 0、Power <= 0 派生；加载后立即反映已有存量。死亡后的普通 Hp 增量保持 Hp=0，其他属性仍可按各自规则变更。
 
 ## 【CURRENT STRATEGY】变更、通知与存储
 
 主要路径为：
 
-`命令或调用方 → PlayerEventSystem.Change* → PlayerModel 属性 setter → 类型事件/JSON 写入`。
+`命令或调用方 → PlayerEventSystem.Change* / ChangeAll → PlayerModel 准备最终值 → 统一应用 → PlayerDataStore.Save → 类型事件`。
 
-- ChangeLevel、ChangeExp、ChangePower、ChangeHp、ChangeAttack、ChangeDefence、ChangeSpeed、ChangeCoin 和各 ChangeUpper 方法按传入增量执行 `+=`；增量为 0 时直接返回。
-- ChangeName 拒绝空字符串。ChangeAll 按 ItemData 字段调用各属性变更方法，不处理物品数量扣减。
-- Name、Level、Exp、Power、Hp、Attack、Defence、Speed、Coin 的正常 setter 分支发送 `Msg.Register.UpdateShowData`，随后保存 JSON。早退分支见下文。
-- 各 Upper 属性 setter 正常分支保存 JSON，不发送 UpdateShowData。GoodsDict setter 保存 JSON，未实现背包刷新；UpdateLocalData 仅执行保存。
-- PlayerDetailsControl.OnStart 查找直接子节点 Text、获取 PlayerModel、注册类型事件并立即 UpdateShow。展示昵称、等级、经验、生命、体力、攻击、防御、速度、金币。
-- ChangeGoodsDic 修改 PlayerModel.GoodsDict 后调用 UpdateLocalData；已存在键执行数量相加，否则添加键。它没有发送背包更新或详情刷新事件。
+- ChangeLevel、ChangeExp、ChangePower、ChangeHp、ChangeAttack、ChangeDefence、ChangeSpeed、ChangeCoin、各 ChangeUpper 方法及 ChangeGoodsDic 的数值参数均是增量；零增量不产生变化。
+- ChangeName 接收最终名称，空值或空字符串报错并返回 false。ChangeAll 接收独立 ItemData，可同时接收物品增量字典；未接入道具库存消耗。
+- 多字段操作先准备全部最终值；任一业务校验失败即返回 false，不应用属性、扣费或奖励。属性使用 struct 候选值，库存只准备本次涉及项，不复制整个库存。
+- 一次实际发生变化的 ChangeAll、LevelUp、库存操作或战斗结算只调用一次 Save。保存失败由 PlayerDataStore 记录路径和原始异常，系统回滚本次内存改动并返回 false；场景道具和胜利敌人对象仅在成功后回收。
+- 实际属性或金币变化在保存成功后发送一次 UpdateShowData；普通库存变化发送一次 InventoryChanged。两类变化同时存在时各发一次。无实际变化时返回 true，不保存、不发送事件。
+- PlayerDetailsControl.OnStart 查找直接子节点 Text、获取 PlayerModel、注册 UpdateShowData 并立即 UpdateShow，继续展示昵称、等级、经验、生命、体力、攻击、防御、速度、金币。
+- InventoryChanged 已由 KnapsackControl 订阅；事件触发后重建格子并按有效数量更新容器高度，释放时注销订阅。
 
 存储位置和平台限制见[资源与数据](DataResources.md)，不要将这些同步文件写入描述为网络存档。
 
 ## 【FACT】限制值与分支
 
-| 项目 | 当前源码行为 |
+| 项目 | 当前实现 |
 |---|---|
-| LimitMinPower / LimitMinHP | 50 / 100；用于对应上限 setter |
-| LimitMinAttack / LimitMinDefence / LimitMinSpeed | 5 / 4 / 5 |
-| MaxLevel | 常量为 100；Level setter 与 LevelUp 未使用它限制等级 |
-| Power | 传入值小于 0 时设置 IsEmptyPower=true 并返回，原 Power 不变；否则截到 UpperPower，写值并清除标记 |
-| Hp | 先执行 CheckChangeDied，早退时跳过通知与保存；未早退时截到 UpperHp，写值并清除 IsDied |
-| Attack / Defence / Speed | 先判断低于各自最小值，再用 else-if 判断高于上限；是有顺序的条件分支 |
-| UpperPower | 低于 50 时改为 50，再写入保存 |
-| UpperHp | 低于 100 时日志后返回，未写入；其他值写入保存 |
-| UpperAttack / UpperSpeed | 分别至少为 5，再写入保存 |
-| UpperDefence | 传入 0 时返回；其他值至少为 4，再写入保存 |
+| LimitMinPower / LimitMinHP | 50 / 100，限制体力上限与生命上限 |
+| LimitMinAttack / LimitMinDefence / LimitMinSpeed | 5 / 4 / 5，限制对应当前值与上限 |
+| MaxLevel | 常量仍为 100，未新增等级限制 |
+| Power | 扣除后小于 0 报错拒绝，恰为 0 合法；恢复截到本次最终 UpperPower |
+| Hp | 活着时对旧 Hp 加一次增量，截到 0 至本次最终 UpperHp；已死亡后普通恢复保持 0 |
+| Attack / Defence / Speed | 本次修改该属性时，先检查对应上限合法，再将当前值加增量截到下限与上限之间 |
+| 各 Upper 属性 | 非零修改后低于对应下限时明确报错并拒绝；不再静默替换默认值 |
+| Coin | ChangeCoin 为专用入口，ChangeGoodsDic 的 Coin 键也转到此入口；最终值至少 0，必需 Coin 键保留 |
+| 普通库存 | 负结果、扣减不存在的条目或超出 int 范围时记录物品与原因并拒绝；正数新增，合法归零删除，零增量不变 |
 
-`LevelUp()` 单次判断所需经验 `Level * 100 + 100`，足够则升一级并扣除该次所需经验，否则打印“经验不足升级”。ChangeExp 没有自动调用 LevelUp；在 Scripts / Framework / Test 检索范围未检出 LevelUp 调用点。
+ChangeAll 先得到本次最终上限，再据其约束本次有非零增量的对应属性；单独修改上限不重写未请求修改的当前值。等级、经验、上限及体力加法发生溢出时明确报错拒绝；Hp 和攻防速使用 long 中间值后按各自边界截取，金币与普通库存拒绝超出 int 上界的结果。
 
-`EnableAttack()` 仅检查两个状态标记都为 false。具体战斗顺序见[战斗](Combat.md)。
+加载旧属性数据时统一检查每组数值，只报错、保留原值，不自动写回。当前 Defence=8、UpperDefence=0、下限=4 的错误在加载时由模型报一次；无关属性、金币和库存操作不重复检查或修正该组数值。若新操作涉及仍不合法的防御上限/属性，则本次操作报错拒绝。
 
-## 【KNOWN ISSUES】静态已见问题
+`LevelUp()` 单次判断所需经验 `Level * 100 + 100`，足够时把升一级与扣经验作为一次操作提交，否则打印“经验不足升级”并返回 false。ChangeExp 不自动升级；在 Scripts / Framework / Test 检索范围未检出 LevelUp 调用点。
 
-- **金币未赋值**：Coin setter 里写入 `_playerData.goodsDict["Coin"]` 的语句被注释；ChangeCoin 仍触发通知和保存，但不会通过该 setter 改变字典金币数。
-- **Hp 判死参数语义不一致**：ChangeHp 用 `Hp += value` 将最终 Hp 传入 setter，CheckChangeDied 却判断 `旧 Hp <= 0 || 旧 Hp + 传入值 <= 0`。命中时写 Hp=0、设置 IsDied 并返回，不通知、不保存；旧 Hp 已为 0 时也会走早退。这里记录原代码条件，正确的死亡/恢复规则为 UNKNOWN。
-- **体力标记与存量分离**：Power 小于 0 的早退路径不改存量；恰为 0 的普通路径会清除 IsEmptyPower。攻击是否允许不能等同于“当前体力足够扣除成本”。
-- **负物品数量**：ChangeGoodsDic 对缺失键也允许添加负数量，代码保留对应 TODO；是否允许负库存没有已确认业务约定。
-- **刷新生命周期**：PlayerDetailsControl 注册事件后未在该类实现注销；重复 OnStart 或销毁后的运行表现未验收。
+`EnableAttack(CostPower)` 检查玩家未死亡、成本非负且不超过当前体力；等于当前体力可扣至 0，其后不能支付正成本。具体循环规则见[战斗](Combat.md)。
+
+## 【KNOWN ISSUES】静态边界
+
+- 当前旧存档的 Defence / UpperDefence 仍不合法，按已确认规则只报错、暂不修正；该数据问题未解决。
+- PlayerDetailsControl 在 Release/OnDestroy 注销 UpdateShowData；重复 OnStart 只刷新一次，不重复注册。
+- 库存事件已发出并由 KnapsackControl 订阅，详见[背包与道具](Inventory.md)。
+- PlayerDataStore 仍复用同步 JsonUti 直接写原路径；保存失败回滚内存不代表磁盘文件具备原子替换或备份能力，平台存储边界见[资源与数据](DataResources.md)。
 
 ## 未知项与验收状态
 
-`UNKNOWN`：等级上限的产品要求、死亡与恢复策略、体力不足时的战斗规则、物品数量边界。上述静态问题没有在本次任务修复，也没有 GamePlayer 复现/回归结果。
+`UNKNOWN`：等级上限的产品要求、正式初始数据及后续存档迁移策略。金币赋值、Hp 增量判定、体力存量标记和普通库存边界已按确认规则改写。第 2 阶段已有主线程通过结论；第 4 阶段 UI 生命周期与刷新已完成静态落地，人工 GamePlayer 交互验收仍待主线程确认。
 
 相关模块：[运行入口](Runtime.md)、[战斗](Combat.md)、[背包与道具](Inventory.md)。

@@ -7,7 +7,7 @@
 | 文件 | 作用 |
 |---|---|
 | [Map.unity](../../Assets/Scenes/Map.unity) | 当前构建列表启用的场景，含 MapCanvas 及其序列化引用 |
-| [MapCanvasControl.cs](../../Assets/Scripts/Controller/UIController/Map/MapCanvasControl.cs) | Start 中调用两个面板的 OnStart；Update 处理调试按键 |
+| [MapCanvasControl.cs](../../Assets/Scripts/Controller/UIController/Map/MapCanvasControl.cs) | Start 编排架构、场景池绑定与两个面板的 OnStart；初始化完成后接受按键；OnDestroy 清理场景池 |
 | [Game.cs](../../Assets/Scripts/Game.cs) | Architecture 注册点 |
 | [QFramework.cs](../../Assets/QFramework/Framework/Scripts/QFramework.cs) | Interface 懒初始化、模型/系统初始化、命令与类型事件 |
 | [TestController.cs](../../Assets/Test/TestController.cs) | 场景按钮创建敌人和道具 |
@@ -24,30 +24,35 @@ Map 的 `MapCanvas` 对象为激活状态，挂载 `MapCanvasControl`。以下�
 | PlayerDetails 字段 | 236714923 | PlayerDetailsControl；GUID `ebb2a445175a0e343a6ae9a7b9b473ff` |
 | KnapsackControl 字段 | 1772732472 | KnapsackControl；GUID `bbf53d1c90daa7d40a8486c5811a1b25` |
 | KnapsackControl.contextRect | 1099784055 | Content 的 RectTransform；格子挂载入口 |
-| ItemParent | 对象 1747035443、RectTransform 1747035444 | 激活的 MapCanvas 子对象；对象池初始化按名称查找 |
+| MapCanvasControl.ItemParent 字段 | 1747035444 | 已绑定现有 ItemParent 的 RectTransform，所属对象 1747035443；对象层级未变 |
 
 `Knapsack` 对象的序列化初始状态为关闭；MapCanvas 仍通过字段直接调用它的 `OnStart()`。
 
+MapCanvasControl.ItemParent 的序列化引用已核对并留存；第 3 阶段运行反馈与验收结论见本页“未知项与验收状态”。相关自动保存机制与覆盖来源边界见[资源与数据](DataResources.md)，写入及延时复读证据见本月 ChangeLog。
+
 ## 【FACT】初始化链
 
-1. Unity 调用 `MapCanvasControl.Start()`，依次执行 `PlayerDetails.OnStart()`、`KnapsackControl.OnStart()`。
-2. 玩家详情通过 `IController.GetArchitecture() → Game.Interface` 获取 `PlayerModel`。首次访问 Interface 时，QFramework 创建 Game 并调用 `Game.Init()`。
-3. Game 注册 `PlayerModel`、`LogUtility`、`GoodsModel`、`FactoryUISystem`、`PlayerEventSystem`。
+1. Unity 调用 `MapCanvasControl.Start()`，先经 `GetArchitecture() → Game.Interface` 获取架构。首次访问 Interface 时，QFramework 创建 Game 并调用 `Game.Init()`。
+2. MapCanvas 从该架构获取已注册的 FactoryUISystem 实例；本次架构初始化完成后才进入场景绑定。
+3. Game 注册 `PlayerDataStore` 存储 utility，以及 `PlayerModel`、`LogUtility`、`GoodsModel`、`FactoryUISystem`、`PlayerEventSystem`。
 4. QFramework 执行注册补丁入口 `OnRegisterPatch`，随后初始化模型集合，再初始化系统集合。两类集合是 HashSet；源码的注册书写顺序不能当作同类对象之间的稳定初始化顺序契约。
-5. PlayerModel 读取玩家 JSON；FactoryUISystem 创建池；PlayerEventSystem 获取 PlayerModel。相关细节见[玩家](Player.md)和[资源与数据](DataResources.md)。
-6. 玩家详情注册刷新事件并立即展示；背包随后从 PlayerModel 的 GoodsDict 创建初始格子。
+5. PlayerModel 经 PlayerDataStore.Load 读取玩家 JSON；FactoryUISystem.OnInit 不访问场景；PlayerEventSystem 获取 PlayerModel 与 PlayerDataStore。相关细节见[玩家](Player.md)和[资源与数据](DataResources.md)。
+6. MapCanvas 调用 `FactoryUISystem.BindScene(ItemParent)`；该方法要求有效的场景引用，缺失即抛错。有效绑定时创建当前场景的三个池，再依次调用 `PlayerDetails.OnStart()`、`KnapsackControl.OnStart()`。玩家详情注册刷新事件并立即展示；背包从 PlayerModel 的 GoodsDict 创建初始格子。当前 Scene 序列化绑定已补齐，用户已确认第 3 阶段初始化正常；验收边界见本页末节。
+7. 上述调用完成后才设置 MapCanvas 的初始化标记，Update 据此接受按键。绑定或面板初始化抛出异常时，MapCanvas 清理本场景池并重新抛出原异常；单格失败由背包条目边界记录和隔离。
 
 这是已核实的入口链，不声称它是所有运行场景中首次访问 Game.Interface 的唯一来源。
+
+MapCanvas.OnDestroy 使用缓存的 FactoryUISystem 和 ItemParent 调用 ClearScene，不在销毁阶段重新获取架构。ClearScene 比较绑定来源的引用身份，重复清理无副作用；旧场景的延迟清理不会清掉新场景绑定。池内与尚未归还对象的清理规则见[资源与数据](DataResources.md)。
 
 ## 【CURRENT STRATEGY】输入与 UI 控制
 
 | 输入入口 | 现有调用 |
 |---|---|
-| MapCanvasControl.Update：E | 取野猪对象，localPosition 设为零 |
-| MapCanvasControl.Update：I | 取活力苹果对象，localPosition 设为 (300, 0, 0) |
+| MapCanvasControl.Update：E | 通过缓存的 FactoryUISystem 实例取野猪对象，localPosition 设为零 |
+| MapCanvasControl.Update：I | 通过缓存的 FactoryUISystem 实例取活力苹果对象，localPosition 设为 (300, 0, 0) |
 | MapCanvasControl.Update：B | 切换背包对象激活状态 |
 | MapCanvasControl.Update：Tab | 切换玩家详情对象激活状态 |
-| TestController.Start：enemyBtn / activeBtn | 分别注册 CreateEnemy / CreateItem，创建位置与上述按键相同 |
+| TestController.Start：enemyBtn / activeBtn | 分别注册 CreateEnemy / CreateItem；点击时获取 Game 中已注册的 FactoryUISystem 实例，创建位置与上述按键相同 |
 
 Map 中存在 TestController 的脚本引用（GUID `42f2add30349522408099dbf10fc3742`）。按钮对应的完整层级与运行点击结果不由脚本字段名推断。
 
@@ -66,7 +71,8 @@ Map 中存在 TestController 的脚本引用（GUID `42f2add30349522408099dbf10f
 ## 未知项与验收状态
 
 - `UNKNOWN`：正式启动体验、输入设备与平台要求、调试按键是否属于产品功能。
-- `UNKNOWN`：各面板显示效果、生命周期重复调用的实际表现，以及全部场景组件的完备性。
-- 本页只确认文本调用与指定绑定；没有 GamePlayer PlayMode 通过记录。
+- `UNKNOWN`：第 3 阶段清单之外的面板交互与显示效果、生命周期调用组合，以及全部场景组件的完备性。第 4 阶段已完成两个面板和详情文本监听的静态生命周期接入，人工交互验收仍待主线程确认。
+- 第 2 阶段玩家状态与存储改动已有用户“实际行为和日志均已核对正确”的反馈，并由主线程结合代码、文档、资源静态检查判定该阶段通过；不扩展为全部场景或平台验收。
+- 第 3 阶段人工 GamePlayer 清单（初始化、生成/回收复用、失败项隔离、退出后重新进入 Map，以及实际行为和日志）已获用户“已确认正常”的反馈；主线程结合代码、资源、文档及引用留存静态验收，已判定该阶段通过。第 4 阶段 UI 刷新与释放代码已完成静态落地，详情使用效果和平台验证仍未覆盖。
 
 相关模块：[玩家](Player.md)、[背包与道具](Inventory.md)、[战斗](Combat.md)、[框架与工具](Framework.md)。

@@ -29,6 +29,9 @@ namespace Code_01
             {
             
             }
+            public struct InventoryChanged
+            {
+            }
             public const string PlayerAttack = "PlayerAttack";
             public const string UseGoods = "UseGoods";
         }

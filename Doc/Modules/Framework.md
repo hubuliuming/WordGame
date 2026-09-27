@@ -7,7 +7,7 @@
 | 范围 | 已核实入口 | 当前关系 |
 |---|---|---|
 | QFramework 架构 | [QFramework.cs](../../Assets/QFramework/Framework/Scripts/QFramework.cs) | Game 继承 Architecture；业务使用 IController、AbstractModel、AbstractSystem、AbstractCommand |
-| QFramework 事件 | 同上及 [Msg.cs](../../Assets/Scripts/Msg/Msg.cs) | 玩家详情使用架构类型事件；背包使用字符串全局事件，二者不是同一通道 |
+| QFramework 事件 | 同上及 [Msg.cs](../../Assets/Scripts/Msg/Msg.cs) | 玩家详情使用 UpdateShowData 类型事件；库存已发送 InventoryChanged 类型事件但展示未订阅；格子使用请求仍走字符串全局事件 |
 | 工程 UI | [UIBase.cs](../../Assets/Framework/UI/UIBase.cs) | UIBase 继承 YMonoBehaviour；同文件的 Framework.UI.UIManager 管理显示栈 |
 | YFramework Mono | [YMonoBehaviour.cs](../../Assets/YFramework/Framework/YMonoBehaviour.cs)、[MonoGlobal.cs](../../Assets/YFramework/Framework/MonoGlobal.cs) | 自定义 OnStart 接口与共享协程宿主；调用限制见下文 |
 | 程序集 | [YFramework.asmdef](../../Assets/YFramework/YFramework.asmdef)、[YFramework.Editor.asmdef](../../Assets/YFramework/Editor/YFramework.Editor.asmdef) | 编辑器程序集 includePlatforms 仅为 Editor；不能据目录名推断其他程序集依赖 |
@@ -17,7 +17,9 @@
 
 ## 【CURRENT STRATEGY】初始化与生命周期边界
 
-Architecture 首次访问 Interface 才创建对象；Game 的注册项、模型先于系统的初始化阶段归[运行入口](Runtime.md)。命令执行时由架构设置命令的 Architecture，再调用 Execute。
+Architecture 首次访问 Interface 才创建对象；Game 的注册项、模型先于系统的初始化阶段归[运行入口](Runtime.md)。命令执行时由架构设置命令的 Architecture，再调用 Execute。框架已有 AbstractCommand<TResult> 和 SendCommand<TResult>(ICommand<TResult>) 的同步返回值能力；UseItemCommand 使用 bool 结果，ItemBase 显式调用 SendCommand<bool> 决定是否回收。玩家存储以现有 IUtility 机制注册。
+
+FactoryUISystem 仍使用既有 AbstractSystem 注册入口，OnInit 不再查找场景对象。当前 AbstractSystem 只有 OnInit，没有 OnDeinit / Dispose；场景池绑定与结束清理由 MapCanvasControl 显式调用，系统本身按绑定引用隔离各次场景生命周期。具体实例登记和销毁边界归[资源与数据](DataResources.md)，未改动 QFramework。
 
 YMonoBehaviour 定义虚 OnAwake、抽象 OnStart、MonoSelf 与 IgnoreSelf，没有统一 Unity 生命周期调度。MonoGlobal.Instance 在首次获取时创建 GameObject 并挂载自身，Awake 调用 DontDestroyOnLoad。工具调用中出现 MonoGlobal 不代表主场景预先挂载了它。
 

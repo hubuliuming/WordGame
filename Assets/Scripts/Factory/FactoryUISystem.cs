@@ -19,115 +19,163 @@ namespace Code_01
 {
     public class FactoryUISystem : AbstractSystem
     {
-        private static Dictionary<string, ObjectPool<GameObject>> _pools = new Dictionary<string, ObjectPool<GameObject>>();
+        private readonly Dictionary<string, ObjectPool<GameObject>> _pools = new Dictionary<string, ObjectPool<GameObject>>();
+        private readonly Dictionary<GameObject, string> _instances = new Dictionary<GameObject, string>();
+        private readonly HashSet<GameObject> _borrowed = new HashSet<GameObject>();
+        private Transform _itemParent;
 
         protected override void OnInit()
         {
-            var itemParent = GameObject.Find("ItemParent").transform;
-            CreateItemPool(Msg.Prefab.活力苹果, Msg.ItemName.活力苹果, itemParent);
-            CreateEnemyPool(Msg.Prefab.野猪, Msg.EnemyName.野猪, itemParent);
+            // 架构初始化不访问场景；由 MapCanvasControl 显式绑定当前场景。
+        }
+
+        public void BindScene(Transform itemParent)
+        {
+            if (itemParent == null)
+                throw new ArgumentNullException(nameof(itemParent), "FactoryUISystem 绑定失败，缺少场景 ItemParent 引用。");
+
+            ClearPools();
+            _itemParent = itemParent;
+            CreatePool(Msg.Prefab.活力苹果, Msg.ItemName.活力苹果, itemParent,
+                go => go.GetComponent<IBaseLife>().Init(Msg.ItemName.活力苹果));
+            CreatePool(Msg.Prefab.野猪, Msg.EnemyName.野猪, itemParent,
+                go => go.GetComponent<IBaseLife>().Init(Msg.EnemyName.野猪),
+                go => go.GetComponent<EnemyBase>().InitData());
             CreatePool(Msg.Prefab.Goods, Msg.ItemName.Goods, itemParent);
         }
-        public static GameObject Get(string name)
+
+        public GameObject Get(string name)
         {
-            foreach (var objName in _pools.Keys)
+            if (_itemParent == null)
+                throw new InvalidOperationException("FactoryUISystem 借出失败，当前场景尚未绑定 ItemParent，池：" + name);
+            if (!_pools.TryGetValue(name, out var pool))
+                throw new InvalidOperationException("FactoryUISystem 未注册对象池：" + name);
+
+            return pool.Get();
+        }
+
+        public void Release(GameObject go)
+        {
+            if (!_instances.TryGetValue(go, out var objName))
             {
-                if (objName.Equals(name))
+                LogUtility.LogWarning("工厂对象池中不存在该物体:" + go.name);
+                return;
+            }
+            if (!_borrowed.Remove(go))
+                throw new InvalidOperationException("FactoryUISystem 不允许重复归还，池：" + objName);
+
+            try
+            {
+                _pools[objName].Release(go);
+            }
+            catch
+            {
+                DestroyInstance(go, objName);
+                throw;
+            }
+        }
+
+        public void Discard(GameObject go)
+        {
+            if (!_instances.TryGetValue(go, out var objName) || !_borrowed.Contains(go))
+                throw new InvalidOperationException("FactoryUISystem 只能销毁本系统当前借出的对象。");
+            DestroyInstance(go, objName);
+        }
+
+        public void ClearScene(Transform itemParent)
+        {
+            // 已销毁的 Unity 对象也保留引用身份，旧场景不能清理新场景的池。
+            if (!ReferenceEquals(_itemParent, itemParent)) return;
+            ClearPools();
+        }
+
+        private void CreatePool(string path, string objName, Transform parent,
+            Action<GameObject> onCreated = null, Action<GameObject> onGet = null)
+        {
+            _pools.Add(objName, new ObjectPool<GameObject>(
+                () => OnCreate(path, objName, parent, onCreated),
+                go => OnGet(go, objName, onGet),
+                go =>
                 {
-                    return _pools[objName].Get();
-                }
-            }
-
-            LogUtility.LogWarning("工厂未生产该游戏物体：" + name);
-            return null;
+                    go.SetActive(false);
+                    go.transform.SetParent(parent, false);
+                },
+                go => DestroyInstance(go, objName)));
         }
 
-        public static void Release(GameObject go)
+        private GameObject OnCreate(string path, string objName, Transform parent, Action<GameObject> onCreated)
         {
-            foreach (var objName in _pools.Keys)
+            GameObject go = null;
+            try
             {
-                if (objName.Equals(go.name))
-                {
-                    _pools[objName].Release(go);
-                    break;
-                }
+                var prefab = Resources.Load<GameObject>(path);
+                go = Object.Instantiate(prefab, parent);
+                go.name = objName;
+                onCreated?.Invoke(go);
+                _instances.Add(go, objName);
+                return go;
             }
-
-            LogUtility.LogWarning("工厂对象池中不存在该物体:" + go.name);
-        }
-
-        private void CreateEnemyPool(string path, string objName, Transform parent = null, Action<GameObject> onCreated = null)
-        {
-            if (!_pools.ContainsKey(objName))
+            catch
             {
-                ObjectPool<GameObject> pool = new ObjectPool<GameObject>(
-                    () =>
-                    {
-                        var go = OnCreate(path, objName, parent);
-                        go.GetComponent<IBaseLife>().Init(objName);
-                        return go;
-                    },
-                    go =>
-                    {
-                        go.SetActive(true);
-                        go.GetComponent<EnemyBase>().InitData();
-                    },
-                    OnRelease);
-                _pools.Add(objName, pool);
+                DestroyInstance(go, objName);
+                throw;
             }
         }
 
-        private void CreateItemPool(string path, string objName, Transform parent = null)
+        private void OnGet(GameObject go, string objName, Action<GameObject> onGet)
         {
-            if (!_pools.ContainsKey(objName))
+            try
             {
-                ObjectPool<GameObject> pool = new ObjectPool<GameObject>(
-                    () =>
-                    {
-                        var go = OnCreate(path, objName, parent);
-                        go.GetComponent<IBaseLife>().Init(objName);
-                        return go;
-                    },
-                    go => OnGet(go),
-                    OnRelease);
-                _pools.Add(objName, pool);
+                go.SetActive(true);
+                onGet?.Invoke(go);
+                _borrowed.Add(go);
             }
-        }
-
-        private void CreatePool(string path, string objName, Transform parent = null)
-        {
-            if (!_pools.ContainsKey(objName))
+            catch
             {
-                ObjectPool<GameObject> pool = new ObjectPool<GameObject>(
-                    () =>
-                        OnCreate(path, objName, parent),
-                    go => OnGet(go),
-                    OnRelease);
-                _pools.Add(objName, pool);
+                DestroyInstance(go, objName);
+                throw;
             }
         }
 
-        private GameObject OnCreate(string path, string itemName, Transform parent)
+        private void DestroyInstance(GameObject go, string objName)
         {
-            var prefab = Resources.Load<GameObject>(path);
-            var go = Object.Instantiate(prefab, parent);
-            go.name = itemName;
-            return go;
+            if (ReferenceEquals(go, null)) return;
+            _instances.Remove(go);
+            _borrowed.Remove(go);
+            DestroyObject(go, objName);
         }
 
-        private void OnGet(GameObject go)
+        private static void DestroyObject(GameObject go, string objName)
         {
-            go.SetActive(true);
+            // 场景卸载时子对象可能已先销毁；清理不依赖父子 OnDestroy 顺序。
+            if (go == null) return;
+            try
+            {
+                Object.Destroy(go);
+            }
+            catch (Exception exception)
+            {
+                LogUtility.LogError("FactoryUISystem 销毁失败，池：" + objName + "，原始异常：" + exception);
+            }
         }
 
-        private void OnRelease(GameObject go)
+        private void ClearPools()
         {
-            go.SetActive(false);
+            _itemParent = null;
+            foreach (var pool in _pools.Values)
+                pool.Clear();
+            _pools.Clear();
+
+            // Clear 只处理池内对象，剩余登记包含被背包改挂父节点的借出对象。
+            foreach (var instance in _instances)
+                DestroyObject(instance.Key, instance.Value);
+            _instances.Clear();
+            _borrowed.Clear();
         }
     }
 
     public static class FactoryExtensive
     {
-        public static void Release(this GameObject go) => FactoryUISystem.Release(go);
+        public static void Release(this GameObject go) => Game.Interface.GetSystem<FactoryUISystem>().Release(go);
     }
 }

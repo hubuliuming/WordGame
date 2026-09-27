@@ -6,25 +6,66 @@
     功能：Nothing
 *****************************************************/
 
+using System;
 using Framework.UI;
 using QFramework;
 using UnityEngine.UI;
-using NotImplementedException = System.NotImplementedException;
-
 
 namespace Code_01.Controller
 {
     public class DetailInform : UIBase
     {
         public string Inform;
+
+        private Text _showText;
+        private IUnRegister _useGoodsRegistration;
+        private bool _initialized;
+
         public override void OnStart()
         {
-            transform.Find("Text").GetComponent<Text>().text = Inform;
-            transform.Find("BtnUse").GetComponent<Button>().onClick.AddListener(()=>StringEventSystem.Global.Register<ItemBase.ItemData>(Msg.Register.UseGoods, o =>
+            if (_initialized)
             {
-                var itemData = (ItemBase.ItemData) o;
-                //player.ChangeAll(itemData);
-            }));
+                UpdateShow();
+                return;
+            }
+
+            try
+            {
+                _showText = transform.Find("Text").GetComponent<Text>();
+                if (_showText == null)
+                    throw new InvalidOperationException("DetailInform 初始化失败，缺少 Text 组件。");
+                _useGoodsRegistration = StringEventSystem.Global.Register<ItemData>(Msg.Register.UseGoods, OnUseGoods);
+                _initialized = true;
+                UpdateShow();
+            }
+            catch
+            {
+                Release();
+                throw;
+            }
+        }
+
+        public void UpdateShow()
+        {
+            _showText.text = Inform;
+        }
+
+        private void OnUseGoods(ItemData itemData)
+        {
+            // 详情使用链尚未接入，当前不应用物品效果或扣减库存。
+        }
+
+        public void Release()
+        {
+            _initialized = false;
+            _useGoodsRegistration?.UnRegister();
+            _useGoodsRegistration = null;
+            _showText = null;
+        }
+
+        private void OnDestroy()
+        {
+            Release();
         }
     }
 }

@@ -22,7 +22,7 @@ namespace Code_01.Editor
         private static int _Hp;
         private static int _tempHp;
 
-        public static EnemyBase.EnemyData enemyData;
+        public static EnemyData enemyData;
         
         internal new static void Show()
         {

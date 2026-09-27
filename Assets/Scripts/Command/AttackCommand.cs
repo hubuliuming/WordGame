@@ -19,59 +19,67 @@ namespace Code_01.Command
     {
         private PlayerModel _playerModel;
         private PlayerEventSystem _playerEventSystem;
-        private EnemyBase.EnemyData _data;
+        private EnemyData _data;
         private GameObject _curObj;
-        public AttackCommand(){}
+        public AttackCommand() { }
 
         public AttackCommand(GameObject obj)
         {
-            this._curObj = obj;
-            this._data = obj.GetComponent<EnemyBase>().data;
+            _curObj = obj;
+            _data = obj.GetComponent<EnemyBase>().data;
         }
 
         protected override void OnExecute()
         {
             _playerModel = this.GetModel<PlayerModel>();
             _playerEventSystem = this.GetSystem<PlayerEventSystem>();
-            if (!_playerEventSystem.EnableAttack())
+            if (!_playerEventSystem.EnableAttack(_data.CostPower))
             {
                 Debug.Log("玩家已经死亡或者体力不足");
                 return;
             }
-            _playerEventSystem.ChangePower(-_data.CostPower);
-            AttackPlayer();
-            Debug.Log("战斗结果:" + AttackResult());
-            //死亡奖励
-            if (AttackResult())
+
+            var playerHp = AttackPlayer();
+            var won = AttackResult();
+            var changes = new ItemData
             {
-                WinAward();
+                changePower = -_data.CostPower,
+                changeHp = Mathf.Max(0, playerHp) - _playerModel.Hp
+            };
+            Dictionary<string, int> goods = null;
+            if (won)
+            {
+                if (string.IsNullOrEmpty(_data.award.GoodsName))
+                {
+                    LogUtility.LogError("战斗结算失败，敌人：" + _curObj.name + "，掉落物品名为空。");
+                    return;
+                }
+                changes.changeExp = _data.award.Exp;
+                changes.changeCoin = _data.award.Coin;
+                // 沿用现有掉落公式；与体力、HP、经验、金币一起提交。
+                goods = DropSystem.GetRangeGoods(_data.award.GoodsName, 1, 3);
+            }
+            if (!_playerEventSystem.ChangeAll(changes, goods)) return;
+
+            Debug.Log("战斗结果:" + won);
+            if (won)
+            {
+                foreach (var goodsItem in goods)
+                    Debug.Log("战利品为经验值:" + _data.award.Exp + ",金币:" + _data.award.Coin +
+                              ",物品为:" + goodsItem.Value + "个" + goodsItem.Key);
                 _curObj.Release();
             }
         }
-    
-        private void WinAward()
-        {
-            Dictionary<string, int> goodsDic= new Dictionary<string, int>();
-            _playerEventSystem.ChangeExp(_data.award.Exp);
-            _playerEventSystem.ChangeCoin(_data.award.Coin);
-            //todo 数值要优化为配置
-            goodsDic = DropSystem.GetRangeGoods(_data.award.GoodsName,1,3);
-            foreach (var i in goodsDic)
-            {
-                _playerEventSystem.ChangeGoodsDic(i.Key,i.Value);
-                Debug.Log("战利品为经验值:"+_data.award.Exp+",金币:"+_data.award.Coin+",物品为:"+i.Value+"个"+i.Key);
-            }
-        }
-    
-        private void AttackPlayer()
+
+        private int AttackPlayer()
         {
             int playerHp = _playerModel.Hp;
             while (_data.HP > 0 && playerHp > 0)
             {
-                //玩家先手
+                // 玩家先手；保留每轮双方都执行攻击的现有规则。
                 if (_playerModel.Speed >= _data.Speed)
                 {
-                    _data.HP -= AttackMath.AttackValue(_playerModel.Attack, _data.Defence); 
+                    _data.HP -= AttackMath.AttackValue(_playerModel.Attack, _data.Defence);
                     playerHp -= AttackMath.AttackValue(_data.Attack, _playerModel.Defence);
                 }
                 else
@@ -80,14 +88,12 @@ namespace Code_01.Command
                     _data.HP -= AttackMath.AttackValue(_playerModel.Attack, _data.Defence);
                 }
             }
-            //当前的HP - 计算战斗后剩余的playerHP，得到改变的HP
-            _playerEventSystem.ChangeHp(-(_playerModel.Hp - playerHp));
+            return playerHp;
         }
+
         private bool AttackResult()
         {
-            if (_data.HP <= 0)
-                return true;
-            return false;
+            return _data.HP <= 0;
         }
     }
 }

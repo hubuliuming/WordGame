@@ -14,16 +14,30 @@ namespace Code_01.Controller
 
         public PlayerDetailsControl PlayerDetails;
         public KnapsackControl KnapsackControl;
+        public Transform ItemParent;
+
+        private FactoryUISystem _factoryUISystem;
+        private bool _initialized;
 
         #endregion
         
         private void Start()
         {
-            //WriteItemJson();
-            //WriteEnemyJson();
-
-            PlayerDetails.OnStart();
-            KnapsackControl.OnStart();
+            var architecture = GetArchitecture();
+            _factoryUISystem = architecture.GetSystem<FactoryUISystem>();
+            try
+            {
+                _factoryUISystem.BindScene(ItemParent);
+                PlayerDetails.OnStart();
+                KnapsackControl.OnStart();
+                _initialized = true;
+            }
+            catch
+            {
+                ReleasePanels();
+                _factoryUISystem.ClearScene(ItemParent);
+                throw;
+            }
         }
 
         public override void OnStart()
@@ -33,6 +47,7 @@ namespace Code_01.Controller
 
         private void Update()
         {
+            if (!_initialized) return;
             // test
             if (Input.GetKeyDown(KeyCode.E))
             {
@@ -60,17 +75,33 @@ namespace Code_01.Controller
 
         private void CreateEnemy()
         {
-            var go = FactoryUISystem.Get(Msg.EnemyName.野猪);
+            var go = _factoryUISystem.Get(Msg.EnemyName.野猪);
             go.transform.localPosition = Vector3.zero;
         }
 
         private void CreateItem()
         {
-            var go = FactoryUISystem.Get(Msg.ItemName.活力苹果);
+            var go = _factoryUISystem.Get(Msg.ItemName.活力苹果);
             go.transform.localPosition = new Vector3(300, 0, 0);
         }
 
         #endregion
+
+        private void OnDestroy()
+        {
+            _initialized = false;
+            ReleasePanels();
+            // Start 未完成架构获取时，尚无本场景的池需要清理。
+            if (_factoryUISystem != null)
+                _factoryUISystem.ClearScene(ItemParent);
+        }
+
+        private void ReleasePanels()
+        {
+            // 先释放面板持有的监听与格子；面板自身 OnDestroy 重复调用也安全。
+            if (!ReferenceEquals(KnapsackControl, null)) KnapsackControl.Release();
+            if (!ReferenceEquals(PlayerDetails, null)) PlayerDetails.Release();
+        }
 
         public IArchitecture GetArchitecture()
         {

@@ -43,7 +43,7 @@
 ## 【FACT】全局确认事实
 
 - [构建场景列表](../ProjectSettings/EditorBuildSettings.asset)只含启用的 `Assets/Scenes/Map.unity`。这不等同于已确认发布平台或全部场景用途。
-- [Game.cs](../Assets/Scripts/Game.cs)继承 QFramework 的 `Architecture<Game>`，注册玩家/物品模型、日志工具、对象池与玩家事件系统。实际启动与注册阶段见[运行入口](Modules/Runtime.md)。
+- [Game.cs](../Assets/Scripts/Game.cs)继承 QFramework 的 `Architecture<Game>`，注册玩家/物品模型、玩家存储与日志工具、对象池与玩家事件系统。实际启动与注册阶段见[运行入口](Modules/Runtime.md)。
 - 已核实的玩家数据链使用本地 JSON；HTTP 与 protobuf 工具的存在不证明本游戏具有登录、联网存档或后端结算。网络边界见[框架与工具](Modules/Framework.md)。
 - [manifest.json](../Packages/manifest.json)声明了 UGUI、2D、AI Navigation 等包；包声明不能证明具体能力已经在主流程使用。
 
@@ -51,6 +51,9 @@
 
 - `UNKNOWN`：正式玩法目标、发布平台、完整产品流程与数值设计意图。
 - `UNKNOWN`：SampleScene、DataSetting 的产品用途，以及尚未逐项核实的场景和资源绑定。
-- `UNKNOWN`：当前工程编译、GamePlayer PlayMode、平台构建和服务器联调结果。本次文档初始化未执行这些操作。
+- 第 2 阶段玩家状态与存储改动已有用户“实际行为和日志均已核对正确”的反馈，主线程结合代码、文档、资源静态检查判定该阶段通过；不表示 AI 执行过测试或构建，也不扩展为完整平台验收。
+- `UNKNOWN`：后续阶段的运行结果，以及完整工程编译、平台构建和服务器联调结果。
+- 第 3 阶段 MapCanvasControl.ItemParent 已在 Map 场景文本中绑定现有 ItemParent；用户针对该阶段人工 GamePlayer 清单反馈“已确认正常”，主线程结合既有静态验收判定该阶段通过，范围见[运行入口](Modules/Runtime.md)。
+- 第 4 阶段 KnapsackControl、PlayerDetailsControl、DetailInform 已完成事件订阅、刷新与释放代码的静态落地；人工 GamePlayer 交互验收、详情使用效果及完整工程编译仍未完成。
 - 资源核实依据为 Scene / Prefab / meta 的文本；没有读取图片、纹理或截图内容。
 - `CodeRule.md` 标题为“Cocos 代码规范”，真实工程配置为 Unity；保留原规则，标题的引擎适用意图为 `UNKNOWN`，不能据此改变工程身份或擅改规范。

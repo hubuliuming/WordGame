@@ -21,9 +21,9 @@ namespace Code_01.Editor
         [UnityEditor.MenuItem("Tools/重写写入ItemJson")]
         private static void WriteItemJson()
         {
-            Dictionary<string,ItemBase.ItemData> datas = new Dictionary<string,ItemBase.ItemData>
+            Dictionary<string,ItemData> datas = new Dictionary<string,ItemData>
             {
-                {Msg.ItemName.馒头,new ItemBase.ItemData()
+                {Msg.ItemName.馒头,new ItemData()
                 {
                     changeAttack = 0,
                     changeCoin = 0,
@@ -32,7 +32,7 @@ namespace Code_01.Editor
                     changePower = 20,
                     changeSpeed = 0
                 }},
-                {Msg.ItemName.活力苹果,new ItemBase.ItemData()
+                {Msg.ItemName.活力苹果,new ItemData()
                 {
                     changeAttack = 0,
                     changeCoin = 0,
@@ -49,17 +49,17 @@ namespace Code_01.Editor
         [UnityEditor.MenuItem("Tools/重写写入EnemyJson")]
         private static void WriteEnemyJson()
         {
-            Dictionary<string, EnemyBase.EnemyData> datas = new Dictionary<string, EnemyBase.EnemyData>()
+            Dictionary<string, EnemyData> datas = new Dictionary<string, EnemyData>()
             {
                 {
-                    Msg.EnemyName.野猪, new EnemyBase.EnemyData()
+                    Msg.EnemyName.野猪, new EnemyData()
                     {
                         HP = 100,
                         Attack = 10,
                         Defence = 3,
                         Speed = 5,
                         CostPower = 10,
-                        award = new EnemyBase.EnemyData.Award()
+                        award = new EnemyData.Award()
                         {
                             Exp = 10,
                             Coin = 20,

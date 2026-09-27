@@ -8,21 +8,22 @@
 
 using Code_01.System;
 using QFramework;
-using YFramework;
 
 namespace Code_01.Command
 {
-    public class UseItemCommand : AbstractCommand
+    public class UseItemCommand : AbstractCommand<bool>
     {
-        private ItemBase.ItemData _data;
-        public UseItemCommand(){}
-        public UseItemCommand(ItemBase.ItemData data)
+        private ItemData _data;
+        public UseItemCommand() { }
+
+        public UseItemCommand(ItemData data)
         {
-            this._data = data;
+            _data = data;
         }
-        protected override void OnExecute()
+
+        protected override bool OnExecute()
         {
-            this.GetSystem<PlayerEventSystem>().ChangeAll(_data);
+            return this.GetSystem<PlayerEventSystem>().ChangeAll(_data);
         }
     }
 }

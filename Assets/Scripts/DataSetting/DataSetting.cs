@@ -13,6 +13,6 @@ namespace Code_01
 {
     public class DataSetting : MonoBehaviour
     {
-        public EnemyBase.EnemyData data;
+        public EnemyData data;
     }
 }

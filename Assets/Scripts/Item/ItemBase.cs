@@ -22,33 +22,16 @@ public interface IItem
 }
 public class ItemBase : UIBase,IController,IBaseLife
 {
-    [Serializable]
-    public struct ItemData
-    {
-        public int changeHp;
-        public int changePower;
-        public int changeLevel;
-        public long changeExp;
-        public int changeAttack;
-        public int changeDefence;
-        public int changeSpeed;
-        public int changeCoin;
-        
-        public int changeUpperHp;
-        public int changeUpperPower;
-        public int changeUpperAttack;
-        public int changeUpperDefence;
-        public int changeUpperSpeed;
-    }
-    
     public void Init(string itemName)
     {
          var datas = JsonUti.ReadFromJson<Dictionary<string,ItemData>>(MsgPaths.Config.RecoverItem);
          var data = datas[itemName];
          transform.Find("Btn").GetComponent<Button>().onClick.AddListener(() =>
          {
-             this.SendCommand(new UseItemCommand(data));
-             gameObject.Release();
+             if (this.SendCommand<bool>(new UseItemCommand(data)))
+             {
+                 gameObject.Release();
+             }
          });
     }
 

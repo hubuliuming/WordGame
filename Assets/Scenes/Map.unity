@@ -748,6 +748,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PlayerDetails: {fileID: 236714923}
   KnapsackControl: {fileID: 1772732472}
+  ItemParent: {fileID: 1747035444}
 --- !u!1 &290818357
 GameObject:
   m_ObjectHideFlags: 0

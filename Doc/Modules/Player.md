@@ -67,6 +67,10 @@ ChangeAll 先得到本次最终上限，再据其约束本次有非零增量的�
 
 ## 未知项与验收状态
 
+## 【FACT】第 1 阶段玩家控制切片
+
+`CombatPrototypePlayerController` 是独立的 3D 测试入口，要求同一对象挂载 `CharacterController`，并通过序列化 `cameraTransform` 获取相机水平朝向；WASD 移动、旋转和重力仅作用于该测试对象，不改变现有 `PlayerModel`、`PlayerControl` 或存档调用链。
+
 `UNKNOWN`：等级上限的产品要求、正式初始数据及后续存档迁移策略。金币赋值、Hp 增量判定、体力存量标记和普通库存边界已按确认规则改写。第 2 阶段已有主线程通过结论；第 4 阶段 UI 生命周期与刷新已完成静态落地，人工 GamePlayer 交互验收仍待主线程确认。
 
 相关模块：[运行入口](Runtime.md)、[战斗](Combat.md)、[背包与道具](Inventory.md)。

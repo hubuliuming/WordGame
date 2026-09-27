@@ -14,6 +14,16 @@
 | [UIBase.cs](../../Assets/Framework/UI/UIBase.cs) | 工程 UI 基类与 UIManager |
 | [YMonoBehaviour.cs](../../Assets/YFramework/Framework/YMonoBehaviour.cs) | 自定义 OnAwake / OnStart 声明 |
 
+## 【FACT】第 0 阶段网络与运行时基础核对
+
+项目当前 Unity 版本为 `6000.5.6f1`。已核对相关包：Input System `1.20.0`；Entities、Entities Graphics、Unity Physics、Netcode for Entities 与 Transport `6.5.0`；Cinemachine `3.1.7`；AI Navigation `2.0.14`；Burst `1.8.29`；Collections `6.5.0`；Mathematics `1.4.0`。
+
+当前 `Assets/Scripts`、`Assets/Test` 和工程程序集未发现 NetCode World、`ClientServerBootstrap`、网络流请求或网络实体同步入口；`com.unity.multiplayer.center` 仅表示包已安装，不代表联机运行链已接入。第 0 阶段未新增网络启动脚本，也未修改 Scene/Prefab/Animator；可运行网络生命周期需要明确启动场景和 World 管理边界后再接入。
+
+当前渲染配置仍为 Built-in：`ProjectSettings/GraphicsSettings.asset` 的 `m_CustomRenderPipeline` 为零引用，QualitySettings 各档 `customRenderPipeline` 也为零引用。项目未检出 Universal Render Pipeline 包或资源引用，URP 切换保留为后续独立步骤。
+
+当前 Packages 清单未包含 Addressables，`Assets` 内也未发现 Addressables 设置资源或运行时调用；现有资源加载边界仍由既有 QFramework/Resources 链维护，迁移不属于本阶段。
+
 ## 【FACT】场景绑定
 
 Map 的 `MapCanvas` 对象为激活状态，挂载 `MapCanvasControl`。以下为 Scene 文本与对应脚本 meta 核对结果：
@@ -69,6 +79,16 @@ Map 中存在 TestController 的脚本引用（GUID `42f2add30349522408099dbf10f
 - [ShowTime.cs](../../Assets/Scripts/ShowTime.cs)在 Update 中写入格式为 `hh:HH:mm:ss` 的当前时间；字段绑定和使用场景未验收。
 
 ## 未知项与验收状态
+
+## 【FACT】第 1 阶段战斗切片入口
+
+新增 `Assets/Scripts/CombatPrototype/` 独立切片脚本：`CombatPrototypePlayerController` 使用 Input System 读取 WASD 并按相机水平朝向移动；`CombatPrototypeOrbitCamera` 提供本地鼠标右键自由旋转和跟随目标；`CombatPrototypeMeleeAttack` 提供鼠标左键/空格触发的前摇、命中、后摇链；`CombatPrototypeHealth` 提供基础生命、受击和死亡停用。脚本不接入 MapCanvas、现有 UGUI 敌人池、ECS 或网络同步。
+
+新增独立场景 `Assets/Scenes/CombatPrototypeScene.unity`：Player 挂载 CharacterController、PlayerController、MeleeAttack、Health；Enemy 位于 Layer 6，挂载 Health 与 CapsuleCollider；Player 的 targetMask 序列化为 Layer 6 位掩码。场景包含 Main Camera/CinemachineBrain、Cinemachine 3.1.7 `CinemachineCamera` 与 `CinemachineThirdPersonFollow`，其 `Target.TrackingTarget` 和 `Target.LookAtTarget` 均绑定 Player Transform；OrbitCameraInput 的 `followTarget` 绑定 Player，`cameraTransform` 绑定 CinemachineCamera Transform。
+
+## 【KNOWN ISSUES】第 1 阶段切片
+
+独立场景绑定已写入 YAML，仍需主线程在 Unity 编辑器打开场景并进行人工 GamePlayer 验收；当前未修改正式 Map 场景、Prefab 或 Animator。该场景未加入正式构建列表。
 
 - `UNKNOWN`：正式启动体验、输入设备与平台要求、调试按键是否属于产品功能。
 - `UNKNOWN`：第 3 阶段清单之外的面板交互与显示效果、生命周期调用组合，以及全部场景组件的完备性。第 4 阶段已完成两个面板和详情文本监听的静态生命周期接入，人工交互验收仍待主线程确认。

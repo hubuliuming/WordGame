@@ -54,4 +54,12 @@ ChangeAll 对完整操作先校验再应用，保存一次；失败不留下局�
 
 ## 未知项与验收状态
 
+## 【FACT】第 1 阶段实时战斗切片
+
+`CombatPrototypeMeleeAttack` 已落地最小实时动作链：输入后进入 Startup，计时结束执行一次 `Physics.OverlapSphereNonAlloc` 扇形过滤并调用 `CombatPrototypeHealth.ApplyDamage`，随后进入 Active/Recovery，完成后回到 Ready。`CombatPrototypeHealth` 负责当前生命、死亡判定和对象停用；该切片不修改 `AttackCommand` 的既有同步结算。
+
+## 【CURRENT STRATEGY】第 1 阶段边界
+
+先以独立 GameObject 组件验证单玩家、单敌人的近战手感；攻击数值由组件序列化字段提供，未接入 PlayerModel、奖励、掉落、ECS 或多人权威结算。
+
 `UNKNOWN`：先手致死后的反击规则、同时死亡的正式胜负规则、战斗失败处置、数值平衡与奖励设计意图。体力成本不得超过当前体力已按用户规则接入，循环先后手与失败敌人状态语义保持现状。第 2 阶段经主线程结合静态检查与用户反馈已通过；第 3 阶段敌人借出、重置、归还与场景清理已有用户正常反馈，主线程已判定该阶段通过，验收边界见[运行入口](Runtime.md)。AI 未运行逻辑单元测试或人工 PlayMode。

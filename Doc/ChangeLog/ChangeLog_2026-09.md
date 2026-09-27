@@ -155,3 +155,15 @@
 - KnapsackControl 缓存已注册 FactoryUISystem，订阅 InventoryChanged；库存变化时清理并归还旧格子，按 Coin/零值/负值规则和 99 上限重建格子，恢复或扩展 Content 高度；单格失败隔离并记录后继续。
 - PlayerDetailsControl 订阅 UpdateShowData，重复 OnStart 只刷新不重复注册；DetailInform 维护 UseGoods 监听，当前回调仍不应用物品效果；三个面板及 MapCanvas 销毁路径均注销监听并释放对象池格子。
 - 同步 Inventory、Player、Runtime、AI_Understanding 文档中的当前事实与已知边界。仅完成静态核对，未运行逻辑单元测试、命令行构建或人工 GamePlayer PlayMode；第 4 阶段交回主线程验收。
+## 2026-09-27：第 0 阶段网络与运行时基础核对
+
+- 按已确认的合作 PvE 第 0 阶段范围核对 Unity `6000.5.6f1` 及现有包：Input System `1.20.0`、Netcode for Entities/Transport `6.5.0`、Entities/Entities Graphics/Unity Physics `6.5.0`、Cinemachine `3.1.7`、AI Navigation `2.0.14`、Burst `1.8.29`、Collections `6.5.0`、Mathematics `1.4.0`。
+- 核实当前未发现 NetCode World、`ClientServerBootstrap`、网络流请求或网络实体同步入口；未新增网络启动脚本。建立可运行网络生命周期仍需明确启动场景与 World 管理边界，不能在本阶段以未接入的空入口替代。
+- 核实当前渲染配置为 Built-in（Graphics/Quality 的自定义渲染管线均为空）；Packages 未包含 Addressables，Assets 未发现 Addressables 设置或调用。未修改 Packages、Scene、Prefab、Animator、资源、meta 或构建配置。
+- 本阶段仅更新事实文档，未运行逻辑单元测试、GamePlayer PlayMode、命令行构建或平台发布；网络联调、URP 切换、Addressables 迁移保留后续阶段。
+## 2026-09-27
+
+- 【FACT】新增独立 `CombatPrototype` 组件，覆盖相机跟随/旋转、相机相对移动、单次近战前摇/命中/后摇、基础生命与死亡停用。
+- 【CURRENT STRATEGY】第 1 阶段仅用于独立测试场景，不接入正式 Map、UGUI 敌人、ECS、网络、奖励或存档。
+- 【KNOWN ISSUES】测试场景中的 Inspector 绑定与 Cinemachine Follow/LookAt 仍需主线程在 Unity 编辑器中配置并进行人工 GamePlayer 验收。
+- 【FACT】新增独立 `CombatPrototypeScene.unity`，完成玩家/敌人组件、Layer 6 targetMask、CinemachineBrain、CinemachineCamera Target 和 ThirdPersonFollow 的序列化绑定；场景未加入正式构建列表。

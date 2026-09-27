@@ -44,7 +44,7 @@ YMonoBehaviour 定义虚 OnAwake、抽象 OnStart、MonoSelf 与 IgnoreSelf，�
 - [ProtoSerializer.cs](../../Assets/YFramework/Network/Protocol/ProtoSerializer.cs)按消息类型注册编码/解码委托，缺少注册时抛错；packet 编解码可替换。默认编码只返回 body 的副本，默认解码产生 cmd=0 的 packet。
 - [ProtoWireCodec.cs](../../Assets/YFramework/Network/Protocol/ProtoWireCodec.cs)提供 protobuf wire 层读写与跳过字段能力；不能据此推断全部业务协议都已注册。
 
-在 `Assets/Scripts`、`Assets/Framework`、`Assets/Test` 的文本检索范围内，未检出 HttpService、ProtoSerializer 的引用。当前已核实玩家链是本地 JSON；后端地址、登录/token 接入、业务消息类型及网络模型同步均为 `UNKNOWN`。
+在 `Assets/Scripts`、`Assets/Framework`、`Assets/Test` 的文本检索范围内，未检出 HttpService、ProtoSerializer 的引用。当前已核实玩家链是本地 JSON；后端地址、登录/token 接入、业务消息类型及网络模型同步均为 `UNKNOWN`。网络实体包安装版本和当前未接入边界归[运行入口](Runtime.md)记录。
 
 已有 [Unity 前端后端协议格式说明](../../Assets/YFramework/Network/Http/UnityBackendProtocolGuide.md)自述为可复用接入口径与示例。协议参考继续归该文档；其中登录、关卡、资源回写示例不能当作本游戏已实现的业务，也没有据此新增协议专题或后端模块。
 
@@ -55,6 +55,10 @@ YMonoBehaviour 定义虚 OnAwake、抽象 OnStart、MonoSelf 与 IgnoreSelf，�
 `Assets/YFramework/Network/LegacySocket/`、`Math/`、`Collections/`、`Extension/`、`Components/` 及 YTools 的其他目录已定位，但不在本页展开完整语义。历史版本说明与 DevTarget 不用于证明当前能力。第三方 QFramework 工具、DOTween 以及其他插件不作全量审计。
 
 ## 未知项与验收状态
+
+## 【FACT】第 1 阶段切片框架边界
+
+战斗切片脚本位于 `Assets/Scripts/CombatPrototype/`，使用 Unity Input System 与 Physics 基础 API，不新增 QFramework 注册项、网络 World、ECS 系统或资源加载入口；现有框架初始化、UI 生命周期和存档边界保持不变。
 
 `UNKNOWN`：全部插件/程序集在当前 Unity 版本的编译兼容性、工具在所有场景中的挂载情况、网络联调结果和自动绑定的全路径行为。框架导航没有运行测试或构建，也没有实际访问后端。
 

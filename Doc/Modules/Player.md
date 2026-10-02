@@ -71,6 +71,36 @@ ChangeAll 先得到本次最终上限，再据其约束本次有非零增量的�
 
 `CombatPrototypePlayerController` 是独立的 3D 测试入口，要求同一对象挂载 `CharacterController`，并通过序列化 `cameraTransform` 获取相机水平朝向；WASD 移动、旋转和重力仅作用于该测试对象，不改变现有 `PlayerModel`、`PlayerControl` 或存档调用链。
 
-`UNKNOWN`：等级上限的产品要求、正式初始数据及后续存档迁移策略。金币赋值、Hp 增量判定、体力存量标记和普通库存边界已按确认规则改写。第 2 阶段已有主线程通过结论；第 4 阶段 UI 生命周期与刷新已完成静态落地，人工 GamePlayer 交互验收仍待主线程确认。
+`UNKNOWN`：等级上限的产品要求、正式初始数据及后续存档迁移策略。金币赋值、Hp 增量判定、体力存量标记和普通库存边界已按确认规则改写。第 1 阶段独立玩家控制切片已获用户人工 GamePlayer 验收确认，结论不扩展到正式玩家链。第 2 阶段已有主线程通过结论；第 4 阶段 UI 生命周期与刷新已完成静态落地，人工 GamePlayer 交互验收仍待主线程确认。
+
+## 【FACT】第 2B 阶段玩家网络链
+
+`CombatPrototypePlayerNetCodeAuthoring` 为玩家 Ghost 烘焙速度 `5`、`CombatPrototypePlayerInput` 和近战数据；NetCode 为 `IInputComponentData` 生成输入缓冲。服务端握手后设置 `GhostOwner.NetworkId`、启用 `AutoCommandTarget`，并把连接 `CommandTarget` 指向玩家；玩家加入连接 `LinkedEntityGroup`，跟随断线销毁。
+
+玩家 Ghost 使用 `OwnerPredicted`：本地拥有者预测，其他客户端插值。`CombatPrototypePlayerInputSystem` 只给 `GhostOwnerIsLocal` 写入 WASD 世界 X/Z 移动，以及空格/鼠标左键 `InputEvent` 攻击事件。`CombatPrototypePlayerMovementSystem` 在 Client/Server 预测组中只处理带 `Simulate` 的实体，以相同输入更新 LocalTransform；移动输入拒绝非有限值并限制长度，旋转直接设置当前移动朝向。网络玩家不接第 1 阶段 CharacterController 的相机相对移动、重力或碰撞链。
+
+## 【KNOWN ISSUES】第 2B 阶段玩家验收
+
+玩家 Ghost、输入缓冲与预测组件已通过 Editor 烘焙数据核对；用户已确认本阶段人工 GamePlayer 验收通过，主线程结合静态检查与用户反馈判定第 2B 阶段通过。玩家验收仅覆盖当前独立网络原型的两个玩家加入/退出、移动与朝向同步及本地输入预测，不扩展为正式 Map、平台构建、大规模性能或线上联调验收。正式 PlayerModel、PlayerDataStore、属性与存档调用链未接入该独立原型；AI 未执行逻辑单元测试、PlayMode 或构建。
 
 相关模块：[运行入口](Runtime.md)、[战斗](Combat.md)、[背包与道具](Inventory.md)。
+
+## 【FACT】第 3A 阶段玩家与敌人目标关系
+
+群体敌人的目标入口复用当前在线连接的 CommandTarget.targetEntity，只接受已进入游戏且连接状态为 Connected 的有效玩家；目标选择读取服务端玩家移动后的 X/Z 位置。断线连接不会继续作为追踪候选，无候选时敌人停止。玩家 Ghost、移动速度、输入、预测和近战时序参数保持原值；近战命中改由空间查询生成各敌人的伤害事件，详见[战斗](Combat.md)。
+
+## 【KNOWN ISSUES】第 3A 阶段玩家关联验收
+
+用户已确认第 3A 人工 GamePlayer 验收通过，主线程结合静态检查与用户反馈判定第 3A 阶段通过。玩家关联验收仅覆盖当前独立网络原型的玩家加入/退出、最近在线目标切换、无在线玩家时停止追踪及群体近战关联行为；群体近战每目标去重、伤害 25 及双端状态一致性的验收边界见[战斗](Combat.md)。第 2B 玩家验收结论保持原范围，本次第 3A 通过结论不扩展为正式 Map、平台构建、大规模性能或线上联调验收。AI 未执行逻辑单元测试、PlayMode 或构建。
+
+## 【FACT】第 4A 阶段网络玩家体力
+
+每个网络玩家 Ghost 独立持有 `CombatPrototypePlayerResource`，整数 `CurrentPower` 与 `UpperPower` 均为 `GhostField`。现有 `CombatPrototypePlayerNetCodeAuthoring.Baker` 从玩家 Prefab 的 `InitialPower=100`、`UpperPower=100` 烘焙当前值与上限，并把 `AttackPowerCost=10` 写入近战配置；配置边界统一检查 `0 <= InitialPower <= UpperPower`、成本非负，不修正非法配置。
+
+## 【CURRENT STRATEGY】第 4A 阶段体力生命周期
+
+体力由服务端近战系统在成功启动攻击时扣除，客户端只接收 Ghost 状态并记录日志，不做本地扣费或体力预测。具体接受、拒绝与时序规则见[战斗](Combat.md)。没有自动恢复；连接销毁时沿原 LinkedEntityGroup 销毁玩家，重新加入沿原 GoInGame 握手生成新玩家，从烘焙初值 100 开始。网络体力不接入正式 `Game`、`PlayerModel`、`PlayerDataStore`，没有账号、奖励、背包或存档链。
+
+## 【KNOWN ISSUES】第 4A 阶段玩家验收
+
+新组件与字段已由 Unity 编译并确认类型加载，玩家 Prefab 参数及实际 SubScene 烘焙中的体力 100/100、成本 10 已静态核对。`UNKNOWN`：人工 GamePlayer 的双玩家体力独立性、双端同步、空挥扣费、攻击期间重复输入、耗尽拒绝、不自动恢复及断线重新加入初值。第 2B、第 3A 与第 3B 的既有人工通过结论不包含第 4A；AI 未运行逻辑单元测试、PlayMode、命令行构建、发布或图片检查。

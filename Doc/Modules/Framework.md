@@ -44,7 +44,7 @@ YMonoBehaviour 定义虚 OnAwake、抽象 OnStart、MonoSelf 与 IgnoreSelf，�
 - [ProtoSerializer.cs](../../Assets/YFramework/Network/Protocol/ProtoSerializer.cs)按消息类型注册编码/解码委托，缺少注册时抛错；packet 编解码可替换。默认编码只返回 body 的副本，默认解码产生 cmd=0 的 packet。
 - [ProtoWireCodec.cs](../../Assets/YFramework/Network/Protocol/ProtoWireCodec.cs)提供 protobuf wire 层读写与跳过字段能力；不能据此推断全部业务协议都已注册。
 
-在 `Assets/Scripts`、`Assets/Framework`、`Assets/Test` 的文本检索范围内，未检出 HttpService、ProtoSerializer 的引用。当前已核实玩家链是本地 JSON；后端地址、登录/token 接入、业务消息类型及网络模型同步均为 `UNKNOWN`。网络实体包安装版本和当前未接入边界归[运行入口](Runtime.md)记录。
+在 `Assets/Scripts`、`Assets/Framework`、`Assets/Test` 的文本检索范围内，未检出 HttpService、ProtoSerializer 的引用。当前已核实玩家链是本地 JSON；后端地址、登录/token 接入、业务消息类型及网络模型同步均为 `UNKNOWN`。网络实体包安装版本和独立原型接入边界归[运行入口](Runtime.md)记录。
 
 已有 [Unity 前端后端协议格式说明](../../Assets/YFramework/Network/Http/UnityBackendProtocolGuide.md)自述为可复用接入口径与示例。协议参考继续归该文档；其中登录、关卡、资源回写示例不能当作本游戏已实现的业务，也没有据此新增协议专题或后端模块。
 
@@ -62,4 +62,46 @@ YMonoBehaviour 定义虚 OnAwake、抽象 OnStart、MonoSelf 与 IgnoreSelf，�
 
 `UNKNOWN`：全部插件/程序集在当前 Unity 版本的编译兼容性、工具在所有场景中的挂载情况、网络联调结果和自动绑定的全路径行为。框架导航没有运行测试或构建，也没有实际访问后端。
 
+## 【FACT】第 2B / 第 3A 阶段 NetCode 接入边界
+
+`Assets/Scripts/CombatPrototype/Networking/` 使用 Netcode for Entities 6.5.0 官方生命周期、Ghost 和输入 API。`ClientServerBootstrap` 配合独立主场景 `OverrideAutomaticNetcodeBootstrap` 标记控制网络 World；未启用标记时创建本地 World。`GoInGame` RPC 统一负责玩家生成与连接绑定，`LinkedEntityGroup` 管理断线销毁，`IInputComponentData`/`InputEvent`、`AutoCommandTarget`、`GhostOwnerIsLocal` 与 `Simulate` 组成输入及预测链。
+
+Authoring/Baker、预测玩家移动、敌人批量生成、敌人目标选择与移动、空间索引、服务端近战、伤害事件结算、状态日志、玩家 Mono 表现和敌人实体显示系统按职责分开。两个 Ghost Prefab 由唯一 SubScene Spawner 显式引用；玩家通过官方 `GhostPresentationGameObjectAuthoring`、`GhostPresentationGameObjectEntityOwner` 与 Transform 同步系统接入 GameObject 表现，敌人通过 Entities Graphics 显示，当前渲染配置见[运行入口](Runtime.md)。旧 EnemyView 资产和脚本保留，敌人 Ghost 已清空 ClientPrefab；新的显示系统只读同步死亡标记，不承担伤害结算。
+
+该目录不注册到 QFramework Game 架构，不修改正式 Map/第 1 阶段入口、UI 或存档；渲染管线配置由本页第 3B-1 节界定。代码编译和 Editor 烘焙已核对；用户已确认第 2B 阶段人工 GamePlayer 验收通过，主线程结合静态检查与用户反馈判定第 2B 阶段通过。结论仅覆盖当前独立网络原型的双玩家加入退出、移动朝向与输入预测、基础近战、单敌人状态和 Mono 表现，不扩展为群体 ECS、正式 Map、平台构建、大规模性能或线上联调验收；AI 未执行逻辑单元测试、PlayMode 或构建。
+
 本页保留能力边界；具体业务已知问题在[玩家](Player.md)、[背包与道具](Inventory.md)、[战斗](Combat.md)、[资源与数据](DataResources.md)中维护。
+
+## 【CURRENT STRATEGY】第 3A 阶段 ECS 群体职责
+
+群体实现限定在现有 Networking 目录：生成系统负责独立条目失败隔离；敌人移动系统从在线连接选目标；空间系统维护只含存活敌人的格子索引；近战系统产生命中事件；伤害系统消费并清空事件。移动配置、目标和伤害事件缓冲通过 GhostComponent(PrefabType = GhostPrefabType.Server) 限定为服务端组件，生命与死亡沿用原 GhostField。只有 Spawner 是单例，不再把敌人当作单例读取。
+
+群体逻辑沿用已有 SubScene 和敌人 Ghost，敌人当前实体表现见第 3B-2 节，不接入正式业务架构；当前管线为 URP，渲染前置配置的验收与第 3A 群体逻辑验收分开记录。代码编译及实际烘焙资源已核对；用户已确认本阶段人工 GamePlayer 验收通过，主线程结合静态检查与用户反馈判定第 3A 阶段通过。结论仅覆盖当前独立网络原型的 32 敌人生成、最近在线玩家追踪及玩家加入/退出后的目标切换、停止距离与无在线玩家时停止追踪、群体近战每目标去重和伤害 25、死亡停止及双端 HP、死亡与统计一致性；不扩展为正式 Map、平台构建、大规模性能或线上联调验收。第 3A 通过结论不包含第 3B-2 实体表现验收；敌人反击及寻路避障未接入；AI 未执行逻辑单元测试、PlayMode 或构建。
+
+## 【CURRENT STRATEGY】第 3B-1 阶段渲染与表现边界
+
+当前 URP Forward+、Linear 和 SRP Batcher 为全局渲染前置配置，两份网络 View 共享 URP/Lit 材质，路径和参数由[运行入口](Runtime.md)维护。玩家保留 GhostPresentationGameObjectAuthoring → ClientPrefab → Transform 同步的表现调用链；敌人根实体渲染及死亡隐藏由第 3B-2 节界定。
+
+包、配置、材质和实际烘焙静态验收通过；用户已确认第 3B-1 人工 GamePlayer 验证通过，主线程结合静态检查与用户反馈判定第 3B-1 阶段通过。人工验收范围仅覆盖网络场景外观、亮度与边缘效果、Map UI/TMP/自定义 Outline Shader 兼容，以及切换 URP/Linear 后双端 32 敌人群体行为回归；不扩展为平台构建、大规模性能或线上联调验收。第 3A 与第 3B-1 通过结论保持原验收范围，不包含第 3B-2 敌人实体渲染与死亡隐藏；AI 未执行逻辑单元测试、PlayMode、构建、发布或图片读取。
+
+## 【CURRENT STRATEGY】第 3B-2 阶段敌人表现职责
+
+`CombatPrototypeEnemyRenderSystem` 位于现有 Networking 目录，仅在客户端 PresentationSystemGroup、EntitiesGraphicsSystem 之前读取 CombatPrototypeEnemyState.IsDead，控制根实体 MaterialMeshInfo 的启用状态；查询忽略组件启用筛选，保留对已隐藏敌人的更新。显示系统不承担服务端生成、追踪、目标选择、近战或伤害结算，不修改网络同步字段。
+
+敌人 Ghost 根节点使用 MeshFilter/MeshRenderer 烘焙 Entities Graphics 组件；原 GhostPresentationGameObjectAuthoring 保留但两端 Prefab 引用均为空，实际烘焙根实体已无 Mono 表现引用。玩家保留原 Mono 桥接，旧 EnemyView 资产与脚本不删除；资源与实际烘焙事实由[运行入口](Runtime.md)维护。
+
+## 【KNOWN ISSUES】第 3B-2 阶段表现验收
+
+新系统已由 Unity 编译并确认类型已加载，资源和实际烘焙已静态核对；用户已确认第 3B-2 人工 GamePlayer 验证通过，主线程结合既有静态检查与用户反馈判定第 3B-2 阶段通过。验收仅覆盖当前独立网络原型的双端敌人显示与移动、死亡隐藏无重复显示或残影、重新加入后的死亡状态，以及 HP/存活/死亡统计一致性。第 2B、第 3A 与第 3B-1 通过结论保持各自原范围；本阶段不扩展为规模性能、平台构建或线上联调验收。AI 未运行逻辑单元测试、PlayMode、命令行构建、发布或图片检查。
+
+## 【FACT】第 4A 阶段网络体力职责
+
+现有 Networking 目录新增独立 `CombatPrototypePlayerResource` ECS 组件，`CurrentPower`/`UpperPower` 为整数 GhostField。原玩家 Authoring/Baker 负责体力初值、上限与近战成本的烘焙及配置合法性边界；原服务端近战系统负责攻击准入和唯一运行时体力消耗，原日志系统读取状态。没有新增资源服务、恢复系统或本地预测扣费链。
+
+## 【CURRENT STRATEGY】第 4A 阶段框架边界
+
+体力随每个玩家 Ghost 和原连接生命周期独立存在，由服务端消耗、客户端接收快照；规则与参数分别见[玩家](Player.md)、[战斗](Combat.md)，Prefab/烘焙与日志入口见[运行入口](Runtime.md)。原输入与移动预测、群体敌人和实体表现职责保持；不注册到 QFramework `Game`，不调用 `PlayerModel`/`PlayerDataStore`，不接账号、奖励、背包、存档、自动恢复或玩家受击链。
+
+## 【KNOWN ISSUES】第 4A 阶段接入验收
+
+代码编译、Ghost 字段加载及实际 SubScene 产物已静态核对；人工 GamePlayer 的体力权威同步与原网络战斗回归仍为 `UNKNOWN`。第 2B、第 3A、第 3B 的既有人工通过结论不包含第 4A，不形成规模性能、平台构建或线上联调结论；AI 未执行逻辑单元测试、PlayMode、命令行构建、发布或图片检查。

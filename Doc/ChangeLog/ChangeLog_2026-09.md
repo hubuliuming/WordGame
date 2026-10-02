@@ -163,7 +163,16 @@
 - 本阶段仅更新事实文档，未运行逻辑单元测试、GamePlayer PlayMode、命令行构建或平台发布；网络联调、URP 切换、Addressables 迁移保留后续阶段。
 ## 2026-09-27
 
+- 第 2A 阶段按用户授权新增独立 Netcode for Entities 生命周期日志原型：`CombatPrototypeNetCodeBootstrap` 配置自动连接端口 7979；客户端/服务端通过 `NetworkStreamInGame` 与最小 RPC 完成进入游戏握手日志，并记录服务端 NetworkId 权威边界。
+- 未创建 Ghost Prefab、SubScene、Baker 或实体同步链；玩家位置/旋转、攻击输入、敌人状态、UI、匹配、Relay、正式 Map、奖励和存档均未接入。未手写 baked YAML，未运行逻辑单元测试、命令行构建或平台发布。
+
 - 【FACT】新增独立 `CombatPrototype` 组件，覆盖相机跟随/旋转、相机相对移动、单次近战前摇/命中/后摇、基础生命与死亡停用。
 - 【CURRENT STRATEGY】第 1 阶段仅用于独立测试场景，不接入正式 Map、UGUI 敌人、ECS、网络、奖励或存档。
 - 【KNOWN ISSUES】测试场景中的 Inspector 绑定与 Cinemachine Follow/LookAt 仍需主线程在 Unity 编辑器中配置并进行人工 GamePlayer 验收。
 - 【FACT】新增独立 `CombatPrototypeScene.unity`，完成玩家/敌人组件、Layer 6 targetMask、CinemachineBrain、CinemachineCamera Target 和 ThirdPersonFollow 的序列化绑定；场景未加入正式构建列表。
+- 用户已完成第 1 阶段独立战斗切片的人工 GamePlayer 验收并确认正常；主线程据此判定第 1 阶段通过。结论仅覆盖 CombatPrototype 独立场景，不扩展为正式 Map、多人同步、ECS 群体或完整战斗业务验收。
+
+## 2026-09-27：移除项目级 UnityMCP 工具白名单
+
+- 按用户确认，移除项目级 `.codex/config.toml` 中 UnityMCP 的 4 项 `enabled_tools` 允许列表；保留服务地址、启动超时与工具超时配置。
+- UnityMCP `tool-groups` 资源列出 10 组，核心组默认启用、其余 9 组默认禁用；`custom-tools` 资源返回 35 项，工具组定义合计 43 项。配置变更后的会话目录刷新后包含 48 个 UnityMCP 工具；已启用全部 10 组，并核验 `manage_scene`、`manage_asset`、`manage_gameobject`、`manage_components`、`execute_menu_item`、`execute_code` 均在可执行工具目录中。

@@ -96,7 +96,7 @@ Authoring/Baker、预测玩家移动、敌人批量生成、敌人目标选择�
 
 ## 【FACT】第 4A 阶段网络体力职责
 
-现有 Networking 目录新增独立 `CombatPrototypePlayerResource` ECS 组件，`CurrentPower`/`UpperPower` 为整数 GhostField。原玩家 Authoring/Baker 负责体力初值、上限与近战成本的烘焙及配置合法性边界；原服务端近战系统负责攻击准入和唯一运行时体力消耗，原日志系统读取状态。没有新增资源服务、恢复系统或本地预测扣费链。
+现有 Networking 目录新增独立 `CombatPrototypePlayerResource` ECS 组件，`CurrentPower`/`UpperPower` 为整数 GhostField。原玩家 Authoring/Baker 负责体力初值、上限与近战成本的烘焙及配置合法性边界；原服务端近战系统负责攻击准入和唯一运行时体力消耗，原日志系统读取状态。第 6B 复活与第 7A 物品使用由独立服务端系统恢复体力；没有本地预测扣费链。
 
 ## 【CURRENT STRATEGY】第 4A 阶段框架边界
 
@@ -126,7 +126,7 @@ Authoring/Baker、预测玩家移动、敌人批量生成、敌人目标选择�
 
 ## 【CURRENT STRATEGY】第 4C 阶段框架边界
 
-背包随每名玩家 Ghost 独立存在，按原连接生命周期销毁和重新生成，第 4D 在服务端生成时恢复固定 ID 存档，客户端仅同步；归属与在线校验继续由原奖励链承担。该背包没有注册到 QFramework Game，没有新的账号、道具使用、掉落、拾取或复杂事务系统；同名合并由[背包与道具](Inventory.md)维护，统一奖励规则由[战斗](Combat.md)维护，存档职责见第 4D 节。
+背包随每名玩家 Ghost 独立存在，按原连接生命周期销毁和重新生成，第 4D 在服务端生成时恢复固定 ID 存档，客户端仅同步；归属与在线校验继续由原奖励链承担。该背包没有注册到 QFramework Game，未接正式账号、正式背包 UI、掉落、拾取或复杂事务系统；网络物品使用见第 7A 节，同名合并由[背包与道具](Inventory.md)维护，统一奖励规则由[战斗](Combat.md)维护，存档职责见第 4D 节。
 
 ## 【KNOWN ISSUES】第 4C 阶段接入验收
 
@@ -138,7 +138,7 @@ Authoring/Baker、预测玩家移动、敌人批量生成、敌人目标选择�
 
 ## 【CURRENT STRATEGY】第 4D 阶段边界
 
-固定 ID 是客户端声明的开发标识，不承担正式认证；NetworkId 仍用于现有连接、输入和击杀归属。存档服务只在服务端握手与成功奖励路径被调用，不进入客户端预测循环，不读取或覆盖正式 PlayerDataStore 的 JSON，不接账号、正式 UI、掉落或持久去重。Scene/Prefab/Animator 及原组件挂载保持；具体准入由[玩家](Player.md)、提交规则由[战斗](Combat.md)、文件契约由[资源与数据](DataResources.md)维护。
+固定 ID 是客户端声明的开发标识，不承担正式认证；NetworkId 仍用于现有连接、输入和击杀归属。存档类由服务端握手、成功奖励及第 7A 物品使用调用，不进入客户端预测循环，不读取或覆盖正式 PlayerDataStore 的 JSON，不接账号、正式 UI、掉落或持久去重。Scene/Prefab/Animator 及原组件挂载保持；具体准入由[玩家](Player.md)、提交规则由[战斗](Combat.md)、文件契约由[资源与数据](DataResources.md)维护。
 
 ## 【KNOWN ISSUES】第 4D 阶段接入验收
 
@@ -161,3 +161,11 @@ Authoring/Baker、预测玩家移动、敌人批量生成、敌人目标选择�
 ## 【KNOWN ISSUES】第 6A 阶段接入验收
 
 编译、生成的生命 Serializer/Snapshot、实际烘焙参数和资源边界已静态核对；用户已确认第 6A 人工 GamePlayer 验收通过，主线程结合既有静态验收与用户反馈判定该阶段通过，完整范围见[运行入口](Runtime.md)。客户端与服务端使用同一第 6A Ghost 版本，旧阶段人工通过范围保持；规模性能仍为 `UNKNOWN`，第 5A 恢复后按用户“不启动，静态检测”完成本轮只读核对，尚未取得运行采样，采集覆盖缺口归[性能基线](Performance.md)。人工通过来自用户反馈，AI 未执行游戏系统、PlayMode、逻辑单元测试或构建。
+
+## 【FACT】第 7A 阶段物品使用职责
+
+新增 CombatPrototypeItemUseSystem 只进入 ServerSimulation 的 PredictedSimulationSystemGroup，UpdateAfter(CombatPrototypeEnemySpatialSystem)、UpdateBefore(CombatPrototypeMeleeServerSystem)。原输入系统增加 E 键 UseItem；现有存储类增加 PrepareItemConsumption，原 Load、PrepareReward、SavePrepared 与 JSON v1 契约保持。消费系统承担玩家资格、候选准备、存档调用和库存/体力同次提交，存储类继续承担 JSON 投影与唯一文件读写。
+
+## 【CURRENT STRATEGY】第 7A 阶段接入边界
+
+沿用原 CommandTarget、GhostOwner、Simulate、固定身份、背包和体力组件，不新增 RPC、玩家 Baker 组件或 QFramework 注册，不调用正式 PlayerModel/PlayerDataStore。Scene/Prefab/Animator、旧 meta 和原组件挂载保持。业务规则归[背包与道具](Inventory.md)，体力生命周期归[玩家](Player.md)，顺序归[战斗](Combat.md)，静态证据和人工验收范围归[运行入口](Runtime.md)。

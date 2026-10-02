@@ -267,3 +267,27 @@
 - 本阶段通过范围覆盖双玩家手动复活与同步、满生命/满体力和原加入位置、存活拒绝/重复输入、旧攻击及锁定清理、序号与奖励库存保持及原操作/存档回归；没有把反馈扩展为性能、平台或线上联调通过。
 - 同步 AI_Understanding、Player、Combat、Runtime 的验收状态，并将第 6B 静态落地时的环境证据与用户人工通过来源区分记录；代码与资源未修改，第 5A/5B 尚无性能运行样本的边界保持。
 - 本轮仅读取文件并同步文档，未启动 GamePlayer、调用游戏系统、执行逻辑单元测试/构建/发布/性能采样或读取图片。
+
+## 2026-10-02：第 7A 网络物品使用与体力恢复静态落地
+
+- 用户确认第 7A 执行方案后由主线程完成，未创建子Agent；继续采用编译与静态核对，未启动 GamePlayer。
+- 现有 CombatPrototypePlayerInput 增加 UseItem，E 键按下当帧只写本地拥有者事件，沿原 NetCode 输入命令发送。新增独立 CombatPrototypeItemUseSystem，仅在服务端预测模拟组、敌人空间索引之后且玩家近战之前更新。
+- 复用当前连接、CommandTarget、GhostOwner、Simulate、身份、生命、近战、库存与体力；死亡、非 Ready、满体力或小块肉不足时拒绝。接受时消耗 1 份小块肉，恢复最多 30 点并截到 UpperPower，同 tick 的后续近战可使用恢复后的体力。
+- 现有存储类增加 PrepareItemConsumption，数量归零时从候选及 ECS 缓冲移除，其他库存顺序、金币/经验保持；先 SavePrepared 成功返回，再用已取得的引用同次提交库存与体力。保存失败时该使用操作两项均保持，旧正式档保留，独立玩家失败隔离并记录阶段/原异常；没有自动重试。
+- 原 Load、PrepareReward、SavePrepared、JSON v1 字段及严格校验保持，体力仍不持久化；重新加入恢复消费后的库存，生命/体力沿烘焙初值，原奖励与第 6B 复活规则保持。
+- 新脚本由 Unity 定点导入，唯一新 meta 自动生成，GUID 为 a227d368e6f698741adef1dd18595c6a；没有修改既有 Scene/SubScene、Prefab、Animator、Baker 组件挂载、旧 meta 或项目设置。
+- 正常 Unity 编译已加载新系统和四项输入字段；只读反射确认生成辅助/Serializer/Send/Receive/Compare 类型，UseItem 在生成的事件增减、序列化/反序列化及变化掩码方法中被引用，恢复常量为 30。新系统含 ISystemCompilerGenerated，十项系统顺序特性与源码一致；未调用游戏或存档业务方法。
+- Console 查询为 0 条 Error、1 条 MCP WebSocket 未初始化 Warning；Editor 未进入 PlayMode，Profiler/录制关闭，采集会话和停止回调为空，仅 6 个 Editor/Loading World，未清空 Console。
+- 增量同步 AI_Understanding、Inventory、Player、Combat、DataResources、Framework、Runtime、Performance 与本 ChangeLog。物品规则归 Inventory，Runtime 保留人工清单；性能文档同步新的保存调用与计时范围，项目外采集助手保持关闭且未修改。
+- 主线程源码、编译元数据、UTF-8、git diff/空白和八份事实文档局部链接检查完成；导航 8079 字节，Player 24559、Framework 24548、Combat 24324 字节。Runtime 既有大文档仅同步第 7A 内容，未拆分或整理无关部分；DataResources 既有长行保持。
+- 人工 GamePlayer 的消费/恢复、拒绝、同 tick 输入、双玩家同步、保存失败与重连恢复仍为 UNKNOWN；第 6A/6B 已有人工通过范围保持，第 5A/5B 运行性能仍未验收。AI 未新增或运行逻辑单元测试、PlayMode、游戏系统、命令行构建、发布、性能采样或图片读取，未提交 Git。
+- 主线程最终复核 272 项非视觉项目基线，当前 274 项，仅两份原脚本及九份 Doc 文档修改、新系统及其 meta 新增，无删除或范围外变化；判定第 7A 实现与静态验收通过，人工运行验收保持 UNKNOWN。
+
+## 2026-10-02：第 7A 用户人工验收通过
+
+- 用户明确反馈“验收通过，继续下一阶段”；主线程结合第 7A 已有静态核对与该反馈，判定第 7A 阶段通过。
+- 人工通过范围沿原清单，覆盖小块肉消费/体力恢复、归零移除、拒绝条件及同 tick 输入、双玩家独立与双端同步、保存失败保持、固定 ID 重连/重启恢复及原操作/奖励/复活回归；没有扩展为规模性能、平台或线上联调通过。
+- 增量同步 AI_Understanding、Inventory、Player、Runtime、DataResources、Framework、Performance 的验收状态及本 ChangeLog；Runtime 将原静态环境证据与用户人工通过来源区分，第 5A/5B 无运行采样的边界保持。
+- 用户在下一阶段方向选择中回复“暂不执行”；本轮未启动后续开发，没有新增阶段实现或修改业务方案。
+- 本轮仅进行文件读取与文档同步，代码、资源、项目设置及采集助手保持本轮开始时内容；未调用 Unity 工具、启动 GamePlayer、运行逻辑单元测试/构建/发布/性能采样或读取图片。
+- 主线程复核本轮 274 项非视觉文件基线，仅上述八份 Doc 文档变化，无新增、删除或范围外变化；严格 UTF-8、git diff/空白及七份事实文档局部链接检查通过。导航 8082 字节，Runtime 既有体量超限与 DataResources 既有长行保留，未进行无关拆分或整理，未提交 Git。

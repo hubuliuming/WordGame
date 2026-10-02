@@ -16,7 +16,7 @@
 | 属性、生命、体力、等级、金币、刷新 | [玩家](Modules/Player.md) | [数据文件](Modules/DataResources.md) |
 | 野猪、BtnAttack、伤害、掉落、战斗奖励 | [战斗](Modules/Combat.md) | [玩家](Modules/Player.md) |
 | 网络敌人反击、玩家受伤、死亡停动与手动复活 | [战斗](Modules/Combat.md) | [玩家](Modules/Player.md)、[运行验收](Modules/Runtime.md) |
-| 背包、Goods、99、UseGoods、活力苹果 | [背包与道具](Modules/Inventory.md) | [资源与数据](Modules/DataResources.md) |
+| 背包、Goods、99、UseGoods、活力苹果、网络 E 键小块肉 | [背包与道具](Modules/Inventory.md) | [资源与数据](Modules/DataResources.md) |
 | JSON、streamingAssets、Resources、对象池、重写数据菜单 | [资源与数据](Modules/DataResources.md) | 对应业务模块 |
 | 固定玩家 ID、服务端存档、重连恢复、坏档、保存失败 | [资源与数据](Modules/DataResources.md) | [玩家准入](Modules/Player.md)、[奖励提交](Modules/Combat.md)、[运行验收](Modules/Runtime.md) |
 | 规模、性能基线、Tick、帧耗时、GC、RTT、快照、预测误差、存档耗时 | [性能基线](Modules/Performance.md) | [运行入口](Modules/Runtime.md)、[资源与数据](Modules/DataResources.md) |
@@ -58,8 +58,9 @@
 - `UNKNOWN`：后续阶段的运行结果，以及完整工程编译、平台构建和服务器联调结果。
 - 用户已确认第 4D 网络原型存档人工 GamePlayer 验收通过，主线程结合既有静态验收与用户反馈判定该阶段通过；范围覆盖多人独立保存、重连/服务端重启恢复及失败隔离，具体边界见[运行入口](Modules/Runtime.md)。既有阶段通过范围保持，规模性能与平台验收仍为 `UNKNOWN`。
 - 第 5A 已确认 2 玩家/32 敌人的性能口径，存档 Profiler 标记已编译并注册；第 5B 已补齐项目外采集助手并通过主线程静态验收，按用户要求保持 GamePlayer、采样与运行回调关闭。尚无运行样本，数据有效性与最终性能验收仍为 `UNKNOWN`；覆盖、使用边界与静态证据见[性能基线](Modules/Performance.md)。
-- 用户已确认第 6A 敌人反击与玩家受伤的人工 GamePlayer 验收通过，主线程结合既有静态验收与用户反馈判定该阶段通过；范围包含生命同步、反击/空击、同 tick 击杀取消、死亡门槛和重入恢复，完整边界见[运行入口](Modules/Runtime.md)。玩家生命归[玩家](Modules/Player.md)，攻击及结算顺序归[战斗](Modules/Combat.md)；该结论不包含规模性能或平台验收。
+- 第 6A 敌人反击与玩家受伤已获用户人工通过反馈，主线程结合静态核对判定通过。生命归[玩家](Modules/Player.md)，战斗归[战斗](Modules/Combat.md)，完整验收边界见[运行入口](Modules/Runtime.md)；不含规模性能或平台验收。
 - 用户已确认第 6B 手动复活人工 GamePlayer 验收通过，主线程结合静态核对判定该阶段通过。规则归[玩家](Modules/Player.md)，敌人锁定归[战斗](Modules/Combat.md)，范围归[运行入口](Modules/Runtime.md)。
+- 第 7A 网络物品使用已获用户人工通过反馈，主线程结合静态核对判定通过。规则归[背包与道具](Modules/Inventory.md)，范围见[运行入口](Modules/Runtime.md)；不含规模性能或平台验收。
 - 第 3 阶段 MapCanvasControl.ItemParent 已在 Map 场景文本中绑定现有 ItemParent；用户针对该阶段人工 GamePlayer 清单反馈“已确认正常”，主线程结合既有静态验收判定该阶段通过，范围见[运行入口](Modules/Runtime.md)。
 - 第 4 阶段 KnapsackControl、PlayerDetailsControl、DetailInform 已完成事件订阅、刷新与释放代码的静态落地；人工 GamePlayer 交互验收、详情使用效果及完整工程编译仍未完成。
 - 资源核实依据为 Scene / Prefab / meta 的文本；没有读取图片、纹理或截图内容。

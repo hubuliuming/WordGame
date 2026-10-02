@@ -77,7 +77,7 @@ ChangeAll 先得到本次最终上限，再据其约束本次有非零增量的�
 
 `CombatPrototypePlayerNetCodeAuthoring` 为玩家 Ghost 烘焙速度 `5`、`CombatPrototypePlayerInput` 和近战数据；NetCode 为 `IInputComponentData` 生成输入缓冲。服务端握手后设置 `GhostOwner.NetworkId`、启用 `AutoCommandTarget`，并把连接 `CommandTarget` 指向玩家；玩家加入连接 `LinkedEntityGroup`，跟随断线销毁。
 
-玩家 Ghost 使用 `OwnerPredicted`：本地拥有者预测，其他客户端插值。`CombatPrototypePlayerInputSystem` 只给 `GhostOwnerIsLocal` 写入 WASD 世界 X/Z 移动，以及空格/鼠标左键 `InputEvent` 攻击事件；第 6B 增加 R 键 `Respawn` 输入事件。`CombatPrototypePlayerMovementSystem` 在 Client/Server 预测组中只处理带 `Simulate` 的实体，以相同输入更新 LocalTransform；移动输入拒绝非有限值并限制长度，旋转直接设置当前移动朝向。网络玩家不接第 1 阶段 CharacterController 的相机相对移动、重力或碰撞链。
+玩家 Ghost 使用 `OwnerPredicted`：本地拥有者预测，其他客户端插值。`CombatPrototypePlayerInputSystem` 只给 `GhostOwnerIsLocal` 写入 WASD 世界 X/Z 移动，以及空格/鼠标左键 `InputEvent` 攻击事件；第 6B 增加 R 键 `Respawn`，第 7A 增加 E 键 `UseItem` 输入事件。`CombatPrototypePlayerMovementSystem` 在 Client/Server 预测组中只处理带 `Simulate` 的实体，以相同输入更新 LocalTransform；移动输入拒绝非有限值并限制长度，旋转直接设置当前移动朝向。网络玩家不接第 1 阶段 CharacterController 的相机相对移动、重力或碰撞链。
 
 ## 【KNOWN ISSUES】第 2B 阶段玩家验收
 
@@ -99,7 +99,7 @@ ChangeAll 先得到本次最终上限，再据其约束本次有非零增量的�
 
 ## 【CURRENT STRATEGY】第 4A 阶段体力生命周期
 
-体力由服务端近战系统在成功启动攻击时扣除，客户端只接收 Ghost 状态并记录日志，不做本地扣费或体力预测。具体接受、拒绝与时序规则见[战斗](Combat.md)。没有自动恢复；第 6B 手动复活由服务端补满体力。连接销毁时沿原 LinkedEntityGroup 销毁玩家，重新加入沿原 GoInGame 握手生成新玩家，从烘焙初值 100 开始。网络体力不接入正式 `Game`、`PlayerModel`、`PlayerDataStore`，体力没有账号或持久化链；金币、经验与背包的固定 ID 恢复见本页第 4D 节。
+体力由服务端近战系统在成功启动攻击时扣除，客户端只接收 Ghost 状态并记录日志，不做本地扣费或体力预测。具体接受、拒绝与时序规则见[战斗](Combat.md)。没有自动恢复；第 6B 手动复活由服务端补满体力，第 7A 物品使用在保存消费成功后恢复体力，规则见[背包与道具](Inventory.md)。连接销毁时沿原 LinkedEntityGroup 销毁玩家，重新加入沿原 GoInGame 握手生成新玩家，从烘焙初值 100 开始。网络体力不接入正式 `Game`、`PlayerModel`、`PlayerDataStore`，体力没有账号或持久化链；金币、经验与背包的固定 ID 恢复见本页第 4D 节。
 
 ## 【KNOWN ISSUES】第 4A 阶段玩家验收
 
@@ -135,7 +135,7 @@ ChangeAll 先得到本次最终上限，再据其约束本次有非零增量的�
 
 已进入游戏的同一连接重复 RPC 沿原规则消费，不生成第二个玩家；同一更新内每个连接只处理一次。服务端从 Connected、NetworkStreamInGame、NetworkId、CommandTarget 指向的有效玩家收集占用 ID，并在接受本次请求后立即占用该 ID，覆盖同一更新内不同连接竞争同一 ID 的情况。已在线 ID 拒绝新连接，保留原玩家；无效 ID、坏档或读取失败记录错误并请求断开，仅终止当前请求。
 
-完整恢复 Coin、Experience 和库存后，沿原 GhostOwner、AutoCommandTarget、CommandTarget、生成位置及 LinkedEntityGroup 绑定。仅无档新玩家采用 0/0、空库存；体力仍为烘焙 100/100，第 6A 生命也从烘焙 100/100 开始，攻击状态与位置重新初始化。断线销毁仍由原 NetCode 生命周期负责；存档在成功奖励时已保存，不增加断线补存或退出回调。
+完整恢复 Coin、Experience 和库存后，沿原 GhostOwner、AutoCommandTarget、CommandTarget、生成位置及 LinkedEntityGroup 绑定。仅无档新玩家采用 0/0、空库存；体力仍为烘焙 100/100，第 6A 生命也从烘焙 100/100 开始，攻击状态与位置重新初始化。断线销毁仍由原 NetCode 生命周期负责；存档在成功奖励及第 7A 物品使用时保存，不增加断线补存或退出回调。
 
 ## 【KNOWN ISSUES】第 4D 阶段玩家验收
 
@@ -174,3 +174,15 @@ CurrentHealth 降至 0 后设置 IsDead=1，后续伤害不再扣血或递增受
 ## 【KNOWN ISSUES】第 6B 阶段玩家验收
 
 输入字段、独立系统及 NetCode 生成类型已编译并加载，源代码与编译后系统特性、文件边界已静态核对；用户已确认第 6B 人工 GamePlayer 验收通过，主线程结合既有静态核对与用户反馈判定该阶段通过。玩家范围覆盖 R 键死亡复活、满生命/满体力与原加入位置、双玩家独立及双端同步、存活请求拒绝、重复输入、序号与奖励/库存保持和原操作/存档回归，完整边界归[运行入口](Runtime.md)。复活点附近有敌人时仍可再次受伤或死亡；第 6A 及此前通过结论保持，人工通过来自用户反馈，AI 未运行 GamePlayer 或逻辑单元测试。
+
+## 【FACT】第 7A 阶段体力恢复接入
+
+E 键 UseItem 沿原命令链发送；服务端 CombatPrototypeItemUseSystem 在近战前、保存成功后写入现有体力组件，完整规则归[背包与道具](Inventory.md)。
+
+## 【CURRENT STRATEGY】第 7A 阶段玩家状态边界
+
+使用只写目标库存与 CurrentPower，原实体、生命和序号保持。体力不持久化；重连恢复消费后的库存，体力仍为 100/100。R 复活仍补满体力且保留库存。
+
+## 【KNOWN ISSUES】第 7A 阶段玩家验收
+
+用户反馈第 7A 人工验收通过，主线程结合静态核对判定通过；玩家验收范围见[运行入口](Runtime.md)。

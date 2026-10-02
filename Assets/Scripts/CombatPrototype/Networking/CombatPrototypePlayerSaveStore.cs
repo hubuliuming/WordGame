@@ -118,6 +118,34 @@ namespace Code_01.CombatPrototype.Networking
             };
         }
 
+        public static CombatPrototypePlayerSaveData PrepareItemConsumption(FixedString64Bytes playerId,
+            CombatPrototypePlayerReward reward, DynamicBuffer<CombatPrototypeInventoryItem> inventory,
+            int itemIndex, CombatPrototypeInventoryItem nextItem)
+        {
+            var removeItem = nextItem.Quantity == 0;
+            var items = new CombatPrototypePlayerSaveItem[inventory.Length - (removeItem ? 1 : 0)];
+            var targetIndex = 0;
+            for (var index = 0; index < inventory.Length; index++)
+            {
+                if (index == itemIndex && removeItem)
+                    continue;
+                var item = index == itemIndex ? nextItem : inventory[index];
+                items[targetIndex++] = new CombatPrototypePlayerSaveItem
+                {
+                    ItemName = item.ItemName.ToString(),
+                    Quantity = item.Quantity
+                };
+            }
+            return new CombatPrototypePlayerSaveData
+            {
+                Version = CurrentVersion,
+                PlayerId = playerId.ToString(),
+                Coin = reward.Coin,
+                Experience = reward.Experience,
+                Items = items
+            };
+        }
+
         public static void SavePrepared(CombatPrototypePlayerSaveData data)
         {
             using var profilingScope = SaveMarker.Auto();

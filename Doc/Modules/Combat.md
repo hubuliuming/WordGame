@@ -150,9 +150,9 @@ Ghost 字段、Baker 和资源引用已形成实际烘焙数据；用户已确�
 
 [CombatPrototypeEnemyAttack.cs](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypeEnemyAttack.cs) 定义仅服务端保留的攻击配置与状态：Damage=10、Range=1.75、StartupSeconds=0.5、RecoverySeconds=1；状态含 Ready/Startup/Recovery、计时、攻击序号及锁定玩家实体/NetworkId。敌人原 Baker 添加配置和 Ready、计时/序号 0、空目标状态，检查各攻击参数为有限正值且 `0 <= StopDistance <= AttackRange`。
 
-## 【CURRENT STRATEGY】第 6A 阶段反击与玩家伤害顺序
+## 【CURRENT STRATEGY】网络原型战斗顺序与反击
 
-现有服务端预测模拟组的完整顺序为：`玩家移动 → 敌人目标与移动 → 敌人空间索引 → 玩家近战事件 → 敌人伤害 → 击杀奖励/存档 → CombatPrototypeEnemyAttackSystem → CombatPrototypePlayerDamageSystem → CombatPrototypePlayerRespawnSystem`。前八项沿用第 6A 顺序及职责，第 6B 在末尾接入独立玩家复活系统。
+服务端预测模拟组当前顺序：`PlayerMovement → EnemyMovement → EnemySpatial → ItemUse → MeleeServer → Damage → Reward/SavePrepared → EnemyAttack → PlayerDamage → PlayerRespawn`。第 7A [物品使用](Inventory.md) 在近战前恢复体力，第 6B 复活仍在玩家伤害后。
 
 - [敌人攻击系统](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypeEnemyAttackSystem.cs) 复用当前最近在线存活目标。Ready 仅在 X/Z 距离不超过 1.75 时锁定该实体及 NetworkId，递增一次攻击序号并进入 0.5 秒前摇；前摇与后摇中敌人停止移动和旋转。
 - 前摇结束先进入 1 秒后摇，再对锁定目标重新确认 Connected、NetworkStreamInGame、CommandTarget、玩家生命与 X/Z 距离。目标离线、死亡或出范围则空击，同次挥击不换目标；命中只添加一条伤害 10 的玩家事件，后摇不再产生命中。后摇结束清空锁定目标并回 Ready。

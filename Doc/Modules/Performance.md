@@ -6,9 +6,9 @@
 
 用户已确认首轮规模为 **2 玩家、32 敌人**，沿用现有 GamePlayer 双客户端和不同开发固定 ID。32 是既有 Spawner 的生成数量；实际在线人数及存活/死亡数量必须随采集记录，不能把生成数量当作持续存活数量。
 
-当前存档标记已由 Unity 正常编译并注册。用户恢复第 5A 后要求“不启动，静态检测”，随后确认第 5B 补齐项目外采集助手；助手 5B-1 已实现并通过主线程静态验收，默认禁止启动采集，运行覆盖及数据有效性仍未验证。尚无运行样本，性能数值和本阶段 GamePlayer 回归结果均为 `UNKNOWN`，本阶段未通过最终性能验收。第 6A 及以前的人工通过结论保留各自范围，不能用作性能通过依据。
+当前存档标记已由 Unity 正常编译并注册。用户恢复第 5A 后要求“不启动，静态检测”，随后确认第 5B 补齐项目外采集助手；助手 5B-1 已实现并通过主线程静态验收，默认禁止启动采集，运行覆盖及数据有效性仍未验证。尚无运行样本，性能数值和本阶段 GamePlayer 回归结果均为 `UNKNOWN`，本阶段未通过最终性能验收。第 6A/6B/7A 及以前的人工通过结论保留各自范围，不能用作性能通过依据。
 
-当前第 6A 已接入敌人反击、玩家生命同步及死亡停止移动/攻击，行为入口见[战斗](Combat.md)与[玩家](Player.md)。后续样本须明确记录第 6A 源码/Ghost 版本和玩家存活/死亡变化；第 4D 行为与第 6A 行为不作为同一负载直接比较，当前仍没有任一版本的运行性能样本。
+当前原型含第 6A 反击/死亡、第 6B 手动复活及第 7A 物品使用，行为归[战斗](Combat.md)、[玩家](Player.md)与[背包与道具](Inventory.md)。样本口径须标明实际源码/输入/Ghost 版本、生命变化及复活/使用请求；不同阶段不作为同一负载直接比较，仍没有任一版本的运行性能样本。
 
 ## 【FACT】存档观察入口
 
@@ -17,9 +17,9 @@
 | 标记 | 计量范围 | 范围外工作 |
 |---|---|---|
 | CombatPrototype.PlayerSave.Load | Load 的整个调用，包括打开文件、无档初值、严格读取/校验与返回；异常路径也结束计时 | 握手验证、玩家生成与恢复后的组件写入 |
-| CombatPrototype.PlayerSave.SavePrepared | SavePrepared 的路径准备、JSON 序列化、临时文件写入、Flush(true)、Replace/Move；异常路径也结束计时 | PrepareReward 候选投影、ECS 三项提交与调用方日志 |
+| CombatPrototype.PlayerSave.SavePrepared | SavePrepared 的路径准备、JSON 序列化、临时文件写入、Flush(true)、Replace/Move；异常路径也结束计时 | PrepareReward/PrepareItemConsumption 候选投影、ECS 奖励或库存/体力提交与调用方日志 |
 
-标记复用原服务端准入/奖励调用链，没有新增 ECS 游戏系统、Ghost 字段或业务读写入口。ProfilerRecorder 的按帧累加值可能包含多个调用；调用次数须另记，按帧均值/P95 不能写成单次存档耗时，无事件不能写成“耗时为 0”。
+标记本身沿用原存储实现，当前调用来自服务端准入、奖励及第 7A 物品使用；物品使用与奖励保存共用 SavePrepared 标记，调用次数不等同于击杀奖励成功数。ProfilerRecorder 的按帧累加值可能包含多个调用；调用次数须另记，按帧均值/P95 不能写成单次存档耗时，无事件不能写成“耗时为 0”。
 
 ## 【FACT】已核实的 Editor 环境
 
@@ -39,17 +39,17 @@
 
 ## 【FACT】第 5A 静态核对结果
 
-本轮核对源码、序列化资源文本、已加载程序集与现有采集助手，没有触发业务读写或游戏系统。静态结果只证明当前配置、调用边界和观察覆盖情况，不提供耗时、GC、网络质量或承载能力结论。
+源码、资源文本、已加载程序集与现有采集助手已有静态核对；当前编译后的顺序与存档调用包含第 6B/7A 接入。静态结果只证明配置、调用边界和观察覆盖情况，不提供耗时、GC、网络质量或承载能力结论。
 
 | 核对对象 | 已核实状态 |
 |---|---|
 | 规模与引用 | 原 SubScene 的 Spawner 引用现有玩家/敌人 Prefab，EnemyCount=32、8 列、间距 3、原点 (0,1,2)；2 玩家仍是已确认采集目标，实际在线人数 UNKNOWN |
 | 第 6A 参数与门槛 | 玩家生命 100/100；敌人伤害 10、范围 1.75、前摇 0.5 秒、后摇 1 秒；死亡玩家排除追踪并停止移动/攻击，死亡敌人停止反击 |
-| 编译后的结算顺序 | PlayerMovement → EnemyMovement → EnemySpatial → MeleeServer → Damage → Reward/SavePrepared → EnemyAttack → PlayerDamage；各相邻 UpdateAfter 与源码一致 |
-| 存档入口与标记 | 服务端准入调用 Load，奖励链先 PrepareReward、SavePrepared 再提交 ECS；两个标记仍注册为 Scripts/TimeNanoseconds，PrepareReward 不在保存标记内 |
+| 编译后的结算顺序 | PlayerMovement → EnemyMovement → EnemySpatial → ItemUse → MeleeServer → Damage → Reward/SavePrepared → EnemyAttack → PlayerDamage → PlayerRespawn；UpdateAfter/UpdateBefore 与源码一致 |
+| 存档入口与标记 | 服务端准入调用 Load；奖励/物品使用先准备候选、SavePrepared 再提交 ECS。两个标记仍为 Scripts/TimeNanoseconds，两种候选投影不在保存标记内 |
 | 当前观察状态 | Editor 未进入 PlayMode、未处于编译中，6 个 World 仅为 Editor/Loading；Profiler.enabled=false，采集会话未启动且无停止回调；未启用记录器或录制 |
 
-源码可见的成本入口包括：敌人移动按在线存活玩家逐个搜索最近目标；空间表复用 Persistent 容器并按更新清空重建存活敌人条目，容量仅在敌人数超过现值时扩充；近战只查询范围所覆盖的网格。移动、反击和奖励收集使用原生临时容器，这不能直接记作托管 GC。PrepareReward 创建存档候选数组/字符串，SavePrepared 同步 JSON 序列化、UTF-8 字节分配、写盘和 Flush(true)；原每 2 秒状态/库存/逐敌人日志及战斗事件日志保留。上述调用的实际次数、耗时和分配量均未测量。
+源码可见的成本入口包括：敌人移动按在线存活玩家逐个搜索最近目标；空间表复用 Persistent 容器并按更新清空重建存活敌人条目，容量仅在敌人数超过现值时扩充；近战只查询范围所覆盖的网格。移动、反击和奖励收集使用原生临时容器，这不能直接记作托管 GC。PrepareReward/PrepareItemConsumption 创建存档候选数组/字符串，SavePrepared 同步 JSON 序列化、UTF-8 字节分配、写盘和 Flush(true)；原每 2 秒状态/库存/逐敌人日志及战斗事件日志保留。上述调用的实际次数、耗时和分配量均未测量。
 
 ## 【CURRENT STRATEGY】已确认的采集口径
 

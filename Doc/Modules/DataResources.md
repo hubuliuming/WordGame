@@ -162,3 +162,11 @@ EditorTest 声明以下菜单；三个重写菜单直接写入上表对应 JSON�
 `UNKNOWN`：正式存档/配置职责划分、资源跨场景运行结果、Android 文件访问方案，以及表格到 JSON 的导入链。`Assets/Instructions/Item/ReconveItem.xls` 仅核实存在，未读取表格内容。
 
 第 2 阶段玩家状态与存储改动的实际行为和日志已有用户核对正确的反馈，主线程已结合静态检查判定该阶段通过。第 3 阶段 MapCanvasControl.ItemParent 序列化引用已补齐并经延时复读留存；用户针对该阶段人工 GamePlayer 清单反馈“已确认正常”，主线程结合静态验收已判定该阶段通过，范围见[运行入口](Runtime.md)。AI 未执行上述菜单、逻辑单元测试、GamePlayer PlayMode 或平台构建；该结论不扩展至后续功能或平台验证。
+
+## 【FACT】第 7A 阶段消费候选与存档兼容
+
+存储类增加 PrepareItemConsumption，将当前完整库存和目标扣除后的数量投影为同一 v1 候选；目标归零时省略该项，其他条目及顺序保持，允许消费最后一项后 Items 为空数组。Version、PlayerId、Coin、Experience 和 Items 的字段契约、严格加载检查与原奖励投影不变，CurrentPower/UpperPower 仍不入 JSON。
+
+## 【CURRENT STRATEGY】第 7A 阶段消费保存
+
+服务端物品使用系统先准备候选，再调用原 SavePrepared，只有成功返回后才修改库存和体力；保存失败时该使用操作两项均保持，旧正式文件保留，继续后续玩家。没有新增文件路径、迁移、定时保存、断线补存或其他写盘入口。消费规则由[背包与道具](Inventory.md)维护，用户已确认第 7A 运行验收通过，范围归[运行入口](Runtime.md)。

@@ -104,7 +104,7 @@ Map 中存在 TestController 的脚本引用（GUID `42f2add30349522408099dbf10f
 
 ## 【CURRENT STRATEGY】第 3A 阶段观测入口
 
-原型保留日志入口：`CombatPrototypeNetCodeLogSystem` 在 Client/Server World 中记录玩家数量及敌人存活/死亡数量变化，每 2 秒记录玩家位置、旋转、攻击阶段/序号、生命/上限、受击序号及死亡标记，以及各敌人 Ghost ID、位置、HP、受击序号、死亡标记；服务端同时记录各敌人目标 NetworkId。服务端另记录握手、批量生成结果、攻击开始、空间查询命中目标数和事件扣血日志。WASD 写入世界 X/Z 平面移动，空格或鼠标左键发送基础攻击事件；第 6B 的 R 键发送手动复活请求，独立服务端系统记录接受、拒绝和处理失败。状态含义见[玩家](Player.md)与[战斗](Combat.md)。
+原型保留日志入口：`CombatPrototypeNetCodeLogSystem` 在 Client/Server World 中记录玩家数量及敌人存活/死亡数量变化，每 2 秒记录玩家位置、旋转、攻击阶段/序号、生命/上限、受击序号及死亡标记，以及各敌人 Ghost ID、位置、HP、受击序号、死亡标记；服务端同时记录各敌人目标 NetworkId。服务端另记录握手、批量生成结果、攻击开始、空间查询命中目标数和事件扣血日志。WASD 写入世界 X/Z 平面移动，空格或鼠标左键发送基础攻击事件；第 6B 的 R 键发送手动复活请求，第 7A 的 E 键发送物品使用请求，独立服务端系统记录接受、拒绝和处理失败。状态含义见[玩家](Player.md)、[战斗](Combat.md)与[背包与道具](Inventory.md)。
 
 ## 【KNOWN ISSUES】第 2B 阶段验收边界
 
@@ -270,7 +270,7 @@ Unity 已编译并加载包含 Move、Attack、Respawn 的输入类型，以及�
 
 复活日志记录 NetworkId、玩家实体、生命/体力、受击与攻击序号、位置、取消的旧前摇数及解除的旧锁定数；存活和归属不一致请求分别记录 PlayerAlive、CommandTargetOwnerMismatch，失败记录连接、玩家、阶段与原始异常。既有每 2 秒状态日志继续读取复活后的状态。生命与复活条件归[玩家](Player.md)，旧敌人锁定和执行顺序归[战斗](Combat.md)。
 
-输入命令布局已增加 Respawn，服务端与所有客户端必须使用同一第 6B 版本；混用旧命令布局不在本阶段支持范围。原第 4D JSON 契约未改，复活不读写存档。
+第 6B 引入 Respawn 时要求服务端与客户端命令布局一致；当前第 7A 版本约束见本页第 7A 节。原第 4D JSON 契约未改，复活不读写存档。
 
 ## 【KNOWN ISSUES】第 6B 阶段验收
 
@@ -281,3 +281,29 @@ AI 执行第 6B 静态落地时 Editor 未进入 PlayMode，Profiler 关闭，�
 用户人工通过范围覆盖同一第 6B 版本的双玩家死亡后 R 键复活、满生命/满体力、原加入位置及双端同步、存活拒绝、重复输入、独立状态、旧前摇取消与旧后摇保持、攻击/受击序号及奖励/库存保持、原移动/攻击/存档回归。复活仍没有保护时间，32 敌人可在后续 tick 再次造成伤害。
 
 人工通过结论来自用户明确反馈；AI 未新增或运行逻辑单元测试、GamePlayer/PlayMode、游戏系统、命令行构建、发布、性能采样或图片读取。本结论不扩展到规模性能、平台构建或线上联调，第 5A/5B 与第 6A 既有结论保持原范围。
+
+## 【FACT】第 7A 阶段编译与资源边界
+
+现有 CombatPrototypePlayerInput 增加 UseItem，输入类型含 Move、Attack、Respawn、UseItem；NetCode 的输入事件辅助、输入缓冲 Serializer 与 Send/Receive/CompareCommandSystem 已加载。新增 CombatPrototypeItemUseSystem 含 ISystemCompilerGenerated，编译后特性为 ServerSimulation、PredictedSimulationSystemGroup、UpdateAfter(CombatPrototypeEnemySpatialSystem)、UpdateBefore(CombatPrototypeMeleeServerSystem)，与既有链连成十项顺序。现有存储类增加消费候选投影，原加载、奖励投影、SavePrepared 和 JSON v1 保持。
+
+唯一新增脚本 meta 由 Unity 自动生成，GUID 为 a227d368e6f698741adef1dd18595c6a；玩家/敌人 Baker、Scene/SubScene、Prefab、Animator、旧 meta/GUID、View 和组件挂载均与本轮基线一致。没有新增玩家组件、RPC 或存档字段。
+
+## 【CURRENT STRATEGY】第 7A 阶段观测与版本
+
+客户端 E 键按下当帧发送使用请求，服务端成功日志记录 NetworkId、PlayerId、玩家、物品、消耗/剩余数量、实际恢复量和最终体力；拒绝原因包含 CommandTargetOwnerMismatch、PlayerDead、AttackInProgress、PowerFull、InsufficientItem。处理失败日志保留连接、玩家、NetworkId、阶段与原异常，既有每 2 秒状态日志继续读取库存和体力。规则归[背包与道具](Inventory.md)，体力归[玩家](Player.md)，顺序归[战斗](Combat.md)。
+
+UseItem 已改变输入命令布局，服务端与所有客户端必须使用同一第 7A 版本。原 v1 存档仍兼容，消费后的库存持久化，体力不入 JSON；第 6B 复活保持原规则。
+
+## 【KNOWN ISSUES】第 7A 阶段验收
+
+主线程已完成正常 Unity 编译、源码及编译后类型/顺序特性核对，判定第 7A 静态验收通过；用户明确反馈“验收通过，继续下一阶段”，主线程结合既有静态核对与用户反馈判定第 7A 阶段通过。
+
+第 7A 静态落地时 Editor 未进入 PlayMode，Profiler/录制关闭，采集会话及停止回调为空，仅有 6 个 Editor/Loading World；当时 Console 查询为 0 条 Error、1 条 MCP WebSocket 未初始化 Warning，未清空 Console。以下为本阶段人工通过范围，服务端与客户端使用同一第 7A 版本：
+
+1. 两名不同固定 ID 玩家使用同一第 7A 版本；存活、Ready、有小块肉且体力不足时按 E，库存扣 1、体力最多增加 30 并截到上限，最后一份消耗后移除条目。按住 E 不按帧连续消耗。
+2. 死亡、攻击阶段非 Ready、满体力和无物品分别拒绝，使用操作不改库存/体力；存活且 Ready 的 E+攻击先恢复再沿原成本扣费，满体力 E 先拒绝。死亡时 E+R 只在末尾按原规则复活，不重放 E。
+3. 双玩家独立消费，服务端与两客户端库存/体力一致；使用操作保持金币/经验、生命与攻击/受击序号，原近战、敌人伤害、奖励和复活回归。
+4. 人工制造保存失败时，该使用操作两项均保持、旧正式档保留，错误有阶段和原异常，其他玩家仍可处理；没有自动重复扣除。
+5. 同 ID 重连及服务端重启恢复消费后的库存，体力仍为烘焙 100/100；v1 档内无零数量条目，空 Items 仍可加载，后续击杀可继续按原规则入包。
+
+本阶段人工通过结论来自用户反馈；AI 未新增或运行逻辑单元测试、GamePlayer/PlayMode、游戏系统、命令行构建、发布、性能采样或图片读取。第 6A/6B 及以前的人工通过范围保持；第 5A/5B 尚无运行样本，同步写盘成本、规模性能、平台和线上联调仍为 UNKNOWN。

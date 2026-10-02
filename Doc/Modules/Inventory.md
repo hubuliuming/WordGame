@@ -65,13 +65,13 @@ KnapsackControl.OnStart 缓存当前 PlayerModel 与 FactoryUISystem，记录 Co
 
 ## 【KNOWN ISSUES】
 
-- **背包使用未完成**：格子未构造真实物品效果，DetailInform 监听未执行属性变更，亦未建立扣减库存的调用。
+- **正式 Map 背包使用未完成**：格子未构造真实物品效果，DetailInform 监听未执行属性变更，亦未建立扣减库存的调用。
 - **展示数量边界**：旧存档中的负库存只记录错误并跳过展示；新的普通库存修改已拒绝负结果并移除合法归零条目，零增量不变。模型的旧数据报错与写入规则见[玩家](Player.md)。
-- **配置覆盖范围**：当前玩家数据含小块肉，但恢复道具表只有馒头、活力苹果。小块肉是否可使用以及效果是什么为 `UNKNOWN`；不能自行补配。
+- **正式配置覆盖范围**：当前正式玩家数据含小块肉，但恢复道具表只有馒头、活力苹果。正式 Map 中小块肉是否可使用及其效果为 `UNKNOWN`；第 7A 网络原型数值不改变该配置。
 
 ## 未知项与验收状态
 
-`UNKNOWN`：背包排序、容量、道具消耗规则、详情窗口完整交互，以及是否允许堆叠上限之外的业务例外。第 4 阶段已完成 UI 监听、刷新和释放代码的静态落地；人工 GamePlayer 交互验收仍由主线程确认，未读取界面图片。
+`UNKNOWN`：正式 Map 的背包排序、容量、道具消耗规则、详情窗口完整交互，以及是否允许堆叠上限之外的业务例外。第 4 阶段已完成 UI 监听、刷新和释放代码的静态落地；人工 GamePlayer 交互验收仍由主线程确认，未读取界面图片。
 
 ## 【FACT】第 4C 阶段网络玩家本局背包
 
@@ -81,7 +81,7 @@ KnapsackControl.OnStart 缓存当前 PlayerModel 与 FactoryUISystem，记录 Co
 
 服务端沿既有击杀奖励链直接入包：按 ItemName 查找目标条目，同名数量累加，名称不存在时新增一个条目；不创建第二份可变 ECS 背包，也不套用正式 UI 的 99 拆格规则。当前敌人物品奖励为 `小块肉 ×1`，名称复用 `Code_01.Msg.ItemName.小块肉`。第 4D 将完整候选库存投影为 JSON 条目，与金币/经验一起保存成功后同次提交，具体失败与归属规则见[战斗](Combat.md)。
 
-客户端仅接收背包 Ghost 状态；原日志入口每 2 秒记录背包条目数及各条目的名称、数量。固定 ID 库存持久化格式与加载校验由[资源与数据](DataResources.md)维护，加入恢复由[玩家](Player.md)维护。正式背包 UI、物品使用、恢复效果、世界掉落、拾取和账号保持原边界；小块肉的使用效果仍为 UNKNOWN。
+客户端仅接收背包 Ghost 状态；原日志入口每 2 秒记录背包条目数及各条目的名称、数量。固定 ID 库存持久化格式与加载校验由[资源与数据](DataResources.md)维护，加入恢复由[玩家](Player.md)维护。正式背包 UI、世界掉落、拾取和账号保持原边界；网络原型物品使用与恢复规则见本页第 7A 节。
 
 ## 【KNOWN ISSUES】第 4C 阶段本局背包验收
 
@@ -90,3 +90,21 @@ KnapsackControl.OnStart 缓存当前 PlayerModel 与 FactoryUISystem，记录 Co
 ## 【KNOWN ISSUES】第 4D 阶段库存恢复验收
 
 候选库存序列化、全部校验后恢复及保存成功后入包的调用点已静态核对，原背包 Ghost 字段保持；用户已确认第 4D 人工 GamePlayer 验收通过，主线程结合既有静态验收与用户反馈判定该阶段通过。库存范围覆盖多人独立保存、恢复后同名继续累计、重启恢复、坏库存拒绝加入及写盘失败三项均不到账，完整边界见[运行入口](Runtime.md)。第 4C 当时空背包重入的通过结论保持其历史范围；AI 未运行逻辑单元测试、PlayMode、构建、发布或图片检查。
+
+## 【FACT】第 7A 阶段网络物品使用
+
+[CombatPrototypePlayerInput.cs](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypePlayerInput.cs) 增加 InputEvent UseItem；客户端 E 键按下当帧只给 GhostOwnerIsLocal 写入事件，沿原 NetCode 输入缓冲发送。独立 [CombatPrototypeItemUseSystem.cs](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypeItemUseSystem.cs) 在服务端预测模拟组中处理，排在敌人空间索引之后、玩家近战之前，使用现有玩家库存和体力组件。
+
+当前原型仅使用 `Code_01.Msg.ItemName.小块肉`：每次接受消耗 1 份，恢复最多 30 点 CurrentPower，截到 UpperPower。该数值属于已确认的第 7A 网络原型规则；正式 Map 的 RecoverItem 配置、UseItemCommand 和详情路径保持原状。
+
+## 【CURRENT STRATEGY】第 7A 阶段准入与消费提交
+
+服务端沿 Connected、NetworkStreamInGame、未请求断线的连接 CommandTarget 确认当前启用 Simulate 的玩家，并核对 GhostOwner 与连接 NetworkId。死亡、近战阶段不是 Ready、体力已满、没有小块肉或数量不足 1 时拒绝，不消耗物品、不恢复体力；客户端不按生命或库存快照过滤输入。
+
+资格成立后先取得必需体力引用、库存、身份和金币/经验，准备扣除 1 后的完整库存候选及截断后的体力。数量归零的条目从候选 JSON 和最终 ECS 缓冲中移除，其余物品及顺序保持；不创建第二份可变 ECS 背包。候选保持当前金币/经验，并复用 PrepareItemConsumption → SavePrepared；保存成功返回后，用预先取得的引用同次提交库存和体力。失败时该使用操作不改变库存或体力，旧正式档保留，日志包含连接、玩家、NetworkId、阶段和原始异常，继续处理其他玩家；没有自动重试。存档字段与替换规则归[资源与数据](DataResources.md)。
+
+使用发生在玩家近战之前：进入该系统时为 Ready 的有效 E 请求可先恢复体力，再供同 tick 的攻击准入使用；满体力请求先拒绝，随后攻击扣费不改变该次拒绝结果。死亡 E 请求也先拒绝，末尾 R 复活不重新处理本 tick 的 E。体力不持久化，不改变生命、攻击序号、金币/经验或原奖励流程；网络状态沿现有 Ghost 同步。
+
+## 【KNOWN ISSUES】第 7A 阶段物品使用验收
+
+输入、新系统、消费候选和顺序特性已编译并静态核对；用户已确认第 7A 人工 GamePlayer 验收通过，主线程结合既有静态核对与用户反馈判定该阶段通过。范围覆盖消费/恢复、拒绝条件、双玩家同步、保存失败和重连恢复，完整边界见[运行入口](Runtime.md)。同步序列化/写盘仍会阻塞服务端，实际耗时和规模性能未测量，观察范围见[性能基线](Performance.md)。正式背包 UI、其他网络物品效果、世界掉落与拾取保持各自既有未知范围。

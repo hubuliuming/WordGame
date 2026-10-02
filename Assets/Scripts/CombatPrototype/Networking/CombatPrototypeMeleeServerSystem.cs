@@ -27,12 +27,21 @@ namespace Code_01.CombatPrototype.Networking
         {
             var deltaTime = SystemAPI.Time.DeltaTime;
             var damageEvents = SystemAPI.GetBufferLookup<CombatPrototypeDamageEvent>();
-            foreach (var (attack, config, input, transform, owner, resource) in SystemAPI.Query<
+            foreach (var (attack, config, input, transform, owner, resource, health) in SystemAPI.Query<
                          RefRW<CombatPrototypeMeleeState>, RefRO<CombatPrototypeMeleeConfig>,
                          RefRO<CombatPrototypePlayerInput>, RefRO<LocalTransform>, RefRO<GhostOwner>,
-                         RefRW<CombatPrototypePlayerResource>>()
+                         RefRW<CombatPrototypePlayerResource>, RefRO<CombatPrototypePlayerHealth>>()
                          .WithAll<CombatPrototypePlayerNetCode, Simulate>())
             {
+                if (health.ValueRO.IsDead != 0)
+                {
+                    attack.ValueRW.Phase = CombatPrototypeAttackPhase.Ready;
+                    attack.ValueRW.PhaseTimer = 0f;
+                    if (input.ValueRO.Attack.IsSet)
+                        Debug.Log($"[CombatPrototype.NetCode] Server attack rejected; NetworkId={owner.ValueRO.NetworkId}, reason=PlayerDead, power={resource.ValueRO.CurrentPower}/{resource.ValueRO.UpperPower}, sequence={attack.ValueRO.AttackSequence}, phase=Ready.");
+                    continue;
+                }
+
                 if (attack.ValueRO.Phase == CombatPrototypeAttackPhase.Ready)
                 {
                     if (input.ValueRO.Attack.IsSet)

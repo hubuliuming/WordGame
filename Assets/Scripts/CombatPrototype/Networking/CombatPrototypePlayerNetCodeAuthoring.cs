@@ -1,4 +1,5 @@
 using Unity.Entities;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace Code_01.CombatPrototype.Networking
@@ -6,6 +7,8 @@ namespace Code_01.CombatPrototype.Networking
     public sealed class CombatPrototypePlayerNetCodeAuthoring : MonoBehaviour
     {
         public float MoveSpeed = 5f;
+        public float InitialHealth = 100f;
+        public float MaxHealth = 100f;
         public int InitialPower = 100;
         public int UpperPower = 100;
         public int AttackPowerCost = 10;
@@ -20,6 +23,12 @@ namespace Code_01.CombatPrototype.Networking
         {
             public override void Bake(CombatPrototypePlayerNetCodeAuthoring authoring)
             {
+                if (!math.isfinite(authoring.InitialHealth) || !math.isfinite(authoring.MaxHealth) ||
+                    authoring.InitialHealth <= 0f || authoring.MaxHealth <= 0f ||
+                    authoring.InitialHealth > authoring.MaxHealth)
+                    throw new global::System.InvalidOperationException(
+                        "[CombatPrototype.NetCode] Player health configuration requires finite 0 < InitialHealth <= MaxHealth.");
+
                 if (authoring.UpperPower < 0 || authoring.InitialPower < 0 ||
                     authoring.InitialPower > authoring.UpperPower || authoring.AttackPowerCost < 0)
                     throw new global::System.InvalidOperationException(
@@ -28,6 +37,14 @@ namespace Code_01.CombatPrototype.Networking
                 var entity = GetEntity(TransformUsageFlags.Dynamic);
                 AddComponent(entity, new CombatPrototypePlayerNetCode { MoveSpeed = authoring.MoveSpeed });
                 AddComponent<CombatPrototypePlayerInput>(entity);
+                AddComponent(entity, new CombatPrototypePlayerHealth
+                {
+                    CurrentHealth = authoring.InitialHealth,
+                    MaxHealth = authoring.MaxHealth
+                });
+                AddBuffer<CombatPrototypePlayerDamageEvent>(entity);
+                AddComponent<CombatPrototypePlayerReward>(entity);
+                AddBuffer<CombatPrototypeInventoryItem>(entity);
                 AddComponent(entity, new CombatPrototypePlayerResource
                 {
                     CurrentPower = authoring.InitialPower,

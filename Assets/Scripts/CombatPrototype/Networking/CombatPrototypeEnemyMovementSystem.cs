@@ -3,6 +3,7 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.NetCode;
 using Unity.Transforms;
+using UnityEngine;
 
 namespace Code_01.CombatPrototype.Networking
 {
@@ -50,6 +51,13 @@ namespace Code_01.CombatPrototype.Networking
                     !SystemAPI.HasComponent<CombatPrototypePlayerNetCode>(player) ||
                     !SystemAPI.HasComponent<LocalTransform>(player))
                     continue;
+                if (!SystemAPI.HasComponent<CombatPrototypePlayerHealth>(player))
+                {
+                    Debug.LogError($"[CombatPrototype.NetCode] Server enemy movement target collection failed; NetworkId={id.ValueRO.Value}, player={player}, reason=MissingPlayerHealth.");
+                    continue;
+                }
+                if (SystemAPI.GetComponent<CombatPrototypePlayerHealth>(player).IsDead != 0)
+                    continue;
                 players.Add(new OnlinePlayer
                 {
                     Entity = player,
@@ -59,9 +67,10 @@ namespace Code_01.CombatPrototype.Networking
             }
 
             var deltaTime = SystemAPI.Time.DeltaTime;
-            foreach (var (transform, health, movement, target) in SystemAPI.Query<
+            foreach (var (transform, health, movement, target, attack) in SystemAPI.Query<
                          RefRW<LocalTransform>, RefRO<CombatPrototypeEnemyState>,
-                         RefRO<CombatPrototypeEnemyMovement>, RefRW<CombatPrototypeEnemyTarget>>())
+                         RefRO<CombatPrototypeEnemyMovement>, RefRW<CombatPrototypeEnemyTarget>,
+                         RefRO<CombatPrototypeEnemyAttackState>>())
             {
                 target.ValueRW = default;
                 if (health.ValueRO.IsDead != 0)
@@ -85,6 +94,8 @@ namespace Code_01.CombatPrototype.Networking
 
                 var nearest = players[nearestIndex];
                 target.ValueRW = new CombatPrototypeEnemyTarget { Player = nearest.Entity, NetworkId = nearest.NetworkId };
+                if (attack.ValueRO.Phase != CombatPrototypeEnemyAttackPhase.Ready)
+                    continue;
                 var direction = nearest.Position - transform.ValueRO.Position;
                 direction.y = 0f;
                 if (nearestDistanceSquared < 0.0001f)

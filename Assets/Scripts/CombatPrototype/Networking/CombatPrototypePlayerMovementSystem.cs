@@ -12,10 +12,14 @@ namespace Code_01.CombatPrototype.Networking
         public void OnUpdate(ref SystemState state)
         {
             var deltaTime = SystemAPI.Time.DeltaTime;
-            foreach (var (transform, input, player) in
-                     SystemAPI.Query<RefRW<LocalTransform>, RefRO<CombatPrototypePlayerInput>, RefRO<CombatPrototypePlayerNetCode>>()
+            foreach (var (transform, input, player, health) in
+                     SystemAPI.Query<RefRW<LocalTransform>, RefRO<CombatPrototypePlayerInput>,
+                         RefRO<CombatPrototypePlayerNetCode>, RefRO<CombatPrototypePlayerHealth>>()
                          .WithAll<Simulate>())
             {
+                if (health.ValueRO.IsDead != 0)
+                    continue;
+
                 // Commands are external input: reject non-finite axes and cap the vector to unit length.
                 var move = input.ValueRO.Move;
                 if (!math.all(math.isfinite(move)))

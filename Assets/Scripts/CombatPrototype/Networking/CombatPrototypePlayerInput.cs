@@ -9,6 +9,7 @@ namespace Code_01.CombatPrototype.Networking
     {
         public float2 Move;
         public InputEvent Attack;
+        public InputEvent Respawn;
     }
 
     [WorldSystemFilter(WorldSystemFilterFlags.ClientSimulation)]
@@ -30,12 +31,15 @@ namespace Code_01.CombatPrototype.Networking
             move = math.normalizesafe(move);
             var attack = (keyboard != null && keyboard.spaceKey.wasPressedThisFrame) ||
                          (mouse != null && mouse.leftButton.wasPressedThisFrame);
+            var respawn = keyboard != null && keyboard.rKey.wasPressedThisFrame;
 
             foreach (var input in SystemAPI.Query<RefRW<CombatPrototypePlayerInput>>().WithAll<GhostOwnerIsLocal>())
             {
                 input.ValueRW = new CombatPrototypePlayerInput { Move = move };
                 if (attack)
                     input.ValueRW.Attack.Set();
+                if (respawn)
+                    input.ValueRW.Respawn.Set();
             }
         }
     }

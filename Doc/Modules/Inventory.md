@@ -72,3 +72,21 @@ KnapsackControl.OnStart 缓存当前 PlayerModel 与 FactoryUISystem，记录 Co
 ## 未知项与验收状态
 
 `UNKNOWN`：背包排序、容量、道具消耗规则、详情窗口完整交互，以及是否允许堆叠上限之外的业务例外。第 4 阶段已完成 UI 监听、刷新和释放代码的静态落地；人工 GamePlayer 交互验收仍由主线程确认，未读取界面图片。
+
+## 【FACT】第 4C 阶段网络玩家本局背包
+
+[CombatPrototypeInventoryItem.cs](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypeInventoryItem.cs) 是每名网络玩家 Ghost 独立持有的动态缓冲元素，`ItemName` 为 `FixedString64Bytes`，`Quantity` 为 `int`，两个字段均标注 GhostField。现有玩家 Baker 添加空缓冲；第 4D 无档新玩家为空库存，有档玩家在服务端生成时按固定 ID 恢复，沿原 Ghost 同步；不导入正式 PlayerModel 的库存或存档。
+
+## 【CURRENT STRATEGY】第 4C 阶段物品入包与同步
+
+服务端沿既有击杀奖励链直接入包：按 ItemName 查找目标条目，同名数量累加，名称不存在时新增一个条目；不创建第二份可变 ECS 背包，也不套用正式 UI 的 99 拆格规则。当前敌人物品奖励为 `小块肉 ×1`，名称复用 `Code_01.Msg.ItemName.小块肉`。第 4D 将完整候选库存投影为 JSON 条目，与金币/经验一起保存成功后同次提交，具体失败与归属规则见[战斗](Combat.md)。
+
+客户端仅接收背包 Ghost 状态；原日志入口每 2 秒记录背包条目数及各条目的名称、数量。固定 ID 库存持久化格式与加载校验由[资源与数据](DataResources.md)维护，加入恢复由[玩家](Player.md)维护。正式背包 UI、物品使用、恢复效果、世界掉落、拾取和账号保持原边界；小块肉的使用效果仍为 UNKNOWN。
+
+## 【KNOWN ISSUES】第 4C 阶段本局背包验收
+
+缓冲字段与生成的 Ghost Serializer/Snapshot 已由 Unity 编译并加载，实际 SubScene 产物确认玩家初始空背包与敌人小块肉 1 配置；用户已确认第 4C 人工 GamePlayer 验收通过，主线程结合既有静态验收与用户反馈判定第 4C 阶段通过。背包验收仅覆盖当前独立网络原型的双玩家空初始库存、独立累计与双端同步、同名合并、金币/经验/小块肉三项奖励一致、离线不补发和重新加入清空；非致命无奖、每敌人一次、多目标分别结算及原体力、移动、伤害和死亡显示回归范围见[运行入口](Runtime.md)。第 4B 及更早通过范围保持，不扩展为正式背包 UI、道具使用、存档、规模性能、平台构建或线上联调验收。人工通过结论来自用户反馈，AI 未执行逻辑单元测试、PlayMode、命令行构建、发布或图片检查。
+
+## 【KNOWN ISSUES】第 4D 阶段库存恢复验收
+
+候选库存序列化、全部校验后恢复及保存成功后入包的调用点已静态核对，原背包 Ghost 字段保持；用户已确认第 4D 人工 GamePlayer 验收通过，主线程结合既有静态验收与用户反馈判定该阶段通过。库存范围覆盖多人独立保存、恢复后同名继续累计、重启恢复、坏库存拒绝加入及写盘失败三项均不到账，完整边界见[运行入口](Runtime.md)。第 4C 当时空背包重入的通过结论保持其历史范围；AI 未运行逻辑单元测试、PlayMode、构建、发布或图片检查。

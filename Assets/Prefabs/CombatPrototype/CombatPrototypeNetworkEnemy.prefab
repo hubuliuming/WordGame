@@ -90,6 +90,14 @@ MonoBehaviour:
   MaxHealth: 100
   MoveSpeed: 2
   StopDistance: 1.5
+  AttackDamage: 10
+  AttackRange: 1.75
+  AttackStartupSeconds: 0.5
+  AttackRecoverySeconds: 1
+  RewardCoin: 1
+  RewardExperience: 10
+  RewardItemName: "\u5C0F\u5757\u8089"
+  RewardItemQuantity: 1
 --- !u!114 &3289694339824754252
 MonoBehaviour:
   m_ObjectHideFlags: 0

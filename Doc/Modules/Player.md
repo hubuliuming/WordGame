@@ -77,7 +77,7 @@ ChangeAll 先得到本次最终上限，再据其约束本次有非零增量的�
 
 `CombatPrototypePlayerNetCodeAuthoring` 为玩家 Ghost 烘焙速度 `5`、`CombatPrototypePlayerInput` 和近战数据；NetCode 为 `IInputComponentData` 生成输入缓冲。服务端握手后设置 `GhostOwner.NetworkId`、启用 `AutoCommandTarget`，并把连接 `CommandTarget` 指向玩家；玩家加入连接 `LinkedEntityGroup`，跟随断线销毁。
 
-玩家 Ghost 使用 `OwnerPredicted`：本地拥有者预测，其他客户端插值。`CombatPrototypePlayerInputSystem` 只给 `GhostOwnerIsLocal` 写入 WASD 世界 X/Z 移动，以及空格/鼠标左键 `InputEvent` 攻击事件。`CombatPrototypePlayerMovementSystem` 在 Client/Server 预测组中只处理带 `Simulate` 的实体，以相同输入更新 LocalTransform；移动输入拒绝非有限值并限制长度，旋转直接设置当前移动朝向。网络玩家不接第 1 阶段 CharacterController 的相机相对移动、重力或碰撞链。
+玩家 Ghost 使用 `OwnerPredicted`：本地拥有者预测，其他客户端插值。`CombatPrototypePlayerInputSystem` 只给 `GhostOwnerIsLocal` 写入 WASD 世界 X/Z 移动，以及空格/鼠标左键 `InputEvent` 攻击事件；第 6B 增加 R 键 `Respawn` 输入事件。`CombatPrototypePlayerMovementSystem` 在 Client/Server 预测组中只处理带 `Simulate` 的实体，以相同输入更新 LocalTransform；移动输入拒绝非有限值并限制长度，旋转直接设置当前移动朝向。网络玩家不接第 1 阶段 CharacterController 的相机相对移动、重力或碰撞链。
 
 ## 【KNOWN ISSUES】第 2B 阶段玩家验收
 
@@ -87,7 +87,7 @@ ChangeAll 先得到本次最终上限，再据其约束本次有非零增量的�
 
 ## 【FACT】第 3A 阶段玩家与敌人目标关系
 
-群体敌人的目标入口复用当前在线连接的 CommandTarget.targetEntity，只接受已进入游戏且连接状态为 Connected 的有效玩家；目标选择读取服务端玩家移动后的 X/Z 位置。断线连接不会继续作为追踪候选，无候选时敌人停止。玩家 Ghost、移动速度、输入、预测和近战时序参数保持原值；近战命中改由空间查询生成各敌人的伤害事件，详见[战斗](Combat.md)。
+群体敌人的目标入口复用当前在线连接的 CommandTarget.targetEntity，只接受已进入游戏且连接状态为 Connected 的有效玩家；第 6A 同时排除玩家生命组件标记为死亡的目标。目标选择读取服务端玩家移动后的 X/Z 位置，断线或死亡玩家不会继续作为追踪候选，无候选时敌人停止。玩家 Ghost、移动速度、输入、预测和近战时序参数保持原值；近战命中由空间查询生成各敌人的伤害事件，详见[战斗](Combat.md)。
 
 ## 【KNOWN ISSUES】第 3A 阶段玩家关联验收
 
@@ -99,8 +99,78 @@ ChangeAll 先得到本次最终上限，再据其约束本次有非零增量的�
 
 ## 【CURRENT STRATEGY】第 4A 阶段体力生命周期
 
-体力由服务端近战系统在成功启动攻击时扣除，客户端只接收 Ghost 状态并记录日志，不做本地扣费或体力预测。具体接受、拒绝与时序规则见[战斗](Combat.md)。没有自动恢复；连接销毁时沿原 LinkedEntityGroup 销毁玩家，重新加入沿原 GoInGame 握手生成新玩家，从烘焙初值 100 开始。网络体力不接入正式 `Game`、`PlayerModel`、`PlayerDataStore`，没有账号、奖励、背包或存档链。
+体力由服务端近战系统在成功启动攻击时扣除，客户端只接收 Ghost 状态并记录日志，不做本地扣费或体力预测。具体接受、拒绝与时序规则见[战斗](Combat.md)。没有自动恢复；第 6B 手动复活由服务端补满体力。连接销毁时沿原 LinkedEntityGroup 销毁玩家，重新加入沿原 GoInGame 握手生成新玩家，从烘焙初值 100 开始。网络体力不接入正式 `Game`、`PlayerModel`、`PlayerDataStore`，体力没有账号或持久化链；金币、经验与背包的固定 ID 恢复见本页第 4D 节。
 
 ## 【KNOWN ISSUES】第 4A 阶段玩家验收
 
-新组件与字段已由 Unity 编译并确认类型加载，玩家 Prefab 参数及实际 SubScene 烘焙中的体力 100/100、成本 10 已静态核对。`UNKNOWN`：人工 GamePlayer 的双玩家体力独立性、双端同步、空挥扣费、攻击期间重复输入、耗尽拒绝、不自动恢复及断线重新加入初值。第 2B、第 3A 与第 3B 的既有人工通过结论不包含第 4A；AI 未运行逻辑单元测试、PlayMode、命令行构建、发布或图片检查。
+新组件与字段、玩家 Prefab 参数及实际 SubScene 烘焙已完成静态核对；用户已确认第 4A 人工 GamePlayer 验收通过，主线程结合既有静态验收与用户反馈判定第 4A 阶段通过。玩家验收仅覆盖当前独立网络原型的双玩家体力独立性及双端同步、成功启动攻击一次扣 10（含空挥）、忙碌输入拒绝且阶段继续推进、10 次成功启动后体力耗尽并拒绝后续攻击且序号不增加、无自动恢复、断线重新加入恢复 100，以及原移动回归；群体伤害与死亡显示回归范围见[战斗](Combat.md)。第 2B、第 3A 与第 3B 的既有通过范围保持原状，不扩展为规模性能、平台构建或线上联调验收。人工通过结论来自用户反馈，AI 未运行逻辑单元测试、PlayMode、命令行构建、发布或图片检查。
+
+## 【FACT】第 4B 阶段本局奖励状态
+
+每个网络玩家 Ghost 独立持有 `CombatPrototypePlayerReward`，整数 `Coin` 与 `Experience` 均为 GhostField。现有玩家 Baker 添加该组件，烘焙金币和经验初值均为 0；玩家 Authoring 序列化字段与玩家 Prefab 保持。该数据属于独立网络原型，现由第 4D 固定 ID 存档保存和恢复，不是正式 PlayerModel 的金币、经验或存档。
+
+## 【CURRENT STRATEGY】第 4B 阶段本局奖励生命周期
+
+`CombatPrototypeRewardSystem` 在服务端伤害系统之后消费击杀奖励事件，从带 NetworkStreamInGame、NetworkId、CommandTarget 且状态为 Connected 的连接确认接收玩家。当前结算包含第 4C 物品，并按第 4D 在完整候选存档写入成功后同次提交金币、经验和目标物品；客户端仅接收 Ghost 并沿用状态日志。归属、整体失败与每敌人奖励规则见[战斗](Combat.md)。
+
+结算时攻击者已离线则记录 AttackerOffline 并消费事件，不补发；连接销毁时玩家沿原 LinkedEntityGroup 销毁。第 4D 重新加入按固定 ID 恢复金币/经验与背包，仅无档新玩家从 0/0 与空背包开始；体力仍从 100 开始。正式账号、PlayerModel/PlayerDataStore、正式背包、实体掉落、升级和奖励 UI 保持原边界；本局背包见第 4C 节。
+
+## 【KNOWN ISSUES】第 4B 阶段玩家验收
+
+代码编译、两个 GhostField 及其生成的 Serializer/Snapshot、实际烘焙的 0/0 初值已完成静态核对；用户已确认第 4B 人工 GamePlayer 验收通过，主线程结合既有静态验收与用户反馈判定第 4B 阶段通过。玩家验收仅覆盖当前独立网络原型的致命一击归属并获得金币 1/经验 10、双玩家累计独立与双端同步、离线不补发和重新加入归零；非致命无奖、每敌人一次、多目标分别结算及原体力/伤害/死亡显示回归范围见[战斗](Combat.md)。既有第 2B、第 3A、第 3B、第 4A 通过结论保持原范围，不扩展为规模性能、平台构建或线上联调验收。人工通过结论来自用户反馈，AI 未执行逻辑单元测试、PlayMode、命令行构建、发布或图片检查。
+
+## 【FACT】第 4C 阶段本局背包生命周期
+
+每名玩家独立持有 `CombatPrototypeInventoryItem` Ghost 缓冲，玩家 Baker 烘焙为空，玩家 Authoring 序列化参数与玩家 Prefab 保持。运行实体随原连接生命周期销毁；第 4D 再次加入按固定 ID 恢复背包与金币/经验，无档新玩家为空背包与 0/0，所有加入均为体力 100/100。库存名称与数量、同名累加和同步规则由[背包与道具](Inventory.md)维护，玩家不接正式存档或账号身份。
+
+## 【KNOWN ISSUES】第 4C 阶段玩家验收
+
+编译、背包 Ghost 字段及实际烘焙初值已静态核对；用户已确认第 4C 人工 GamePlayer 验收通过，主线程结合既有静态验收与用户反馈判定第 4C 阶段通过。玩家验收仅覆盖当前独立网络原型的双玩家空初始背包、独立累计与双端同步、致命一击金币/经验/小块肉三项奖励一致、同名合并、离线不补发、重新加入空背包，以及原体力和移动回归；非致命无奖、每敌人一次、多目标分别结算、伤害和死亡显示回归范围见[战斗](Combat.md)。第 4B 和更早通过结论保持原范围，不扩展为规模性能、平台构建或线上联调验收。人工通过结论来自用户反馈，AI 未执行逻辑单元测试、PlayMode、命令行构建、发布或图片检查。
+
+## 【FACT】第 4D 阶段固定身份与玩家准入
+
+`CombatPrototypeGoInGameRequest` 携带 `FixedString64Bytes PlayerId`。服务端在同一个 GoInGame 入口验证 ID、读取并完整校验存档后才排入玩家实例化；新增 `CombatPrototypePlayerIdentity` 在准入时仅添加到服务端玩家，未加入 GhostField 或玩家 Baker，未新增 Prefab 挂载。身份配置与存档字段由[资源与数据](DataResources.md)维护。
+
+## 【CURRENT STRATEGY】第 4D 阶段加入、重复身份与恢复
+
+已进入游戏的同一连接重复 RPC 沿原规则消费，不生成第二个玩家；同一更新内每个连接只处理一次。服务端从 Connected、NetworkStreamInGame、NetworkId、CommandTarget 指向的有效玩家收集占用 ID，并在接受本次请求后立即占用该 ID，覆盖同一更新内不同连接竞争同一 ID 的情况。已在线 ID 拒绝新连接，保留原玩家；无效 ID、坏档或读取失败记录错误并请求断开，仅终止当前请求。
+
+完整恢复 Coin、Experience 和库存后，沿原 GhostOwner、AutoCommandTarget、CommandTarget、生成位置及 LinkedEntityGroup 绑定。仅无档新玩家采用 0/0、空库存；体力仍为烘焙 100/100，第 6A 生命也从烘焙 100/100 开始，攻击状态与位置重新初始化。断线销毁仍由原 NetCode 生命周期负责；存档在成功奖励时已保存，不增加断线补存或退出回调。
+
+## 【KNOWN ISSUES】第 4D 阶段玩家验收
+
+身份组件、握手系统及新 RPC Serializer 已由 Unity 编译并加载；用户已确认第 4D 人工 GamePlayer 验收通过，主线程结合既有静态验收与用户反馈判定该阶段通过。玩家范围覆盖独立 ID 加入、同 ID 重连/服务端重启恢复、重复 ID 拒绝、坏档隔离及体力重置，完整边界见[运行入口](Runtime.md)。第 4B/4C 的归零与空背包记录保持当时范围；第 4D 人工通过来自本阶段用户反馈，AI 未运行逻辑单元测试、PlayMode、构建、发布或图片检查。
+
+## 【FACT】第 6A 阶段网络玩家生命
+
+[CombatPrototypePlayerHealth.cs](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypePlayerHealth.cs) 保存每名玩家独立的 float CurrentHealth、MaxHealth、uint HitSequence 与 byte IsDead，四项均为 GhostField。原玩家 Baker 从 InitialHealth=100、MaxHealth=100 烘焙生命，受击序号和死亡标记为 0；只接受有限的 `0 < InitialHealth <= MaxHealth`，非法配置直接暴露错误。
+
+玩家同时持有仅服务端保留的 [CombatPrototypePlayerDamageEvent](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypePlayerDamageEvent.cs) 空缓冲，每条事件包含敌人实体、攻击序号和伤害。客户端接收生命快照，生命扣减由服务端伤害系统结算，局内恢复由第 6B 复活系统写入，不调用正式 PlayerModel 或 PlayerDataStore；事件产生与结算顺序由[战斗](Combat.md)维护。
+
+## 【CURRENT STRATEGY】第 6A 阶段死亡与生命生命周期
+
+CurrentHealth 降至 0 后设置 IsDead=1，后续伤害不再扣血或递增受击序号。玩家移动系统在读入移动与旋转前检查死亡标记；服务端近战系统在死亡分支取消未完成阶段并清零计时，后续攻击输入记录 PlayerDead，不再扣体力、递增攻击序号或生成伤害。已经启动攻击的原体力扣费保持，原存活玩家攻击流程沿用。
+
+死亡玩家保留连接、实体、金币/经验/库存及原 Mono 显示，敌人排除其追踪与反击资格；局内手动复活见第 6B 节，尚未接入玩家死亡隐藏、治疗或受击动画。断线仍沿原 LinkedEntityGroup 销毁玩家，再次加入重新生成生命 100/100、受击序号 0、未死亡；金币/经验/背包继续按第 4D 固定 ID 恢复，生命不入存档。
+
+## 【KNOWN ISSUES】第 6A 阶段玩家验收
+
+生命 Ghost Serializer/Snapshot 四字段、实际生命初值与空伤害缓冲已静态核对；用户已确认第 6A 人工 GamePlayer 验收通过，主线程结合既有静态验收与用户反馈判定该阶段通过。玩家范围覆盖双玩家生命独立与双端同步、死亡后停止移动/攻击且不再扣体力或增加攻击序号、敌人排除死亡玩家、重新加入重置生命并恢复原固定 ID 奖励/背包，完整边界由[运行入口](Runtime.md)维护。第 4D 及以前的通过范围保持；本结论不包含规模性能、平台构建或线上联调，AI 未执行游戏系统、PlayMode 或逻辑单元测试。
+
+## 【FACT】第 6B 阶段手动复活入口
+
+[CombatPrototypePlayerInput.cs](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypePlayerInput.cs) 在现有 IInputComponentData 中增加 InputEvent Respawn；客户端 R 键按下当帧只给 GhostOwnerIsLocal 写入事件，沿原 NetCode 输入缓冲发送。输入不按客户端生命快照过滤，死亡资格由服务端当次伤害结算后的 IsDead 判定。
+
+[CombatPrototypePlayerRespawnSystem.cs](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypePlayerRespawnSystem.cs) 只进入 ServerSimulation 的 PredictedSimulationSystemGroup，并在玩家伤害结算之后更新。它沿 Connected、NetworkStreamInGame、未请求断线的连接 CommandTarget 读取玩家，只处理当前启用 Simulate 的玩家；GhostOwner 必须与连接 NetworkId 一致。存活请求记录 PlayerAlive 并拒绝，归属不一致记录 CommandTargetOwnerMismatch 并拒绝。
+
+## 【CURRENT STRATEGY】第 6B 阶段复活状态
+
+服务端确认死亡后，先取得必需玩家组件与伤害缓冲引用，再清理旧敌人锁定，清空玩家伤害缓冲；玩家近战回 Ready、计时为 0，CurrentPower=UpperPower、CurrentHealth=MaxHealth、IsDead=0。位置按原加入公式恢复到 (NetworkId * 2, 1, 0)，旋转和缩放保留。复活沿用原玩家实体、连接和身份，不创建新 Ghost；HitSequence、玩家及敌人攻击序号不因复活归零或递增，金币/经验/库存与存档保持原值。
+
+复活发生在本 tick 已完成的移动、近战、反击和玩家伤害之后，本 tick 不再次移动或攻击，后续 tick 恢复原操作与敌人候选资格；同 tick 的 R 请求若在该结算点已死亡，也按死亡状态处理。客户端等待原生命/体力/位置快照，不自行恢复生命或预测复活。旧敌人挥击的取消与后摇规则归[战斗](Combat.md)。
+
+必需组件或缓冲获取失败记录连接、玩家、NetworkId、阶段与原始异常，终止当前玩家处理并继续其他连接，不补默认组件或状态。没有复活保护时间、自动复活、额外复活费用或持久化生命/体力。
+
+## 【KNOWN ISSUES】第 6B 阶段玩家验收
+
+输入字段、独立系统及 NetCode 生成类型已编译并加载，源代码与编译后系统特性、文件边界已静态核对；用户已确认第 6B 人工 GamePlayer 验收通过，主线程结合既有静态核对与用户反馈判定该阶段通过。玩家范围覆盖 R 键死亡复活、满生命/满体力与原加入位置、双玩家独立及双端同步、存活请求拒绝、重复输入、序号与奖励/库存保持和原操作/存档回归，完整边界归[运行入口](Runtime.md)。复活点附近有敌人时仍可再次受伤或死亡；第 6A 及此前通过结论保持，人工通过来自用户反馈，AI 未运行 GamePlayer 或逻辑单元测试。

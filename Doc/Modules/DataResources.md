@@ -28,7 +28,7 @@
 - UNITY_EDITOR 及其他平台分支：`Application.streamingAssetsPath + "/Data/..."`。
 - UNITY_ANDROID 分支：`"jar:file://" + Application.dataPath + "!/assets/Data/..."`。
 - JsonUti.ReadFromJson 使用 StreamReader 和 JsonConvert.DeserializeObject；WriteToJson 使用 StreamWriter 和缩进序列化，直接写入给定路径。
-- 当前调用未切换到 persistentDataPath；没有在 JsonUti 中实现网络下载、Android jar 内容读取、目录创建或单项异常隔离。
+- 上述正式 JSON 调用未切换到 persistentDataPath；没有在 JsonUti 中实现网络下载、Android jar 内容读取、目录创建或单项异常隔离。独立网络原型使用本页第 4D 节的存储类与路径，不复用这些正式存档调用。
 - PlayerDataStore.Load 对缺失 PlayerData、goodsDict 或必需 Coin 键显式抛出数据错误，不创建默认存档。Save 捕获文件写入/序列化异常并记录路径及原异常，返回 false；调用方回滚本次内存改动。原 JSON 形状、字段与存储路径不变。
 - 磁盘实际目录拼写为 `Assets/streamingAssets`。目标平台大小写与可写性未经过构建验证。
 
@@ -113,6 +113,49 @@ EditorTest 声明以下菜单；三个重写菜单直接写入上表对应 JSON�
 - Android 分支产生 jar URI，但 JsonUti 仍使用文件流；当前文件读写方式与 Android URI 接入没有在代码中衔接。平台实际运行结果为 `UNKNOWN`。
 - 玩家加载失败保持显式错误，保存失败会返回 false；JsonUti 仍直接写原文件，尚无原子替换/备份保证。敌人/道具按名称取不到配置或必需组件缺失时，对象池清理该失败实例并保留原异常；背包仅在独立格子边界记录、跳过失败项，不提供配置或节点兜底。
 - 编辑器重写菜单是覆盖写入入口；其数值来源与当前文件不同，执行记录不能被当作玩家运行存档的来源证明。
+
+## 【FACT】第 4D 阶段网络原型存档格式与路径
+
+[CombatPrototypePlayerSaveData.cs](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypePlayerSaveData.cs) 定义版本化存档，[CombatPrototypePlayerSaveStore.cs](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypePlayerSaveStore.cs) 是服务端唯一文件读写入口。路径为 `Application.persistentDataPath/CombatPrototype/Players/<PlayerId>.json`；当前 Editor 的根目录实际为 `C:/Users/91611/AppData/LocalLow/DefaultCompany/Code_01`。正式 `Assets/streamingAssets/Data/PlayerData/Player.json` 与 PlayerDataStore 保持原状。
+
+| 字段 | 当前契约与加载检查 |
+|---|---|
+| Version | 必需整数，当前仅支持 1 |
+| PlayerId | 必需字符串，必须与请求的已验证 ID 按 Ordinal 完全一致 |
+| Coin / Experience | 必需整数，范围 0～int.MaxValue |
+| Items | 必需数组，允许空数组；每项恰含 ItemName、Quantity |
+| ItemName | 必需字符串，非空白、严格 UTF-8 有效且字节数不超过 FixedString64Bytes.UTF8MaxLengthInBytes；同名 Ordinal 重复拒绝整个存档 |
+| Quantity | 必需整数，范围 1～int.MaxValue |
+
+根对象恰含上述五个字段，库存项恰含上述两个字段；缺字段、未知字段、JSON 重复属性、错误类型（含浮点数或数字字符串）、不支持版本、非法数值及不匹配身份均拒绝。UTF-8 严格读取（支持 UTF-8 BOM）、UTF-8 无 BOM 写入；没有迁移、自动修正、跳过坏库存项或重写坏档。
+
+第 6A 玩家生命、上限、受击序号和死亡标记均不加入该 JSON，体力也不持久化；重新生成沿既有玩家 Baker 初值初始化生命与体力，金币/经验/背包仍按固定 ID 恢复。生命职责归[玩家](Player.md)，原 Prefab 新参数与实际烘焙归[运行入口](Runtime.md)。
+
+## 【FACT】第 4D 阶段开发 ID 配置
+
+[CombatPrototypeDevelopmentIdentity.cs](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypeDevelopmentIdentity.cs) 优先读取进程参数 `-combatPrototypePlayerId <ID>`，该参数只允许出现一次，并对当前进程内的客户端 World 生效。
+
+无该参数时，Editor 读取 [UserSettings/CombatPrototypeDevelopmentIdentity.json](../../UserSettings/CombatPrototypeDevelopmentIdentity.json)：Version=1、Clients 为按 World.Name 精确匹配的对象，当前明确配置 `ClientWorld: player-a`；多个 World 使用该文件时须分别列出各自的明确 ID。
+
+独立第二进程可声明 `-combatPrototypePlayerId player-b`；非 Editor 缺参数或 Editor 缺配置项时显式报错并断开，不随机分配或回退。
+
+[CombatPrototypePlayerIdentity.cs](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypePlayerIdentity.cs) 在客户端配置与服务端 RPC 两个输入边界使用同一规则：ID 长度 1～32，仅小写 ASCII 字母、数字、下划线、连字符；拒绝 con/prn/aux/nul 与 com1～com9、lpt1～lpt9 等保留文件名。该限制使各 ID 的文件名固定且不含路径分隔符；固定 ID 只用于开发存档，不是账号认证。
+
+## 【CURRENT STRATEGY】第 4D 阶段读取与写入边界
+
+服务端以 FileMode.Open 读取正式文件，只把 FileNotFoundException 或 DirectoryNotFoundException 认作首次无档，采用已确认的 0/0 与空库存；权限、I/O、解码、JSON 或字段校验错误交回握手边界记录并拒绝当前玩家，原文件保留。读取只认正式 `.json`，失败遗留的 `.json.tmp` 不作为可恢复存档。
+
+每个在线击杀奖励先准备完整最终金币/经验、目标物品及必要缓冲容量，再把当前库存与目标最终值投影为一个 JSON 候选。存储类序列化该候选，在同一目录写 `<PlayerId>.json.tmp`、Flush(true)，有旧正式文件时 File.Replace，无旧文件时 File.Move；服务端运行时按该固定路径创建 Players 目录。只有保存函数成功返回后才修改三项 ECS 状态，失败时旧正式文件与旧玩家数值保持，事件消费与后续隔离见[战斗](Combat.md)。
+
+没有另外的备份文件、定时保存、断线补存或退出保存；准入恢复由[玩家](Player.md)维护，原型背包规则由[背包与道具](Inventory.md)维护。AI 静态核对未调用读写存档的业务方法，实际保存与恢复由人工 GamePlayer 验收确认。
+
+## 【KNOWN ISSUES】第 4D 阶段存储验收
+
+四份脚本已由 Unity 编译并加载；文件路径、JSON 校验、临时文件替换与奖励提交顺序已静态核对。用户已确认第 4D 人工 GamePlayer 验收通过，主线程结合既有静态验收与用户反馈判定该阶段通过；存储范围覆盖多人独立文件、重连/重启恢复、重复身份与坏档拒绝、I/O 失败保留旧档且不部分到账，完整边界见[运行入口](Runtime.md)。本规则仅覆盖当前开发原型的单服务端本地文件写入，不包含正式账号、跨服务器协调、掉电恢复保证、迁移或平台构建验收；AI 未运行逻辑单元测试、PlayMode、构建、发布或图片检查。
+
+## 【FACT】第 5A 阶段存档耗时入口
+
+当前存储类在 Load 与 SavePrepared 入口提供 Profiler 标记，文件契约与原提交顺序保持。标记计量边界、单位、调用次数与待采集结果统一归[性能基线](Performance.md)；标记编译完成不表示实际存档耗时已测得。
 
 ## 未知项与验收状态
 

@@ -98,19 +98,19 @@ Map 中存在 TestController 的脚本引用（GUID `42f2add30349522408099dbf10f
 
 独立主场景为 `Assets/Scenes/CombatPrototypeNetCode.unity`，保留 Main Camera、Directional Light 与自动加载的 `CombatPrototypeNetCodeSubScene`。子场景路径为 `Assets/Scenes/CombatPrototypeNetCode/CombatPrototypeNetCodeSubScene.unity`，唯一 `CombatPrototypeNetworkRoot` 挂载 `CombatPrototypePlayerSpawnerAuthoring`，显式引用玩家、敌人两个 Ghost Prefab；Root 自身没有 Ghost，场景中没有额外玩家或敌人 Ghost 实例。
 
-运行调用链为：`SubScene 数据加载 → 客户端发送 GoInGame RPC → 服务端唯一握手入口生成玩家 → GhostOwner / AutoCommandTarget / CommandTarget 绑定 → 玩家加入连接 LinkedEntityGroup → NetworkStreamInGame`。重复或失效 RPC 不重复生成玩家；连接销毁时由 NetCode 的 LinkedEntityGroup 销毁对应玩家。服务端的 `CombatPrototypeEnemySpawnSystem` 从同一个 Spawner 批量生成 `32` 个现有敌人 Ghost，以 `(0, 1, 2)` 为首个网格位置，在 X/Z 平面按 `8` 列、`4` 行、间距 `3` 排列；玩家生成位置沿用 `(NetworkId * 2, 1, 0)`。批量生成只尝试一次，逐项记录和隔离实例化/初始化失败，清理当前项半成品，日志分别记录成功与失败数量。
+运行调用链为：`SubScene 数据加载 → 客户端读取第 4D 固定 ID 并发送 GoInGame RPC → 服务端唯一握手入口验证身份与存档 → 生成玩家并恢复金币/经验/背包 → GhostOwner / AutoCommandTarget / CommandTarget 绑定 → 玩家加入连接 LinkedEntityGroup → NetworkStreamInGame`。重复或失效 RPC 不重复生成玩家；连接销毁时由 NetCode 的 LinkedEntityGroup 销毁对应玩家。服务端的 `CombatPrototypeEnemySpawnSystem` 从同一个 Spawner 批量生成 `32` 个现有敌人 Ghost，以 `(0, 1, 2)` 为首个网格位置，在 X/Z 平面按 `8` 列、`4` 行、间距 `3` 排列；玩家生成位置沿用 `(NetworkId * 2, 1, 0)`。批量生成只尝试一次，逐项记录和隔离实例化/初始化失败，清理当前项半成品，日志分别记录成功与失败数量。
 
 `Assets/Prefabs/CombatPrototype/` 中的玩家 Ghost 使用 `HasOwner`、`OwnerPredicted`、`SupportedGhostModes=All` 和自动输入目标；敌人 Ghost 使用 `Interpolated`。玩家通过官方 `GhostPresentationGameObjectAuthoring.ClientPrefab` 绑定原 Mono 表现 Prefab，并由官方桥接同步 Transform，服务端表现引用为空。敌人根节点已直接配置 MeshFilter/MeshRenderer，原 ClientPrefab 已清空；实体渲染与死亡隐藏见本页第 3B-2 节。
 
 ## 【CURRENT STRATEGY】第 3A 阶段观测入口
 
-原型保留日志入口：`CombatPrototypeNetCodeLogSystem` 在 Client/Server World 中记录玩家数量及敌人存活/死亡数量变化，每 2 秒记录玩家位置、旋转、攻击阶段/序号，以及各敌人 Ghost ID、位置、HP、受击序号、死亡标记；服务端同时记录各敌人目标 NetworkId。服务端另记录握手、批量生成结果、攻击开始、空间查询命中目标数和事件扣血日志。WASD 写入世界 X/Z 平面移动，空格或鼠标左键发送基础攻击事件；状态含义见[玩家](Player.md)与[战斗](Combat.md)。
+原型保留日志入口：`CombatPrototypeNetCodeLogSystem` 在 Client/Server World 中记录玩家数量及敌人存活/死亡数量变化，每 2 秒记录玩家位置、旋转、攻击阶段/序号、生命/上限、受击序号及死亡标记，以及各敌人 Ghost ID、位置、HP、受击序号、死亡标记；服务端同时记录各敌人目标 NetworkId。服务端另记录握手、批量生成结果、攻击开始、空间查询命中目标数和事件扣血日志。WASD 写入世界 X/Z 平面移动，空格或鼠标左键发送基础攻击事件；第 6B 的 R 键发送手动复活请求，独立服务端系统记录接受、拒绝和处理失败。状态含义见[玩家](Player.md)与[战斗](Combat.md)。
 
 ## 【KNOWN ISSUES】第 2B 阶段验收边界
 
 - 代码编译、Unity 资源绑定与 Editor 配置的 SubScene 烘焙产物已核对；用户已确认本阶段人工 GamePlayer 验收通过，主线程结合静态检查与用户反馈判定第 2B 阶段通过。
 - 验收范围仅当前独立网络原型：两个玩家加入/退出、跨客户端移动与朝向同步、本地输入预测、基础近战和单敌人生命/受击/死亡状态及 Mono 表现；不扩展为群体 ECS、正式 Map、平台构建、大规模性能或线上联调验收。
-- UI 保留 TODO；房间/匹配、Relay、敌人反击、寻路避障、正式 Map、属性奖励和存档未接入本网络原型。第 3A 已接入群体生成、最近在线玩家追踪及空间查询伤害链，验收边界见下节。
+- UI 保留 TODO；房间/匹配、Relay、寻路避障、正式 Map、正式属性奖励与正式存档保持原边界；独立网络奖励与开发固定 ID 存档的当前入口见本页第 4B/4C/4D 节，敌人反击与玩家受伤见第 6A 节。第 3A 已接入群体生成、最近在线玩家追踪及空间查询伤害链，验收边界见下节。
 - 当前渲染管线为 URP，玩家保留官方 Mono 表现桥接，敌人已接入 Entities Graphics；第 3B-2 已由用户确认人工 GamePlayer 验收通过，范围见本页对应验收节。Console 中的既有 No SRP、PEListener 序列化与 DOTween 弃用记录不能作为本阶段运行验收通过的依据，诊断记录见 ChangeLog。
 - AI 未执行本阶段逻辑单元测试、PlayMode、命令行构建或平台发布；人工 GamePlayer 通过结论来自用户明确反馈。
 - `UNKNOWN`：第 3 阶段清单之外的面板交互与显示效果、生命周期调用组合，以及全部场景组件的完备性。第 4 阶段已完成两个面板和详情文本监听的静态生命周期接入，人工交互验收仍待主线程确认。
@@ -129,7 +129,7 @@ CombatPrototypeEnemySpawnSystem 在服务端网络接收之后、握手系统之
 
 ## 【KNOWN ISSUES】第 3A 阶段验收边界
 
-第 3A 代码已经 Unity 编译，Editor 保存的 Prefab/SubScene 参数和实际烘焙产物已读取核对；用户已确认本阶段人工 GamePlayer 验收通过，主线程结合静态检查与用户反馈判定第 3A 阶段通过。验收仅覆盖当前独立网络原型的双客户端 32 敌人生成、最近在线玩家选择与玩家加入/退出后的目标切换、停止距离与无在线玩家时停止追踪、群体近战每次攻击每目标去重及伤害 25、死亡后停止移动和受击，以及双端 HP、死亡状态与存活/死亡统计一致性。第 2B 的通过结论只覆盖此前单敌人原型范围；本次第 3A 通过结论不扩展为正式 Map、平台构建、大规模性能或线上联调验收。AI 未执行逻辑单元测试、PlayMode、命令行构建或平台发布，也未读取图片。当前使用 URP，玩家保留 Mono 表现；敌人 Entities Graphics 接入的验收边界见第 3B-2 节，敌人反击与寻路避障未接入。
+第 3A 代码已经 Unity 编译，Editor 保存的 Prefab/SubScene 参数和实际烘焙产物已读取核对；用户已确认本阶段人工 GamePlayer 验收通过，主线程结合静态检查与用户反馈判定第 3A 阶段通过。验收仅覆盖当前独立网络原型的双客户端 32 敌人生成、最近在线玩家选择与玩家加入/退出后的目标切换、停止距离与无在线玩家时停止追踪、群体近战每次攻击每目标去重及伤害 25、死亡后停止移动和受击，以及双端 HP、死亡状态与存活/死亡统计一致性。第 2B 的通过结论只覆盖此前单敌人原型范围；本次第 3A 通过结论不扩展为正式 Map、平台构建、大规模性能或线上联调验收。AI 未执行逻辑单元测试、PlayMode、命令行构建或平台发布，也未读取图片。当前使用 URP，玩家保留 Mono 表现；敌人 Entities Graphics 接入的验收边界见第 3B-2 节，敌人反击/玩家受伤见第 6A 节，寻路避障仍未接入。
 
 ## 【FACT】第 3B-1 阶段渲染配置与材质
 
@@ -173,4 +173,111 @@ URP 与 Linear 是全项目配置，影响所有场景；玩家保留原 Mono �
 
 ## 【KNOWN ISSUES】第 4A 阶段运行验收
 
-代码编译、新组件类型加载、玩家 Prefab 参数及实际烘焙数据已静态核对；第 4A 人工 GamePlayer 结果仍为 `UNKNOWN`，包括双玩家独立体力及双端日志一致性、消耗与拒绝分支、不自动恢复、重新加入初始体力和原移动/32 敌人战斗表现回归。既有第 2B、第 3A 与第 3B 人工通过结论保持原范围；AI 未执行逻辑单元测试、PlayMode、命令行构建、平台发布或图片读取。
+代码编译、新组件类型加载、玩家 Prefab 参数及实际烘焙数据已完成静态核对；用户已确认第 4A 人工 GamePlayer 验收通过，主线程结合既有静态验收与用户反馈判定第 4A 阶段通过。验收仅覆盖当前独立网络原型的双玩家独立体力及双端同步、成功启动攻击一次扣 10（含空挥）、忙碌输入拒绝且阶段继续推进、10 次成功启动后耗尽并拒绝后续攻击且序号不增加、无自动恢复、断线重新加入恢复 100，以及原移动、群体伤害和死亡显示回归。既有第 2B、第 3A 与第 3B 人工通过结论保持原范围，本阶段不扩展为规模性能、平台构建或线上联调验收。人工通过结论来自用户反馈，AI 未执行逻辑单元测试、PlayMode、命令行构建、平台发布或图片读取。
+
+## 【FACT】第 4B 阶段奖励资源与烘焙
+
+`Assets/Prefabs/CombatPrototype/CombatPrototypeNetworkEnemy.prefab` 在既有 Enemy Authoring 保存 RewardCoin=1、RewardExperience=10；相对执行前副本仅新增这两个参数，根节点、7 个组件、Ghost 与渲染引用不变。玩家 Authoring 只在 Baker 中添加本局奖励组件初值 0/0，玩家 Prefab 文本未修改；三份新增脚本的 meta 由 Unity 生成。
+
+现有 SubScene 的 Editor 配置已定点重新烘焙并只读反序列化：玩家 Coin/Experience=0/0；敌人奖励配置=1/10，奖励与伤害事件缓冲长度均为 0。玩家体力 100/100、成本 10、Ready/序号 0、速度 5、近战 25/2/100/0.18/0.08/0.3 保持；Spawner=1、敌人 32、8 列、间距 3、首位置 (0,1,2)、HP100/速度2/停止1.5 保持，玩家 Mono 表现及敌人根实体渲染引用保持。临时读取 World 的 systems=0，读取后释放，没有执行游戏系统；四份网络 Prefab 均无缺失脚本。
+
+## 【CURRENT STRATEGY】第 4B 阶段奖励观测入口
+
+原每 2 秒玩家快照记录 coin 与 experience，当前还包含第 4C 背包日志，两端分别记录自身已持有的 Ghost 状态。服务端在首次死亡后记录 reward queued，在成功同次写回后记录 reward granted、当次奖励和 totalCoin/totalExperience；攻击者离线记录 reward skipped 与 AttackerOffline，数据缺失或结算异常输出带敌人、NetworkId、攻击序号和原因的错误日志。日志入口保持 `CombatPrototypeNetCodeLogSystem`，没有新增 UI；具体规则见[战斗](Combat.md)和[玩家](Player.md)。
+
+## 【KNOWN ISSUES】第 4B 阶段运行验收
+
+新增组件与系统已由 Unity 编译并加载，奖励 Ghost Serializer/Snapshot、Prefab 参数与实际烘焙已完成静态核对；用户已确认第 4B 人工 GamePlayer 验收通过，主线程结合既有静态验收与用户反馈判定第 4B 阶段通过。验收仅覆盖当前独立网络原型的非致命无奖、致命一击归属并获得金币 1/经验 10、每敌人一次奖励和多目标分别结算、双玩家累计独立与双端同步、离线不补发/重入归零，以及原体力、伤害和死亡显示回归。既有阶段通过范围保持，不扩展为规模性能、平台构建或线上联调验收。人工通过结论来自用户反馈，AI 未执行逻辑单元测试、PlayMode、命令行构建、发布或图片读取。
+
+## 【FACT】第 4C 阶段本局背包资源与烘焙
+
+现有 `CombatPrototypeNetworkEnemy.prefab` 的 Enemy Authoring 保存 RewardItemName=小块肉、RewardItemQuantity=1，Coin=1、Experience=10 保持；根节点、7 个既有组件、Ghost 与渲染引用保持。玩家 Baker 新增空背包缓冲，玩家 Prefab 没有新增序列化参数或组件挂载；新增缓冲脚本的 meta 由 Unity 生成。
+
+现有 SubScene 的 Editor 配置实际产物已重新烘焙并只读核对：玩家背包长度 0、Coin/Experience=0/0、体力 100/100、成本 10、Ready/序号 0；敌人奖励小块肉 1、金币 1、经验 10，两类事件缓冲均为空。玩家速度与近战、Spawner 的 32 敌人/8 列/间距 3/原点 (0,1,2)、敌人 HP100/速度2/停止1.5、根实体渲染及原 PlayerView 引用保持。读取时临时 World 的 systems=0，读取后释放；原 Editor/Streaming World 数量前后均为 6，没有创建或运行游戏系统。
+
+## 【CURRENT STRATEGY】第 4C 阶段背包观测入口
+
+`CombatPrototypeNetCodeLogSystem` 以只读 BufferLookup 访问背包，原每 2 秒玩家快照增加 `inventoryEntries`；每个条目另记录同一 World/玩家 NetworkId 下的 `inventoryItem` 和 `quantity`。空背包通过 inventoryEntries=0 表示；客户端记录已接收的 Ghost 状态，不发奖或自行改库存。服务端 reward queued/skipped/granted 日志包含物品名与当次数量，成功日志另含 totalItemQuantity；金币/经验原日志字段保持。
+
+## 【KNOWN ISSUES】第 4C 阶段运行验收
+
+Unity 编译、背包生成的 Ghost Serializer/Snapshot、Enemy Prefab 参数与实际产物已静态核对；用户已确认第 4C 人工 GamePlayer 验收通过，主线程结合既有静态验收与用户反馈判定第 4C 阶段通过。验收仅覆盖当前独立网络原型的双玩家空初始背包、独立累计与双端同步、非致命无奖、致命一击金币/经验/小块肉三项奖励一致、同名合并、每敌人一次和多目标分别奖励、离线不补发与重新加入空背包，以及原体力、移动、伤害和死亡显示回归。第 4B 及此前验收范围保持，不扩展为规模性能、平台构建或线上联调验收。人工通过结论来自用户反馈，AI 未执行逻辑单元测试、PlayMode、命令行构建、发布或图片读取。
+
+## 【FACT】第 4D 阶段资源与观测入口
+
+现有 Networking 新增 `CombatPrototypeDevelopmentIdentity`、`CombatPrototypePlayerIdentity`、`CombatPrototypePlayerSaveData`/`CombatPrototypePlayerSaveItem`、`CombatPrototypePlayerSaveStore` 四份脚本，meta 由 Unity 正常导入生成。既有 NetCodeLifecycle、RewardSystem、NetCodeLogSystem 分别接入准入恢复、保存后结算与身份日志；Scene、Prefab、Animator、既有 meta、正式玩家链及包/构建设置保持本阶段执行前状态。
+
+配置入口是 [CombatPrototypeDevelopmentIdentity.json](../../UserSettings/CombatPrototypeDevelopmentIdentity.json)，当前明确配置 `ClientWorld → player-a`；完整配置规则和存档格式见[资源与数据](DataResources.md)。
+
+服务端接受日志包含 NetworkId、PlayerId、restored、金币/经验、库存条目数与实际路径；重复 ID 记录 `PlayerIdAlreadyOnline`，准入/读取错误包含身份、路径和原异常。成功奖励日志为 `reward granted and saved`，失败日志为 `reward settlement or save failed`，原每 2 秒快照另记录服务端 `persistentPlayerId` 与 NetworkId 的映射。客户端只记录所声明的 ID 和已收到的 Ghost 状态，不读取或写入服务器存档。
+
+## 【KNOWN ISSUES】第 4D 阶段人工运行验收
+
+新增类型和包含 PlayerId 的 GoInGame RPC Serializer 已由 Unity 编译并加载，四份网络 Prefab 无缺失脚本，实际 persistentDataPath 为 `C:/Users/91611/AppData/LocalLow/DefaultCompany/Code_01`。静态检查覆盖准入先校验、同更新重复身份隔离、候选存档先写后提交与文件差异；AI 未运行游戏系统、PlayMode、逻辑单元测试、命令行构建、平台发布或图片检查。
+
+用户已确认第 4D 人工 GamePlayer 验收通过，主线程结合既有静态验收与用户反馈判定该阶段通过。以下为本阶段人工通过范围，客户端与服务端使用同一第 4D 代码版本：
+
+- 用不同固定 ID 加入；无档玩家为金币/经验 0/0、空库存和体力 100，两人的奖励与 JSON 独立且双端状态一致。
+- 每次击杀金币 1、经验 10、小块肉 1 一起到账；同名累计；同 ID 断线重入及服务端重启后恢复这三项，体力仍重置为 100。
+- 同 ID 已在线时新连接被拒绝，原玩家继续运行；配置缺失/非法 ID 被明确拒绝。
+- 离线状态下损坏 JSON、改变 Version 或构造非法库存后，该 ID 加入失败且原文件保留；其他合法 ID 仍能加入和结算。
+- 人工使保存失败后，该次三项均不增加、已有正式文件保留；失败事件不补发，其他独立事件继续。存储恢复后，后续成功奖励可继续保存。
+- 原移动、体力扣费、非致命无奖、每敌人一次、多目标分别结算及伤害、死亡显示回归。
+
+第 4B/4C 当时重入归零的通过结论保持原范围，第 4D 恢复通过来自本阶段用户反馈。当前只覆盖开发固定 ID 与服务端本地同步文件写入；正式认证、跨服务器并发存档、存档迁移、规模性能、平台构建和线上联调仍未验收。人工通过结论不表示 AI 执行过游戏系统、逻辑单元测试、PlayMode、构建、发布或图片检查。
+
+## 【FACT】第 5A 阶段性能入口
+
+首轮已确认规模为 2 玩家/32 敌人，沿用当前网络场景和人工 GamePlayer；存档读写 Profiler 标记已编译并注册。用户恢复该阶段后明确要求“不启动，静态检测”，本轮以第 6A 已验收版本核对配置、编译后的结算顺序、标记边界和临时助手覆盖缺口；Editor 未进入 PlayMode，Profiler 关闭，采集助手未注册回调。尚无运行采样，运行结果与最终性能验收仍为 UNKNOWN。采集口径、静态发现、环境、指标与限制统一归[性能基线](Performance.md)，本页不复制性能报告。
+
+## 【FACT】第 5B 阶段采集助手静态验收
+
+项目外助手 5B-1 按用户确认方案补齐 World/Tick、玩家生命/体力、敌人数量/阶段、连接 RTT、预测误差、Frame Timing 与负载事件记录；采集控制、World 只读查询与清理、原生结果检查分别由启动模板及两个新增辅助文本负责，状态查询继续独立。组合代码与状态入口已通过 C#6 内存编译；启动返回 static-compiled-not-armed、armed=false，状态为 not-armed 且无停止回调，原 6 个 Editor/Loading World 保持。主线程静态验收通过，仅覆盖实现、API、默认关闭和改动边界；运行数据有效性与性能验收仍为 UNKNOWN，完整覆盖与限制归[性能基线](Performance.md)。
+
+## 【FACT】第 6A 阶段资源与实际烘焙
+
+现有 CombatPrototypeNetworkPlayer.prefab 的原 Authoring 增加 InitialHealth=100、MaxHealth=100；现有 CombatPrototypeNetworkEnemy.prefab 的原 Authoring 增加 AttackDamage=10、AttackRange=1.75、AttackStartupSeconds=0.5、AttackRecoverySeconds=1。仅写入上述序列化参数，玩家仍为 5 组件/0 子节点，敌人仍为 7 组件/0 子节点；原挂载、两份 View、Scene/SubScene 结构及既有 meta/GUID 保持本轮执行前状态。
+
+原 SubScene 的 Editor 配置已定点重新烘焙，实际产物只读核对：玩家生命 100/100、HitSequence=0、IsDead=0、玩家伤害缓冲长度 0；敌人反击参数与上述 Prefab 一致，Ready、计时/序号 0、空锁定目标。玩家体力 100/100、成本 10、原近战参数、Coin/Experience=0/0 与空库存保持；Spawner=1、敌人 32/8 列/间距 3/原点 (0,1,2)、敌人 HP100/速度2/停止1.5、原伤害/奖励空缓冲与根实体渲染组件保持。
+
+五份新脚本及两个系统已由正常 Unity 导入编译，生命 Ghost Serializer/Snapshot 包含 CurrentHealth、MaxHealth、HitSequence、IsDead。烘焙读取用临时 World，systems=0，读取后释放，原 Editor/Loading World 前后均为 6；没有执行游戏系统。新脚本 meta 由 Unity 自动生成，仅原 Editor 烘焙缓存随重新导入更新。
+
+## 【CURRENT STRATEGY】第 6A 阶段运行观测
+
+每 2 秒玩家日志在原字段上增加 `HP=当前/上限`、hit、dead；服务端反击日志记录敌人实体、锁定玩家/NetworkId、攻击序号、Startup/Recovery，以及 TargetOfflineOrDead、TargetOutOfRange 空击原因。事件结算日志记录攻击来源、玩家 HP/受击/死亡；死亡后攻击输入记录 PlayerDead。玩家死亡继续使用日志验收，原 Mono 玩家显示保留。
+
+完整服务端顺序、锁定目标与一次命中规则归[战斗](Combat.md)，玩家死亡门槛及重入生命归[玩家](Player.md)，生命不入存档的契约归[资源与数据](DataResources.md)。新增 Ghost 字段要求双客户端与服务端使用同一第 6A 版本。
+
+## 【KNOWN ISSUES】第 6A 阶段人工运行验收
+
+主线程已判定实现与静态验收通过；用户明确反馈“验收已通过，继续下一阶段”，主线程结合既有静态验收与用户反馈判定第 6A 阶段通过。以下为本阶段人工通过范围，客户端与服务端使用同一第 6A 版本：
+
+1. 两个不同固定 ID 玩家以同一版本加入，初始生命各为 100/100，受击序号/死亡独立且双端一致；敌人距离内前摇后每序号只命中一次，伤害 10，前摇/后摇停止移动。
+2. 锁定玩家在命中前移出 X/Z 距离 1.75、断线或死亡时本次空击并进入后摇，进行中的挥击不切换目标；下一轮可选择其他最近在线存活玩家。
+3. 玩家与敌人同 tick 到达命中时，已被玩家击杀的敌人无反击伤害；事件消费后不重复扣血，原敌人伤害、死亡显示与首次击杀奖励不重复。
+4. 玩家生命归零后移动/朝向和攻击停止，新的攻击输入不再扣体力或增加攻击序号，敌人排除该玩家；死亡实体仍保留原显示。重新加入恢复生命 100/100、受击序号 0、未死亡，并按固定 ID 恢复金币/经验/背包。
+5. 原体力、近战伤害、多目标结算、金币/经验/小块肉保存、重连恢复及失败隔离回归。32 敌人的伤害允许叠加；该人工通过范围不包含规模性能，尚未取得运行性能数值。
+
+第 4D 及以前的人工通过结论保持原范围，第 5A 已由用户要求恢复后改为本轮静态检测，尚无运行采样，性能通过仍为 UNKNOWN。本次第 6A 人工通过来自用户反馈，不扩展为规模性能、平台构建或线上联调；AI 未运行逻辑单元测试、GamePlayer/PlayMode、游戏系统、命令行构建、发布或图片检查。
+
+## 【FACT】第 6B 阶段编译与资源边界
+
+现有 CombatPrototypePlayerInput 增加 Respawn 输入事件；新增独立 CombatPrototypePlayerRespawnSystem，原玩家 Baker 已添加该输入组件，未改 Authoring、Scene/SubScene、Prefab、Animator、View 或原组件挂载。新脚本通过 Unity 定点导入，唯一新增 meta 由 Unity 自动生成，GUID 为 6d3fa6f03e7768847bf7faaf4e24e604；既有 meta/GUID 和资源文本与本轮开始前一致。
+
+Unity 已编译并加载包含 Move、Attack、Respawn 的输入类型，以及生成的 InputEventHelper、输入缓冲 Serializer、Send/Receive/CompareCommandSystem。复活系统含 ISystemCompilerGenerated，编译后的特性为 ServerSimulation、PredictedSimulationSystemGroup、UpdateAfter(CombatPrototypePlayerDamageSystem)；与原八项特性连成既有战斗之后的复活链。未创建服务端/客户端 Game World、调用游戏系统或进行 SubScene 定点烘焙读取。
+
+## 【CURRENT STRATEGY】第 6B 阶段观测与版本
+
+复活日志记录 NetworkId、玩家实体、生命/体力、受击与攻击序号、位置、取消的旧前摇数及解除的旧锁定数；存活和归属不一致请求分别记录 PlayerAlive、CommandTargetOwnerMismatch，失败记录连接、玩家、阶段与原始异常。既有每 2 秒状态日志继续读取复活后的状态。生命与复活条件归[玩家](Player.md)，旧敌人锁定和执行顺序归[战斗](Combat.md)。
+
+输入命令布局已增加 Respawn，服务端与所有客户端必须使用同一第 6B 版本；混用旧命令布局不在本阶段支持范围。原第 4D JSON 契约未改，复活不读写存档。
+
+## 【KNOWN ISSUES】第 6B 阶段验收
+
+主线程已核对源码、正常 Unity 编译、生成输入类型、编译后的顺序特性及文件改动边界，判定第 6B 静态验收通过；用户随后明确反馈“我已验收通过，接下来下一阶段”，主线程结合既有静态核对与用户反馈判定第 6B 阶段通过。静态落地仅修改原输入脚本、新复活脚本及其 meta、对应五份文档；既有资源、其他脚本、项目设置及用户设置保持当时执行前状态。
+
+AI 执行第 6B 静态落地时 Editor 未进入 PlayMode，Profiler 关闭，采集会话及停止回调均不存在；正常编译触发 Domain Reload 后，仅有 6 个 Editor/Loading World。当时 Console 为 0 条 Error、6 条 Warning：5 条既有 Server Tick Batching 记录，以及本轮编译报告的既有 PEListener.cs:17 字段 args 序列化分析警告 UAC1001；该脚本未修改，未清空 Console。
+
+用户人工通过范围覆盖同一第 6B 版本的双玩家死亡后 R 键复活、满生命/满体力、原加入位置及双端同步、存活拒绝、重复输入、独立状态、旧前摇取消与旧后摇保持、攻击/受击序号及奖励/库存保持、原移动/攻击/存档回归。复活仍没有保护时间，32 敌人可在后续 tick 再次造成伤害。
+
+人工通过结论来自用户明确反馈；AI 未新增或运行逻辑单元测试、GamePlayer/PlayMode、游戏系统、命令行构建、发布、性能采样或图片读取。本结论不扩展到规模性能、平台构建或线上联调，第 5A/5B 与第 6A 既有结论保持原范围。

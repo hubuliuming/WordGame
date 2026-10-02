@@ -14,11 +14,13 @@ namespace Code_01.CombatPrototype.Networking
         private int _lastAliveCount = -1;
         private int _lastDeadCount = -1;
         private EntityQuery _players;
+        private bool _isServer;
 
         protected override void OnCreate()
         {
             RequireForUpdate<CombatPrototypePlayerSpawner>();
             _players = GetEntityQuery(ComponentType.ReadOnly<CombatPrototypePlayerNetCode>());
+            _isServer = World.IsServer();
         }
 
         protected override void OnUpdate()
@@ -48,11 +50,21 @@ namespace Code_01.CombatPrototype.Networking
                 return;
             _nextSnapshot = SystemAPI.Time.ElapsedTime + 2d;
 
-            foreach (var (owner, transform, attack, resource) in SystemAPI.Query<RefRO<GhostOwner>, RefRO<LocalTransform>, RefRO<CombatPrototypeMeleeState>,
-                         RefRO<CombatPrototypePlayerResource>>()
-                         .WithAll<CombatPrototypePlayerNetCode>())
+            var inventories = SystemAPI.GetBufferLookup<CombatPrototypeInventoryItem>(true);
+            var identities = SystemAPI.GetComponentLookup<CombatPrototypePlayerIdentity>(true);
+            foreach (var (owner, transform, attack, resource, reward, health, player) in SystemAPI.Query<RefRO<GhostOwner>, RefRO<LocalTransform>, RefRO<CombatPrototypeMeleeState>,
+                         RefRO<CombatPrototypePlayerResource>, RefRO<CombatPrototypePlayerReward>, RefRO<CombatPrototypePlayerHealth>>()
+                         .WithAll<CombatPrototypePlayerNetCode>().WithEntityAccess())
             {
-                Debug.Log($"[CombatPrototype.NetCode][{World.Name}] Player={owner.ValueRO.NetworkId}, position={transform.ValueRO.Position}, rotation={transform.ValueRO.Rotation.value}, phase={attack.ValueRO.Phase}, attack={attack.ValueRO.AttackSequence}, power={resource.ValueRO.CurrentPower}/{resource.ValueRO.UpperPower}.");
+                var inventory = inventories[player];
+                if (_isServer)
+                    Debug.Log($"[CombatPrototype.NetCode][{World.Name}] Player={owner.ValueRO.NetworkId}, persistentPlayerId={identities[player].PlayerId}.");
+                Debug.Log($"[CombatPrototype.NetCode][{World.Name}] Player={owner.ValueRO.NetworkId}, position={transform.ValueRO.Position}, rotation={transform.ValueRO.Rotation.value}, phase={attack.ValueRO.Phase}, attack={attack.ValueRO.AttackSequence}, power={resource.ValueRO.CurrentPower}/{resource.ValueRO.UpperPower}, HP={health.ValueRO.CurrentHealth}/{health.ValueRO.MaxHealth}, hit={health.ValueRO.HitSequence}, dead={health.ValueRO.IsDead}, coin={reward.ValueRO.Coin}, experience={reward.ValueRO.Experience}, inventoryEntries={inventory.Length}.");
+                for (var index = 0; index < inventory.Length; index++)
+                {
+                    var item = inventory[index];
+                    Debug.Log($"[CombatPrototype.NetCode][{World.Name}] Player={owner.ValueRO.NetworkId}, inventoryItem={item.ItemName}, quantity={item.Quantity}.");
+                }
             }
             foreach (var (health, transform, ghost) in SystemAPI.Query<
                          RefRO<CombatPrototypeEnemyState>, RefRO<LocalTransform>, RefRO<GhostInstance>>())

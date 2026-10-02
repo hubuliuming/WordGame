@@ -76,7 +76,7 @@ Authoring/Baker、预测玩家移动、敌人批量生成、敌人目标选择�
 
 群体实现限定在现有 Networking 目录：生成系统负责独立条目失败隔离；敌人移动系统从在线连接选目标；空间系统维护只含存活敌人的格子索引；近战系统产生命中事件；伤害系统消费并清空事件。移动配置、目标和伤害事件缓冲通过 GhostComponent(PrefabType = GhostPrefabType.Server) 限定为服务端组件，生命与死亡沿用原 GhostField。只有 Spawner 是单例，不再把敌人当作单例读取。
 
-群体逻辑沿用已有 SubScene 和敌人 Ghost，敌人当前实体表现见第 3B-2 节，不接入正式业务架构；当前管线为 URP，渲染前置配置的验收与第 3A 群体逻辑验收分开记录。代码编译及实际烘焙资源已核对；用户已确认本阶段人工 GamePlayer 验收通过，主线程结合静态检查与用户反馈判定第 3A 阶段通过。结论仅覆盖当前独立网络原型的 32 敌人生成、最近在线玩家追踪及玩家加入/退出后的目标切换、停止距离与无在线玩家时停止追踪、群体近战每目标去重和伤害 25、死亡停止及双端 HP、死亡与统计一致性；不扩展为正式 Map、平台构建、大规模性能或线上联调验收。第 3A 通过结论不包含第 3B-2 实体表现验收；敌人反击及寻路避障未接入；AI 未执行逻辑单元测试、PlayMode 或构建。
+群体逻辑沿用已有 SubScene 和敌人 Ghost，敌人当前实体表现见第 3B-2 节，不接入正式业务架构；当前管线为 URP，渲染前置配置的验收与第 3A 群体逻辑验收分开记录。代码编译及实际烘焙资源已核对；用户已确认本阶段人工 GamePlayer 验收通过，主线程结合静态检查与用户反馈判定第 3A 阶段通过。结论仅覆盖当前独立网络原型的 32 敌人生成、最近在线玩家追踪及玩家加入/退出后的目标切换、停止距离与无在线玩家时停止追踪、群体近战每目标去重和伤害 25、死亡停止及双端 HP、死亡与统计一致性；不扩展为正式 Map、平台构建、大规模性能或线上联调验收。第 3A 通过结论不包含第 3B-2 实体表现及第 6A 反击/生命验收；寻路避障仍未接入；AI 未执行逻辑单元测试、PlayMode 或构建。
 
 ## 【CURRENT STRATEGY】第 3B-1 阶段渲染与表现边界
 
@@ -100,8 +100,64 @@ Authoring/Baker、预测玩家移动、敌人批量生成、敌人目标选择�
 
 ## 【CURRENT STRATEGY】第 4A 阶段框架边界
 
-体力随每个玩家 Ghost 和原连接生命周期独立存在，由服务端消耗、客户端接收快照；规则与参数分别见[玩家](Player.md)、[战斗](Combat.md)，Prefab/烘焙与日志入口见[运行入口](Runtime.md)。原输入与移动预测、群体敌人和实体表现职责保持；不注册到 QFramework `Game`，不调用 `PlayerModel`/`PlayerDataStore`，不接账号、奖励、背包、存档、自动恢复或玩家受击链。
+体力随每个玩家 Ghost 和原连接生命周期独立存在，由服务端消耗、客户端接收快照；规则与参数分别见[玩家](Player.md)、[战斗](Combat.md)，Prefab/烘焙与日志入口见[运行入口](Runtime.md)。原输入与移动预测、群体敌人和实体表现职责保持；不注册到 QFramework `Game`，不调用 `PlayerModel`/`PlayerDataStore`，体力不持久化，不接账号、正式背包或自动恢复；奖励职责见第 4B 节，背包见第 4C 节，独立网络存档见第 4D 节，玩家受击职责见第 6A 节。
 
 ## 【KNOWN ISSUES】第 4A 阶段接入验收
 
-代码编译、Ghost 字段加载及实际 SubScene 产物已静态核对；人工 GamePlayer 的体力权威同步与原网络战斗回归仍为 `UNKNOWN`。第 2B、第 3A、第 3B 的既有人工通过结论不包含第 4A，不形成规模性能、平台构建或线上联调结论；AI 未执行逻辑单元测试、PlayMode、命令行构建、发布或图片检查。
+代码编译、Ghost 字段加载及实际 SubScene 产物已完成静态核对；用户已确认第 4A 人工 GamePlayer 验收通过，主线程结合既有静态验收与用户反馈判定第 4A 阶段通过。验收仅覆盖当前独立网络原型的双玩家独立体力与同步、成功启动一次扣 10（含空挥）、忙碌拒绝且阶段继续、耗尽后拒绝且序号不增加、无自动恢复、重新加入恢复 100，以及原移动、群体伤害和死亡显示回归，完整范围见[运行入口](Runtime.md)。第 2B、第 3A、第 3B 的既有人工通过范围保持原状，不形成规模性能、平台构建或线上联调结论；AI 未执行逻辑单元测试、PlayMode、命令行构建、发布或图片检查。
+
+## 【FACT】第 4B 阶段本局奖励职责
+
+现有 Networking 目录新增 `CombatPrototypePlayerReward`、`CombatPrototypeKillRewardConfig`/`CombatPrototypeKillRewardEvent` 与 `CombatPrototypeRewardSystem`。玩家组件保存本局金币和经验 GhostField；敌人配置与事件仅服务端保留；既有伤害系统负责在首次死亡时产出致命一击事件，独立奖励系统在其后确认在线玩家并统一写入累计值，原日志系统只读取结果。
+
+## 【CURRENT STRATEGY】第 4B 阶段框架边界
+
+奖励归属复用当前有效网络连接和 CommandTarget，玩家状态复用原 Ghost/连接生命周期；没有独立账号、重连补发或持久去重账本。奖励系统对独立事件隔离失败，当前单次金币/经验/第 4C 物品先准备完整结果，按第 4D 保存成功后同次提交；业务规则由[战斗](Combat.md)与[玩家](Player.md)维护，存档格式由[资源与数据](DataResources.md)维护，资源与日志入口由[运行入口](Runtime.md)维护。
+
+原伤害顺序、体力、移动预测、敌人群体与表现职责保持；不注册到 QFramework Game，不调用正式 PlayerModel/PlayerDataStore，不接正式背包、实体掉落或 UI，也不改变 Scene/Prefab 层级和组件挂载；本局背包范围见第 4C 节。
+
+## 【KNOWN ISSUES】第 4B 阶段接入验收
+
+代码编译、类型/生成的 Ghost Serializer 与实际 SubScene 产物已完成静态核对；用户已确认第 4B 人工 GamePlayer 验收通过，主线程结合既有静态验收与用户反馈判定第 4B 阶段通过。验收仅覆盖当前独立网络原型的非致命无奖、致命一击归属并获得金币 1/经验 10、每敌人一次奖励和多目标分别结算、双玩家累计独立与双端同步、离线不补发/重入归零及原体力、伤害、死亡显示回归，完整范围见[运行入口](Runtime.md)。第 4A 及此前阶段通过范围保持，不形成规模性能、平台构建或线上联调结论。人工通过结论来自用户反馈，AI 未执行逻辑单元测试、PlayMode、命令行构建、发布或图片检查。
+
+## 【FACT】第 4C 阶段本局背包职责
+
+现有 Networking 目录新增 `CombatPrototypeInventoryItem` Ghost 缓冲元素；玩家 Baker 负责空初值，敌人 Authoring/Baker 负责物品奖励配置，伤害系统将物品数据复制到原击杀事件，既有奖励系统负责金币/经验/目标物品整体准备与提交，原日志系统只读背包。名称复用 `Code_01.Msg.ItemName.小块肉`，未修改正式消息定义、正式库存数据或 UI。
+
+## 【CURRENT STRATEGY】第 4C 阶段框架边界
+
+背包随每名玩家 Ghost 独立存在，按原连接生命周期销毁和重新生成，第 4D 在服务端生成时恢复固定 ID 存档，客户端仅同步；归属与在线校验继续由原奖励链承担。该背包没有注册到 QFramework Game，没有新的账号、道具使用、掉落、拾取或复杂事务系统；同名合并由[背包与道具](Inventory.md)维护，统一奖励规则由[战斗](Combat.md)维护，存档职责见第 4D 节。
+
+## 【KNOWN ISSUES】第 4C 阶段接入验收
+
+代码编译、背包 Ghost Serializer/Snapshot 和实际 SubScene 初值已静态核对；用户已确认第 4C 人工 GamePlayer 验收通过，主线程结合既有静态验收与用户反馈判定第 4C 阶段通过。验收仅覆盖当前独立网络原型的双玩家空初始库存、独立累计与双端同步、非致命无奖、致命一击三项奖励一致、同名合并、每敌人一次和多目标分别结算、离线不补发与重新加入清空，以及原体力、移动、伤害和死亡显示回归，完整范围见[运行入口](Runtime.md)。第 4B 及以前通过结论保持原范围，不形成规模性能、平台构建或线上联调结论。人工通过结论来自用户反馈，AI 未执行逻辑单元测试、PlayMode、命令行构建、发布或图片检查。
+
+## 【FACT】第 4D 阶段身份与存储职责
+
+开发身份配置负责按进程参数或 Editor World 读取明确 ID；服务端身份组件仅记录已准入 ID；存档数据保存版本、身份、金币、经验与库存条目；独立存储类负责严格读取、候选 JSON 投影和同目录临时文件替换。原握手负责身份占用与恢复后生成，原奖励负责在线归属、完整准备、存档调用和同次 ECS 提交，原日志只读状态；没有新增 ECS 游戏系统或 QFramework 注册项。
+
+## 【CURRENT STRATEGY】第 4D 阶段边界
+
+固定 ID 是客户端声明的开发标识，不承担正式认证；NetworkId 仍用于现有连接、输入和击杀归属。存档服务只在服务端握手与成功奖励路径被调用，不进入客户端预测循环，不读取或覆盖正式 PlayerDataStore 的 JSON，不接账号、正式 UI、掉落或持久去重。Scene/Prefab/Animator 及原组件挂载保持；具体准入由[玩家](Player.md)、提交规则由[战斗](Combat.md)、文件契约由[资源与数据](DataResources.md)维护。
+
+## 【KNOWN ISSUES】第 4D 阶段接入验收
+
+四份新增脚本、原接入系统及 RPC 生成类型已由 Unity 编译并加载，资源结构与差异已静态核对；用户已确认第 4D 人工 GamePlayer 验收通过，主线程结合既有静态验收与用户反馈判定该阶段通过。存档恢复、重复 ID/坏档隔离与保存失败的完整通过范围见[运行入口](Runtime.md)。本地同步序列化和写盘有必要分配与阻塞，本阶段没有规模性能、跨服务器并发、平台构建或线上联调通过结论；AI 未运行逻辑单元测试、PlayMode、构建、发布或图片检查。
+
+## 【FACT】第 5A 阶段观察边界
+
+既有存储类使用 Unity.Profiling.ProfilerMarker 观察原 Load/SavePrepared 调用，不改变握手、奖励或同步职责。测量复用 Unity MCP/Profiler，未新增 ECS 游戏系统或 QFramework 注册项；指标范围与 UNKNOWN 运行状态归[性能基线](Performance.md)。
+
+## 【FACT】第 6A 阶段生命与双向战斗职责
+
+现有 Networking 目录增加五份脚本：PlayerHealth 只定义网络生命；PlayerDamageEvent 定义服务端玩家伤害事件；EnemyAttack 定义服务端攻击配置/状态；EnemyAttackSystem 负责锁定、阶段推进与命中事件；PlayerDamageSystem 负责玩家生命结算和缓冲消费。既有玩家/敌人 Authoring 负责烘焙，两个移动系统与服务端近战系统读取对应死亡/阶段门槛，原日志系统只读生命。
+
+## 【CURRENT STRATEGY】第 6A 阶段接入边界
+
+两个新增游戏系统只进入 ServerSimulation 的 PredictedSimulationSystemGroup，分别排在原 RewardSystem 和新 EnemyAttackSystem 之后；客户端生命来自 Ghost 快照，移动系统继续使用原输入预测并依据同步死亡标记停动。玩家伤害缓冲、敌人攻击配置及状态均限定 Server Prefab；生命四字段同步。资源与静态烘焙事实归[运行入口](Runtime.md)，业务规则归[玩家](Player.md)与[战斗](Combat.md)。
+
+生命链复用既有 Ghost、CommandTarget、LinkedEntityGroup 与 Authoring，没有 QFramework 注册、正式 PlayerModel/PlayerDataStore 接入、存档格式变化或新 UI/表现系统。
+
+## 【KNOWN ISSUES】第 6A 阶段接入验收
+
+编译、生成的生命 Serializer/Snapshot、实际烘焙参数和资源边界已静态核对；用户已确认第 6A 人工 GamePlayer 验收通过，主线程结合既有静态验收与用户反馈判定该阶段通过，完整范围见[运行入口](Runtime.md)。客户端与服务端使用同一第 6A Ghost 版本，旧阶段人工通过范围保持；规模性能仍为 `UNKNOWN`，第 5A 恢复后按用户“不启动，静态检测”完成本轮只读核对，尚未取得运行采样，采集覆盖缺口归[性能基线](Performance.md)。人工通过来自用户反馈，AI 未执行游戏系统、PlayMode、逻辑单元测试或构建。

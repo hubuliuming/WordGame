@@ -169,3 +169,15 @@ Authoring/Baker、预测玩家移动、敌人批量生成、敌人目标选择�
 ## 【CURRENT STRATEGY】第 7A 阶段接入边界
 
 沿用原 CommandTarget、GhostOwner、Simulate、固定身份、背包和体力组件，不新增 RPC、玩家 Baker 组件或 QFramework 注册，不调用正式 PlayerModel/PlayerDataStore。Scene/Prefab/Animator、旧 meta 和原组件挂载保持。业务规则归[背包与道具](Inventory.md)，体力生命周期归[玩家](Player.md)，顺序归[战斗](Combat.md)，静态证据和人工验收范围归[运行入口](Runtime.md)。
+
+## 【FACT】Editor 启动配置职责
+
+新增三份 Networking 脚本和一份 Editor 脚本，均限定 UNITY_EDITOR：[CombatPrototypeStartupSettings.cs](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypeStartupSettings.cs) 定义模式/角色和已验证的不可变配置；[CombatPrototypeStartupSettingsStore.cs](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypeStartupSettingsStore.cs) 负责严格文件解析、输入校验和唯一启动配置写入；[CombatPrototypeStartupDriverConstructor.cs](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypeStartupDriverConstructor.cs) 实现官方 INetworkStreamDriverConstructor，单机两端只注册 IPC，联机保留官方服务端驱动及明确的客户端传输；[CombatPrototypeStartupSettingsWindow.cs](../../Assets/Scripts/Editor/CombatPrototypeStartupSettingsWindow.cs) 负责编辑器交互与既有参数资源定位。
+
+原 Bootstrap 负责启动时机、场景标记、World 创建/连接、配置快照及本次启动失败清理。单机保留 ServerSimulation/ClientSimulation 双 World，因此继续使用原服务端权威战斗、输入和 Ghost 链，不新增本地战斗系统或游戏 ECS 系统，不注册到 QFramework Game，不修改玩家握手、固定 ID、存档或网络字段。
+
+## 【CURRENT STRATEGY】Editor 启动配置边界
+
+配置在 World 创建前读取并生效；AutoConnectPort 为 0，项目入口通过官方 API 明确创建 World 并监听/连接，避免旧自动连接设置覆盖项目模式和端点。每次 Initialize 重设旧启动状态，成功启动后不重读启动文件。非 Editor 保留原 Bootstrap 分支。参数契约归[资源与数据](DataResources.md)，模式和人工验收范围归[运行入口](Runtime.md)。
+
+已有 Scene/Prefab/Animator、资源引用、组件挂载及 Baker 数值来源保持；窗口只定位已有资源，不新增场景配置组件或运行时数值覆写链。当前实现与编译的静态核对不代表人工 GamePlayer、新模式运行或平台验收通过。

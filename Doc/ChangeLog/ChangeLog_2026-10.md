@@ -291,3 +291,17 @@
 - 用户在下一阶段方向选择中回复“暂不执行”；本轮未启动后续开发，没有新增阶段实现或修改业务方案。
 - 本轮仅进行文件读取与文档同步，代码、资源、项目设置及采集助手保持本轮开始时内容；未调用 Unity 工具、启动 GamePlayer、运行逻辑单元测试/构建/发布/性能采样或读取图片。
 - 主线程复核本轮 274 项非视觉文件基线，仅上述八份 Doc 文档变化，无新增、删除或范围外变化；严格 UTF-8、git diff/空白及七份事实文档局部链接检查通过。导航 8082 字节，Runtime 既有体量超限与 DataResources 既有长行保留，未进行无关拆分或整理，未提交 Git。
+
+## 2026-10-02：Editor 启动配置与单机 IPC 静态落地
+
+- 用户确认启动配置方案后由主线程执行，未创建子Agent。
+- 新增 StartupSettings、StartupSettingsStore、StartupDriverConstructor 和 StartupSettingsWindow 四份脚本；现有 NetCodeBootstrap 接入 Editor 配置、明确 World 创建/监听/连接和本次失败清理，非 Editor 保留原分支。
+- 新增 Tools/CombatPrototype/启动配置 菜单，提供单机/联机、Host/Client/Server、客户端 IPv4、联机端口、后台运行、保存校验和重读；显示现有身份来源并定位原参数资源，PlayMode 期间锁定启动编辑并显示成功启动快照。
+- 创建本地 UserSettings/CombatPrototypeStartupSettings.json，实际值为 Version=1、Online/Host、127.0.0.1、Port=7979、RunInBackground=true；.gitignore 仅增加该文件的忽略项。
+- 单机明确只注册双端 IPC，固定通道 7979；联机沿用服务端官方驱动及原战斗、身份、奖励和存档链。新入口将 AutoConnectPort 设为 0，不由 PlayMode Tools 创建角色或覆盖端点，不自动创建 ThinClient。
+- 配置采用严格 UTF-8、六字段/版本/类型/枚举/IP/端口/后台运行校验，保存采用同目录临时文件、Flush(true) 和替换；缺失/坏配置显式失败，不补默认配置。
+- 四份新脚本由 Unity 定点导入并生成新 meta；Unity 编译和菜单注册已核对，无新增脚本编译错误。Console 保留既有连接、UnityConnect、序列化引用记录及 PEListener/DOTween 警告，未清空 Console 或修改告警来源。
+- 原网络主场景/SubScene、玩家/敌人 Prefab、开发身份文件及任务开始已有场景/渲染配置/EditorUserSettings 改动的内容散列保持；原 Map.meta 的删除状态保持，未修改 Scene/Prefab/Animator、旧 meta、构建设置或存档。
+- 局部同步 Runtime、Framework、DataResources 当前事实、策略和待验收项；本条只记录实际改动。AI 未启动 GamePlayer/PlayMode、执行逻辑单元测试/构建/发布/性能采样或读取图片，人工运行验收和最终通过结论保持 UNKNOWN。
+- 主线程静态验收通过：最终 Assembly-CSharp/Editor 程序集更新时间晚于五份脚本，新增配置属性不可变、Editor 启动入口和窗口类型已加载；窗口实际打开并读取 Online/Host、127.0.0.1、7979、后台运行 true、现有 player-a，无配置/身份读取错误，isPlaying=false。
+- 复核 11 份本轮文本的严格 UTF-8、三份模块文档链接和四个新脚本 GUID 唯一性；git diff/空白检查通过，九项已有资源/配置基线散列保持。静态通过不等同人工 GamePlayer 或最终运行验收通过，未提交 Git。

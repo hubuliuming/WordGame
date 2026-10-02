@@ -94,7 +94,7 @@ Map 中存在 TestController 的脚本引用（GUID `42f2add30349522408099dbf10f
 
 ## 【FACT】第 2B / 第 3A 阶段 NetCode 运行入口
 
-`CombatPrototypeNetCodeBootstrap.Initialize` 通过官方 `DiscoverAutomaticNetcodeBootstrap` 读取启动场景标记；标记启用时以端口 `7979` 调用 `ClientServerBootstrap` 创建所选 Client/Server World，并启用后台运行。未启用标记时调用 `CreateLocalWorld`。该判断沿用包对启动时场景尚未有效的处理，不直接依赖早期 `GetActiveScene().name`。
+`CombatPrototypeNetCodeBootstrap.Initialize` 通过官方 `DiscoverAutomaticNetcodeBootstrap` 读取启动场景标记。标记启用时，Editor 从启动配置文件创建明确的 Client/Server World 并显式监听、连接，具体规则见本页“Editor 启动配置”；非 Editor 保留端口 `7979`、后台运行及原 `ClientServerBootstrap` 创建链。未启用标记时仍调用 `CreateLocalWorld`，不读取原型启动配置。场景标记判断沿用包对启动时场景尚未有效的处理，不直接依赖早期 `GetActiveScene().name`。
 
 独立主场景为 `Assets/Scenes/CombatPrototypeNetCode.unity`，保留 Main Camera、Directional Light 与自动加载的 `CombatPrototypeNetCodeSubScene`。子场景路径为 `Assets/Scenes/CombatPrototypeNetCode/CombatPrototypeNetCodeSubScene.unity`，唯一 `CombatPrototypeNetworkRoot` 挂载 `CombatPrototypePlayerSpawnerAuthoring`，显式引用玩家、敌人两个 Ghost Prefab；Root 自身没有 Ghost，场景中没有额外玩家或敌人 Ghost 实例。
 
@@ -307,3 +307,28 @@ UseItem 已改变输入命令布局，服务端与所有客户端必须使用同
 5. 同 ID 重连及服务端重启恢复消费后的库存，体力仍为烘焙 100/100；v1 档内无零数量条目，空 Items 仍可加载，后续击杀可继续按原规则入包。
 
 本阶段人工通过结论来自用户反馈；AI 未新增或运行逻辑单元测试、GamePlayer/PlayMode、游戏系统、命令行构建、发布、性能采样或图片读取。第 6A/6B 及以前的人工通过范围保持；第 5A/5B 尚无运行样本，同步写盘成本、规模性能、平台和线上联调仍为 UNKNOWN。
+
+## 【FACT】Editor 启动配置入口
+
+菜单 `Tools/CombatPrototype/启动配置` 打开 [CombatPrototypeStartupSettingsWindow.cs](../../Assets/Scripts/Editor/CombatPrototypeStartupSettingsWindow.cs) 定义的 EditorWindow。窗口提供单机/联机、Host/Client/Server、客户端 IPv4、联机端口和后台运行配置；“保存并校验”写入已验证文件，“重新读取”舍弃窗口候选值并读取磁盘。未保存值不会参与启动；PlayMode 或即将切换 PlayMode 时禁用启动字段和保存/重读操作，并展示本次成功启动的不可变快照。
+
+`CombatPrototypeNetCodeBootstrap.Initialize` 在场景标记启用的 Editor 入口读取一次配置。每次 Initialize 先清空旧快照，将 AutoConnectPort 设为 0，重设默认地址及官方传输构造器，再按配置创建所需 World。新入口不调用原自动 World/ThinClient 创建链，NetCode PlayMode Tools 的角色、自动连接地址和端口不决定本次 World 数量或连接端点；联机 Host 的本机客户端传输仍沿用官方驱动选择及网络模拟设置。
+
+| 模式 | 本次创建 | 监听/连接 |
+|---|---|---|
+| SinglePlayer | ServerWorld + ClientWorld | 两端只注册 IPC；监听与连接为 127.0.0.1:7979，7979 为进程内通道编号，不开放 UDP 接入 |
+| Online / Host | ServerWorld + ClientWorld | 服务端沿官方默认驱动监听 0.0.0.0:Port；本机客户端连接 127.0.0.1:Port |
+| Online / Client | ClientWorld | 明确使用 UDP 驱动，连接 ServerAddress:Port |
+| Online / Server | ServerWorld | 沿官方默认驱动监听 0.0.0.0:Port，没有本地客户端 |
+
+启动先创建并监听服务端，再创建并连接客户端；使用官方 CreateServerWorld/CreateClientWorld、NetworkStreamDriver.Listen/Connect。成功发起启动后记录配置快照和模式/角色/端点/后台运行日志；该日志不表示网络握手或玩家准入已经完成。配置读取/校验、监听或启动调用失败时，记录路径和原异常，清理本次新增的客户端/服务端 World 并恢复此前默认注入 World、后台运行和官方传输构造器，不回退为其他模式。
+
+玩家生成继续走原固定 ID、GoInGame RPC、存档恢复和连接绑定链；战斗、奖励、复活、物品使用及 Ghost 字段保持。单机仍使用服务端逻辑和原存档；同一存档根目录中的同一 ID 对应同一文件。新配置链仅在 UNITY_EDITOR 编译，非 Editor 启动行为未接入该文件。
+
+窗口显示现有开发身份及来源，提供身份文件定位和原 SubScene/玩家/敌人 Prefab 的资源选择入口，不保存身份或覆写玩法参数。生成、生命、体力、移动、攻击及奖励数值仍由原 Spawner/Authoring Inspector 和既有烘焙链负责；Scene、Prefab 层级、原组件挂载及旧 meta 保持。
+
+## 【KNOWN ISSUES】Editor 启动配置验收边界
+
+主线程已核对实现符合确认方案、Unity 编译完成、窗口正确读取实际配置、文档同步及修改边界，判定代码与文档静态验收通过；新增模式的人工 GamePlayer 行为、连接结果、失败清理及连续模式切换仍为 `UNKNOWN`。既有第 2B～第 7A 人工通过范围不扩展为本次启动配置通过；AI 未启动 PlayMode、执行逻辑单元测试、构建、发布、性能采样或读取图片。
+
+人工验收范围：单机一名本地玩家及原战斗/奖励/复活/物品使用；单机 IPC 驱动与外部进程无法加入；联机 Host/Client 使用不同固定 ID 的加入、同步和存档；Client/Server World 数量；缺失/非法配置及监听失败的暴露与清理；单机→联机→单机重复进入；Map 和第 1 阶段入口回归。窗口当前场景提示仅用于使用说明，真正的启动范围仍由现有官方场景标记判断。

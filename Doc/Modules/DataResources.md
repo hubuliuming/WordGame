@@ -170,3 +170,30 @@ EditorTest 声明以下菜单；三个重写菜单直接写入上表对应 JSON�
 ## 【CURRENT STRATEGY】第 7A 阶段消费保存
 
 服务端物品使用系统先准备候选，再调用原 SavePrepared，只有成功返回后才修改库存和体力；保存失败时该使用操作两项均保持，旧正式文件保留，继续后续玩家。没有新增文件路径、迁移、定时保存、断线补存或其他写盘入口。消费规则由[背包与道具](Inventory.md)维护，用户已确认第 7A 运行验收通过，范围归[运行入口](Runtime.md)。
+
+## 【FACT】Editor 启动配置文件与字段
+
+[CombatPrototypeStartupSettingsStore.cs](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypeStartupSettingsStore.cs) 是原型 Editor 启动配置的唯一读写入口，文件位于 [UserSettings/CombatPrototypeStartupSettings.json](../../UserSettings/CombatPrototypeStartupSettings.json)。根对象恰含六个字段，JSON 重复属性、缺失/未知字段、错误类型、不支持版本、非法模式/角色/地址/端口和联机关闭后台运行均拒绝；读取使用严格 UTF-8 并支持 UTF-8 BOM，写入为 UTF-8 无 BOM。
+
+| 字段 | 当前文件值 | 校验及用途 |
+|---|---|---|
+| Version | 1 | 必需整数，仅支持 1 |
+| GameMode | Online | 精确字符串 SinglePlayer / Online |
+| OnlineRole | Host | 精确字符串 Host / Client / Server；单机连接不使用该角色 |
+| ServerAddress | 127.0.0.1 | 必需合法 IPv4，拒绝 0.0.0.0；只有 Online/Client 使用该连接地址 |
+| Port | 7979 | 必需整数 1～65535；单机使用固定 IPC 通道 7979 |
+| RunInBackground | true | 必需布尔；Online 必须为 true，SinglePlayer 可配置 |
+
+当前值是本轮建立的开发启动设置，不是正式产品模式或发布默认值。全部字段均执行输入校验，即使当前模式不使用其中的连接字段；保存后由 Bootstrap 读取一次形成不可变快照。读取缺失或坏文件直接失败，不创建默认文件、不修正字段、不迁移版本，也不读取失败遗留的 .tmp 文件。
+
+## 【CURRENT STRATEGY】Editor 配置保存与既有数据边界
+
+窗口“保存并校验”将已验证配置序列化，在同一 UserSettings 目录写 .json.tmp 并 Flush(true)，已有文件时 File.Replace，无旧文件时 File.Move。失败保留显式错误；UserSettings 目录须已存在，不为必需目录增加运行时兜底创建。窗口候选值与磁盘文件明确区分，进入 PlayMode 后禁用保存/重读。
+
+[.gitignore](../../.gitignore) 仅新增 /UserSettings/CombatPrototypeStartupSettings.json 的忽略规则；其他 UserSettings 文件的管理方式保持。没有启动设置文件的开发环境可在该窗口明确保存候选值建立配置，启动入口自身不自动补配置。
+
+开发身份仍使用原 -combatPrototypePlayerId 优先及 CombatPrototypeDevelopmentIdentity.json 按 World.Name 读取规则。窗口只展示实际来源并提供文件定位，不复制或改写 PlayerId。原服务端存档路径、格式、固定 ID 契约以及正式 PlayerDataStore JSON 保持。玩法数值仍保存于既有 Spawner/Authoring 所属资源并沿原烘焙链生效，不加入启动 JSON。
+
+## 【KNOWN ISSUES】Editor 启动配置验证范围
+
+文件、字段、UTF-8 和源码边界已静态核对，新脚本由 Unity 编译；坏配置的实际启动表现、端口占用、保存失败与重复模式切换仍待人工 GamePlayer 验证，保持 UNKNOWN。本轮未调用玩家存档 Load/SavePrepared，不改变已有第 4D/7A 存档人工通过范围。

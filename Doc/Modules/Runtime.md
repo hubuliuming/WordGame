@@ -135,7 +135,7 @@ CombatPrototypeEnemySpawnSystem 在服务端网络接收之后、握手系统之
 
 `Packages` 中 URP、Universal Config、Shader Graph 与 Render Pipelines Core 均为 `17.5.0`；Searcher `4.9.4` 是 Shader Graph 的解析依赖。URP 全局设置为 `Assets/UniversalRenderPipelineGlobalSettings.asset`，其默认 Volume Profile 为 `Assets/DefaultVolumeProfile.asset`，当前 components 为空；包级配置还包括 `ProjectSettings/URPProjectSettings.asset` 与 `ShaderGraphSettings.asset`。
 
-玩家与敌人的 `CombatPrototypeNetworkPlayerView.prefab`、`CombatPrototypeNetworkEnemyView.prefab` 共用 `Assets/Materials/CombatPrototype/CombatPrototypeNetworkView.mat`，Shader 为 `Universal Render Pipeline/Lit`，白色、不透明、Metallic=0、Smoothness=0.5、无贴图。两份 View Prefab 保留原 Mesh、组件及层级；玩家 Ghost 仍通过原 ClientPrefab 引用 PlayerView，服务端表现引用为空。敌人 Ghost 复用 EnemyView 的网格与该材质，其当前实体渲染绑定见第 3B-2 节；旧 EnemyView 资产保留。
+玩家与敌人两份 View 的原根 MeshRenderer 仍引用 `Assets/Materials/CombatPrototype/CombatPrototypeNetworkView.mat`，Shader 为 `Universal Render Pipeline/Lit`，白色、不透明、Metallic=0、Smoothness=0.5、无贴图。PlayerView 原根 Renderer 当前关闭，实际角色由 VisualRoot 的灰衣修士模型和独立材质显示，资源与动画归[玩家美术](../PlayerArt.md)；玩家 Ghost 仍通过原 ClientPrefab 引用同一 PlayerView，服务端表现引用为空。敌人 Ghost 继续复用 EnemyView 的 Capsule 网格与原材质，其当前实体渲染绑定见第 3B-2 节；旧 EnemyView 资产保留。
 
 管线 MSAA 为 `1`（关闭多重采样），Render Scale 为 `1`；URP 将当前 Ultra 的 `QualitySettings.antiAliasing` 同步为 `0`。`lightsUseLinearIntensity` 与 `lightsUseColorTemperature` 均为 true，由 URP 依据当前 Linear 配置设置。Graphics/Quality 文件使用当前 Unity 序列化版本及其默认字段。
 
@@ -350,3 +350,13 @@ Z/X 单次按下改变水平目标角，鼠标滚轮改变观察距离；角色�
 源码、Unity 编译、类型加载和 Main Camera 的实际序列化绑定已静态核对；用户明确反馈尚未进行人工验收，人工 GamePlayer 的视野比例、跟随手感、输入方向及生命周期回归仍为 UNKNOWN。既有网络战斗人工通过结论不扩展为本次镜头通过。当前未新增地图边界、遮挡处理或角色表现修正；未改 Ghost Prefab、SubScene、Animator、旧 meta、包或构建配置。
 
 人工验收范围为直行/斜行/急停/转身、持续按 W 时 Z/X 旋转、滚轮缩放上下限、双客户端只跟随本人且视角独立、死亡/复活/断线重连，以及原攻击/E 物品/R 复活回归。AI 未启动 GamePlayer/PlayMode、执行游戏系统、逻辑单元测试、命令行构建、发布、性能采样或图片检查。
+
+## 【FACT】网络原型 PlayerView 美术接入
+
+原 PlayerView 根节点增加 CombatPrototypePlayerNetCodeView，新增一个 VisualRoot 嵌套角色实例，位置 (0,-1,0)，关闭原胶囊 Renderer；原 Owner、根 Transform 与 Ghost ClientPrefab 引用保持。VisualRoot 使用两层 Animator 与实际序列化绑定的 CombatPrototypePlayerAnimation，完整资源映射和动画规格归[玩家美术](../PlayerArt.md)。Scene/SubScene、玩家 Ghost Authoring、敌人显示与项目设置保持本轮开始时内容。
+
+## 【KNOWN ISSUES】玩家美术与动画人工验收
+
+主线程代码/资源静态验收通过，人工 GamePlayer 尚未确认。检查范围：双端玩家均显示灰衣修士且只有一份模型；WASD 待机/移动切换及移动中挥刀；攻击前摇/命中动作/后摇与原扣费/伤害回归；受击、死亡倒地保持、R 复活恢复站立；断线重连与新观察者不重放旧受击或死亡；镜头旋转/缩放与原 E 物品使用回归。角色细节、实际光照、动画衔接与运行性能仍为 UNKNOWN。
+
+Clip 图片由隔离 Editor 预览场景采样生成，仅用于本次获授权的新资源视觉检查。AI 未启动 GamePlayer/PlayMode、执行业务系统、逻辑单元测试、命令行构建、平台发布或性能采样；既有网络阶段人工通过结论不扩展为本次角色运行通过。

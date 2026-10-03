@@ -16,6 +16,7 @@
 | 属性、生命、体力、等级、金币、刷新 | [玩家](Modules/Player.md) | [数据文件](Modules/DataResources.md) |
 | 野猪、BtnAttack、伤害、掉落、战斗奖励 | [战斗](Modules/Combat.md) | [玩家](Modules/Player.md) |
 | 网络敌人反击、玩家受伤、死亡停动与手动复活 | [战斗](Modules/Combat.md) | [玩家](Modules/Player.md)、[运行验收](Modules/Runtime.md) |
+| Player美术动画 | [玩家美术](PlayerArt.md) | — |
 | AI 出图、末世玄幻 | [模板](CombatImagePromptTemplate.md) | — |
 | 背包、Goods、99、UseGoods、活力苹果、网络 E 键小块肉 | [背包与道具](Modules/Inventory.md) | [资源与数据](Modules/DataResources.md) |
 | JSON、streamingAssets、Resources、对象池、重写数据菜单 | [资源与数据](Modules/DataResources.md) | 对应业务模块 |
@@ -64,5 +65,5 @@
 - 第 7A 网络物品使用已获用户人工通过反馈，主线程结合静态核对判定通过。规则归[背包与道具](Modules/Inventory.md)，范围见[运行入口](Modules/Runtime.md)；不含规模性能或平台验收。
 - 第 3 阶段 MapCanvasControl.ItemParent 已在 Map 场景文本中绑定现有 ItemParent；用户针对该阶段人工 GamePlayer 清单反馈“已确认正常”，主线程结合既有静态验收判定该阶段通过，范围见[运行入口](Modules/Runtime.md)。
 - 第 4 阶段 KnapsackControl、PlayerDetailsControl、DetailInform 已完成事件订阅、刷新与释放代码的静态落地；人工 GamePlayer 交互验收、详情使用效果及完整工程编译仍未完成。
-- 资源核实依据为 Scene / Prefab / meta 的文本；没有读取图片、纹理或截图内容。
+- 资源绑定据 Scene/Prefab/meta 文本；仅查看本次授权新图。
 - `CodeRule.md` 标题为“Cocos 代码规范”，真实工程配置为 Unity；保留原规则，标题的引擎适用意图为 `UNKNOWN`，不能据此改变工程身份或擅改规范。

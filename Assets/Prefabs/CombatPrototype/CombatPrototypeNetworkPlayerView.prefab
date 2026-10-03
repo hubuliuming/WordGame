@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 2910104241055837844}
   - component: {fileID: 9157531049987612}
   - component: {fileID: 7439533767214076918}
+  - component: {fileID: 3410009388185664284}
   m_Layer: 0
   m_Name: CombatPrototypeNetworkPlayerView
   m_TagString: Untagged
@@ -31,7 +32,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 7681259427291977598}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &2910104241055837844
@@ -49,7 +51,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5620285977066312488}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -103,3 +105,89 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0199cca95a2e14d5883379f33cc211e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.NetCode.Hybrid::Unity.NetCode.Hybrid.GhostPresentationGameObjectEntityOwner
+--- !u!114 &3410009388185664284
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5620285977066312488}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 515bf5c1e3a150343927492eb74a3c49, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::Code_01.CombatPrototype.Networking.CombatPrototypePlayerNetCodeView
+  playerAnimation: {fileID: 5056036644616537555}
+--- !u!1001 &3457737927582908598
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 8115338245304800783}
+    m_Modifications:
+    - target: {fileID: 1293244030864461801, guid: 2923dbd6e2a7aa2498443eff904a3581, type: 3}
+      propertyPath: m_Name
+      value: VisualRoot
+      objectReference: {fileID: 0}
+    - target: {fileID: 5000414591040247752, guid: 2923dbd6e2a7aa2498443eff904a3581, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5000414591040247752, guid: 2923dbd6e2a7aa2498443eff904a3581, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5000414591040247752, guid: 2923dbd6e2a7aa2498443eff904a3581, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5000414591040247752, guid: 2923dbd6e2a7aa2498443eff904a3581, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5000414591040247752, guid: 2923dbd6e2a7aa2498443eff904a3581, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5000414591040247752, guid: 2923dbd6e2a7aa2498443eff904a3581, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5000414591040247752, guid: 2923dbd6e2a7aa2498443eff904a3581, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5000414591040247752, guid: 2923dbd6e2a7aa2498443eff904a3581, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5000414591040247752, guid: 2923dbd6e2a7aa2498443eff904a3581, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5000414591040247752, guid: 2923dbd6e2a7aa2498443eff904a3581, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 2923dbd6e2a7aa2498443eff904a3581, type: 3}
+--- !u!114 &5056036644616537555 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7626561028175922533, guid: 2923dbd6e2a7aa2498443eff904a3581, type: 3}
+  m_PrefabInstance: {fileID: 3457737927582908598}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 95e0f7c9239a0b543bab0955a8f25935, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::Code_01.CombatPrototype.Networking.CombatPrototypePlayerAnimation
+--- !u!4 &7681259427291977598 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5000414591040247752, guid: 2923dbd6e2a7aa2498443eff904a3581, type: 3}
+  m_PrefabInstance: {fileID: 3457737927582908598}
+  m_PrefabAsset: {fileID: 0}

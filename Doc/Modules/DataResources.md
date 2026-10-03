@@ -197,3 +197,7 @@ EditorTest 声明以下菜单；三个重写菜单直接写入上表对应 JSON�
 ## 【KNOWN ISSUES】Editor 启动配置验证范围
 
 文件、字段、UTF-8 和源码边界已静态核对，新脚本由 Unity 编译；坏配置的实际启动表现、端口占用、保存失败与重复模式切换仍待人工 GamePlayer 验证，保持 UNKNOWN。本轮未调用玩家存档 Load/SavePrepared，不改变已有第 4D/7A 存档人工通过范围。
+
+## 【FACT】网络玩家美术资源入口
+
+玩家 Ghost 的原 ClientPrefab 继续引用 CombatPrototypeNetworkPlayerView；其中 VisualRoot 引用新增灰衣修士模型，角色设定图、网格/材质、动画控制器/Clip/遮罩和预览的路径及用途统一见[玩家美术资源表](../PlayerArt.md)。新资源及脚本 meta 由 Unity 正常导入生成，既有 GUID、Bundle、包与构建配置保持。

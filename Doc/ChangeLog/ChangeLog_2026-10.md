@@ -324,3 +324,15 @@
 - 用户明确反馈尚未进行人工验收；人工 GamePlayer 的视野、跟随、持续移动时旋转、缩放、双客户端归属、死亡/复活/重连与原操作回归仍为 UNKNOWN。AI 未启动 PlayMode、执行游戏系统、逻辑单元测试、命令行构建、发布、性能采样或图片检查；未提交 Git。
 - 最终 Console 检查定位到相机绑定查询的两条 GetSingletonEntity 启用型组件异常，调用栈分别来自输入与表现阶段；已将本地玩家查询改为 SystemAPI.Query 的启用匹配枚举，保留唯一性检查，不分配临时数组。修正已重新编译，Console 保留修正前异常记录；修正后人工运行复测仍为 UNKNOWN。
 - 主线程静态验收通过：修正后 Unity 编译与类型加载、相机绑定及参数、十份任务文件严格 UTF-8、模块文档局部链接和 git diff/空白检查已核对；十八项旧资源/配置基线中只有获授权的网络主场景变化，其余十七项（含任务开始已有 AutoSaveSettings.asset 修改）散列保持。人工 GamePlayer 与修正后运行复测仍待完成，未判定整体验收通过。
+
+## 2026-10-03：网络 Player 灰衣修士美术与战斗动画静态实装
+
+- 用户确认灰衣短刀修士外观，随后确认执行方案并一次性授权 PlayerView 层级/组件、Animator/Clip、角色资源导入及本次新设定/角色预览的视觉检查；主线程完成落地，未创建子Agent。
+- 内置 image_gen 生成角色三视图设定稿，已复制到 Assets/Art/Player/CombatPrototype/GrayRobeCultivatorConcept.png；Doc/PlayerArt.md 保存完整提示词、工具、参数与实际消费边界。未读取原有 Player.jpg 或其他旧图片。
+- 新增分部件低面数 GrayRobeCultivator.prefab、23 份网格、11 份 URP/Lit 材质；79 个 Renderer、2584 个三角形。模型按灰衣、旧皮护肩、符袋、短刀和暗朱红特征制作，设定稿细节简化。
+- 新增 Idle/Move/Startup/Active/Recovery/Hit/Death 七份 60 fps Clip，时长为 1.6/0.7/0.18/0.08/0.3/0.16/0.75 秒，每份 161 条曲线，无动画事件。新建两层 PlayerCombat.controller 与只启用 Torso 后代的 PlayerUpperBody.mask，关闭 Root Motion。
+- 新增 CombatPrototypePlayerNetCodeView 与 CombatPrototypePlayerAnimation，分别负责真实 Owner/World/Entity 状态读取和 Animator 表现；移动读取官方桥接完成后的显示位移，上身攻击不锁定下肢移动，死亡优先于受击/攻击，复活清除旧表现，首次绑定只建立序号基线。
+- 仅修改原 CombatPrototypeNetworkPlayerView：增加一个 View 脚本和 VisualRoot 嵌套角色，局部 Y=-1，关闭原根胶囊 Renderer；原组件、根 Transform、GUID 和 Ghost ClientPrefab 引用保持。Scene/SubScene、玩家/敌人 Ghost Prefab、旧 meta、包/构建设置、伤害/体力/奖励/存档链未修改，新 meta 均由 Unity 生成。
+- Unity 编译与新增类型已加载；只读资源核对确认必需引用正确、缺失脚本 0、所有曲线目标存在、两层状态与遮罩符合范围。通过隔离 Editor 预览场景采样核对本次新模型与动作，调整走路关键帧的脚部高度并导出 PlayerAnimationPreview.png；两份新图设置 NPOT=None 保留 1536x1024/1600x1100 的源图比例。
+- 局部同步 AI_Understanding、Player、Combat、Runtime、DataResources，新增 PlayerArt 专题；移除与当前玩家动画冲突的“尚未接入受击动画”描述，保留正式 Map、敌人和既有验收边界。
+- 主线程代码与资源静态验收通过；人工 GamePlayer 的双端角色显示、移动中攻击、受击/死亡/复活、断线重连、镜头和原战斗/物品回归仍为 UNKNOWN，性能未采样。AI 未启动 PlayMode、执行业务系统、逻辑单元测试、命令行构建或平台发布，未提交 Git。

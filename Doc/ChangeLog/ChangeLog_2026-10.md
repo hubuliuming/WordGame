@@ -312,3 +312,15 @@
 - 文档包含统一美术方向、必填信息、通用提示词、六类图片补充要求、三个完整示例及批量生成与验收标准；示例涵盖战斗场景、敌人前摇设定和武器图标。
 - Doc/AI_Understanding.md 的按任务阅读表增加模板入口；未改写既有模块文档。正式镜头、分辨率、角色比例、资源映射和生产规格保持 UNKNOWN，示例名称与视觉设计不作为现有功能或资源绑定事实。
 - 本轮仅修改上述模板、导航和本 ChangeLog，未创建子Agent，未修改代码、Scene、Prefab、Animator、meta、包或构建设置；未生成或读取图片，未运行逻辑单元测试、GamePlayer PlayMode、构建或发布。
+
+## 2026-10-03：网络战斗原型角色视野与本地跟随相机落地
+
+- 用户确认调整方案及 Main Camera 组件挂载、新脚本 meta 的一次性授权；由主线程执行，未创建子Agent。
+- 新增 CombatPrototypeFollowCamera 与 CombatPrototypeCameraBindingSystem；前者负责镜头姿态/缩放/平滑和水平方向转换，后者仅在客户端处理本地拥有者、官方 PlayerView、表现同步完成、复活对齐与释放。
+- 原 CombatPrototypePlayerInputSystem 接入当前本地镜头水平角到世界 X/Z Move 的转换，保留原四个输入字段、移动速度 5、预测/服务端移动与战斗/体力/物品/奖励/存档链。Z/X 每次旋转 45°，滚轮缩放；原空格/鼠标左键攻击、R 复活、E 物品使用保持。
+- 仅在 CombatPrototypeNetCode.unity 的现有 Main Camera 新增一个 FollowCamera 组件并显式绑定同对象 Camera，FOV 从 60 改为 35；保存俯角 40°、锚点 Y 偏移 0.5、默认距离 18、上下限 12/26、缩放步长 1、跟随/缩放平滑 0.12s 与旋转过渡 0.18s。没有新增场景物体或修改原 Transform。
+- 两份新脚本由 Unity 定点导入并生成 meta。编译中发现旧 CompleteDependency 调用的受保护访问错误，已按安装包的公开 CheckedStateRef.CompleteDependency 修正；最新程序集已编译、两个类型已加载，无新增脚本编译错误，未手动清空 Console。
+- Main Camera 在干净 Edit Mode 中完成一次挂载与保存，实际组件由 3 个变为 4 个，Camera 引用与参数已读回；局部同步 Runtime、Player、Framework 当前事实/策略/待验收项及本 ChangeLog。
+- 用户明确反馈尚未进行人工验收；人工 GamePlayer 的视野、跟随、持续移动时旋转、缩放、双客户端归属、死亡/复活/重连与原操作回归仍为 UNKNOWN。AI 未启动 PlayMode、执行游戏系统、逻辑单元测试、命令行构建、发布、性能采样或图片检查；未提交 Git。
+- 最终 Console 检查定位到相机绑定查询的两条 GetSingletonEntity 启用型组件异常，调用栈分别来自输入与表现阶段；已将本地玩家查询改为 SystemAPI.Query 的启用匹配枚举，保留唯一性检查，不分配临时数组。修正已重新编译，Console 保留修正前异常记录；修正后人工运行复测仍为 UNKNOWN。
+- 主线程静态验收通过：修正后 Unity 编译与类型加载、相机绑定及参数、十份任务文件严格 UTF-8、模块文档局部链接和 git diff/空白检查已核对；十八项旧资源/配置基线中只有获授权的网络主场景变化，其余十七项（含任务开始已有 AutoSaveSettings.asset 修改）散列保持。人工 GamePlayer 与修正后运行复测仍待完成，未判定整体验收通过。

@@ -30,6 +30,8 @@ namespace Code_01.CombatPrototype.Networking
                 (keyboard.dKey.isPressed ? 1f : 0f) - (keyboard.aKey.isPressed ? 1f : 0f),
                 (keyboard.wKey.isPressed ? 1f : 0f) - (keyboard.sKey.isPressed ? 1f : 0f));
             move = math.normalizesafe(move);
+            var cameraBinding = state.World.GetExistingSystemManaged<CombatPrototypeCameraBindingSystem>();
+            move = cameraBinding.ReadMove(move, keyboard, mouse);
             var attack = (keyboard != null && keyboard.spaceKey.wasPressedThisFrame) ||
                          (mouse != null && mouse.leftButton.wasPressedThisFrame);
             var respawn = keyboard != null && keyboard.rKey.wasPressedThisFrame;

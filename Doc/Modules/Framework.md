@@ -181,3 +181,15 @@ Authoring/Baker、预测玩家移动、敌人批量生成、敌人目标选择�
 配置在 World 创建前读取并生效；AutoConnectPort 为 0，项目入口通过官方 API 明确创建 World 并监听/连接，避免旧自动连接设置覆盖项目模式和端点。每次 Initialize 重设旧启动状态，成功启动后不重读启动文件。非 Editor 保留原 Bootstrap 分支。参数契约归[资源与数据](DataResources.md)，模式和人工验收范围归[运行入口](Runtime.md)。
 
 已有 Scene/Prefab/Animator、资源引用、组件挂载及 Baker 数值来源保持；窗口只定位已有资源，不新增场景配置组件或运行时数值覆写链。当前实现与编译的静态核对不代表人工 GamePlayer、新模式运行或平台验收通过。
+
+## 【FACT】网络原型本地相机职责
+
+[CombatPrototypeFollowCamera](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypeFollowCamera.cs) 是网络主场景现有 Main Camera 上的 MonoBehaviour，负责固定俯角/FOV、观察距离、水平角过渡、位置平滑及水平移动方向转换。[CombatPrototypeCameraBindingSystem](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypeCameraBindingSystem.cs) 是仅客户端创建的 SystemBase，负责每个 World 的唯一相机注册、本地玩家归属、官方 PlayerView 绑定、复活对齐和释放；本地玩家查询枚举启用的 GhostOwnerIsLocal 匹配，保留唯一性检查且不分配临时实体数组；通过 CreateAfter 声明既有官方表现系统的创建依赖。
+
+## 【CURRENT STRATEGY】镜头与网络表现时序
+
+原 CombatPrototypePlayerInputSystem 在 GhostInputSystemGroup 内取得本 World 的相机绑定系统，按一次当前水平角采集镜头操作并转换 Move。相机向 ClientServerBootstrap.ClientWorld 注册；绑定系统在 PresentationSystemGroup 通过官方实体到 GameObject 接口获取本地 PlayerView，并使用官方 Transform 桥接系统的 CheckedStateRef.CompleteDependency 完成作业后读取位置和更新相机。没有向预测/服务端系统注入 Camera，也没有修改官方包、正式 Game 架构或玩家/敌人 Prefab。
+
+## 【KNOWN ISSUES】本地相机接入验收
+
+两个新类型与输入修改已由 Unity 编译并加载，Main Camera 的必需引用和新脚本 GUID 已静态核对。用户明确反馈尚未进行人工验收，人工 GamePlayer 及镜头效果仍为 UNKNOWN，边界归[运行入口](Runtime.md)；静态检查不作为运行通过结论。

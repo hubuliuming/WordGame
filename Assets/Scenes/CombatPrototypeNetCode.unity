@@ -197,6 +197,7 @@ GameObject:
   - component: {fileID: 329441054}
   - component: {fileID: 329441053}
   - component: {fileID: 329441052}
+  - component: {fileID: 329441055}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -245,7 +246,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 60
+  field of view: 35
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -278,6 +279,29 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &329441055
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 329441051}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0bd67069a284777408449099f927acb0, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::Code_01.CombatPrototype.Networking.CombatPrototypeFollowCamera
+  controlledCamera: {fileID: 329441053}
+  pitch: 40
+  fieldOfView: 35
+  targetHeight: 0.5
+  defaultDistance: 18
+  minDistance: 12
+  maxDistance: 26
+  zoomStep: 1
+  followSmoothTime: 0.12
+  rotationStep: 45
+  rotationDuration: 0.18
 --- !u!1 &2108281770
 GameObject:
   m_ObjectHideFlags: 0

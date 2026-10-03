@@ -66,15 +66,15 @@ namespace Code_01.CombatPrototype.Networking
                     Debug.Log($"[CombatPrototype.NetCode][{World.Name}] Player={owner.ValueRO.NetworkId}, inventoryItem={item.ItemName}, quantity={item.Quantity}.");
                 }
             }
-            foreach (var (health, transform, ghost) in SystemAPI.Query<
-                         RefRO<CombatPrototypeEnemyState>, RefRO<LocalTransform>, RefRO<GhostInstance>>())
-            {
-                Debug.Log($"[CombatPrototype.NetCode][{World.Name}] Enemy ghost={ghost.ValueRO.ghostId}, position={transform.ValueRO.Position}, HP={health.ValueRO.CurrentHealth}, hit={health.ValueRO.HitSequence}, dead={health.ValueRO.IsDead}.");
-            }
-            foreach (var (target, ghost) in SystemAPI.Query<RefRO<CombatPrototypeEnemyTarget>, RefRO<GhostInstance>>())
-            {
-                Debug.Log($"[CombatPrototype.NetCode][{World.Name}] Enemy ghost={ghost.ValueRO.ghostId}, target NetworkId={target.ValueRO.NetworkId}.");
-            }
+            // foreach (var (health, transform, ghost) in SystemAPI.Query<
+            //              RefRO<CombatPrototypeEnemyState>, RefRO<LocalTransform>, RefRO<GhostInstance>>())
+            // {
+            //     Debug.Log($"[CombatPrototype.NetCode][{World.Name}] Enemy ghost={ghost.ValueRO.ghostId}, position={transform.ValueRO.Position}, HP={health.ValueRO.CurrentHealth}, hit={health.ValueRO.HitSequence}, dead={health.ValueRO.IsDead}.");
+            //  }
+            // foreach (var (target, ghost) in SystemAPI.Query<RefRO<CombatPrototypeEnemyTarget>, RefRO<GhostInstance>>())
+            // {
+            //     Debug.Log($"[CombatPrototype.NetCode][{World.Name}] Enemy ghost={ghost.ValueRO.ghostId}, target NetworkId={target.ValueRO.NetworkId}.");
+            // }
         }
     }
 }

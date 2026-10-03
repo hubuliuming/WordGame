@@ -77,7 +77,7 @@ ChangeAll 先得到本次最终上限，再据其约束本次有非零增量的�
 
 `CombatPrototypePlayerNetCodeAuthoring` 为玩家 Ghost 烘焙速度 `5`、`CombatPrototypePlayerInput` 和近战数据；NetCode 为 `IInputComponentData` 生成输入缓冲。服务端握手后设置 `GhostOwner.NetworkId`、启用 `AutoCommandTarget`，并把连接 `CommandTarget` 指向玩家；玩家加入连接 `LinkedEntityGroup`，跟随断线销毁。
 
-玩家 Ghost 使用 `OwnerPredicted`：本地拥有者预测，其他客户端插值。`CombatPrototypePlayerInputSystem` 只给 `GhostOwnerIsLocal` 写入 WASD 世界 X/Z 移动，以及空格/鼠标左键 `InputEvent` 攻击事件；第 6B 增加 R 键 `Respawn`，第 7A 增加 E 键 `UseItem` 输入事件。`CombatPrototypePlayerMovementSystem` 在 Client/Server 预测组中只处理带 `Simulate` 的实体，以相同输入更新 LocalTransform；移动输入拒绝非有限值并限制长度，旋转直接设置当前移动朝向。网络玩家不接第 1 阶段 CharacterController 的相机相对移动、重力或碰撞链。
+玩家 Ghost 使用 `OwnerPredicted`：本地拥有者预测，其他客户端插值。`CombatPrototypePlayerInputSystem` 只给 `GhostOwnerIsLocal` 写入由当前本地镜头水平角转换的世界 X/Z Move，以及空格/鼠标左键 `InputEvent` 攻击事件；第 6B 增加 R 键 `Respawn`，第 7A 增加 E 键 `UseItem` 输入事件。`CombatPrototypePlayerMovementSystem` 在 Client/Server 预测组中只处理带 `Simulate` 的实体，以相同输入更新 LocalTransform；移动输入拒绝非有限值并限制长度，旋转直接设置当前移动朝向。网络玩家仍不接第 1 阶段 CharacterController 脚本的移动、重力或碰撞链；网络镜头与输入转换采用本页“本地跟随镜头”定义的独立入口。
 
 ## 【KNOWN ISSUES】第 2B 阶段玩家验收
 
@@ -186,3 +186,17 @@ E 键 UseItem 沿原命令链发送；服务端 CombatPrototypeItemUseSystem 在
 ## 【KNOWN ISSUES】第 7A 阶段玩家验收
 
 用户反馈第 7A 人工验收通过，主线程结合静态核对判定通过；玩家验收范围见[运行入口](Runtime.md)。
+
+## 【FACT】网络原型本地跟随镜头与移动输入
+
+[CombatPrototypePlayerInput.cs](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypePlayerInput.cs) 保留 Move、Attack、Respawn、UseItem 四个原输入字段。WASD 在原归一化之后，调用本客户端 World 的 CombatPrototypeCameraBindingSystem，再由 CombatPrototypeFollowCamera 当前水平角旋转到世界 X/Z Move；相机操作每个渲染帧采集一次，同一水平角应用到画面。初始角为 0°，W/S 为画面前后、A/D 为画面左右，移动速度仍为 5。
+
+## 【CURRENT STRATEGY】镜头归属与玩家生命周期
+
+本地跟随只读取 GhostOwnerIsLocal 玩家经官方桥接得到的显示根 Transform，以及同步的 IsDead。输入转换后继续使用原 CombatPrototypePlayerMovementSystem 的同一客户端预测/服务端模拟与朝向写入；服务端不读取镜头，不新增 Ghost 字段，不改攻击、体力、物品、奖励或存档结算。
+
+死亡保持本人镜头；复活从死亡转为存活时重置位置跟随并保留当前视角。新实体首次绑定与重连恢复默认视角，且在生成本次移动命令前完成重置；没有本地玩家时解除目标。镜头配置、绑定链和完整人工范围归[运行入口](Runtime.md)。
+
+## 【KNOWN ISSUES】本地镜头玩家验收
+
+源码、Unity 编译及原四个输入字段已静态核对；用户明确反馈尚未进行人工验收，相机相对方向、斜向速度、双客户端归属、复活/重连与原移动/攻击/物品回归的人工 GamePlayer 结果仍为 UNKNOWN。既有第 2B～第 7A 玩家人工通过范围保持。AI 未运行游戏系统、PlayMode、逻辑单元测试或构建。

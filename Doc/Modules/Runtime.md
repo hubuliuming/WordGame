@@ -104,7 +104,7 @@ Map 中存在 TestController 的脚本引用（GUID `42f2add30349522408099dbf10f
 
 ## 【CURRENT STRATEGY】第 3A 阶段观测入口
 
-原型保留日志入口：`CombatPrototypeNetCodeLogSystem` 在 Client/Server World 中记录玩家数量及敌人存活/死亡数量变化，每 2 秒记录玩家位置、旋转、攻击阶段/序号、生命/上限、受击序号及死亡标记，以及各敌人 Ghost ID、位置、HP、受击序号、死亡标记；服务端同时记录各敌人目标 NetworkId。服务端另记录握手、批量生成结果、攻击开始、空间查询命中目标数和事件扣血日志。WASD 写入世界 X/Z 平面移动，空格或鼠标左键发送基础攻击事件；第 6B 的 R 键发送手动复活请求，第 7A 的 E 键发送物品使用请求，独立服务端系统记录接受、拒绝和处理失败。状态含义见[玩家](Player.md)、[战斗](Combat.md)与[背包与道具](Inventory.md)。
+原型保留日志入口：`CombatPrototypeNetCodeLogSystem` 在 Client/Server World 中记录玩家数量及敌人存活/死亡数量变化，每 2 秒记录玩家位置、旋转、攻击阶段/序号、生命/上限、受击序号及死亡标记，以及各敌人 Ghost ID、位置、HP、受击序号、死亡标记；服务端同时记录各敌人目标 NetworkId。服务端另记录握手、批量生成结果、攻击开始、空间查询命中目标数和事件扣血日志。WASD 按当前本地镜头水平角转换后写入世界 X/Z Move，空格或鼠标左键发送基础攻击事件；第 6B 的 R 键发送手动复活请求，第 7A 的 E 键发送物品使用请求，独立服务端系统记录接受、拒绝和处理失败。状态含义见[玩家](Player.md)、[战斗](Combat.md)与[背包与道具](Inventory.md)。
 
 ## 【KNOWN ISSUES】第 2B 阶段验收边界
 
@@ -332,3 +332,21 @@ UseItem 已改变输入命令布局，服务端与所有客户端必须使用同
 主线程已核对实现符合确认方案、Unity 编译完成、窗口正确读取实际配置、文档同步及修改边界，判定代码与文档静态验收通过；新增模式的人工 GamePlayer 行为、连接结果、失败清理及连续模式切换仍为 `UNKNOWN`。既有第 2B～第 7A 人工通过范围不扩展为本次启动配置通过；AI 未启动 PlayMode、执行逻辑单元测试、构建、发布、性能采样或读取图片。
 
 人工验收范围：单机一名本地玩家及原战斗/奖励/复活/物品使用；单机 IPC 驱动与外部进程无法加入；联机 Host/Client 使用不同固定 ID 的加入、同步和存档；Client/Server World 数量；缺失/非法配置及监听失败的暴露与清理；单机→联机→单机重复进入；Map 和第 1 阶段入口回归。窗口当前场景提示仅用于使用说明，真正的启动范围仍由现有官方场景标记判断。
+
+## 【FACT】网络原型本地跟随镜头
+
+[CombatPrototypeNetCode.unity](../../Assets/Scenes/CombatPrototypeNetCode.unity) 的现有 Main Camera 挂载 [CombatPrototypeFollowCamera](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypeFollowCamera.cs)，controlledCamera 显式引用同对象的 Camera。当前透视 FOV=35、固定俯角 40°、跟随显示根节点的 Y 偏移 0.5、默认距离 18、范围 12～26、缩放步长 1、位置与缩放平滑时间 0.12s、水平旋转步长 45°、旋转过渡 0.18s；原 Camera Transform、物体层级及其余组件保持。
+
+[CombatPrototypeCameraBindingSystem](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypeCameraBindingSystem.cs) 仅在 ClientSimulation 的 PresentationSystemGroup 执行。相机 Start 向官方 ClientServerBootstrap.ClientWorld 中的该系统注册；系统从本 World 的 CombatPrototypePlayerNetCode + GhostOwnerIsLocal 以 SystemAPI.Query 枚举 GhostOwnerIsLocal 启用匹配并确认唯一拥有者，经 GhostPresentationGameObjectSystem.GetGameObjectForEntity 获取既有 PlayerView，并在完成官方 Transform 桥接作业后读取显示位置。没有本地玩家属于准入/断线等待；多个本地玩家、必需相机或 PlayerView 缺失显式失败。Server-only 没有本地客户端注册。
+
+## 【CURRENT STRATEGY】本地镜头与输入
+
+Z/X 单次按下改变水平目标角，鼠标滚轮改变观察距离；角色转身不驱动镜头旋转。当前水平角在原 GhostInputSystemGroup 输入采集时每个渲染帧推进一次，同一角度用于 WASD 转换和表现阶段镜头姿态。移动输入仍通过原 Move/预测/服务端链，具体边界归[玩家](Player.md)；空格/鼠标左键攻击、R 复活和 E 物品使用保持。
+
+首次绑定或重连新玩家在输入转换前重置默认方向与距离，首次显示直接对齐并清除跟随速度。死亡仍观察本人；同步生命从死亡转为存活时直接对齐复活位置、清除位置平滑速度，保留当前旋转和缩放。无本地玩家时解除目标并保持最后相机姿态；SubScene 停止、Scene 释放或 World 销毁时清理绑定。
+
+## 【KNOWN ISSUES】本地跟随镜头验收边界
+
+源码、Unity 编译、类型加载和 Main Camera 的实际序列化绑定已静态核对；用户明确反馈尚未进行人工验收，人工 GamePlayer 的视野比例、跟随手感、输入方向及生命周期回归仍为 UNKNOWN。既有网络战斗人工通过结论不扩展为本次镜头通过。当前未新增地图边界、遮挡处理或角色表现修正；未改 Ghost Prefab、SubScene、Animator、旧 meta、包或构建配置。
+
+人工验收范围为直行/斜行/急停/转身、持续按 W 时 Z/X 旋转、滚轮缩放上下限、双客户端只跟随本人且视角独立、死亡/复活/断线重连，以及原攻击/E 物品/R 复活回归。AI 未启动 GamePlayer/PlayMode、执行游戏系统、逻辑单元测试、命令行构建、发布、性能采样或图片检查。

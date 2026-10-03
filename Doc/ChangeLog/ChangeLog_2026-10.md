@@ -336,3 +336,26 @@
 - Unity 编译与新增类型已加载；只读资源核对确认必需引用正确、缺失脚本 0、所有曲线目标存在、两层状态与遮罩符合范围。通过隔离 Editor 预览场景采样核对本次新模型与动作，调整走路关键帧的脚部高度并导出 PlayerAnimationPreview.png；两份新图设置 NPOT=None 保留 1536x1024/1600x1100 的源图比例。
 - 局部同步 AI_Understanding、Player、Combat、Runtime、DataResources，新增 PlayerArt 专题；移除与当前玩家动画冲突的“尚未接入受击动画”描述，保留正式 Map、敌人和既有验收边界。
 - 主线程代码与资源静态验收通过；人工 GamePlayer 的双端角色显示、移动中攻击、受击/死亡/复活、断线重连、镜头和原战斗/物品回归仍为 UNKNOWN，性能未采样。AI 未启动 PlayMode、执行业务系统、逻辑单元测试、命令行构建或平台发布，未提交 Git。
+
+## 2026-10-03：战斗地图配置建议模板导出
+
+- 按用户指定路径新增 E:/UnityProjects/MyGame/Code_01策划/Config/战斗地图配置建议模板.md，整理已讨论的空间参数、生态密度、物体参数、配置数据职责、来源接口草案及地图 JSON 示例。
+- 模板明确标注建议值、待确认与尚未实装状态，保留实际资源引用、物品定义和运行接入中的 UNKNOWN；未将建议模板写为已生效业务配置。
+- 本次仅导出 Markdown 并追加本记录，未修改代码或资源，未运行逻辑单元测试、GamePlayer PlayMode、构建或发布，未读取图片。
+
+## 2026-10-03：战斗地图第一阶段落地
+
+- 用户确认第一阶段方案并授权新地图材质/网格/装饰 Prefab、原网络 SubScene 根节点新增 MapAuthoring 与 Unity 生成新 meta；由主线程执行，未创建子 Agent。
+- 新增 Assets/Scripts/CombatPrototype/Map/：四类普通配置与集合、来源接口、草地/森林默认来源、边界校验、布局烘焙、地图 ECS 数据、共用玩家位置函数、分块网格与客户端显示。默认 3×3 块、每块 16×16 格、格长 2 米、地图 96×96 米、地面 Y=0、种子 12345；三类地表、静态草丛和碎石已登记，道路/安全区/空地/边缘/敌人初始网格排除装饰。
+- 原 GoInGame 与 R 复活等待地图并共用出生计算，当前玩家仍为 (NetworkId×2,1,0)。Spawner Baker 从地图提供的原点/总量生成 ECS 数据，敌人仍为 32 个、8 列、间距 3，首点改为 (0,1,16)；旧 EnemyPosition/EnemyCount 序列化字段保留且不再控制当前原点/总量。原敌人生成增加地图就绪前提，其实例化与失败隔离保持。
+- 新增 CombatPrototypeMapAssetBuilder Editor 入口，创建 4 材质、2 网格及 2 个单根装饰 Prefab；原 CombatPrototypeNetworkRoot 仅新增地图组件，默认 Forest，显式绑定 3 材质与 2 Prefab。主场景、镜头、玩家/敌人原 Prefab、Animator、旧 meta、包与构建设置经基线哈希核对保持。
+- Unity 编译完成且最终 Console 无编译/地图错误。仅执行隔离 Editor 烘焙与网格数据检查，没有运行游戏模拟或显示系统；所有隔离 World/场景及临时生成网格均已释放。
+- 两种模板实际烘焙均为 1 地图、9 块、2304 格，其中 452 格为禁止装饰区域；地图原点 (-48,-48)、尺寸 (96,96)，NetworkId=1 玩家位置 (2,1,0)。地表资源引用有效，两个装饰 Prefab 均有 Prefab、LocalTransform、MaterialMeshInfo。
+
+| 隔离烘焙模板 | 草地格 | 林地格 | 岩地格 | 草丛组 | 碎石 | 生成块网格 | 非空地表子网格 |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Forest | 512 | 1588 | 204 | 601 | 20 | 9 | 19 |
+| Grassland | 1478 | 636 | 190 | 743 | 21 | 9 | 16 |
+
+- 新增 Doc/Modules/Map.md；局部同步 AI_Understanding、Runtime、Player、Combat、DataResources，以及项目外战斗地图配置建议模板的实装状态和 JSON 字段形状。本记录保留此前建议模板导出记录。
+- 主线程代码/资源/文档静态验收通过；人工 GamePlayer 的地图显示、跨端一致性、原玩法回归与生命周期清理仍为 UNKNOWN。实际 JSON 读取、树木、采集、碰撞/寻路/攻击遮挡、动态对象、再生和地图状态存档未接入。AI 未启动 PlayMode、执行逻辑单元测试、命令行构建、发布、性能采样或读取图片，未提交 Git。

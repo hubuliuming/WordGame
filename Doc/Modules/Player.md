@@ -165,7 +165,7 @@ CurrentHealth 降至 0 后设置 IsDead=1，后续伤害不再扣血或递增受
 
 ## 【CURRENT STRATEGY】第 6B 阶段复活状态
 
-服务端确认死亡后，先取得必需玩家组件与伤害缓冲引用，再清理旧敌人锁定，清空玩家伤害缓冲；玩家近战回 Ready、计时为 0，CurrentPower=UpperPower、CurrentHealth=MaxHealth、IsDead=0。位置按原加入公式恢复到 (NetworkId * 2, 1, 0)，旋转和缩放保留。复活沿用原玩家实体、连接和身份，不创建新 Ghost；HitSequence、玩家及敌人攻击序号不因复活归零或递增，金币/经验/库存与存档保持原值。
+服务端确认死亡后，先取得必需玩家组件与伤害缓冲引用，再清理旧敌人锁定，清空玩家伤害缓冲；玩家近战回 Ready、计时为 0，CurrentPower=UpperPower、CurrentHealth=MaxHealth、IsDead=0。位置通过与加入流程共用的 CombatPrototypeMapSpawnUtility 从[地图配置](Map.md)计算，当前仍为 (NetworkId * 2, 1, 0)，旋转和缩放保留。复活沿用原玩家实体、连接和身份，不创建新 Ghost；HitSequence、玩家及敌人攻击序号不因复活归零或递增，金币/经验/库存与存档保持原值。
 
 复活发生在本 tick 已完成的移动、近战、反击和玩家伤害之后，本 tick 不再次移动或攻击，后续 tick 恢复原操作与敌人候选资格；同 tick 的 R 请求若在该结算点已死亡，也按死亡状态处理。客户端等待原生命/体力/位置快照，不自行恢复生命或预测复活。旧敌人挥击的取消与后摇规则归[战斗](Combat.md)。
 

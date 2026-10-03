@@ -1,0 +1,100 @@
+using System;
+
+namespace Code_01.CombatPrototype.Map
+{
+    public sealed class CombatPrototypeDefaultMapConfigSource : ICombatMapConfigSource
+    {
+        public const string GrasslandId = "battle_grassland_01";
+        public const string ForestId = "battle_forest_01";
+
+        public CombatMapConfigSet LoadValidated(string mapDefinitionId)
+        {
+            var forest = mapDefinitionId == ForestId;
+            if (!forest && mapDefinitionId != GrasslandId)
+                throw new InvalidOperationException("Unknown map definition: " + mapDefinitionId);
+
+            var config = new CombatMapConfigSet
+            {
+                map = new MapDefinitionConfig
+                {
+                    schemaVersion = 1, configRevision = 1,
+                    mapDefinitionId = mapDefinitionId, defaultSeed = 12345,
+                    geometry = new MapGeometryConfig
+                    {
+                        cellSizeMeters = 2f, cellsPerChunk = 16, chunkCountX = 3,
+                        chunkCountZ = 3, baseHeightMeters = 0f
+                    },
+                    layout = new MapLayoutConfig
+                    {
+                        mainPathGroundId = "grass", mainPathWidthMeters = 4f, minimumPathWidthMeters = 2f,
+                        edgeKeepoutMeters = 2f, spawnSafeRadiusMeters = 6f,
+                        combatClearRadiusMeters = 8f, enemySpawnMinDistanceMeters = 12f
+                    },
+                    population = new MapPopulationConfig { initialEnemyCount = 32 },
+                    spawn = new MapSpawnConfig
+                    {
+                        playerOriginX = 0f, playerOriginZ = 0f, playerSpacingMeters = 2f,
+                        actorHeightOffsetMeters = 1f, enemyOriginX = 0f, enemyOriginZ = 16f
+                    },
+                    biomeIds = new[] { "grassland", "forest", "rocky" },
+                    defaultBiomeId = forest ? "forest" : "grassland",
+                    biomeRegions = forest
+                        ? new[]
+                        {
+                            Region("grassland", 0.3f, 0.3f, 0.7f, 0.7f),
+                            Region("rocky", 0.75f, 0f, 1f, 0.35f)
+                        }
+                        : new[]
+                        {
+                            Region("forest", 0f, 0.82f, 1f, 1f),
+                            Region("forest", 0f, 0f, 0.12f, 0.82f),
+                            Region("rocky", 0.8f, 0f, 1f, 0.4f)
+                        }
+                },
+                biomes = new[]
+                {
+                    Biome("grassland", "grass", 12f, 0.4f, 0.6f, 0.2f),
+                    Biome("forest", "forest_floor", 8f, 1.5f, 0.5f, 0.2f),
+                    Biome("rocky", "rock", 3f, 0.1f, 0.2f, 1f)
+                },
+                grounds = new[]
+                {
+                    Ground("grass", "ground_grass"),
+                    Ground("forest_floor", "ground_forest"),
+                    Ground("rock", "ground_rock")
+                },
+                objects = new[]
+                {
+                    new MapObjectDefinitionConfig
+                    {
+                        objectId = "decor_grass", visualResourceKey = "decor_grass",
+                        footprintRadiusMeters = 0f, minimumSameTypeSpacingMeters = 0.5f
+                    },
+                    new MapObjectDefinitionConfig
+                    {
+                        objectId = "decor_pebble", visualResourceKey = "decor_pebble",
+                        footprintRadiusMeters = 0.3f, minimumSameTypeSpacingMeters = 2.5f
+                    }
+                }
+            };
+            CombatPrototypeMapConfigValidator.Validate(config);
+            return config;
+        }
+
+        private static GroundDefinitionConfig Ground(string id, string key) =>
+            new GroundDefinitionConfig
+            { groundId = id, visualResourceKey = key, walkable = true, movementMultiplier = 1f };
+
+        private static BiomeDefinitionConfig Biome(string id, string ground, float grass,
+            float tree, float gatherable, float rock) => new BiomeDefinitionConfig
+        {
+            biomeId = id, groundId = ground, decorationObjectId = "decor_grass",
+            rockObjectId = "decor_pebble", decorationDensityPer100m2 = grass,
+            treeDensityPer100m2 = tree, gatherableDensityPer100m2 = gatherable,
+            rockDensityPer100m2 = rock
+        };
+
+        private static MapBiomeRegionConfig Region(string id, float x0, float z0, float x1, float z1) =>
+            new MapBiomeRegionConfig { biomeId = id, minX = x0, minZ = z0, maxX = x1, maxZ = z1 };
+    }
+}

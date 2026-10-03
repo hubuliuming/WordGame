@@ -1,3 +1,4 @@
+using Code_01.CombatPrototype.Map;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -20,6 +21,7 @@ namespace Code_01.CombatPrototype.Networking
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<CombatPrototypePlayerSpawner>();
+            state.RequireForUpdate<CombatPrototypeMapData>();
         }
 
         public void OnUpdate(ref SystemState state)
@@ -57,12 +59,14 @@ namespace Code_01.CombatPrototype.Networking
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<CombatPrototypePlayerSpawner>();
+            state.RequireForUpdate<CombatPrototypeMapData>();
             state.RequireForUpdate<CombatPrototypeGoInGameRequest>();
         }
 
         public void OnUpdate(ref SystemState state)
         {
             var spawner = SystemAPI.GetSingleton<CombatPrototypePlayerSpawner>();
+            var map = SystemAPI.GetSingleton<CombatPrototypeMapData>();
             using var ecb = new EntityCommandBuffer(Allocator.Temp);
             using var handledThisUpdate = new NativeHashSet<Entity>(4, Allocator.Temp);
             using var occupiedPlayerIds = new NativeHashSet<FixedString64Bytes>(4, Allocator.Temp);
@@ -119,7 +123,7 @@ namespace Code_01.CombatPrototype.Networking
                         inventory.Add(item);
                     ecb.SetComponent(createdPlayer, new GhostOwner { NetworkId = networkId });
                     ecb.SetComponent(createdPlayer, new AutoCommandTarget { Enabled = true });
-                    ecb.SetComponent(createdPlayer, LocalTransform.FromPosition(new float3(networkId * 2f, 1f, 0f)));
+                    ecb.SetComponent(createdPlayer, LocalTransform.FromPosition(CombatPrototypeMapSpawnUtility.PlayerPosition(map, networkId)));
                     ecb.SetComponent(connection, new CommandTarget { targetEntity = createdPlayer });
                     ecb.AppendToBuffer(connection, new LinkedEntityGroup { Value = createdPlayer });
                     ecb.AddComponent<NetworkStreamInGame>(connection);

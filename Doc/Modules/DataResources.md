@@ -192,7 +192,7 @@ EditorTest 声明以下菜单；三个重写菜单直接写入上表对应 JSON�
 
 [.gitignore](../../.gitignore) 仅新增 /UserSettings/CombatPrototypeStartupSettings.json 的忽略规则；其他 UserSettings 文件的管理方式保持。没有启动设置文件的开发环境可在该窗口明确保存候选值建立配置，启动入口自身不自动补配置。
 
-开发身份仍使用原 -combatPrototypePlayerId 优先及 CombatPrototypeDevelopmentIdentity.json 按 World.Name 读取规则。窗口只展示实际来源并提供文件定位，不复制或改写 PlayerId。原服务端存档路径、格式、固定 ID 契约以及正式 PlayerDataStore JSON 保持。玩法数值仍保存于既有 Spawner/Authoring 所属资源并沿原烘焙链生效，不加入启动 JSON。
+开发身份仍使用原 -combatPrototypePlayerId 优先及 CombatPrototypeDevelopmentIdentity.json 按 World.Name 读取规则。窗口只展示实际来源并提供文件定位，不复制或改写 PlayerId。原服务端存档路径、格式、固定 ID 契约以及正式 PlayerDataStore JSON 保持。生命、体力、攻击等玩法数值仍保存于各 Authoring 所属资源；地图默认来源提供尺寸、布局、出生原点与敌人总量，原 Spawner 保留列数/间距，两者沿烘焙链生效，配置契约归[战斗地图](Map.md)，均不加入启动 JSON。
 
 ## 【KNOWN ISSUES】Editor 启动配置验证范围
 
@@ -201,3 +201,9 @@ EditorTest 声明以下菜单；三个重写菜单直接写入上表对应 JSON�
 ## 【FACT】网络玩家美术资源入口
 
 玩家 Ghost 的原 ClientPrefab 继续引用 CombatPrototypeNetworkPlayerView；其中 VisualRoot 引用新增灰衣修士模型，角色设定图、网格/材质、动画控制器/Clip/遮罩和预览的路径及用途统一见[玩家美术资源表](../PlayerArt.md)。新资源及脚本 meta 由 Unity 正常导入生成，既有 GUID、Bundle、包与构建配置保持。
+
+## 【FACT】网络战斗地图配置与资源
+
+Assets/Scripts/CombatPrototype/Map/ 包含四类可序列化配置、配置集合、来源接口、默认来源、边界校验、Authoring/Baker 和地图数据/显示脚本。当前使用默认来源，没有实际地图 JSON 文件读取或运行状态写盘；资源键通过 SubScene 的 GroundMaterials、DecorationPrefabs 显式绑定，字段契约与资源映射统一归[战斗地图](Map.md)。
+
+新资源位于 Assets/Art/Map/CombatPrototype/ 与 Assets/Prefabs/CombatPrototype/Map/，包括 4 个材质、2 个网格和 2 个静态装饰 Prefab。新增资源和脚本 meta 由 Unity 导入生成；既有玩家/敌人资源、旧 meta、Bundle、包与构建设置保持。地表运行网格及装饰实体由客户端地图显示系统拥有和清理，共享资源不随地图根实体释放而销毁。该模块没有调用背包或玩家存档 Load/SavePrepared，也不保存地图对象状态。

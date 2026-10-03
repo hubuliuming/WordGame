@@ -96,9 +96,9 @@ Map 中存在 TestController 的脚本引用（GUID `42f2add30349522408099dbf10f
 
 `CombatPrototypeNetCodeBootstrap.Initialize` 通过官方 `DiscoverAutomaticNetcodeBootstrap` 读取启动场景标记。标记启用时，Editor 从启动配置文件创建明确的 Client/Server World 并显式监听、连接，具体规则见本页“Editor 启动配置”；非 Editor 保留端口 `7979`、后台运行及原 `ClientServerBootstrap` 创建链。未启用标记时仍调用 `CreateLocalWorld`，不读取原型启动配置。场景标记判断沿用包对启动时场景尚未有效的处理，不直接依赖早期 `GetActiveScene().name`。
 
-独立主场景为 `Assets/Scenes/CombatPrototypeNetCode.unity`，保留 Main Camera、Directional Light 与自动加载的 `CombatPrototypeNetCodeSubScene`。子场景路径为 `Assets/Scenes/CombatPrototypeNetCode/CombatPrototypeNetCodeSubScene.unity`，唯一 `CombatPrototypeNetworkRoot` 挂载 `CombatPrototypePlayerSpawnerAuthoring`，显式引用玩家、敌人两个 Ghost Prefab；Root 自身没有 Ghost，场景中没有额外玩家或敌人 Ghost 实例。
+独立主场景为 `Assets/Scenes/CombatPrototypeNetCode.unity`，保留 Main Camera、Directional Light 与自动加载的 `CombatPrototypeNetCodeSubScene`。子场景路径为 `Assets/Scenes/CombatPrototypeNetCode/CombatPrototypeNetCodeSubScene.unity`，唯一 `CombatPrototypeNetworkRoot` 挂载原 `CombatPrototypePlayerSpawnerAuthoring` 和 `CombatPrototypeMapAuthoring`，显式引用玩家、敌人两个 Ghost Prefab 及地图资源；地图配置和资源归[战斗地图](Map.md)。Root 自身没有 Ghost，场景中没有额外玩家或敌人 Ghost 实例。
 
-运行调用链为：`SubScene 数据加载 → 客户端读取第 4D 固定 ID 并发送 GoInGame RPC → 服务端唯一握手入口验证身份与存档 → 生成玩家并恢复金币/经验/背包 → GhostOwner / AutoCommandTarget / CommandTarget 绑定 → 玩家加入连接 LinkedEntityGroup → NetworkStreamInGame`。重复或失效 RPC 不重复生成玩家；连接销毁时由 NetCode 的 LinkedEntityGroup 销毁对应玩家。服务端的 `CombatPrototypeEnemySpawnSystem` 从同一个 Spawner 批量生成 `32` 个现有敌人 Ghost，以 `(0, 1, 2)` 为首个网格位置，在 X/Z 平面按 `8` 列、`4` 行、间距 `3` 排列；玩家生成位置沿用 `(NetworkId * 2, 1, 0)`。批量生成只尝试一次，逐项记录和隔离实例化/初始化失败，清理当前项半成品，日志分别记录成功与失败数量。
+运行调用链为：`SubScene 地图/Spawner 数据加载 → 客户端读取第 4D 固定 ID 并发送 GoInGame RPC → 服务端唯一握手入口验证身份与存档 → 生成玩家并恢复金币/经验/背包 → GhostOwner / AutoCommandTarget / CommandTarget 绑定 → 玩家加入连接 LinkedEntityGroup → NetworkStreamInGame`。重复或失效 RPC 不重复生成玩家；连接销毁时由 NetCode 的 LinkedEntityGroup 销毁对应玩家。服务端的 `CombatPrototypeEnemySpawnSystem` 从同一个 Spawner 批量生成 `32` 个现有敌人 Ghost，地图提供总量与首点，当前以 `(0, 1, 16)` 为首个网格位置，在 X/Z 平面按 `8` 列、`4` 行、间距 `3` 排列；玩家加入和复活共用地图位置计算，当前仍为 `(NetworkId * 2, 1, 0)`。批量生成只尝试一次，逐项记录和隔离实例化/初始化失败，清理当前项半成品，日志分别记录成功与失败数量。
 
 `Assets/Prefabs/CombatPrototype/` 中的玩家 Ghost 使用 `HasOwner`、`OwnerPredicted`、`SupportedGhostModes=All` 和自动输入目标；敌人 Ghost 使用 `Interpolated`。玩家通过官方 `GhostPresentationGameObjectAuthoring.ClientPrefab` 绑定原 Mono 表现 Prefab，并由官方桥接同步 Transform，服务端表现引用为空。敌人根节点已直接配置 MeshFilter/MeshRenderer，原 ClientPrefab 已清空；实体渲染与死亡隐藏见本页第 3B-2 节。
 
@@ -325,7 +325,7 @@ UseItem 已改变输入命令布局，服务端与所有客户端必须使用同
 
 玩家生成继续走原固定 ID、GoInGame RPC、存档恢复和连接绑定链；战斗、奖励、复活、物品使用及 Ghost 字段保持。单机仍使用服务端逻辑和原存档；同一存档根目录中的同一 ID 对应同一文件。新配置链仅在 UNITY_EDITOR 编译，非 Editor 启动行为未接入该文件。
 
-窗口显示现有开发身份及来源，提供身份文件定位和原 SubScene/玩家/敌人 Prefab 的资源选择入口，不保存身份或覆写玩法参数。生成、生命、体力、移动、攻击及奖励数值仍由原 Spawner/Authoring Inspector 和既有烘焙链负责；Scene、Prefab 层级、原组件挂载及旧 meta 保持。
+窗口显示现有开发身份及来源，提供身份文件定位和原 SubScene/玩家/敌人 Prefab 的资源选择入口，不保存身份或覆写玩法参数。生命、体力、移动、攻击及奖励数值仍由所属 Authoring Inspector 和既有烘焙链负责；地图原点与敌人总量由[地图默认配置](Map.md)提供，列数/间距保留原 Spawner 值，不写入启动 JSON。Editor 启动配置本身未改变 Scene/Prefab 层级或旧组件挂载。
 
 ## 【KNOWN ISSUES】Editor 启动配置验收边界
 
@@ -360,3 +360,18 @@ Z/X 单次按下改变水平目标角，鼠标滚轮改变观察距离；角色�
 主线程代码/资源静态验收通过，人工 GamePlayer 尚未确认。检查范围：双端玩家均显示灰衣修士且只有一份模型；WASD 待机/移动切换及移动中挥刀；攻击前摇/命中动作/后摇与原扣费/伤害回归；受击、死亡倒地保持、R 复活恢复站立；断线重连与新观察者不重放旧受击或死亡；镜头旋转/缩放与原 E 物品使用回归。角色细节、实际光照、动画衔接与运行性能仍为 UNKNOWN。
 
 Clip 图片由隔离 Editor 预览场景采样生成，仅用于本次获授权的新资源视觉检查。AI 未启动 GamePlayer/PlayMode、执行业务系统、逻辑单元测试、命令行构建、平台发布或性能采样；既有网络阶段人工通过结论不扩展为本次角色运行通过。
+
+## 【FACT】战斗地图第一阶段入口
+
+当前网络 SubScene 默认选择 Forest，可在 PlayMode 前保存 Preset 切换到 Grassland。默认来源经校验与 LayoutBuilder 烘焙地图单例及缓冲；客户端在 Presentation 阶段、Entities Graphics 前创建分块地表和静态装饰。服务端等待地图数据并沿原 Spawner 生成敌人，GoInGame 和复活使用共用出生位置函数。资源、参数、所有权与清理职责由[战斗地图](Map.md)维护。
+
+## 【KNOWN ISSUES】战斗地图第一阶段验收
+
+主线程已核对 Unity 编译、两种模板的隔离 Editor 烘焙、网格数据、资源绑定和授权修改边界，代码与文档静态验收通过。人工 GamePlayer、运行渲染、跨端结果与清理、性能均为 UNKNOWN；既有战斗/存档阶段人工通过不扩展为本次地图通过。AI 未启动 PlayMode、执行游戏模拟系统、逻辑单元测试、命令行构建、发布或读取图片。
+
+人工验收范围：
+
+1. 分别在 PlayMode 前保存 Forest、Grassland，确认 96×96 米地图的三类地表、草丛和碎石显示，区块无裂缝/重叠；出生区、十字道路、战斗空地及敌人初始排列区没有装饰侵入。静态装饰不阻挡原移动。
+2. 确认初始 32 个敌人、8 列、间距 3，首点 (0,1,16)；玩家加入仍按 NetworkId×2 排列、脚部与地表对齐，R 复活回到与加入相同的地图位置。
+3. 双客户端检查地表与静态装饰一致、镜头旋转/缩放和本人跟随；回归原移动、攻击、受击/死亡/复活、E 物品使用、奖励保存及断线重连。
+4. 停止并再次进入、重复切换两种模板，以及 SubScene/World 释放时确认没有重复地表、装饰或遗留对象；Console 无地图生成、资源绑定和清理错误。运行性能另有验收口径，本清单不视为性能通过。

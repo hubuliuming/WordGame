@@ -1,3 +1,4 @@
+using Code_01.CombatPrototype.Map;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.NetCode;
@@ -14,10 +15,12 @@ namespace Code_01.CombatPrototype.Networking
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<CombatPrototypePlayerSpawner>();
+            state.RequireForUpdate<CombatPrototypeMapData>();
         }
 
         public void OnUpdate(ref SystemState state)
         {
+            var map = SystemAPI.GetSingleton<CombatPrototypeMapData>();
             var inputs = SystemAPI.GetComponentLookup<CombatPrototypePlayerInput>(true);
             var owners = SystemAPI.GetComponentLookup<GhostOwner>(true);
             var healths = SystemAPI.GetComponentLookup<CombatPrototypePlayerHealth>();
@@ -94,7 +97,7 @@ namespace Code_01.CombatPrototype.Networking
                     melee.ValueRW.Phase = CombatPrototypeAttackPhase.Ready;
                     melee.ValueRW.PhaseTimer = 0f;
                     resource.ValueRW.CurrentPower = resource.ValueRO.UpperPower;
-                    transform.ValueRW.Position = new float3(networkId * 2f, 1f, 0f);
+                    transform.ValueRW.Position = CombatPrototypeMapSpawnUtility.PlayerPosition(map, networkId);
                     health.ValueRW.CurrentHealth = health.ValueRO.MaxHealth;
                     health.ValueRW.IsDead = 0;
                     // HitSequence and AttackSequence are intentionally retained on the same player entity.

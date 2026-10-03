@@ -1,3 +1,4 @@
+using Code_01.CombatPrototype.Map;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.NetCode;
@@ -17,6 +18,7 @@ namespace Code_01.CombatPrototype.Networking
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<CombatPrototypePlayerSpawner>();
+            state.RequireForUpdate<CombatPrototypeMapData>();
         }
 
         public void OnUpdate(ref SystemState state)

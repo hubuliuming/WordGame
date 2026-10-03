@@ -129,6 +129,7 @@ GameObject:
   m_Component:
   - component: {fileID: 11350338}
   - component: {fileID: 11350339}
+  - component: {fileID: 11350340}
   m_Layer: 0
   m_Name: CombatPrototypeNetworkRoot
   m_TagString: Untagged
@@ -169,6 +170,31 @@ MonoBehaviour:
   EnemyCount: 32
   EnemyColumns: 8
   EnemySpacing: 3
+--- !u!114 &11350340
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 11350337}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a5c9a6a8e480b248a8d67fafff68608, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::Code_01.CombatPrototype.Map.CombatPrototypeMapAuthoring
+  Preset: 1
+  GroundMaterials:
+  - ResourceKey: ground_grass
+    Material: {fileID: 2100000, guid: 15fdad0bd2f822c48b6e3835a4533a68, type: 2}
+  - ResourceKey: ground_forest
+    Material: {fileID: 2100000, guid: 4613c115a3d792948b71c1f06c21de3a, type: 2}
+  - ResourceKey: ground_rock
+    Material: {fileID: 2100000, guid: c377c0f9177bf264bbbc81f4900bdcd2, type: 2}
+  DecorationPrefabs:
+  - ResourceKey: decor_grass
+    Prefab: {fileID: 7339649208865929778, guid: 5fcd468c7110c2d4e897aebb042f4ded, type: 3}
+  - ResourceKey: decor_pebble
+    Prefab: {fileID: 8229334279263349665, guid: 224e536415945244cadf061b7d7a6944, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

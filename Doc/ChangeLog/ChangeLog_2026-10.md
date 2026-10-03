@@ -305,3 +305,10 @@
 - 局部同步 Runtime、Framework、DataResources 当前事实、策略和待验收项；本条只记录实际改动。AI 未启动 GamePlayer/PlayMode、执行逻辑单元测试/构建/发布/性能采样或读取图片，人工运行验收和最终通过结论保持 UNKNOWN。
 - 主线程静态验收通过：最终 Assembly-CSharp/Editor 程序集更新时间晚于五份脚本，新增配置属性不可变、Editor 启动入口和窗口类型已加载；窗口实际打开并读取 Online/Host、127.0.0.1、7979、后台运行 true、现有 player-a，无配置/身份读取错误，isPlaying=false。
 - 复核 11 份本轮文本的严格 UTF-8、三份模块文档链接和四个新脚本 GUID 唯一性；git diff/空白检查通过，九项已有资源/配置基线散列保持。静态通过不等同人工 GamePlayer 或最终运行验收通过，未提交 Git。
+
+## 2026-10-03：末世玄幻战斗模式 AI 出图模板文档落地
+
+- 用户确认模板草案后由主线程执行，新增 Doc/CombatImagePromptTemplate.md；模板版本为 1.0，采用末世玄幻、荒野求生、风格化手绘质感和清晰战斗轮廓的已确认出图方向。
+- 文档包含统一美术方向、必填信息、通用提示词、六类图片补充要求、三个完整示例及批量生成与验收标准；示例涵盖战斗场景、敌人前摇设定和武器图标。
+- Doc/AI_Understanding.md 的按任务阅读表增加模板入口；未改写既有模块文档。正式镜头、分辨率、角色比例、资源映射和生产规格保持 UNKNOWN，示例名称与视觉设计不作为现有功能或资源绑定事实。
+- 本轮仅修改上述模板、导航和本 ChangeLog，未创建子Agent，未修改代码、Scene、Prefab、Animator、meta、包或构建设置；未生成或读取图片，未运行逻辑单元测试、GamePlayer PlayMode、构建或发布。

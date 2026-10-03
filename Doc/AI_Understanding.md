@@ -16,6 +16,7 @@
 | 属性、生命、体力、等级、金币、刷新 | [玩家](Modules/Player.md) | [数据文件](Modules/DataResources.md) |
 | 野猪、BtnAttack、伤害、掉落、战斗奖励 | [战斗](Modules/Combat.md) | [玩家](Modules/Player.md) |
 | 网络敌人反击、玩家受伤、死亡停动与手动复活 | [战斗](Modules/Combat.md) | [玩家](Modules/Player.md)、[运行验收](Modules/Runtime.md) |
+| AI 出图、末世玄幻 | [模板](CombatImagePromptTemplate.md) | — |
 | 背包、Goods、99、UseGoods、活力苹果、网络 E 键小块肉 | [背包与道具](Modules/Inventory.md) | [资源与数据](Modules/DataResources.md) |
 | JSON、streamingAssets、Resources、对象池、重写数据菜单 | [资源与数据](Modules/DataResources.md) | 对应业务模块 |
 | 固定玩家 ID、服务端存档、重连恢复、坏档、保存失败 | [资源与数据](Modules/DataResources.md) | [玩家准入](Modules/Player.md)、[奖励提交](Modules/Combat.md)、[运行验收](Modules/Runtime.md) |

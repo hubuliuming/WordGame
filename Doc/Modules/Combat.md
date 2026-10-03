@@ -156,7 +156,7 @@ Ghost 字段、Baker 和资源引用已形成实际烘焙数据；用户已确�
 
 ## 【CURRENT STRATEGY】网络原型战斗顺序与反击
 
-服务端预测模拟组当前顺序：`PlayerMovement → EnemyMovement → EnemySpatial → ItemUse → MeleeServer → Damage → Reward/SavePrepared → EnemyAttack → PlayerDamage → MapGather/SavePrepared → PlayerRespawn`。第 7A [物品使用](Inventory.md) 在近战前恢复体力，地图采集在当次伤害后检查生命/HitSequence 并取消失效预约，随后才结算仍有效的采集；第 6B 复活在采集之后。采集不修改近战、反击、原奖励规则，完整规则归 [背包与道具](Inventory.md)。
+服务端预测模拟组当前顺序：`PlayerMovement → EnemyMovement → EnemySpatial → ItemUse → MeleeServer → Damage → Reward/SavePrepared → MapDropSpawn → EnemyAttack → PlayerDamage → MapDropMotion → MapDropPickup/SavePrepared → MapDropCleanup → MapGather/SavePrepared → MapGatherRegrow → PlayerRespawn`。第 7A [物品使用](Inventory.md) 在近战前恢复体力，地图采集在当次伤害后检查生命/HitSequence 并取消失效预约，随后才结算仍有效的采集；独立 MapGatherRegrow 随后只恢复到期采集点，第 6B 复活在再生之后。采集不修改近战、反击、原奖励规则，完整规则归 [背包与道具](Inventory.md)。
 
 - [敌人攻击系统](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypeEnemyAttackSystem.cs) 复用当前最近在线存活目标。Ready 仅在 X/Z 距离不超过 1.75 时锁定该实体及 NetworkId，递增一次攻击序号并进入 0.5 秒前摇；前摇与后摇中敌人停止移动和旋转。
 - 前摇结束先进入 1 秒后摇，再对锁定目标重新确认 Connected、NetworkStreamInGame、CommandTarget、玩家生命与 X/Z 距离。目标离线、死亡或出范围则空击，同次挥击不换目标；命中只添加一条伤害 10 的玩家事件，后摇不再产生命中。后摇结束清空锁定目标并回 Ready。
@@ -184,4 +184,14 @@ Ghost 字段、Baker 和资源引用已形成实际烘焙数据；用户已确�
 
 ## 【FACT】战斗地图与群体生成边界
 
-敌人生成等待地图数据就绪；原 Spawner Baker 取得地图默认来源中的初始总量和原点，保留原列数/间距后交给 EnemySpawnSystem。地图布局与当前位置统一归[战斗地图](Map.md)。草丛/碎石/树木没有 EnemyState、Ghost 或伤害事件，不参与敌人空间索引与近战结算；gather_apple 虽为 Ghost，也没有 EnemyState 或伤害链，攻击只取消玩家预约，不破坏采集点。敌人追踪已使用第三阶段静态树木扫掠/滑动，寻路和攻击遮挡未接入。原反击、伤害、击杀奖励与保存规则保持，地图第四阶段原玩法回归仍待 [人工验收](Runtime.md)。
+敌人生成等待地图数据就绪；原 Spawner Baker 取得地图默认来源中的初始总量和原点，保留原列数/间距后交给 EnemySpawnSystem。地图布局与当前位置统一归[战斗地图](Map.md)。草丛/碎石仍为静态；砍伐开启时树木为独立 Ghost，但三类物体均没有 EnemyState 或伤害事件，不参与敌人空间索引与近战结算；gather_apple 虽为 Ghost，也没有 EnemyState 或伤害链，攻击只取消玩家预约，不破坏采集点；第五阶段到期再生只修改采集状态，不调用攻击、伤害或奖励链，再次采集须新 F。敌人追踪使用原扫掠/滑动，并跳过砍倒树木的 Disabled 记录，寻路和攻击遮挡未接入。原反击、伤害、击杀奖励与保存规则保持，用户已确认地图第四阶段人工 GamePlayer 通过，主线程结合既有静态核对判定该阶段通过；战斗范围限采集中断及原移动/攻击/反击/伤害/奖励保存回归；用户已确认第五阶段人工 GamePlayer 通过，主线程结合既有静态核对判定该阶段通过，战斗范围限再生后的原战斗回归，完整边界归 [运行入口](Runtime.md)。
+
+## 【FACT】敌人首次死亡的独立地图掉落
+
+[MapDropSpawnSystem](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapDropSpawnSystem.cs) 在原奖励之后、敌人反击之前观测 EnemyState.IsDead，每个敌人本局首次死亡只尝试额外生成一份配置掉落，默认活力苹果 ×1。原 Damage/Reward 系统、致命一击归属和金币/经验/小块肉整体保存规则保持；额外地面苹果不依赖原奖励的成功或攻击者在线，也不绑定击杀者。掉落没有 EnemyState/伤害缓冲，不参加敌人索引、近战或反击。
+
+运动、落地、G 资格、拾取保存和到期清理由独立服务端系统处理；G 在当次玩家伤害后检查生命及近战 Ready，保存成功才提交库存和消耗。F 采集、原点再生及原战斗规则保持。完整配置和生命周期归[掉落与拾取](MapDrops.md)。用户已确认第六阶段人工 GamePlayer 通过，主线程结合静态核对与用户反馈判定该阶段通过；战斗范围限非致命无掉落、每敌人首次死亡一次额外掉落、原统一奖励/保存失败隔离和原战斗回归，完整边界归[运行入口](Runtime.md)第六阶段九项清单。
+
+## 【FACT】树木产出与战斗边界
+
+H 砍伐使用独立树木状态/计时，不调用近战伤害或原击杀奖励链。攻击/受击/死亡会取消砍伐；完成后只生成木材掉落并解除对应阻挡，敌人沿原移动工具通过该位置。木材没有 EnemyState 或伤害缓冲，原金币/经验/小块肉奖励和敌人首次死亡额外苹果保持。完整链归[树木砍伐](MapTreeHarvest.md)与[掉落与拾取](MapDrops.md)；第七阶段原战斗/奖励回归人工结果为 UNKNOWN，清单归[运行入口](Runtime.md)。

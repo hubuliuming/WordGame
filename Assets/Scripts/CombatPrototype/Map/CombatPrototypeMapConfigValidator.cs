@@ -8,14 +8,37 @@ namespace Code_01.CombatPrototype.Map
         public static void Validate(CombatMapConfigSet config)
         {
             if (config == null || config.map == null || config.map.geometry == null ||
-                config.map.layout == null || config.map.movement == null || config.map.population == null || config.map.spawn == null ||
+                config.map.layout == null || config.map.movement == null || config.map.drops == null || config.map.treeHarvest == null ||
+                config.map.population == null || config.map.spawn == null ||
                 config.biomes == null || config.grounds == null || config.objects == null ||
                 config.map.biomeIds == null || config.map.biomeRegions == null)
                 throw new InvalidOperationException("Map configuration is missing required sections.");
             var map = config.map;
             Id(map.mapDefinitionId, "mapDefinitionId");
-            if (map.schemaVersion != 3 || map.configRevision < 1 || map.defaultSeed < 1)
-                throw new InvalidOperationException("Map requires schemaVersion=3, positive revision and seed.");
+            if (map.schemaVersion != 5 || map.configRevision < 1 || map.defaultSeed < 1)
+                throw new InvalidOperationException("Map requires schemaVersion=5, positive revision and seed.");
+            var drops = map.drops;
+            Id(drops.itemId, "drops.itemId");
+            Id(drops.visualResourceKey, "drops.visualResourceKey");
+            CombatPrototypeMapYieldItemResolver.Resolve(drops.itemId);
+            if (drops.quantity <= 0)
+                throw new InvalidOperationException("drops.quantity must be a positive integer.");
+            Positive(drops.pickupDistanceMeters, "drops.pickupDistanceMeters");
+            Positive(drops.flightDurationSeconds, "drops.flightDurationSeconds");
+            Nonnegative(drops.scatterRadiusMeters, "drops.scatterRadiusMeters");
+            Nonnegative(drops.arcHeightMeters, "drops.arcHeightMeters");
+            Nonnegative(drops.groundOffsetMeters, "drops.groundOffsetMeters");
+            Positive(drops.visualScale, "drops.visualScale");
+            Nonnegative(drops.lifetimeSeconds, "drops.lifetimeSeconds");
+            var treeHarvest = map.treeHarvest;
+            Id(treeHarvest.treeObjectId, "treeHarvest.treeObjectId");
+            Id(treeHarvest.visualResourceKey, "treeHarvest.visualResourceKey");
+            Positive(treeHarvest.harvestDurationSeconds, "treeHarvest.harvestDurationSeconds");
+            Id(treeHarvest.dropItemId, "treeHarvest.dropItemId");
+            CombatPrototypeMapYieldItemResolver.Resolve(treeHarvest.dropItemId);
+            if (treeHarvest.dropQuantity <= 0)
+                throw new InvalidOperationException("treeHarvest.dropQuantity must be a positive integer.");
+            Id(treeHarvest.dropVisualResourceKey, "treeHarvest.dropVisualResourceKey");
             var geometry = map.geometry;
             Positive(geometry.cellSizeMeters, "cellSizeMeters");
             Finite(geometry.baseHeightMeters, "baseHeightMeters");
@@ -92,11 +115,16 @@ namespace Code_01.CombatPrototype.Map
                     Id(item.yieldItemId, "yieldItemId");
                     if (item.yieldQuantity <= 0 || item.interactionDistanceMeters <= 0f || item.gatherDurationSeconds <= 0f)
                         throw new InvalidOperationException("Gatherable requires positive quantity, interaction distance and duration; objectId=" + item.objectId);
-                    if (item.blocksMovement || item.blocksMelee || item.blocksProjectile || item.regrowEnabled)
-                        throw new InvalidOperationException("Current gatherables require blocking and regrowth disabled; objectId=" + item.objectId);
+                    if (item.blocksMovement || item.blocksMelee || item.blocksProjectile)
+                        throw new InvalidOperationException("Current gatherables require blocking disabled; objectId=" + item.objectId);
                     CombatPrototypeMapYieldItemResolver.Resolve(item.yieldItemId);
                 }
             }
+            Reference(objectIds, treeHarvest.treeObjectId, "treeHarvest.treeObjectId");
+            var treeDefinition = Array.Find(config.objects, item => item.objectId == treeHarvest.treeObjectId);
+            if (treeDefinition.gatherable || !treeDefinition.blocksMovement || treeDefinition.interactionDistanceMeters <= 0f ||
+                !Array.Exists(config.biomes, biome => biome != null && biome.treeObjectId == treeHarvest.treeObjectId))
+                throw new InvalidOperationException("treeHarvest.treeObjectId must reference a blocking, nongatherable biome tree with positive interaction distance.");
             var biomeIds = new HashSet<string>(StringComparer.Ordinal);
             foreach (var biome in config.biomes)
             {

@@ -81,7 +81,7 @@ KnapsackControl.OnStart 缓存当前 PlayerModel 与 FactoryUISystem，记录 Co
 
 服务端沿既有击杀奖励链直接入包：按 ItemName 查找目标条目，同名数量累加，名称不存在时新增一个条目；不创建第二份可变 ECS 背包，也不套用正式 UI 的 99 拆格规则。当前敌人物品奖励为 `小块肉 ×1`，名称复用 `Code_01.Msg.ItemName.小块肉`。第 4D 将完整候选库存投影为 JSON 条目，与金币/经验一起保存成功后同次提交，具体失败与归属规则见[战斗](Combat.md)。
 
-客户端仅接收背包 Ghost 状态；原日志入口每 2 秒记录背包条目数及各条目的名称、数量。固定 ID 库存持久化格式与加载校验由[资源与数据](DataResources.md)维护，加入恢复由[玩家](Player.md)维护。正式背包 UI、世界掉落、拾取和账号保持原边界；网络原型物品使用与恢复规则见本页第 7A 节。
+客户端仅接收背包 Ghost 状态；原日志入口每 2 秒记录背包条目数及各条目的名称、数量。固定 ID 库存持久化格式与加载校验由[资源与数据](DataResources.md)维护，加入恢复由[玩家](Player.md)维护。正式背包 UI 和账号保持原边界；网络原型物品使用与恢复规则见本页第 7A 节，动态掉落与 G 拾取归[掉落与拾取](MapDrops.md)。
 
 ## 【KNOWN ISSUES】第 4C 阶段本局背包验收
 
@@ -107,7 +107,7 @@ KnapsackControl.OnStart 缓存当前 PlayerModel 与 FactoryUISystem，记录 Co
 
 ## 【KNOWN ISSUES】第 7A 阶段物品使用验收
 
-输入、新系统、消费候选和顺序特性已编译并静态核对；用户已确认第 7A 人工 GamePlayer 验收通过，主线程结合既有静态核对与用户反馈判定该阶段通过。范围覆盖消费/恢复、拒绝条件、双玩家同步、保存失败和重连恢复，完整边界见[运行入口](Runtime.md)。同步序列化/写盘仍会阻塞服务端，实际耗时和规模性能未测量，观察范围见[性能基线](Performance.md)。正式背包 UI、其他网络物品效果、世界掉落与拾取保持各自既有未知范围。
+输入、新系统、消费候选和顺序特性已编译并静态核对；用户已确认第 7A 人工 GamePlayer 验收通过，主线程结合既有静态核对与用户反馈判定该阶段通过。范围覆盖消费/恢复、拒绝条件、双玩家同步、保存失败和重连恢复，完整边界见[运行入口](Runtime.md)。同步序列化/写盘仍会阻塞服务端，实际耗时和规模性能未测量，观察范围见[性能基线](Performance.md)。正式背包 UI 和其他网络物品效果保持各自既有未知范围；动态掉落与 G 拾取的当前边界见[掉落与拾取](MapDrops.md)。
 
 ## 【FACT】战斗地图第四阶段采集输入与产出
 
@@ -117,10 +117,26 @@ KnapsackControl.OnStart 缓存当前 PlayerModel 与 FactoryUISystem，记录 Co
 
 资格沿 Connected、NetworkStreamInGame、未请求断线的连接 CommandTarget 验证，要求启用 Simulate 的当前玩家、GhostOwner 与 NetworkId 一致、存活、没有攻击请求且近战 Ready、Move 为有限零向量。服务端选择本人 X/Z 距离内最近 Available 点；距离精确相同时取较小 PlacementIndex，同次更新的玩家请求按 NetworkId 升序处理。预约后点进入 Collecting 并记录采集者、开始 HitSequence 和完成时间；持有者的新 F 请求不重启计时，不在同次完成/取消后再开新预约。
 
-已有预约先于新请求处理。移动输入、攻击请求或非 Ready、受击序号改变、死亡、超距、断线/目标失效均取消并释放为 Available，不发物品。期间采集者不强制锁定移动或攻击，取消不恢复体力；完成时间到达仍须先满足当次资格与范围。Available/Collecting 显示，Depleted 由客户端按 Ghost 状态隐藏，没有进度 UI、再生或自动重试。
+已有预约先于新请求处理。移动输入、攻击请求或非 Ready、受击序号改变、死亡、超距、断线/目标失效均取消并释放为 Available，不发物品。期间采集者不强制锁定移动或攻击，取消不恢复体力；完成时间到达仍须先满足当次资格与范围。Available/Collecting 显示，Depleted 由客户端按 Ghost 状态隐藏，没有进度 UI 或自动重试；耗尽后的再生沿下述独立服务端计时链。
 
-完成前取得库存与状态引用；按既有 ItemName 合并或新增，检查数量溢出并预留新增缓冲容量。PrepareReward 生成保持当前金币/经验的完整库存候选，SavePrepared 成功返回后同次提交库存、清除预约并设置 Depleted。准备/保存失败记录地图、布置索引、NetworkId、物品、阶段与原异常，库存数量及资源耗尽不提交，释放预约并继续其他点；玩家须重新按 F。没有修改原奖励/消费系统或存档格式，地图耗尽状态不写盘；客户端背包仍沿原 Ghost 缓冲同步及每 2 秒日志查看。
+完成前取得库存与状态引用；按既有 ItemName 合并或新增，检查数量溢出并预留新增缓冲容量。PrepareReward 生成保持当前金币/经验的完整库存候选，SavePrepared 成功返回后同次提交库存、清除预约并设置 Depleted，同时按配置记录再生期限。准备/保存失败记录地图、布置索引、NetworkId、物品、阶段与原异常，库存数量及资源耗尽不提交，释放预约并继续其他点；玩家须重新按 F。没有修改原奖励/消费系统或存档格式，地图耗尽状态及再生期限不写盘；客户端背包仍沿原 Ghost 缓冲同步及每 2 秒日志查看。
+
+## 【CURRENT STRATEGY】采集物原点再生
+
+默认 gather_apple 启用 regrowEnabled=true、regrowSeconds=600；再生字段形状保持；当前地图契约为 schemaVersion=5、默认 configRevision=6，包含 drops/treeHarvest 段。Map Baker → GatherSpawnSystem 将开关和间隔送入仅服务端的 GatherConfig；仅在采集保存成功后，GatherProgress.RegrowAt 写为该次 Server World 模拟时间加间隔，Collector/StartHitSequence/FinishAt 清空。取消或准备/保存失败清空进度、释放预约，不发物品、不安排再生，也不自动重试。
+
+[GatherRegrowSystem](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapGatherRegrowSystem.cs) 在 PredictedSimulationSystemGroup 的 GatherSystem 之后、PlayerRespawnSystem 之前恢复到期 Depleted 点为 Available，并清空期限及采集者。原实体、位置和 PlacementIndex 保持，客户端复用原 Ghost 状态和显示系统恢复显示；再生不入包、不保存库存，也不自动开始下一次采集。玩家须重新按 F，完整资格/预约/保存规则继续生效；regrowEnabled=false 时点保持本局耗尽。计时与耗尽仅保留当前 Server World，停止重进生成新的 Available 点，已保存库存仍沿原 v1 固定 ID 恢复。
 
 ## 【KNOWN ISSUES】战斗地图第四阶段采集验收
 
-输入及新系统正常编译，状态 Ghost Serializer、服务端配置/进度特性、系统顺序、两种模板隔离烘焙与引用已静态核对。F 目标选择/计时、中断与争抢、写盘失败不发物品、耗尽跨端隐藏、晚加入及重启库存恢复仍待人工 GamePlayer，结果为 UNKNOWN，完整清单归 [运行入口](Runtime.md)。玩家 v1 存档保留苹果，地图耗尽只保留本局；停止服务端再进入会重新生成采集点。写盘仍同步阻塞服务端，性能未测量。
+输入及新系统正常编译，状态 Ghost Serializer、服务端配置/进度特性、系统顺序、两种模板隔离烘焙与引用已静态核对。用户已确认第四阶段人工 GamePlayer 验收通过，主线程结合静态核对与用户反馈判定该阶段通过；范围来自第四阶段 v3/revision=3、再生关闭的版本，含 F 目标选择/计时、中断与争抢、保存失败不发物品、不耗尽并释放预约、耗尽跨端隐藏、晚加入和重启库存恢复，完整边界归 [运行入口](Runtime.md)。人工结论来自用户反馈，AI 未运行游戏系统、PlayMode 或逻辑单元测试。玩家 v1 存档保留苹果，地图耗尽及再生期限只保留本局；停止服务端再进入会重新生成采集点。第五阶段正常编译、参数烘焙和仅服务端字段已静态核对；用户已确认第五阶段人工 GamePlayer 通过，主线程结合静态核对与用户反馈判定该阶段通过，范围限至少两轮原点再生、新 F 再采集、跨端恢复/晚加入、再生关闭及失败/取消不安排再生，完整边界归 [运行入口](Runtime.md)。写盘仍同步阻塞服务端，性能未测量。
+
+## 【FACT】地图动态掉落与 G 拾取入包
+
+敌人首次死亡额外生成活力苹果 ×1 的插值 Ghost；原金币/经验/小块肉统一击杀奖励与保存链保持。服务端 G 单次请求仅选择本人 X/Z 2 米内最近 Landed 且未到期的掉落，同距取较小 DropId，同次更新按 NetworkId 升序处理；在线当前玩家须存活、静止且近战 Ready，没有攻击请求。任意合格玩家均可拾取，没有击杀者专属所有权。
+
+拾取复用 PrepareReward → SavePrepared，保持当前金币/经验并合并同名库存；成功保存后同次提交库存与 Consumed，后续请求不能重复发放。保存失败不改库存数量或未到期掉落，继续其他请求，恢复后须新 G；到期仍按配置清理。世界掉落仅保留当前 Server World，已入包苹果沿原 v1 固定 ID 保存。苹果没有新增使用效果或 UI；F 预约/耗尽/600 秒再生保持。配置、运动、Ghost 和清理职责归[掉落与拾取](MapDrops.md)。用户已确认第六阶段人工 GamePlayer 通过，主线程结合静态核对与用户反馈判定该阶段通过；库存范围限保存成功入包、同名累计、争抢一次提交、保存失败保留及固定 ID 恢复，完整边界归[运行入口](Runtime.md)第六阶段九项清单。
+
+## 【FACT】砍伐木材与库存提交
+
+H 预约/计时由服务端 TreeHarvest 独立处理，默认 2 米/2 秒后生成一份 wood ×3 地面掉落，砍倒时不直接入包。DropPickup 改按目标实际 ItemId 解析名称；vitality_apple/wood 分别映射活力苹果/Msg.ItemName.木材，同名 checked 累加，仍先 PrepareReward → SavePrepared，再提交库存及 Consumed。原存储类/v1 格式、金币/经验、F/E 和玩家 Prefab 保持；树木和未拾取木材不保存，已入包木材随固定 ID 恢复。砍伐规则归[树木砍伐](MapTreeHarvest.md)，拾取规则归[掉落与拾取](MapDrops.md)。第七阶段人工 GamePlayer 为 UNKNOWN，原通过边界保持，清单归[运行入口](Runtime.md)。

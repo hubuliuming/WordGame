@@ -420,3 +420,70 @@
 - 局部同步 Map、Inventory、Runtime、Player、Combat、DataResources、AI_Understanding 和项目外战斗地图配置建议模板；配置例与真实森林 JSON 一致，第四阶段人工清单含交互/中断/争抢/保存失败/耗尽与晚加入/重启/配置错误/清理回归。修正 Combat 中与已验收第三阶段不一致的“未接移动碰撞”残留。第一/第三阶段人工通过保持，第二阶段独立 JSON 和第四阶段人工 GamePlayer 仍为 UNKNOWN。
 - 主线程代码/资源/文档静态验收通过：3153 个既有非视觉文件基线中仅 22 个授权文件变化，无范围外变化；新增 22 个文件及 11 个唯一 GUID。44 份任务文本严格 UTF-8，五份 JSON、300 个本地文档链接、策划示例一致性、Scene 仅追加引用及 git diff/空白检查通过。导航 8191 字节，Map 22156 字节；采集详细提交规则归 Inventory，人工清单归 Runtime，没有全量拆分或重写既有模块。
 - 未新增/运行逻辑单元测试、人工 GamePlayer、PlayMode、命令行构建、平台发布、性能采样或图片检查，未提交 Git。静态验收不代表交互、写盘失败、跨端显示或性能通过；砍树、再生、地图状态持久化、攻击遮挡、寻路、新 UI、热重载及联网配置一致性协议未接入。
+
+## 2026-10-03：战斗地图第四阶段人工验收通过
+
+- 用户明确反馈“我已验收通过，接下来下一阶段”；主线程结合既有代码、资源与文档静态核对，判定战斗地图第四阶段通过。
+- 人工通过范围限 Runtime.md 第四阶段既有八项清单：采集显示/布置，F 目标选择/计时及产出，预约中断/争抢，保存失败不入包/不耗尽并释放预约，耗尽跨端同步/晚加入，同局重连与服务端重启库存恢复，采集配置修改/错误反馈，以及清理和原移动/战斗/复活/E 物品/奖励存档回归。未触发的独立用例仍按原清单保留 UNKNOWN。
+- 第二阶段独立 JSON 人工清单未单独获确认，仍为 UNKNOWN；第一/第三阶段既有通过、性能/平台构建/线上联调及超出当前清单的未知边界保持。
+- 局部同步 Map、Inventory、Runtime、Player、Combat、DataResources 和项目外战斗地图配置建议模板的验收状态，并追加本记录；只修改上述八份文档，不改代码、JSON、Scene、Prefab、Animator、meta、包或构建设置，未创建子Agent。AI 导航的地图/采集路由保持。
+- AI 未启动 GamePlayer/PlayMode、执行游戏系统、逻辑单元测试、命令行构建、发布、性能采样或图片检查。人工通过结论来自用户反馈，未执行第五阶段开发。
+
+## 2026-10-03：战斗地图第五阶段采集物原点再生
+
+- 用户确认第五阶段方案，由主线程按确认范围执行，未创建子Agent。仅接入现有采集物的“成功采集并耗尽→服务端模拟计时→原实体/位置恢复 Available→新 F 再次采集”。
+- gather_apple 默认 regrowEnabled=true、regrowSeconds=600；沿用现有 JSON 字段形状和 schemaVersion=3，内置来源与两份地图 JSON 的 configRevision 统一为 4。objects.json 仅修改该物体的再生开关/间隔，其他对象、biomes.json、grounds.json、布局/种子/密度/出生/产出与移动参数保持。
+- 修改七份既有 Map 脚本：DefaultMapConfigSource、MapConfigValidator、MapData、MapAuthoring、MapGatherData、MapGatherSpawnSystem、MapGatherSystem。校验器解除采集物的再生禁用限制，保留有限非负间隔及启用时正间隔校验；三类阻挡仍禁止。MapObject 和仅服务端 GatherConfig 新增 RegrowEnabled/RegrowSeconds，Baker 与服务端生成链传递配置；仅服务端 GatherProgress 增加 double RegrowAt，共享 GatherState Ghost 字段仍为 PlacementIndex/Phase/CollectorNetworkId。
+- Complete 在准备阶段计算候选期限，只有 SavePrepared 成功后同次提交库存、耗尽与期限；关闭时期限为 0。取消或准备/保存失败清空进度、释放预约，不发物品、不耗尽、不安排再生，无自动重试。原玩家存档类、v1 格式、奖励/消费系统与输入字段保持。
+- 新增独立 CombatPrototypeMapGatherRegrowSystem.cs 及 Unity 导入生成的 meta。在 ServerSimulation 的 PredictedSimulationSystemGroup，GatherSystem 之后、PlayerRespawnSystem 之前恢复启用再生且到期的 Depleted 点，清空进度/采集者、设置 Available；保持原实体/位置/索引，不创建新 Ghost、不发物品、不写盘。逐项记录再生或带条目标识/阶段/原异常的失败，其他点继续处理。客户端复用原状态同步和 MaterialMeshInfo 显示链，未改渲染系统。
+- 期限采用当前 Server World 的 SystemAPI.Time.ElapsedTime，不依赖客户端或系统墙钟；耗尽/期限只保留本局，不写玩家或地图存档。关闭再生则保持本局耗尽，服务端重启从 Available 重建，既有苹果库存仍按原固定 ID 恢复。再次采集须新 F，原预约/资格/中断与 SavePrepared 顺序保持。
+- 正常 Unity 导入/编译后新再生类型及生成代码已加载，开关/间隔/期限字段类型为 byte/float/double，配置/进度仍标注仅服务端，共享 Ghost 同步仍为三字段。两个模板从保存 SubScene 克隆至临时 Editor 场景隔离烘焙，与当前 BuiltIn 逐字段一致，烘焙配置为 v3/revision=4、启用再生/600 秒。Forest/Grassland 仍为 36/38 采集点、89/53 树木和阻挡记录，草丛 598/746、碎石 17/22；1 地图/9 块/2304 格/452 禁布格、96×96 米及 32 敌人/8 列/间距 3/首点 (0,1,16)、NetworkId=1 玩家点 (2,1,0) 保持，占地/间距/保护区域/敌人出生重叠违规均为 0。有效烘焙前后 Console 为 [0,7,49]，未清空 Console，Editor 未进入 PlayMode、原主场景保持干净。
+- 局部同步 Map、Inventory、Runtime、Player、Combat、DataResources 及项目外战斗地图配置建议模板，追加本月记录；AI_Understanding 原地图/采集导航保持。Runtime 新增临时 5 秒、至少两轮、同 Ghost 原点、双端/晚加入、关闭、取消/保存失败、重启和原玩法回归的人工清单，要求结束恢复 Json/Forest、v3/revision=4 及启用再生/600 秒。明确第四阶段既有通过来自再生关闭的 v3/revision=3 版本，保留用户验收结论。
+- 主线程代码、资源边界和文档静态验收通过；第五阶段人工 GamePlayer 为 UNKNOWN，第一/第三/第四阶段既有通过及第二阶段独立 JSON UNKNOWN 保持。AI 未新增/运行逻辑单元测试、游戏模拟/显示系统、GamePlayer/PlayMode、命令行构建、平台发布、性能采样或图片检查，未提交 Git。循环再生、跨端恢复、失败/取消与关闭分支不能以静态烘焙替代；树木再生、砍树、攻击遮挡、寻路、地图状态持久化、通用动态物体、新 UI、热重载及联网配置一致性协议未接入。
+- 最终范围核对：3175 个既有非视觉文件中仅 18 个授权文件变化（含项目外模板），新增再生脚本及 meta 两个文件、1 个唯一 GUID；既有 Scene/Prefab/Animator/资源/旧 meta/包与构建设置无变化。20 份任务文本严格 UTF-8、5 份 JSON、259 个本地文档链接、策划森林示例与真实 JSON 一致性及 git diff/空白检查通过。导航保持 8191 字节，Map 为 23513 字节。最终仍仅有原 6 个 Editor/Loading World，无临时烘焙 World，原主场景干净、未进入 PlayMode，Console 为 0 Error/7 Warning，未清空日志。
+
+## 2026-10-03：战斗地图第五阶段人工验收通过
+
+- 用户明确反馈“我已验收通过，接下来下一阶段”；主线程结合既有代码、资源边界与文档静态核对，判定战斗地图第五阶段通过。
+- 人工通过范围限 Runtime.md 第五阶段既有八项清单：至少两轮同 Ghost/原点再生、新 F 再采集且不重复发奖/写盘、跨端恢复与晚加入/重连、关闭再生、取消/保存失败不安排再生、服务端重启按既有规则重建及库存恢复、再生配置修改/错误反馈，以及清理和原玩法回归。未触发的精确同 tick/同距等独立用例仍按原清单保留 UNKNOWN。
+- 第一/第三/第四阶段既有通过、第二阶段独立 JSON UNKNOWN 及性能/平台构建/线上联调等超出清单的边界保持。
+- 局部同步 Map、Inventory、Runtime、Player、Combat、DataResources 和项目外战斗地图配置建议模板的验收状态，并追加本记录；只修改上述八份文档，代码、JSON、Scene、Prefab、Animator、meta、包与构建设置保持，AI_Understanding 原地图/采集导航保持，未创建子Agent。
+- 人工结论来自用户反馈，AI 未运行 GamePlayer/PlayMode、游戏模拟/显示系统、逻辑单元测试、命令行构建、发布、性能采样或图片检查。本轮未执行第六阶段开发。
+
+## 2026-10-03：战斗地图第六阶段动态掉落与拾取
+
+- 用户确认并授权第六阶段完整方案，由主线程执行，未创建子Agent。每敌人本局首次死亡额外生成活力苹果 ×1，服务端控制飞行/落地、G 单次拾取、保存入包及到期/地图释放清理；原金币/经验/小块肉统一奖励、F 种植采集及 600 秒原点再生保持。
+- 两份地图 JSON 和 BuiltIn 升级 schemaVersion=4、默认 configRevision=5，增加必填 drops 段：enabled=true、itemId=vitality_apple、quantity=1、visualResourceKey=drop_apple、pickupDistanceMeters=2、flightDurationSeconds=0.4、scatterRadiusMeters=0.6、arcHeightMeters=0.6、groundOffsetMeters=0.05、visualScale=0.5、lifetimeSeconds=600（0 关闭自动到期）。原空间/移动/出生/生态值、共享 biomes/grounds/objects JSON 保持；旧版本或缺字段明确失败。
+- 仅修改五份既有 C#：MapDefinitionConfig、DefaultMapConfigSource、MapConfigValidator、MapAuthoring、Networking/PlayerInput。增加 drops DTO/数值及白名单校验、显式掉落 Prefab 烘焙配置与 G 的 InputEvent Pickup；所有端须使用相同输入布局/资源/配置，没有修改原奖励、存储、伤害或采集系统。
+- 新增十份脚本：MapDropConfig，DropData/Authoring/Spawn/Motion/Pickup/Cleanup/Render，Editor DropAssetBuilder/DropBinding；新脚本及 Prefab meta 由 Unity 导入生成。DropState 同步 DropId/ItemId/Quantity/Phase 四字段，Progress 标注仅服务端；服务端驱动 LocalTransform 弧线位置，客户端按插值 Ghost 和 Consumed 控制显示。
+- 在线当前玩家须存活、静止、没有攻击请求且近战 Ready；G 选 X/Z 范围内最近 Landed 且未到期的掉落，同距取较小 DropId，同次更新按 NetworkId 升序，任意合格玩家均可拾取。SavePrepared 成功后同次提交库存及 Consumed；保存失败保留库存及未到期掉落，不自动补发，须新 G。原 v1 格式/存储类保持，地面 DropId/位置/状态/期限不写盘，重启清空；已拾取库存随固定 ID 恢复。
+- 按一次性资源授权创建 DroppedApple.prefab，复用既有 GatherApple.asset/.mat，单根仅插值 Ghost、无 Owner/AutoCommandTarget；原 SubScene 的 DecorationPrefabs 仅追加 drop_apple 引用。新 Prefab GUID 为 3c92d1d189fc4af44b3957ed7ba2784c。原网格/材质、主场景、玩家/敌人及采集 Prefab、Animator、旧 meta、包与构建设置保持；清理 Unity 新序列化的空字段尾部空白。
+- 首轮正常 Unity 编译发现 NativeList 的 using 变量不可写错误，改为 try/finally 释放后编译无 C# 错误，新掉落系统、状态序列化器与 Pickup 输入命令类型已加载。清理增加 CleanupQueued，避免多 tick 重复排队；拥有者清理保留已排队项给 EndSimulation ECB，避免记录与回放之间提前重复销毁。
+- 保存 SubScene 克隆至临时 Editor 场景，Forest/Grassland 两种模板隔离烘焙均与 BuiltIn 逐字段一致，schema=4/revision=5、全部 drops 默认值及独立 Ghost Prefab 有效。仍为 1 地图/9 块/2304 格/452 禁布格、96×96 米；森林/草地分别为草丛 598/746、碎石 17/22、树木与阻挡 89/53、采集点 36/38，占地/间距/保护区域及敌人出生重叠违规为 0。原 32 敌人/8 列/间距 3/首点 (0,1,16) 和 NetworkId=1 玩家点 (2,1,0) 保持。烘焙前后 Console 为 [0,2,2]，两个 Warning 来自既有 PEListener 序列化与 DOTween 过时 API；未清空 Console，原主场景干净、未进入 PlayMode。
+- 新增 MapDrops 专题并局部同步 Map、Inventory、Runtime、Player、Combat、DataResources、AI_Understanding 与项目外建议模板，当前模板 JSON 示例同步真实森林配置；Runtime 新增九项第六阶段人工清单。保留第一/第三/第四/第五阶段用户人工通过与第二阶段独立 JSON UNKNOWN；历史第四/第五阶段默认值明确归当时版本，当前恢复值为 v4/revision=5。
+- 主线程代码/资源/文档静态验收通过；第六阶段人工 GamePlayer 为 UNKNOWN。AI 未新增/运行逻辑单元测试、游戏模拟/显示系统、GamePlayer/PlayMode、命令行构建、发布、性能采样或图片检查，未提交 Git。不增加物理、UI、世界存档、砍树、通用动态对象框架、热重载或联网配置一致性协议；同步写盘性能/平台/线上验收仍为 UNKNOWN。
+- 最终范围核对：3177 个既有非视觉文件中仅 17 个授权文件变化，新增十份脚本及其 meta、一个 Prefab 及其 meta 和一个掉落专题，共 23 个文件、11 个唯一 GUID。SubScene 仅追加两行 drop_apple 引用；旧资源/meta/场景结构保持，新生成 meta 仅清理尾部空白。40 份任务文本严格 UTF-8、5 份 JSON、344 个本地文档链接、策划森林示例与真实 JSON 一致性及 git diff/空白检查通过；导航为 8188 字节，Map 为 23969 字节。最终新类型和 Prefab 引用仍已加载，仅有原 6 个 Editor/Loading World，无临时烘焙 World，主场景干净、未进入 PlayMode。最后一次导入后的 Console 为 0 Error/1 Warning，Warning 来自 MCP 域重载时 WebSocket 未初始化，工具已恢复可调用；未清空日志。
+
+## 2026-10-03：战斗地图第六阶段人工验收通过
+
+- 用户明确反馈“我已验收通过，接下来下一阶段”。主线程结合既有代码/资源/文档静态核对与用户人工反馈，判定战斗地图第六阶段通过；人工结论来自用户反馈，范围仅限 Runtime 第六阶段九项清单。
+- 通过范围为敌人首次死亡一次额外苹果掉落、飞行/落地及 G 资格/最近选择、多人争抢一次提交、保存失败保留与新 G 重试、跨端/晚加入/重连及库存恢复、配置/到期/释放和原战斗/奖励/F 再生回归。未实际触发的临界距离、精确同距、同 tick 与其他独立用例仍为 UNKNOWN。
+- 第一/第三/第四/第五阶段既有通过范围保持，第二阶段独立 JSON 人工清单仍为 UNKNOWN；同步写盘耗时、规模性能、平台构建与线上联调未验收。本次反馈不扩展为通用动态对象、物理、UI、世界存档或树木砍伐通过。
+- 局部同步 Map、MapDrops、Inventory、Player、Combat、DataResources、Runtime、本月 ChangeLog 和项目外战斗地图配置建议模板，共九份既有文档；当前 v4/revision=5 默认配置保持，AI_Understanding 原导航保持。代码、JSON、Scene、Prefab、Animator、meta、包与构建设置未修改，未创建子Agent。
+- AI 未运行 GamePlayer/PlayMode、游戏模拟/显示系统、逻辑单元测试、命令行构建、发布、性能采样或图片检查，未提交 Git。本轮未执行第七阶段开发。
+
+## 2026-10-03：战斗地图第七阶段树木砍伐与资源掉落
+
+- 用户确认并授权第七阶段完整方案及四项新资源/两个显式引用的一次性边界，由主线程执行，未创建子Agent。新增 H 单次服务端砍伐预约、2 秒完成木材 ×3、砍倒隐藏及移动阻挡同步，木材复用飞行/G 拾取/保存和清理链。
+- 两份地图 JSON 与 BuiltIn 升级 schemaVersion=5/configRevision=6，增加必填 treeHarvest：enabled=true、treeObjectId=tree_normal、visualResourceKey=tree_harvest、harvestDurationSeconds=2、dropItemId=wood、dropQuantity=3、dropVisualResourceKey=drop_wood。距离复用对象定义的 2 米；原空间、种子、生态、出生、movement/drops 及共享三份 JSON 保持，旧 v4 不补段/迁移。
+- 修改十二份既有 C#：MapDefinitionConfig、DefaultMapConfigSource、MapConfigValidator、MapAuthoring、MapData、MapPresentationSystem、MapMovementUtility、MapYieldItemResolver、DropSpawnSystem、DropPickupSystem、Networking/PlayerInput、Msg/Msg。MapObject 增加 Harvestable，开启时路由新 Ghost，关闭时沿原静态树；MapObstacle 增加 Disabled，由原移动工具跳过。
+- 新增十份脚本：MapTreeHarvestConfig，TreeData/Authoring/Spawn/Harvest/Obstacle/Render，DropSpawnUtility，Editor TreeHarvestAssetBuilder/Binding。TreeState 同步 PlacementIndex/Phase/CollectorNetworkId/FelledTick 四字段，Progress 标注仅服务端；创建/计时/阻挡/显示职责分别拆分。
+- H 验证当前在线归属/Simulate、存活、静止及近战 Ready，最近 Standing/同距较小 PlacementIndex，同次请求按 NetworkId 排序。移动、攻击、受击、死亡、超距/断线取消；F 请求/既有采集优先。先初始化并登记木材掉落，再重新取得结构变更失效访问提交 Felled/解除阻挡；失败清理当前掉落并恢复可预约，错误逐项隔离。
+- 苹果/木材共用 DropId 与有效所有权，G 改按目标实际 ItemId 白名单解析，WoodId 映射 Msg.ItemName.木材；SavePrepared 成功后才入包/Consumed，v1 格式与存储类保持。树木/未拾取木材不写世界存档，重启按原布局恢复树木；已入包木材随固定 ID 库存恢复。drops.enabled 仍控制敌人额外掉落，砍伐开关独立，木材共用其运动/拾取/寿命参数。
+- 阻挡系统在玩家/敌人移动前按权威 FelledTick 重建当前预测 tick；完成发生在本 tick 移动之后，严格晚于砍倒 tick 才移除阻挡，回放此前 tick 恢复原阻挡。客户端显示按 Felled 隐藏，保留本局树木 Ghost 供晚加入；原 F 再生、战斗奖励、角色资源与架构保持。
+- 按授权创建 HarvestableTree.prefab（GUID 3207c51e470cd2244b3b934436fd83ec）与 DroppedWood.prefab（4d858381c32935942851ccbba8a14fe4）；新树复用 TreeNormal.asset/.mat。新木材网格/棕色材质由程序生成，网格 18 顶点/32 三角形，体积为正、三角形无退化；生成前校正朝外绕序。原 SubScene 仅追加 tree_harvest/drop_wood 四行引用，旧 Scene/Prefab/Animator/meta/网格/材质/包与构建设置保持；新 meta 由 Unity 导入生成。
+- 首轮编译出现两处项目 Code_01.System 遮蔽 System.IO 的 CS0234，改为 global::System.IO 后正常 Unity 编译无 C# 错误。HarvestTree 输入辅助/命令序列化类型与 TreeState Ghost Serializer/Snapshot 已生成并加载，系统顺序与仅服务端 Progress 特性已静态核对。
+- 保存 SubScene 克隆至临时 Editor 场景，Forest/Grassland 隔离烘焙均与 BuiltIn 完整值一致，为 v5/revision=6。仍为 1 地图/9 块/2304 格/452 禁布格、96×96 米；森林/草地草丛 598/746、碎石 17/22、树木与初始启用阻挡 89/53、采集点 36/38，占地/间距/保护区/敌人出生重叠违规为 0。四类地图 GhostType 互异，原 32 敌人/8 列/间距 3/首点 (0,1,16) 与 NetworkId=1 玩家点 (2,1,0) 保持。烘焙前后 Console 为 [0,1,5]，Warning 为既有 DOTween 过时 API，未清空 Console；主场景干净、未进入 PlayMode，无临时烘焙 World 遗留。
+- 新增 MapTreeHarvest 专题，局部同步 Map、MapDrops、Inventory、Player、Combat、DataResources、Runtime、AI_Understanding、本月 ChangeLog 与项目外建议模板；配置示例同步真实森林 JSON，Runtime 增加十项第七阶段人工清单。第一/第三/第四/第五/第六阶段通过仅限原版本/原清单，第二阶段独立 JSON 人工仍为 UNKNOWN。
+- 最终范围核对以本阶段开始前 3200 份文件散列为基线：25 份既有文件受影响（含项目外模板），29 份新增文件（含 14 份 Unity 生成 meta）；未删除文件，旧资源仅 SubScene 两处引用改变。Unity 保存引入的原组件空名称尾空格已恢复原序列化格式。54 份文本严格 UTF-8/新增行空白检查、14 个新 GUID 唯一性与旧 GUID 无冲突、5 份 JSON、模板示例一致性、388 个文档本地链接和 git diff --check 均通过；导航 8191 字节、地图主文档 23331 字节、新砍伐专题 12387 字节均在约定上限内。
+- 主线程代码/资源静态验收通过；第七阶段人工 GamePlayer 为 UNKNOWN，取消/争抢、动态阻挡/预测回放、失败回滚、木材拾取保存/恢复与原玩法回归需人工确认。未接斧头、动画/树桩、树木再生、物理、世界存档、新 UI 或使用效果。AI 未运行游戏模拟/显示系统、GamePlayer/PlayMode、逻辑单元测试、命令行构建、发布、性能采样或图片检查，未提交 Git；性能、平台与线上联调仍为 UNKNOWN。

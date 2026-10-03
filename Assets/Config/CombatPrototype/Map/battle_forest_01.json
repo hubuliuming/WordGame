@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 3,
-  "configRevision": 3,
+  "schemaVersion": 5,
+  "configRevision": 6,
   "mapDefinitionId": "battle_forest_01",
   "defaultSeed": 12345,
   "geometry": {
@@ -24,6 +24,28 @@
     "enemyRadiusMeters": 0.45,
     "collisionSkinMeters": 0.01,
     "maxSlideIterations": 3
+  },
+  "drops": {
+    "enabled": true,
+    "itemId": "vitality_apple",
+    "quantity": 1,
+    "visualResourceKey": "drop_apple",
+    "pickupDistanceMeters": 2.0,
+    "flightDurationSeconds": 0.4,
+    "scatterRadiusMeters": 0.6,
+    "arcHeightMeters": 0.6,
+    "groundOffsetMeters": 0.05,
+    "visualScale": 0.5,
+    "lifetimeSeconds": 600.0
+  },
+  "treeHarvest": {
+    "enabled": true,
+    "treeObjectId": "tree_normal",
+    "visualResourceKey": "tree_harvest",
+    "harvestDurationSeconds": 2.0,
+    "dropItemId": "wood",
+    "dropQuantity": 3,
+    "dropVisualResourceKey": "drop_wood"
   },
   "population": {
     "initialEnemyCount": 32

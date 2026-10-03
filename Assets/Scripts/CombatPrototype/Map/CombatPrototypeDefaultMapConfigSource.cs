@@ -17,7 +17,7 @@ namespace Code_01.CombatPrototype.Map
             {
                 map = new MapDefinitionConfig
                 {
-                    schemaVersion = 3, configRevision = 3,
+                    schemaVersion = 5, configRevision = 6,
                     mapDefinitionId = mapDefinitionId, defaultSeed = 12345,
                     geometry = new MapGeometryConfig
                     {
@@ -36,6 +36,19 @@ namespace Code_01.CombatPrototype.Map
                         collisionSkinMeters = 0.01f, maxSlideIterations = 3
                     },
                     population = new MapPopulationConfig { initialEnemyCount = 32 },
+                    drops = new MapDropConfig
+                    {
+                        enabled = true, itemId = CombatPrototypeMapYieldItemResolver.VitalityAppleId,
+                        quantity = 1, visualResourceKey = "drop_apple", pickupDistanceMeters = 2f,
+                        flightDurationSeconds = 0.4f, scatterRadiusMeters = 0.6f, arcHeightMeters = 0.6f,
+                        groundOffsetMeters = 0.05f, visualScale = 0.5f, lifetimeSeconds = 600f
+                    },
+                    treeHarvest = new MapTreeHarvestConfig
+                    {
+                        enabled = true, treeObjectId = "tree_normal", visualResourceKey = "tree_harvest",
+                        harvestDurationSeconds = 2f, dropItemId = CombatPrototypeMapYieldItemResolver.WoodId,
+                        dropQuantity = 3, dropVisualResourceKey = "drop_wood"
+                    },
                     spawn = new MapSpawnConfig
                     {
                         playerOriginX = 0f, playerOriginZ = 0f, playerSpacingMeters = 2f,
@@ -91,7 +104,8 @@ namespace Code_01.CombatPrototype.Map
                         objectId = "gather_apple", visualResourceKey = "gather_apple",
                         footprintRadiusMeters = 0.3f, minimumSameTypeSpacingMeters = 1.5f,
                         interactionDistanceMeters = 2f, gatherable = true, gatherDurationSeconds = 1f,
-                        yieldItemId = CombatPrototypeMapYieldItemResolver.VitalityAppleId, yieldQuantity = 1
+                        yieldItemId = CombatPrototypeMapYieldItemResolver.VitalityAppleId, yieldQuantity = 1,
+                        regrowEnabled = true, regrowSeconds = 600f
                     }
                 }
             };

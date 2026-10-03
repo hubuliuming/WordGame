@@ -57,6 +57,7 @@ namespace Code_01.CombatPrototype.Map
         public int ObjectIndex;
         public float2 Position;
         public float Radius;
+        public byte Disabled;
     }
 
     [InternalBufferCapacity(0)]
@@ -84,9 +85,12 @@ namespace Code_01.CombatPrototype.Map
         public FixedString64Bytes ResourceKey;
         public Entity Prefab;
         public byte Gatherable;
+        public byte Harvestable;
         public float InteractionDistance;
         public float GatherDuration;
         public FixedString64Bytes YieldItemName;
         public int YieldQuantity;
+        public byte RegrowEnabled;
+        public float RegrowSeconds;
     }
 }

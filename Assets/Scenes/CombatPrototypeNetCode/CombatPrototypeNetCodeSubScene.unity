@@ -205,6 +205,12 @@ MonoBehaviour:
     Prefab: {fileID: 478490014354651204, guid: 0e1ec672d91fbb14189d0d4b8344d055, type: 3}
   - ResourceKey: gather_apple
     Prefab: {fileID: 581676323010680513, guid: 48970c8093712c140a78893657a8da0e, type: 3}
+  - ResourceKey: drop_apple
+    Prefab: {fileID: 4487028765474583425, guid: 3c92d1d189fc4af44b3957ed7ba2784c, type: 3}
+  - ResourceKey: tree_harvest
+    Prefab: {fileID: 2904090953180580515, guid: 3207c51e470cd2244b3b934436fd83ec, type: 3}
+  - ResourceKey: drop_wood
+    Prefab: {fileID: 3069278388377741593, guid: 4d858381c32935942851ccbba8a14fe4, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

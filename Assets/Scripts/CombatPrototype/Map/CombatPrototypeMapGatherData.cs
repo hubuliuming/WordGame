@@ -21,6 +21,8 @@ namespace Code_01.CombatPrototype.Map
         public float GatherDuration;
         public FixedString64Bytes YieldItemName;
         public int YieldQuantity;
+        public byte RegrowEnabled;
+        public float RegrowSeconds;
     }
 
     [GhostComponent(PrefabType = GhostPrefabType.Server)]
@@ -29,5 +31,6 @@ namespace Code_01.CombatPrototype.Map
         public Entity Collector;
         public uint StartHitSequence;
         public double FinishAt;
+        public double RegrowAt;
     }
 }

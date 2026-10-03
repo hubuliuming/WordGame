@@ -121,7 +121,7 @@ namespace Code_01.CombatPrototype.Map
                             continue;
                         }
                         if (time >= progress.ValueRO.FinishAt)
-                            Complete(current, progress, config, player, access, map.MapDefinitionId, point);
+                            Complete(current, progress, config, player, access, map.MapDefinitionId, point, time);
                     }
                     catch (Exception exception)
                     {
@@ -234,7 +234,7 @@ namespace Code_01.CombatPrototype.Map
 
         private static void Complete(RefRW<CombatPrototypeMapGatherState> state,
             RefRW<CombatPrototypeMapGatherProgress> progress, CombatPrototypeMapGatherConfig config,
-            OnlinePlayer player, PlayerLookups access, FixedString64Bytes mapId, Entity point)
+            OnlinePlayer player, PlayerLookups access, FixedString64Bytes mapId, Entity point, double time)
         {
             var stage = "PrepareReward";
             var placement = state.ValueRO.PlacementIndex;
@@ -250,6 +250,7 @@ namespace Code_01.CombatPrototype.Map
                 if (itemIndex >= 0) next.Quantity = checked(inventory[itemIndex].Quantity + config.YieldQuantity);
                 else inventory.EnsureCapacity(checked(inventory.Length + 1));
                 var candidate = CombatPrototypePlayerSaveStore.PrepareReward(playerId, reward, inventory, itemIndex, next);
+                var regrowAt = config.RegrowEnabled != 0 ? time + config.RegrowSeconds : 0d;
 
                 stage = "SavePrepared";
                 CombatPrototypePlayerSaveStore.SavePrepared(candidate);
@@ -258,7 +259,7 @@ namespace Code_01.CombatPrototype.Map
                 stage = "CommitGather";
                 if (itemIndex >= 0) inventory[itemIndex] = next;
                 else inventory.Add(next);
-                progress.ValueRW = default;
+                progress.ValueRW = new CombatPrototypeMapGatherProgress { RegrowAt = regrowAt };
                 state.ValueRW.CollectorNetworkId = 0;
                 state.ValueRW.Phase = CombatPrototypeMapGatherPhase.Depleted;
                 Debug.Log("[CombatPrototype.Map] Gather granted and saved; map=" + mapId + ", placement=" +

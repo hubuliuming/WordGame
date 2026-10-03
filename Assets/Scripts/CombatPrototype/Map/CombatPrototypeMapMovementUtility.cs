@@ -19,6 +19,7 @@ namespace Code_01.CombatPrototype.Map
                 for (var i = 0; i < obstacles.Length; i++)
                 {
                     var obstacle = obstacles[i];
+                    if (obstacle.Disabled != 0) continue;
                     if (!Sweep(position - obstacle.Position, remaining, lengthSquared,
                         actorRadius + obstacle.Radius + map.CollisionSkin, out var candidateTime, out var candidateNormal))
                         continue;

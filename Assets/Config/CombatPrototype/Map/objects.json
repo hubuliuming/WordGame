@@ -60,7 +60,7 @@
     "gatherDurationSeconds": 1.0,
     "yieldItemId": "vitality_apple",
     "yieldQuantity": 1,
-    "regrowEnabled": false,
-    "regrowSeconds": 0.0
+    "regrowEnabled": true,
+    "regrowSeconds": 600.0
   }
 ]

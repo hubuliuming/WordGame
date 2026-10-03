@@ -22,6 +22,7 @@ namespace Code_01
             public static readonly string 馒头 = "馒头";
             public static readonly string 小块肉 = "小块肉";
             public static readonly string Goods = "Goods";
+            public static readonly string 木材 = "木材";
         }
         public struct Register
         {

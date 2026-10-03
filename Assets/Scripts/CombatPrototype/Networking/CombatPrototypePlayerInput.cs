@@ -12,6 +12,8 @@ namespace Code_01.CombatPrototype.Networking
         public InputEvent Respawn;
         public InputEvent UseItem;
         public InputEvent Gather;
+        public InputEvent Pickup;
+        public InputEvent HarvestTree;
     }
 
     [WorldSystemFilter(WorldSystemFilterFlags.ClientSimulation)]
@@ -38,6 +40,8 @@ namespace Code_01.CombatPrototype.Networking
             var respawn = keyboard != null && keyboard.rKey.wasPressedThisFrame;
             var useItem = keyboard != null && keyboard.eKey.wasPressedThisFrame;
             var gather = keyboard != null && keyboard.fKey.wasPressedThisFrame;
+            var pickup = keyboard != null && keyboard.gKey.wasPressedThisFrame;
+            var harvestTree = keyboard != null && keyboard.hKey.wasPressedThisFrame;
 
             foreach (var input in SystemAPI.Query<RefRW<CombatPrototypePlayerInput>>().WithAll<GhostOwnerIsLocal>())
             {
@@ -50,6 +54,10 @@ namespace Code_01.CombatPrototype.Networking
                     input.ValueRW.UseItem.Set();
                 if (gather)
                     input.ValueRW.Gather.Set();
+                if (pickup)
+                    input.ValueRW.Pickup.Set();
+                if (harvestTree)
+                    input.ValueRW.HarvestTree.Set();
             }
         }
     }

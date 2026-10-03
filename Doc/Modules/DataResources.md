@@ -204,6 +204,18 @@ EditorTest 声明以下菜单；三个重写菜单直接写入上表对应 JSON�
 
 ## 【FACT】网络战斗地图配置与资源
 
-Assets/Scripts/CombatPrototype/Map/ 包含四类配置、地图子段 MapMovementConfig、配置集合、来源接口、内置/JSON 来源、JSON 读取及边界校验、Authoring/Baker、地图数据/显示脚本及共享移动阻挡工具。当前 SubScene 的 SourceMode=Json，显式绑定 Assets/Config/CombatPrototype/Map/ 下的两份地图对象 JSON 与三份共享数组 JSON；原材质和装饰仍通过 GroundMaterials、DecorationPrefabs 按稳定键绑定。文件/字段契约、来源切换和错误处理统一归[战斗地图](Map.md)。当前整组配置契约为 schemaVersion=3、默认 configRevision=3，两份地图包含必填 movement 段，生态包含 treeObjectId/gatherObjectId，物体包含 tree_normal/gather_apple；JSON 在烘焙时读取为固定 ECS 数据及静态阻挡缓冲，两个相关 Baker 均登记使用文件的内容依赖。移动参数通过地图数据接入，不增加玩家/敌人 Prefab 字段；没有运行时外部配置加载、热重载或地图状态写盘。
+Assets/Scripts/CombatPrototype/Map/ 包含四类配置、地图子段 MapMovementConfig/MapDropConfig/MapTreeHarvestConfig、配置集合、来源接口、内置/JSON 来源、JSON 读取及边界校验、Authoring/Baker、地图数据/显示脚本及共享移动阻挡工具。当前 SubScene 的 SourceMode=Json，显式绑定 Assets/Config/CombatPrototype/Map/ 下的两份地图对象 JSON 与三份共享数组 JSON；原材质和装饰仍通过 GroundMaterials、DecorationPrefabs 按稳定键绑定。文件/字段契约、来源切换和错误处理统一归[战斗地图](Map.md)。当前整组配置契约为 schemaVersion=5、默认 configRevision=6，两份地图包含必填 movement/drops/treeHarvest 段，生态包含 treeObjectId/gatherObjectId，物体包含 tree_normal/gather_apple；JSON 在烘焙时读取为固定 ECS 配置/布置数据及带 Disabled 开关的阻挡缓冲，两个相关 Baker 均登记使用文件的内容依赖。移动参数通过地图数据接入，不增加玩家/敌人 Prefab 字段；没有运行时外部配置加载、热重载或地图状态写盘。
 
-新资源位于 Assets/Art/Map/CombatPrototype/ 与 Assets/Prefabs/CombatPrototype/Map/，包括 6 个材质、4 个网格和 4 个物体 Prefab；草丛/碎石/树木为静态资源，GatherApple.mat、GatherApple.asset、GatherApple.prefab 为新单根插值 Ghost 采集资源。新增资源和脚本 meta 由 Unity 导入生成；既有玩家/敌人资源、旧 meta、Bundle、包与构建设置保持。地表运行网格及草丛/碎石/树木实体由客户端地图显示系统拥有和清理，共享资源不随地图根实体释放而销毁。树木不是 Ghost，阻挡数据随原地图根实体存在；玩家预测与服务端敌人移动读取同一烘焙结构。服务端采集复用 PrepareReward → SavePrepared 后再提交库存及耗尽，vitality_apple 显式映射活力苹果，不新增存档字段或修改旧存储类。玩家金币/经验/完整库存仍为 v1 格式；地图对象状态不保存，重启服务端重新生成资源。产出/失败规则归 [背包与道具](Inventory.md)，实际写盘与重启行为仍待第四阶段人工验收。
+新资源位于 Assets/Art/Map/CombatPrototype/ 与 Assets/Prefabs/CombatPrototype/Map/，包括 7 个材质、5 个网格和 7 个物体 Prefab；草丛/碎石仍为静态，树木在砍伐关闭时使用原静态资源，GatherApple.mat、GatherApple.asset、GatherApple.prefab 为新单根插值 Ghost 采集资源。新增资源和脚本 meta 由 Unity 导入生成；既有玩家/敌人资源、旧 meta、Bundle、包与构建设置保持。地表运行网格及静态装饰由客户端地图显示系统拥有和清理，开启砍伐时树木 Ghost 由服务端 TreeSpawn 拥有和清理，共享资源不随地图根实体释放而销毁。砍伐开启时树木为 Ghost，阻挡数据仍随地图根存在；玩家预测与敌人移动读取同一结构，按权威砍倒时刻更新 Disabled。服务端采集复用 PrepareReward → SavePrepared 后再提交库存及耗尽，按烘焙的 regrowEnabled/regrowSeconds 记录仅服务端 RegrowAt；到期只复用原 Ghost 恢复 Available，不发物品或写盘。默认 gather_apple 启用 600 秒再生，vitality_apple 显式映射活力苹果，不新增存档字段或修改旧存储类。玩家金币/经验/完整库存仍为 v1 格式；地图对象耗尽/再生期限不保存，重启服务端从 Available 重新生成资源。产出/失败规则归 [背包与道具](Inventory.md)，用户已确认第四阶段人工 GamePlayer 通过，主线程结合既有静态核对判定该阶段通过；数据范围限采集保存失败不入包/不耗尽、旧正式档保留、恢复存储后重新采集、原固定 ID 库存恢复与服务端重启资源重建，完整边界归 [运行入口](Runtime.md)。第五阶段只新增独立再生系统脚本及 Unity 生成的 meta，沿用原资源与显式绑定；再生配置烘焙已静态核对；用户已确认第五阶段人工 GamePlayer 通过，主线程结合既有静态核对判定该阶段通过，范围限再生不重复入包/写盘、关闭与失败/取消分支、同局期限及服务端重启按既有规则重建，完整边界归运行入口。存档耗时、平台和线上验证仍为 UNKNOWN。
+
+## 【FACT】地图掉落配置、资源与存档边界
+
+第六阶段在两份地图 JSON 增加必填 drops 段，BuiltIn 值一致。原 DecorationPrefabs 追加 drop_apple → [DroppedApple.prefab](../../Assets/Prefabs/CombatPrototype/Map/DroppedApple.prefab)，该新单根插值 Ghost 复用 GatherApple.asset/.mat，没有创建或修改网格/材质；原主场景、玩家/敌人及种植采集 Prefab、Animator、旧 meta、包与构建设置保持。新脚本和 Prefab 的 meta 由 Unity 导入生成。完整字段、Editor 入口、资源及状态归[掉落与拾取](MapDrops.md)。
+
+原存储类及 v1 格式保持。拾取沿 PrepareReward → SavePrepared 成功后提交库存及 Consumed，金币/经验不变；未拾取的 DropId、位置、飞行/落地/到期期限均不写盘，服务端重启清空地面掉落，已经入包的苹果随当前玩家库存恢复。用户已确认第六阶段人工 GamePlayer 通过，主线程结合静态核对与用户反馈判定该阶段通过；存储范围限成功保存、失败保留旧档/库存/未到期掉落及固定 ID 重连/重启恢复，完整边界归[运行入口](Runtime.md)第六阶段九项清单。同步写盘耗时、规模性能、平台构建与线上联调仍为 UNKNOWN；原第四/第五阶段通过范围保持。
+
+## 【FACT】树木砍伐资源与存档边界
+
+新增 HarvestableTree.prefab 复用 TreeNormal 网格/材质；新增 DroppedWood.prefab 与程序生成的 DroppedWood.asset/.mat，原 DecorationPrefabs 仅追加 tree_harvest/drop_wood 两个引用。新资源/脚本 meta 由 Unity 导入生成，旧资源与旧 meta 保持。资源路径、Ghost 字段、Editor 创建/绑定及生命周期归[树木砍伐](MapTreeHarvest.md)。
+
+TreeState 的砍倒时刻用于客户端预测阻挡，不写世界存档；树木/地面木材随本局释放，重启恢复原布局与 Standing。wood 显式映射“木材”，成功 G 后沿现有 v1 库存保存/恢复；原 PlayerSaveStore 与正式档替换规则未修改。静态引用/烘焙已核对，第七阶段运行保存失败、双端/晚加入与重启恢复人工结果为 UNKNOWN，清单归[运行入口](Runtime.md)。

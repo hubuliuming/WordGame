@@ -75,7 +75,8 @@ namespace Code_01.CombatPrototype.Map
                     {
                         ObjectId = definition.ObjectId, InteractionDistance = definition.InteractionDistance,
                         GatherDuration = definition.GatherDuration, YieldItemName = definition.YieldItemName,
-                        YieldQuantity = definition.YieldQuantity
+                        YieldQuantity = definition.YieldQuantity,
+                        RegrowEnabled = definition.RegrowEnabled, RegrowSeconds = definition.RegrowSeconds
                     });
                     EntityManager.SetComponentData(entity, default(CombatPrototypeMapGatherProgress));
                     _owned.Add(entity);

@@ -12,6 +12,8 @@ namespace Code_01.CombatPrototype.Map
         public MapGeometryConfig geometry;
         public MapLayoutConfig layout;
         public MapMovementConfig movement;
+        public MapDropConfig drops;
+        public MapTreeHarvestConfig treeHarvest;
         public MapPopulationConfig population;
         public MapSpawnConfig spawn;
         public string[] biomeIds;

@@ -125,6 +125,20 @@ namespace Code_01.CombatPrototype.Map
                         BiomeId = biome.biomeId, TreeDensityPer100m2 = biome.treeDensityPer100m2,
                         GatherableDensityPer100m2 = biome.gatherableDensityPer100m2
                     });
+                var treeHarvest = config.map.treeHarvest;
+                var treePrefab = ReadGhostPrefab(prefabs, treeHarvest.visualResourceKey, typeof(CombatPrototypeMapTreeAuthoring));
+                var woodPrefab = ReadGhostPrefab(prefabs, treeHarvest.dropVisualResourceKey, typeof(CombatPrototypeMapDropAuthoring));
+                var treeDefinition = Array.Find(config.objects, item => item.objectId == treeHarvest.treeObjectId);
+                AddComponent(entity, new CombatPrototypeMapTreeSettings
+                {
+                    Enabled = (byte)(treeHarvest.enabled ? 1 : 0),
+                    ObjectId = treeHarvest.treeObjectId, ResourceKey = treeHarvest.visualResourceKey,
+                    InteractionDistance = treeDefinition.interactionDistanceMeters,
+                    HarvestDuration = treeHarvest.harvestDurationSeconds,
+                    DropPrefab = GetEntity(woodPrefab, TransformUsageFlags.Dynamic),
+                    DropResourceKey = treeHarvest.dropVisualResourceKey,
+                    DropItemId = treeHarvest.dropItemId, DropQuantity = treeHarvest.dropQuantity
+                });
                 var objects = AddBuffer<CombatPrototypeMapObject>(entity);
                 foreach (var item in config.objects)
                 {
@@ -145,16 +159,54 @@ namespace Code_01.CombatPrototype.Map
                     }
                     else if (ghost != null || gather != null)
                         throw new InvalidOperationException("Static map object cannot use a gather Ghost prefab; objectId=" + item.objectId);
+                    var harvestable = treeHarvest.enabled && item.objectId == treeHarvest.treeObjectId;
+                    if (harvestable) prefab = treePrefab;
                     objects.Add(new CombatPrototypeMapObject
                     {
-                        ObjectId = item.objectId, ResourceKey = item.visualResourceKey,
+                        ObjectId = item.objectId, ResourceKey = harvestable ? treeHarvest.visualResourceKey : item.visualResourceKey,
                         Prefab = GetEntity(prefab, TransformUsageFlags.Dynamic),
-                        Gatherable = (byte)(item.gatherable ? 1 : 0),
+                        Gatherable = (byte)(item.gatherable ? 1 : 0), Harvestable = (byte)(harvestable ? 1 : 0),
                         InteractionDistance = item.interactionDistanceMeters, GatherDuration = item.gatherDurationSeconds,
                         YieldItemName = item.gatherable ? CombatPrototypeMapYieldItemResolver.Resolve(item.yieldItemId) : default,
-                        YieldQuantity = item.yieldQuantity
+                        YieldQuantity = item.yieldQuantity,
+                        RegrowEnabled = (byte)(item.regrowEnabled ? 1 : 0), RegrowSeconds = item.regrowSeconds
                     });
                 }
+                var drops = config.map.drops;
+                if (!prefabs.TryGetValue(drops.visualResourceKey, out var dropPrefab))
+                    throw new InvalidOperationException("Missing map drop prefab: " + drops.visualResourceKey +
+                        "; config=" + (authoring.SourceMode == CombatPrototypeMapConfigSourceMode.Json
+                            ? CombatPrototypeMapJsonReader.ResourcePath(authoring.SelectedDefinitionJson()) : "BuiltIn") +
+                        "; itemId=" + drops.itemId + "; field=drops.visualResourceKey.");
+                var dropGhost = dropPrefab.GetComponent<GhostAuthoringComponent>();
+                if (dropPrefab.GetComponent<CombatPrototypeMapDropAuthoring>() == null || dropGhost == null ||
+                    dropPrefab.transform.childCount != 0 || dropGhost.HasOwner || dropGhost.SupportAutoCommandTarget ||
+                    dropGhost.DefaultGhostMode != GhostMode.Interpolated || dropGhost.SupportedGhostModes != GhostModeMask.Interpolated)
+                    throw new InvalidOperationException("Drop requires one root and interpolated drop Ghost prefab; itemId=" +
+                        drops.itemId + "; visualResourceKey=" + drops.visualResourceKey);
+                AddComponent(entity, new CombatPrototypeMapDropSettings
+                {
+                    Enabled = (byte)(drops.enabled ? 1 : 0),
+                    Prefab = GetEntity(dropPrefab, TransformUsageFlags.Dynamic), ResourceKey = drops.visualResourceKey,
+                    ItemId = drops.itemId, ItemName = CombatPrototypeMapYieldItemResolver.Resolve(drops.itemId),
+                    Quantity = drops.quantity, PickupDistance = drops.pickupDistanceMeters,
+                    FlightDuration = drops.flightDurationSeconds, ScatterRadius = drops.scatterRadiusMeters,
+                    ArcHeight = drops.arcHeightMeters, GroundOffset = drops.groundOffsetMeters,
+                    VisualScale = drops.visualScale, Lifetime = drops.lifetimeSeconds
+                });
+            }
+
+            private static GameObject ReadGhostPrefab(Dictionary<string, GameObject> prefabs, string key, Type component)
+            {
+                if (!prefabs.TryGetValue(key, out var prefab))
+                    throw new InvalidOperationException("Missing treeHarvest prefab; resource=" + key + ", requiredComponent=" + component.Name);
+                var ghost = prefab.GetComponent<GhostAuthoringComponent>();
+                if (prefab.GetComponent(component) == null || ghost == null || prefab.transform.childCount != 0 ||
+                    ghost.HasOwner || ghost.SupportAutoCommandTarget || ghost.DefaultGhostMode != GhostMode.Interpolated ||
+                    ghost.SupportedGhostModes != GhostModeMask.Interpolated)
+                    throw new InvalidOperationException("treeHarvest requires a single-root interpolated Ghost; resource=" + key +
+                        ", requiredComponent=" + component.Name);
+                return prefab;
             }
 
             private static Dictionary<string, Material> ReadMaterials(CombatPrototypeMapMaterialBinding[] bindings)

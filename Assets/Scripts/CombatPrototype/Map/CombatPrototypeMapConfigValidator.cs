@@ -14,8 +14,8 @@ namespace Code_01.CombatPrototype.Map
                 throw new InvalidOperationException("Map configuration is missing required sections.");
             var map = config.map;
             Id(map.mapDefinitionId, "mapDefinitionId");
-            if (map.schemaVersion != 2 || map.configRevision < 1 || map.defaultSeed < 1)
-                throw new InvalidOperationException("Map requires schemaVersion=2, positive revision and seed.");
+            if (map.schemaVersion != 3 || map.configRevision < 1 || map.defaultSeed < 1)
+                throw new InvalidOperationException("Map requires schemaVersion=3, positive revision and seed.");
             var geometry = map.geometry;
             Positive(geometry.cellSizeMeters, "cellSizeMeters");
             Finite(geometry.baseHeightMeters, "baseHeightMeters");
@@ -90,8 +90,11 @@ namespace Code_01.CombatPrototype.Map
                 if (item.gatherable)
                 {
                     Id(item.yieldItemId, "yieldItemId");
-                    if (item.yieldQuantity <= 0 || item.interactionDistanceMeters <= 0f)
-                        throw new InvalidOperationException("Gatherable requires yield quantity and interaction distance.");
+                    if (item.yieldQuantity <= 0 || item.interactionDistanceMeters <= 0f || item.gatherDurationSeconds <= 0f)
+                        throw new InvalidOperationException("Gatherable requires positive quantity, interaction distance and duration; objectId=" + item.objectId);
+                    if (item.blocksMovement || item.blocksMelee || item.blocksProjectile || item.regrowEnabled)
+                        throw new InvalidOperationException("Current gatherables require blocking and regrowth disabled; objectId=" + item.objectId);
+                    CombatPrototypeMapYieldItemResolver.Resolve(item.yieldItemId);
                 }
             }
             var biomeIds = new HashSet<string>(StringComparer.Ordinal);
@@ -103,6 +106,10 @@ namespace Code_01.CombatPrototype.Map
                 Reference(objectIds, biome.decorationObjectId, "biome.decorationObjectId");
                 Reference(objectIds, biome.rockObjectId, "biome.rockObjectId");
                 Reference(objectIds, biome.treeObjectId, "biome.treeObjectId");
+                Reference(objectIds, biome.gatherObjectId, "biome.gatherObjectId");
+                var gatherDefinition = Array.Find(config.objects, item => item.objectId == biome.gatherObjectId);
+                if (!gatherDefinition.gatherable)
+                    throw new InvalidOperationException("biome.gatherObjectId must reference a gatherable; biomeId=" + biome.biomeId);
                 Nonnegative(biome.decorationDensityPer100m2, "decorationDensityPer100m2");
                 Nonnegative(biome.treeDensityPer100m2, "treeDensityPer100m2");
                 Nonnegative(biome.gatherableDensityPer100m2, "gatherableDensityPer100m2");

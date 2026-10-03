@@ -10,6 +10,7 @@ namespace Code_01.CombatPrototype.Map
         public string decorationObjectId;
         public string rockObjectId;
         public string treeObjectId;
+        public string gatherObjectId;
         public float decorationDensityPer100m2;
         public float treeDensityPer100m2;
         public float gatherableDensityPer100m2;

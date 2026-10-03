@@ -46,5 +46,21 @@
     "yieldQuantity": 0,
     "regrowEnabled": false,
     "regrowSeconds": 0.0
+  },
+  {
+    "objectId": "gather_apple",
+    "visualResourceKey": "gather_apple",
+    "footprintRadiusMeters": 0.3,
+    "minimumSameTypeSpacingMeters": 1.5,
+    "interactionDistanceMeters": 2.0,
+    "blocksMovement": false,
+    "blocksMelee": false,
+    "blocksProjectile": false,
+    "gatherable": true,
+    "gatherDurationSeconds": 1.0,
+    "yieldItemId": "vitality_apple",
+    "yieldQuantity": 1,
+    "regrowEnabled": false,
+    "regrowSeconds": 0.0
   }
 ]

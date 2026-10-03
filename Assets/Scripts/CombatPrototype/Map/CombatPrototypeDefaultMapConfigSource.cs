@@ -17,7 +17,7 @@ namespace Code_01.CombatPrototype.Map
             {
                 map = new MapDefinitionConfig
                 {
-                    schemaVersion = 2, configRevision = 2,
+                    schemaVersion = 3, configRevision = 3,
                     mapDefinitionId = mapDefinitionId, defaultSeed = 12345,
                     geometry = new MapGeometryConfig
                     {
@@ -85,6 +85,13 @@ namespace Code_01.CombatPrototype.Map
                         objectId = "tree_normal", visualResourceKey = "tree_normal",
                         footprintRadiusMeters = 0.5f, minimumSameTypeSpacingMeters = 3f,
                         blocksMovement = true, interactionDistanceMeters = 2f, gatherDurationSeconds = 1f
+                    },
+                    new MapObjectDefinitionConfig
+                    {
+                        objectId = "gather_apple", visualResourceKey = "gather_apple",
+                        footprintRadiusMeters = 0.3f, minimumSameTypeSpacingMeters = 1.5f,
+                        interactionDistanceMeters = 2f, gatherable = true, gatherDurationSeconds = 1f,
+                        yieldItemId = CombatPrototypeMapYieldItemResolver.VitalityAppleId, yieldQuantity = 1
                     }
                 }
             };
@@ -100,7 +107,8 @@ namespace Code_01.CombatPrototype.Map
             float tree, float gatherable, float rock) => new BiomeDefinitionConfig
         {
             biomeId = id, groundId = ground, decorationObjectId = "decor_grass",
-            rockObjectId = "decor_pebble", treeObjectId = "tree_normal", decorationDensityPer100m2 = grass,
+            rockObjectId = "decor_pebble", treeObjectId = "tree_normal", gatherObjectId = "gather_apple",
+            decorationDensityPer100m2 = grass,
             treeDensityPer100m2 = tree, gatherableDensityPer100m2 = gatherable,
             rockDensityPer100m2 = rock
         };

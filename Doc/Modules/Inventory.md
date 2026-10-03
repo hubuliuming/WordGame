@@ -108,3 +108,19 @@ KnapsackControl.OnStart 缓存当前 PlayerModel 与 FactoryUISystem，记录 Co
 ## 【KNOWN ISSUES】第 7A 阶段物品使用验收
 
 输入、新系统、消费候选和顺序特性已编译并静态核对；用户已确认第 7A 人工 GamePlayer 验收通过，主线程结合既有静态核对与用户反馈判定该阶段通过。范围覆盖消费/恢复、拒绝条件、双玩家同步、保存失败和重连恢复，完整边界见[运行入口](Runtime.md)。同步序列化/写盘仍会阻塞服务端，实际耗时和规模性能未测量，观察范围见[性能基线](Performance.md)。正式背包 UI、其他网络物品效果、世界掉落与拾取保持各自既有未知范围。
+
+## 【FACT】战斗地图第四阶段采集输入与产出
+
+现有 [CombatPrototypePlayerInput.cs](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypePlayerInput.cs) 增加 InputEvent Gather，客户端 F 键单次按下只给 GhostOwnerIsLocal 写入请求。服务端 [CombatPrototypeMapGatherSystem.cs](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapGatherSystem.cs) 在 PredictedSimulationSystemGroup 的玩家伤害之后、复活之前处理；客户端不提交采集目标或发放物品。默认 gather_apple 的交互中心距离为 X/Z 2 米、时长 1 秒，产出 vitality_apple ×1；[产出映射](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapYieldItemResolver.cs) 只允许该稳定 ID，映射 Msg.ItemName.活力苹果，未知 ID 在配置校验时报错。E 仍只消费小块肉，苹果未接入使用效果或正式 UI。
+
+## 【CURRENT STRATEGY】服务端预约、中断与入包保存
+
+资格沿 Connected、NetworkStreamInGame、未请求断线的连接 CommandTarget 验证，要求启用 Simulate 的当前玩家、GhostOwner 与 NetworkId 一致、存活、没有攻击请求且近战 Ready、Move 为有限零向量。服务端选择本人 X/Z 距离内最近 Available 点；距离精确相同时取较小 PlacementIndex，同次更新的玩家请求按 NetworkId 升序处理。预约后点进入 Collecting 并记录采集者、开始 HitSequence 和完成时间；持有者的新 F 请求不重启计时，不在同次完成/取消后再开新预约。
+
+已有预约先于新请求处理。移动输入、攻击请求或非 Ready、受击序号改变、死亡、超距、断线/目标失效均取消并释放为 Available，不发物品。期间采集者不强制锁定移动或攻击，取消不恢复体力；完成时间到达仍须先满足当次资格与范围。Available/Collecting 显示，Depleted 由客户端按 Ghost 状态隐藏，没有进度 UI、再生或自动重试。
+
+完成前取得库存与状态引用；按既有 ItemName 合并或新增，检查数量溢出并预留新增缓冲容量。PrepareReward 生成保持当前金币/经验的完整库存候选，SavePrepared 成功返回后同次提交库存、清除预约并设置 Depleted。准备/保存失败记录地图、布置索引、NetworkId、物品、阶段与原异常，库存数量及资源耗尽不提交，释放预约并继续其他点；玩家须重新按 F。没有修改原奖励/消费系统或存档格式，地图耗尽状态不写盘；客户端背包仍沿原 Ghost 缓冲同步及每 2 秒日志查看。
+
+## 【KNOWN ISSUES】战斗地图第四阶段采集验收
+
+输入及新系统正常编译，状态 Ghost Serializer、服务端配置/进度特性、系统顺序、两种模板隔离烘焙与引用已静态核对。F 目标选择/计时、中断与争抢、写盘失败不发物品、耗尽跨端隐藏、晚加入及重启库存恢复仍待人工 GamePlayer，结果为 UNKNOWN，完整清单归 [运行入口](Runtime.md)。玩家 v1 存档保留苹果，地图耗尽只保留本局；停止服务端再进入会重新生成采集点。写盘仍同步阻塞服务端，性能未测量。

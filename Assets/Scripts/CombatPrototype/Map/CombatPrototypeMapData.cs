@@ -83,5 +83,10 @@ namespace Code_01.CombatPrototype.Map
         public FixedString64Bytes ObjectId;
         public FixedString64Bytes ResourceKey;
         public Entity Prefab;
+        public byte Gatherable;
+        public float InteractionDistance;
+        public float GatherDuration;
+        public FixedString64Bytes YieldItemName;
+        public int YieldQuantity;
     }
 }

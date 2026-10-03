@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 2,
-  "configRevision": 2,
+  "schemaVersion": 3,
+  "configRevision": 3,
   "mapDefinitionId": "battle_forest_01",
   "defaultSeed": 12345,
   "geometry": {

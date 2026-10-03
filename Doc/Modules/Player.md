@@ -77,11 +77,15 @@ ChangeAll 先得到本次最终上限，再据其约束本次有非零增量的�
 
 `CombatPrototypePlayerNetCodeAuthoring` 为玩家 Ghost 烘焙速度 `5`、`CombatPrototypePlayerInput` 和近战数据；NetCode 为 `IInputComponentData` 生成输入缓冲。服务端握手后设置 `GhostOwner.NetworkId`、启用 `AutoCommandTarget`，并把连接 `CommandTarget` 指向玩家；玩家加入连接 `LinkedEntityGroup`，跟随断线销毁。
 
-玩家 Ghost 使用 `OwnerPredicted`：本地拥有者预测，其他客户端插值。`CombatPrototypePlayerInputSystem` 只给 `GhostOwnerIsLocal` 写入由当前本地镜头水平角转换的世界 X/Z Move，以及空格/鼠标左键 `InputEvent` 攻击事件；第 6B 增加 R 键 `Respawn`，第 7A 增加 E 键 `UseItem` 输入事件。`CombatPrototypePlayerMovementSystem` 等待地图数据，在 Client/Server 预测组中只处理带 `Simulate` 且存活的实体；移动输入拒绝非有限值并限制长度，位移通过共享的 CombatPrototypeMapMovementUtility 对静态阻挡圆进行扫掠及滑动，再更新 LocalTransform。角色 Y、速度和按输入设置朝向的规则保持；地图占地、留缝及烘焙阻挡数据归[战斗地图](Map.md)。网络玩家仍不接第 1 阶段 CharacterController 脚本的移动、重力或碰撞链；网络镜头与输入转换采用本页“本地跟随镜头”定义的独立入口。
+玩家 Ghost 使用 `OwnerPredicted`：本地拥有者预测，其他客户端插值。`CombatPrototypePlayerInputSystem` 只给 `GhostOwnerIsLocal` 写入由当前本地镜头水平角转换的世界 X/Z Move，以及空格/鼠标左键 `InputEvent` 攻击事件；第 6B 增加 R 键 `Respawn`，第 7A 增加 E 键 `UseItem`，地图第四阶段增加 F 键 `Gather` 输入事件。`CombatPrototypePlayerMovementSystem` 等待地图数据，在 Client/Server 预测组中只处理带 `Simulate` 且存活的实体；移动输入拒绝非有限值并限制长度，位移通过共享的 CombatPrototypeMapMovementUtility 对静态阻挡圆进行扫掠及滑动，再更新 LocalTransform。角色 Y、速度和按输入设置朝向的规则保持；地图占地、留缝及烘焙阻挡数据归[战斗地图](Map.md)。网络玩家仍不接第 1 阶段 CharacterController 脚本的移动、重力或碰撞链；网络镜头与输入转换采用本页“本地跟随镜头”定义的独立入口。
+
+## 【FACT】地图采集与玩家状态
+
+F 采集由服务端确认本人资格、最近可用点并计时；移动/攻击/受击/死亡/超距/断线会释放预约，完成后保存并入包活力苹果，E 仍仅使用小块肉。目标、计时和提交规则归 [背包与道具](Inventory.md)。没有新增玩家组件或修改玩家 Prefab；第四阶段交互与原玩家回归仍待 [人工验收](Runtime.md)，结果为 UNKNOWN。
 
 ## 【KNOWN ISSUES】地图移动阻挡验收
 
-静态脚本与地图烘焙数据已核对，玩家树木阻挡、滑动手感、本地预测与远端同步、死亡/复活及原玩法回归的人工 GamePlayer 结果仍为 UNKNOWN，范围归[运行入口](Runtime.md)。既有网络玩家阶段人工通过不扩展为地图第三阶段通过。
+静态脚本与地图烘焙数据已核对；用户已确认地图第三阶段人工 GamePlayer 验收通过，主线程结合既有静态核对判定该阶段通过。玩家范围覆盖树木阻挡、滑动、本地预测与远端同步、死亡/复活及原玩法回归，完整边界归[运行入口](Runtime.md)。性能、平台构建和线上联调仍为 UNKNOWN。
 
 ## 【KNOWN ISSUES】第 2B 阶段玩家验收
 
@@ -169,7 +173,7 @@ CurrentHealth 降至 0 后设置 IsDead=1，后续伤害不再扣血或递增受
 
 ## 【CURRENT STRATEGY】第 6B 阶段复活状态
 
-服务端确认死亡后，先取得必需玩家组件与伤害缓冲引用，再清理旧敌人锁定，清空玩家伤害缓冲；玩家近战回 Ready、计时为 0，CurrentPower=UpperPower、CurrentHealth=MaxHealth、IsDead=0。位置通过与加入流程共用的 CombatPrototypeMapSpawnUtility 从[地图配置](Map.md)计算，当前仍为 (NetworkId * 2, 1, 0)，旋转和缩放保留。复活沿用原玩家实体、连接和身份，不创建新 Ghost；HitSequence、玩家及敌人攻击序号不因复活归零或递增，金币/经验/库存与存档保持原值。
+服务端确认死亡后，先取得必需玩家组件与伤害缓冲引用，再清理旧敌人锁定，清空玩家伤害缓冲；玩家近战回 Ready、计时为 0，CurrentPower=UpperPower、CurrentHealth=MaxHealth、IsDead=0。位置通过与加入流程共用的 CombatPrototypeMapSpawnUtility 从[地图配置](Map.md)计算，当前仍为 (NetworkId * 2, 1, 0)，旋转和缩放保留。地图采集系统位于伤害之后、复活之前，死亡预约先取消，R 复活不重处理同 tick 的 F。复活沿用原玩家实体、连接和身份，不创建新 Ghost；HitSequence、玩家及敌人攻击序号不因复活归零或递增，金币/经验/库存与存档保持原值。
 
 复活发生在本 tick 已完成的移动、近战、反击和玩家伤害之后，本 tick 不再次移动或攻击，后续 tick 恢复原操作与敌人候选资格；同 tick 的 R 请求若在该结算点已死亡，也按死亡状态处理。客户端等待原生命/体力/位置快照，不自行恢复生命或预测复活。旧敌人挥击的取消与后摇规则归[战斗](Combat.md)。
 
@@ -193,7 +197,7 @@ E 键 UseItem 沿原命令链发送；服务端 CombatPrototypeItemUseSystem 在
 
 ## 【FACT】网络原型本地跟随镜头与移动输入
 
-[CombatPrototypePlayerInput.cs](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypePlayerInput.cs) 保留 Move、Attack、Respawn、UseItem 四个原输入字段。WASD 在原归一化之后，调用本客户端 World 的 CombatPrototypeCameraBindingSystem，再由 CombatPrototypeFollowCamera 当前水平角旋转到世界 X/Z Move；相机操作每个渲染帧采集一次，同一水平角应用到画面。初始角为 0°，W/S 为画面前后、A/D 为画面左右，移动速度仍为 5。
+[CombatPrototypePlayerInput.cs](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypePlayerInput.cs) 保留 Move、Attack、Respawn、UseItem 四个原输入字段，另由地图第四阶段增加 Gather。WASD 在原归一化之后，调用本客户端 World 的 CombatPrototypeCameraBindingSystem，再由 CombatPrototypeFollowCamera 当前水平角旋转到世界 X/Z Move；相机操作每个渲染帧采集一次，同一水平角应用到画面。初始角为 0°，W/S 为画面前后、A/D 为画面左右，移动速度仍为 5。
 
 ## 【CURRENT STRATEGY】镜头归属与玩家生命周期
 

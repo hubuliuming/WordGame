@@ -390,3 +390,33 @@
 - 完成后 Editor 未进入 PlayMode，只保留未脏的原主场景，无临时烘焙 World。Map、Player、Combat、Runtime、DataResources 和策划模板按受影响条目更新，策划模板的“实际 JSON 尚未创建”残留已修正；第二阶段人工验收清单改用当前 v2 默认值，第三阶段人工清单已记录，第二/第三阶段人工结果仍为 UNKNOWN，第一阶段人工通过范围保持。
 - 主线程资源/文档静态验收通过：3139 个既有非视觉文件的原始散列基线中，21 个文件在授权范围内变化，无范围外变化；新增 14 个文件及 7 个 Unity 生成的唯一 GUID。35 个本阶段文本文件严格 UTF-8、文档链接及森林 JSON 示例一致性、Scene 仅追加树木引用检查和 git diff --check 通过。AI 导航保持 8183 字节，Map 为 19183 字节；其他已有较大模块只修改关联段落，没有全量拆分或重写。
 - 未新增/运行逻辑单元测试、人工 GamePlayer、PlayMode、命令行构建、平台发布、性能采样或图片检查。实际阻挡/滑动、显示/清理、双端预测同步、配置调整生效和原战斗/存档回归仍待用户人工验收；静态烘焙不代表这些运行结果通过。
+
+## 2026-10-03：战斗地图第三阶段人工验收通过
+
+- 用户明确反馈“我已验收通过，接下来下一阶段”；主线程结合既有代码、资源与文档静态验收，判定战斗地图第三阶段通过。
+- 人工通过范围限 Runtime.md 第三阶段已有七项清单：树木显示/布置与保护区域、玩家和敌人阻挡/滑动/停止、双端预测与位置同步、第三阶段配置修改和错误反馈、清理及原移动/战斗/复活/物品/奖励存档/重连回归。
+- 第二阶段独立 JSON 人工清单未单独获确认，仍为 UNKNOWN；性能、平台构建、线上联调及此前各模块超出本清单的验收边界保持。
+- 局部同步 Map.md、Runtime.md、Player.md、Combat.md 和项目外战斗地图配置建议模板的当前验收状态，并追加本记录；未修改代码、JSON、Scene、Prefab、Animator、meta、包或构建设置，未创建子Agent。
+- AI 未启动 PlayMode、执行 GamePlayer 或游戏系统、逻辑单元测试、命令行构建、发布、性能采样或读取图片。第四阶段代码与资源尚未执行。
+
+## 2026-10-03：战斗地图第四阶段种植采集
+
+- 用户确认并授权第四阶段方案，由主线程执行，未创建子Agent。范围为 gather_apple 初始布置、F 输入、服务端预约/计时/中断与入包保存、耗尽 Ghost 显示、新占位资源及原 MapAuthoring 的一次采集物引用追加。
+- BiomeDefinitionConfig 新增 gatherObjectId；内置来源和两份地图 JSON 升级为 schemaVersion=3、configRevision=3，三种生态引用 gather_apple，objects.json 追加对应定义。旧 v1/v2、缺字段、引用非采集物及未知产出 ID 明确失败，不补默认值或回退来源；grounds.json、旧物体、地图尺寸、种子 12345、出生参数及 32 敌人总量保持。采集物要求正距离/时长/产出，禁止开启移动/近战/投射物阻挡及再生。
+- gather_apple 占地半径 0.3 米、同类间距 1.5 米、交互中心 X/Z 距离 2 米、时长 1 秒；草原/森林/岩地密度 0.6/0.5/0.2 每 100㎡。全图依次布置树木、采集物、草丛/碎石，共用占地/间距/保护区域检查；树木保持，后两类装饰布局发生变化。vitality_apple 显式映射既有 Msg.ItemName.活力苹果 ×1，仅入包和保存；E 仍只使用小块肉。
+- 新增 MapGatherData、MapGatherAuthoring、MapYieldItemResolver、MapGatherSpawnSystem、MapGatherSystem、MapGatherRenderSystem 六份运行脚本，职责分别为状态/配置/计时、烘焙、稳定 ID 映射、服务端生成/清理、交互结算及客户端耗尽显示。现有 PlayerInput 增加 Gather，仅本地拥有者 F 单次按下发事件；MapObject 烘焙配置新增采集参数，客户端静态地图显示跳过采集 Ghost，原移动和战斗脚本未改。
+- 服务端采集系统在玩家伤害之后、复活之前处理已有预约及新请求。沿在线 CommandTarget 核对当前玩家/归属/存活/近战 Ready/零移动输入，选择范围内最近 Available 点，精确同距取较小布置索引；同次请求按 NetworkId 升序。移动/攻击/受击序号变化/死亡/超距/断线取消并释放预约，不锁定玩家操作；重复 F 不重置计时，同次完成或取消后不重新启动。
+- 完成前取得必需状态/库存引用并预留缓冲容量，PrepareReward 投影保持当前金币/经验的完整库存，SavePrepared 成功后同次提交库存和 Depleted。准备/保存失败不发物品、不耗尽，释放预约、记录阶段及原异常并继续其他点，无自动重试。原存储类和奖励/消费系统未改，玩家存档仍为 v1；地图状态只属于本局，服务端重启重新生成点，已保存库存按原固定 ID 恢复。
+- 服务端实例化插值采集 Ghost，同步 PlacementIndex、Phase、CollectorNetworkId；配置与进度组件标注仅服务端保留。客户端按 Depleted 禁用 MaterialMeshInfo，保留耗尽 Ghost 至地图释放供晚加入接收当前状态；根更换/失效、系统停止及 World 销毁清理本系统拥有的实体。实际同步/清理与晚加入仍待人工运行验收。
+- 新增 Editor 采集资源生成/绑定脚本；生成 GatherApple.mat、GatherApple.asset、GatherApple.prefab，单网格/材质、36 顶点/48 三角形，高 0.9 米、最大视觉半径 0.45 米。单根 Prefab 无子对象/Collider/Animator，含 Transform、MeshFilter、MeshRenderer、GatherAuthoring、GhostAuthoringComponent 及 Ghost 自动要求的 LinkedEntityGroupAuthoring，无 Owner/AutoCommandTarget，仅插值。原 SubScene 仅追加 gather_apple 两行引用；原根节点、组件、五份 JSON 引用、Json/Forest 和旧材质/Prefab 引用保持。新增 meta 均由 Unity 导入生成。
+- Unity 正常编译，新输入字段、系统特性及 GatherState Ghost Serializer/Snapshot 已加载，Snapshot 含三项同步字段。两种模板从原保存 SubScene 克隆至临时 Editor 场景，以 SkipCreatingCompanions|AddEntityGUID 隔离烘焙，不调用游戏模拟或显示系统；Json 与当前 BuiltIn 逐字段一致。两种均为 1 地图、9 块、2304 格、452 禁止布置格、96×96 米，32 敌人/8 列/间距 3/首点 (0,1,16)，NetworkId=1 玩家点 (2,1,0)。
+
+| 静态烘焙模板 | 草地/林地/岩地格 | 草丛 | 碎石 | 树木/阻挡 | 采集点 | 最小采集同类间距 |
+|---|---|---:|---:|---:|---:|---:|
+| Forest | 512/1588/204 | 598 | 17 | 89 | 36 | 约 2.1460 米 |
+| Grassland | 1478/636/190 | 746 | 22 | 53 | 38 | 约 2.0394 米 |
+
+- 全部同类间距违规、非零占地重叠、树木/采集保护区域违规与敌人出生重叠为 0，采集配置/Prefab、材质/渲染引用、原玩家/敌人 Ghost 和移动参数有效。树木最小同类间距约 3.0768/3.0634 米。有效烘焙前后 Console 均为 [0,8,52]，无新增错误；最终仍为 0 Error/8 Warning，未清空 Console。Editor 保持干净的原主场景、未进入 PlayMode，仅有原 6 个 Editor/Loading World，无临时烘焙 World。
+- 局部同步 Map、Inventory、Runtime、Player、Combat、DataResources、AI_Understanding 和项目外战斗地图配置建议模板；配置例与真实森林 JSON 一致，第四阶段人工清单含交互/中断/争抢/保存失败/耗尽与晚加入/重启/配置错误/清理回归。修正 Combat 中与已验收第三阶段不一致的“未接移动碰撞”残留。第一/第三阶段人工通过保持，第二阶段独立 JSON 和第四阶段人工 GamePlayer 仍为 UNKNOWN。
+- 主线程代码/资源/文档静态验收通过：3153 个既有非视觉文件基线中仅 22 个授权文件变化，无范围外变化；新增 22 个文件及 11 个唯一 GUID。44 份任务文本严格 UTF-8，五份 JSON、300 个本地文档链接、策划示例一致性、Scene 仅追加引用及 git diff/空白检查通过。导航 8191 字节，Map 22156 字节；采集详细提交规则归 Inventory，人工清单归 Runtime，没有全量拆分或重写既有模块。
+- 未新增/运行逻辑单元测试、人工 GamePlayer、PlayMode、命令行构建、平台发布、性能采样或图片检查，未提交 Git。静态验收不代表交互、写盘失败、跨端显示或性能通过；砍树、再生、地图状态持久化、攻击遮挡、寻路、新 UI、热重载及联网配置一致性协议未接入。

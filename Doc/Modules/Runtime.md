@@ -363,7 +363,7 @@ Clip 图片由隔离 Editor 预览场景采样生成，仅用于本次获授权�
 
 ## 【FACT】战斗地图入口
 
-当前网络 SubScene 选择 SourceMode=Json、Preset=Forest，五份 JSON 已显式绑定；可在 PlayMode 前保存 Preset 切换到 Grassland，或显式选择 BuiltIn。配置经校验与 LayoutBuilder 烘焙地图单例及缓冲，修改 JSON 须完成正常导入/烘焙后再进入。当前配置契约为 schemaVersion=2、configRevision=2，普通树木按生态密度布置。客户端在 Presentation 阶段、Entities Graphics 前创建分块地表和草丛/碎石/树木。玩家 Client/Server 预测移动及服务端敌人移动读取烘焙阻挡缓冲，经过共享扫掠/滑动工具；服务端沿原 Spawner 生成敌人，GoInGame 和复活使用共用出生位置函数。配置文件、参数、所有权与清理职责由[战斗地图](Map.md)维护。
+当前网络 SubScene 选择 SourceMode=Json、Preset=Forest，五份 JSON 已显式绑定；可在 PlayMode 前保存 Preset 切换到 Grassland，或显式选择 BuiltIn。配置经校验与 LayoutBuilder 烘焙地图单例及缓冲，修改 JSON 须完成正常导入/烘焙后再进入。当前配置契约为 schemaVersion=3、configRevision=3，树木和 gather_apple 按生态密度依次布置。客户端在 Presentation 阶段、Entities Graphics 前创建分块地表和草丛/碎石/树木；采集物由服务端在准入前生成插值 Ghost，客户端按同步耗尽状态控制显示。玩家 Client/Server 预测移动及服务端敌人移动读取烘焙阻挡缓冲，经过共享扫掠/滑动工具；服务端沿原 Spawner 生成敌人，GoInGame 和复活使用共用出生位置函数。配置文件、参数、所有权与清理职责由[战斗地图](Map.md)维护。
 
 ## 【KNOWN ISSUES】战斗地图第一阶段验收
 
@@ -378,20 +378,20 @@ Clip 图片由隔离 Editor 预览场景采样生成，仅用于本次获授权�
 
 ## 【KNOWN ISSUES】战斗地图第二阶段 JSON 验收
 
-JSON 读取、五份 TextAsset 引用及两种模板的隔离 Editor 烘焙已静态核对，主线程代码、资源与文档静态验收通过；第二阶段人工 GamePlayer 的配置修改生效、异常配置反馈、来源/模板切换与原玩法回归仍为 UNKNOWN。当前清单使用第三阶段 schemaVersion=2、configRevision=2 的配置，JSON 与当前内置值一致；第一阶段人工通过不扩展为第二、第三阶段人工通过。
+JSON 读取、五份 TextAsset 引用及两种模板的隔离 Editor 烘焙已静态核对，主线程代码、资源与文档静态验收通过；第二阶段人工 GamePlayer 的配置修改生效、异常配置反馈、来源/模板切换与原玩法回归仍为 UNKNOWN。当前清单使用第四阶段 schemaVersion=3、configRevision=3 的配置，JSON 与当前内置值一致；第一、第三阶段人工通过不替代本节独立的 JSON 验收清单。
 
 人工验收范围：
 
-1. 在 PlayMode 前修改 battle_forest_01.json 的 defaultSeed（12345 改为 23456）及 configRevision（2 改为 3），等待成功导入/烘焙后进入；确认装饰布置改变、地表与保护区域仍符合配置。将 biomes.json 中 forest 的 decorationDensityPer100m2 从 8 改为 4，重新进入并核对草丛数量变化；树木密度已由第三阶段启用，采集密度仍仅预留。
+1. 在 PlayMode 前修改 battle_forest_01.json 的 defaultSeed（12345 改为 23456）及 configRevision（3 改为 4），等待成功导入/烘焙后进入；确认装饰布置改变、地表与保护区域仍符合配置。将 biomes.json 中 forest 的 decorationDensityPer100m2 从 8 改为 4，重新进入并核对草丛数量变化；树木密度已由第三阶段启用，采集密度已由第四阶段启用。
 2. 将选中地图 population.initialEnemyCount 从 32 改为 16，重新烘焙并进入，确认实际敌人总量和装饰排除区域使用新配置；Spawner 的旧 EnemyCount 序列化值不控制该总量。加入/复活位置、镜头、双客户端一致性及原移动/攻击/受击/死亡/R 复活/E 物品/奖励存档/重连仍须回归。
 3. 分别核对缺少 JSON 引用、缺字段/重复字段、错误类型、不支持 schemaVersion、地图 ID 不匹配及无效资源键的明确错误；修复后须重新成功烘焙，SourceMode 不应自行切回 BuiltIn。
-4. 在 PlayMode 前保存并切换 Json/BuiltIn 来源及 Forest/Grassland 模板，停止重进后检查地表/装饰和清理。验收结束恢复 SourceMode=Json、Preset=Forest 及五份 JSON 初始值（种子 12345、修订号 2、forest 草丛密度 8、敌人 32）。
+4. 在 PlayMode 前保存并切换 Json/BuiltIn 来源及 Forest/Grassland 模板，停止重进后检查地表/装饰和清理。验收结束恢复 SourceMode=Json、Preset=Forest 及五份 JSON 初始值（种子 12345、修订号 3、forest 草丛密度 8、敌人 32）。
 
 运行热重载、联网配置一致性校验、性能、平台构建和线上联调未覆盖。AI 未启动 GamePlayer/PlayMode、执行游戏模拟/显示系统、逻辑单元测试、命令行构建、发布、性能采样或读取图片。
 
 ## 【KNOWN ISSUES】战斗地图第三阶段树木与移动阻挡验收
 
-Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、阻挡记录对应关系、占地/同类间距、道路/安全区及敌人出生避让已静态核对，主线程静态验收通过。人工 GamePlayer 的显示、实际阻挡、滑动、预测同步、配置修改生效、清理与原玩法回归仍为 UNKNOWN。AI 未运行游戏模拟/显示系统、PlayMode、逻辑单元测试、命令行构建、发布、性能采样或图片检查；静态检查与已有阶段人工通过不代替本阶段运行验收。
+Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、阻挡记录对应关系、占地/同类间距、道路/安全区及敌人出生避让已静态核对，主线程静态验收通过。用户明确反馈“我已验收通过，接下来下一阶段”，主线程结合既有静态核对与用户反馈判定第三阶段通过；人工通过范围限下述七项清单，来自当时 v2 版本；当前恢复值跟随 v3 默认配置，采集行为另见第四阶段。AI 未运行游戏模拟/显示系统、PlayMode、逻辑单元测试、命令行构建、发布、性能采样或图片检查；结论不扩展为第二阶段独立 JSON 清单、规模性能、平台构建或线上联调通过。
 
 人工验收范围：
 
@@ -401,6 +401,23 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 4. 两个客户端使用相同配置，核对树木位置一致、本地预测与远端位置表现；回归死亡/R 复活、镜头、E 物品使用、奖励保存、断线重连及原玩家/敌人生成。
 5. PlayMode 前把三种生态的 treeDensityPer100m2 全部设为 0，完成导入/烘焙后重新进入，核对树木和阻挡记录为空、移动恢复无树状态；treeObjectId 与 Prefab 绑定仍必填。恢复密度后，将 tree_normal 的 blocksMovement=false，重新进入核对树仍显示但不阻挡；再恢复 true 并把占地半径 0.5 改为 0.75，核对停止距离与布置避让变化。
 6. 核对缺失树木绑定、无效 treeObjectId、缺少 movement 段、阻挡物零占地、非法角色半径/留缝/滑动次数及旧 schemaVersion 的明确错误；修复后重新成功烘焙，不补默认值或回退来源。
-7. 停止重进、切换 Forest/Grassland 和 Json/BuiltIn，核对没有重复树木、地图或遗留对象。验收结束恢复 Json/Forest、schemaVersion=2、configRevision=2、种子 12345、32 敌人、树木密度 0.4/1.5/0.1、树木占地 0.5、间距 3、blocksMovement=true，以及 movement=0.4/0.45/0.01/3。
+7. 停止重进、切换 Forest/Grassland 和 Json/BuiltIn，核对没有重复树木、地图或遗留对象。验收结束恢复 Json/Forest、schemaVersion=3、configRevision=3、种子 12345、32 敌人、树木密度 0.4/1.5/0.1、树木占地 0.5、间距 3、blocksMovement=true，以及 movement=0.4/0.45/0.01/3。
 
-本阶段仅处理静态物体移动阻挡；地图边界、地表通行/速度倍率、寻路、攻击遮挡、采集/砍树、再生、动态对象、地图状态存档和联网配置一致性协议未接入，性能与平台验收仍为 UNKNOWN。
+第三阶段通过范围仅覆盖静态物体移动阻挡；第四阶段采集另列下节。地图边界、地表通行/速度倍率、寻路、攻击遮挡、砍树、再生、通用动态对象、地图状态存档和联网配置一致性协议未接入，性能与平台验收仍为 UNKNOWN。
+
+## 【KNOWN ISSUES】战斗地图第四阶段采集验收
+
+正常 Unity 编译、Gather 输入、新系统顺序、状态 Ghost Serializer 和服务端配置/进度特性已静态核对；两种模板从保存 SubScene 克隆至临时 Editor 场景隔离烘焙，通过资源引用、占地/间距及保护区域检查。默认 Forest 为 89 树木/阻挡记录、36 采集点，Grassland 为 53 树木/阻挡记录、38 采集点；静态结果不表示交互或跨端显示通过。第四阶段人工 GamePlayer 仍为 UNKNOWN，第一/第三阶段既有通过与第二阶段独立 JSON UNKNOWN 保持。
+
+人工验收清单（客户端与服务端使用同一 v3 配置及含 Gather 的输入版本）：
+
+1. 分别保存 Forest、Grassland 后进入，核对 gather_apple 显示、底部高度和生态分布，避开道路/安全区/战斗区/敌人初始区域，不与树木或碎石占地重叠；采集物不阻挡玩家/敌人移动。树木阻挡、草丛/碎石及地表继续回归。
+2. 存活且静止、近战 Ready 的玩家在采集中心 X/Z 2 米内单次按 F，核对 Gather started 日志、1 秒后 Gather granted and saved、活力苹果增加 1，并在双端隐藏耗尽点。背包沿每 2 秒日志核对，金币/经验保持；同名累加，不生成新 UI。范围内多个点取最近 Available，精确同距取较小 placement；范围外、全耗尽时明确拒绝，持续按住 F 不连续发放。
+3. 采集中分别输入移动、攻击，遭受命中、死亡、离开范围或断线，核对取消日志、不入包且预约释放；移动因树木受阻仍应取消。攻击已在阶段中、死亡、非零移动输入时 F 不开始；R 复活不补发死亡前预约或同 tick 的 F。原移动/攻击/受击/死亡/R 回归。
+4. 两名玩家在同一可用点范围内争抢：只允许一名预约；同次服务端请求按 NetworkId 升序，另一人可选择其他 Available 点或被拒绝。重复 F 不重置预约时长，不多发物品；预约者取消后另一人须有新 F 请求才能开始。实际同次请求、同距目标与跨端同步单独记录结果，未触发的用例保持 UNKNOWN。
+5. 人工制造既有玩家存档保存失败条件，核对 settlement or save failed 日志、活力苹果数量不增加、点未耗尽、预约释放及原正式档保留；恢复存储后不会自动补发，重新按 F 才可成功。其他玩家/采集点和原独立击杀奖励仍可继续；保存失败条件及实际覆盖需记录。
+6. 在同一服务端局中断线重连、晚加入，核对当前 Available/Collecting/Depleted 状态一致，耗尽点不重新出现，库存按原固定 ID 恢复。停止服务端再进入则重新生成全部点，已保存苹果仍保留；E 仍只使用小块肉，苹果不触发新使用效果。
+7. PlayMode 前把三种生态 gatherableDensityPer100m2 设为 0，重新导入/烘焙并进入，确认无采集点且 F 拒绝，gatherObjectId 和绑定仍必填。恢复密度后调整采集距离/时长/产出数量及种子/revision，重新烘焙核对生效；缺失 gatherObjectId/绑定、引用非采集物、未知 yieldItemId、非正交互/时长/数量、开启任一阻挡/再生或旧版本须明确报错，无默认补全或来源回退。
+8. 停止重进、切换 Forest/Grassland 及 Json/BuiltIn，核对无重复地表、静态物体或采集 Ghost，SubScene/World 释放无遗留。回归镜头、32 敌人/8 列/间距 3/首点 (0,1,16)、加入/复活位置、近战反击、E 小块肉、奖励与保存/恢复。
+
+验收结束恢复 Json/Forest、schemaVersion=3、configRevision=3、seed=12345、32 敌人、树木密度 0.4/1.5/0.1 和原 movement 参数；采集密度 0.6/0.5/0.2、gatherObjectId=gather_apple、占地 0.3、间距 1.5、距离 2、时长 1、vitality_apple ×1，三类阻挡/再生关闭。地图状态存档、再生、砍树、攻击遮挡、资源 UI、运行配置热重载和联网配置一致性协议未接入。AI 未运行 GamePlayer/PlayMode、游戏模拟/显示系统、逻辑单元测试、命令行构建、发布、性能采样或图片检查。

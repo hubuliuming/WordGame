@@ -203,6 +203,8 @@ MonoBehaviour:
     Prefab: {fileID: 8229334279263349665, guid: 224e536415945244cadf061b7d7a6944, type: 3}
   - ResourceKey: tree_normal
     Prefab: {fileID: 478490014354651204, guid: 0e1ec672d91fbb14189d0d4b8344d055, type: 3}
+  - ResourceKey: gather_apple
+    Prefab: {fileID: 581676323010680513, guid: 48970c8093712c140a78893657a8da0e, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

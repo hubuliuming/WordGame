@@ -85,13 +85,21 @@ namespace Code_01.CombatPrototype.Map
                     });
                 }
             }
-            // All trees reserve their footprints before any grass or pebble is placed.
+            // Trees reserve first, then gatherables, then the remaining decorations.
             foreach (var chunk in result.Chunks)
             for (var biome = 0; biome < config.biomes.Length; biome++)
             {
                 ReadCandidates(result, chunk, biome, candidates);
                 var configBiome = config.biomes[biome];
                 Place(configBiome.treeDensityPer100m2, objectIndices[configBiome.treeObjectId],
+                    candidates, config, result, spacing, occupancy, definition.layout, enemyColumns, enemySpacing, ref random);
+            }
+            foreach (var chunk in result.Chunks)
+            for (var biome = 0; biome < config.biomes.Length; biome++)
+            {
+                ReadCandidates(result, chunk, biome, candidates);
+                var configBiome = config.biomes[biome];
+                Place(configBiome.gatherableDensityPer100m2, objectIndices[configBiome.gatherObjectId],
                     candidates, config, result, spacing, occupancy, definition.layout, enemyColumns, enemySpacing, ref random);
             }
             foreach (var chunk in result.Chunks)

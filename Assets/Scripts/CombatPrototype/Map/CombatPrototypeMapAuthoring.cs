@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Code_01.CombatPrototype.Networking;
 using Unity.Entities;
+using Unity.NetCode;
 using UnityEngine;
 
 namespace Code_01.CombatPrototype.Map
@@ -132,10 +133,26 @@ namespace Code_01.CombatPrototype.Map
                             "; config=" + (authoring.SourceMode == CombatPrototypeMapConfigSourceMode.Json
                                 ? CombatPrototypeMapJsonReader.ResourcePath(authoring.ObjectsJson) : "BuiltIn") +
                             "; objectId=" + item.objectId + "; field=visualResourceKey.");
+                    var ghost = prefab.GetComponent<GhostAuthoringComponent>();
+                    var gather = prefab.GetComponent<CombatPrototypeMapGatherAuthoring>();
+                    if (item.gatherable)
+                    {
+                        if (gather == null || ghost == null || prefab.transform.childCount != 0 ||
+                            ghost.HasOwner || ghost.SupportAutoCommandTarget ||
+                            ghost.DefaultGhostMode != GhostMode.Interpolated || ghost.SupportedGhostModes != GhostModeMask.Interpolated)
+                            throw new InvalidOperationException("Gatherable requires one root and interpolated gather Ghost prefab; objectId=" +
+                                item.objectId + "; visualResourceKey=" + item.visualResourceKey);
+                    }
+                    else if (ghost != null || gather != null)
+                        throw new InvalidOperationException("Static map object cannot use a gather Ghost prefab; objectId=" + item.objectId);
                     objects.Add(new CombatPrototypeMapObject
                     {
                         ObjectId = item.objectId, ResourceKey = item.visualResourceKey,
-                        Prefab = GetEntity(prefab, TransformUsageFlags.Dynamic)
+                        Prefab = GetEntity(prefab, TransformUsageFlags.Dynamic),
+                        Gatherable = (byte)(item.gatherable ? 1 : 0),
+                        InteractionDistance = item.interactionDistanceMeters, GatherDuration = item.gatherDurationSeconds,
+                        YieldItemName = item.gatherable ? CombatPrototypeMapYieldItemResolver.Resolve(item.yieldItemId) : default,
+                        YieldQuantity = item.yieldQuantity
                     });
                 }
             }

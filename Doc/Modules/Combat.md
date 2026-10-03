@@ -74,7 +74,7 @@ ChangeAll 对完整操作先校验再应用，保存一次；失败不留下局�
 
 ## 【KNOWN ISSUES】地图阻挡与战斗回归
 
-敌人移动已接入共享的静态物体扫掠/滑动工具，编译与实际地图阻挡缓冲已静态核对。树前停动、双端位置同步、目标切换、前后摇、近战/反击及奖励回归的人工 GamePlayer 仍为 UNKNOWN，范围归[运行入口](Runtime.md)。攻击遮挡未接入，既有战斗阶段人工通过不扩展为地图第三阶段通过。
+敌人移动已接入共享的静态物体扫掠/滑动工具，编译与实际地图阻挡缓冲已静态核对；用户已确认地图第三阶段人工 GamePlayer 验收通过，主线程结合既有静态核对判定该阶段通过。敌人范围覆盖树前阻挡/滑动/停止、双端位置同步、目标切换、前后摇、近战/反击及奖励回归，完整边界归[运行入口](Runtime.md)。攻击遮挡和全局绕路未接入，性能、平台构建和线上联调仍为 UNKNOWN。
 
 ## 【KNOWN ISSUES】第 2B 阶段战斗验收
 
@@ -156,7 +156,7 @@ Ghost 字段、Baker 和资源引用已形成实际烘焙数据；用户已确�
 
 ## 【CURRENT STRATEGY】网络原型战斗顺序与反击
 
-服务端预测模拟组当前顺序：`PlayerMovement → EnemyMovement → EnemySpatial → ItemUse → MeleeServer → Damage → Reward/SavePrepared → EnemyAttack → PlayerDamage → PlayerRespawn`。第 7A [物品使用](Inventory.md) 在近战前恢复体力，第 6B 复活仍在玩家伤害后。
+服务端预测模拟组当前顺序：`PlayerMovement → EnemyMovement → EnemySpatial → ItemUse → MeleeServer → Damage → Reward/SavePrepared → EnemyAttack → PlayerDamage → MapGather/SavePrepared → PlayerRespawn`。第 7A [物品使用](Inventory.md) 在近战前恢复体力，地图采集在当次伤害后检查生命/HitSequence 并取消失效预约，随后才结算仍有效的采集；第 6B 复活在采集之后。采集不修改近战、反击、原奖励规则，完整规则归 [背包与道具](Inventory.md)。
 
 - [敌人攻击系统](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypeEnemyAttackSystem.cs) 复用当前最近在线存活目标。Ready 仅在 X/Z 距离不超过 1.75 时锁定该实体及 NetworkId，递增一次攻击序号并进入 0.5 秒前摇；前摇与后摇中敌人停止移动和旋转。
 - 前摇结束先进入 1 秒后摇，再对锁定目标重新确认 Connected、NetworkStreamInGame、CommandTarget、玩家生命与 X/Z 距离。目标离线、死亡或出范围则空击，同次挥击不换目标；命中只添加一条伤害 10 的玩家事件，后摇不再产生命中。后摇结束清空锁定目标并回 Ready。
@@ -184,4 +184,4 @@ Ghost 字段、Baker 和资源引用已形成实际烘焙数据；用户已确�
 
 ## 【FACT】战斗地图与群体生成边界
 
-敌人生成等待地图数据就绪；原 Spawner Baker 取得地图默认来源中的初始总量和原点，保留原列数/间距后交给 EnemySpawnSystem。地图布局与当前位置统一归[战斗地图](Map.md)。静态草丛和碎石没有 EnemyState、Ghost 或伤害事件，不参与现有敌人空间索引与近战结算；原直线追踪没有接入地图碰撞、寻路或攻击遮挡。移动、反击、伤害、奖励和保存规则保持原实现，地图接入后的人工回归范围见[运行入口](Runtime.md)。
+敌人生成等待地图数据就绪；原 Spawner Baker 取得地图默认来源中的初始总量和原点，保留原列数/间距后交给 EnemySpawnSystem。地图布局与当前位置统一归[战斗地图](Map.md)。草丛/碎石/树木没有 EnemyState、Ghost 或伤害事件，不参与敌人空间索引与近战结算；gather_apple 虽为 Ghost，也没有 EnemyState 或伤害链，攻击只取消玩家预约，不破坏采集点。敌人追踪已使用第三阶段静态树木扫掠/滑动，寻路和攻击遮挡未接入。原反击、伤害、击杀奖励与保存规则保持，地图第四阶段原玩法回归仍待 [人工验收](Runtime.md)。

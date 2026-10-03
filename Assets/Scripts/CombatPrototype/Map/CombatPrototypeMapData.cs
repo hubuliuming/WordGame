@@ -19,6 +19,10 @@ namespace Code_01.CombatPrototype.Map
         public float PlayerSpawnSpacing;
         public float3 EnemySpawnOrigin;
         public int EnemyCount;
+        public float PlayerRadius;
+        public float EnemyRadius;
+        public float CollisionSkin;
+        public int MaxSlideIterations;
     }
 
     [InternalBufferCapacity(0)]
@@ -44,6 +48,15 @@ namespace Code_01.CombatPrototype.Map
         public int ObjectIndex;
         public float3 Position;
         public float YawRadians;
+    }
+
+    [InternalBufferCapacity(0)]
+    public struct CombatPrototypeMapObstacle : IBufferElementData
+    {
+        public int PlacementIndex;
+        public int ObjectIndex;
+        public float2 Position;
+        public float Radius;
     }
 
     [InternalBufferCapacity(0)]

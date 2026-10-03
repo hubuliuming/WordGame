@@ -17,7 +17,7 @@ namespace Code_01.CombatPrototype.Map
             {
                 map = new MapDefinitionConfig
                 {
-                    schemaVersion = 1, configRevision = 1,
+                    schemaVersion = 2, configRevision = 2,
                     mapDefinitionId = mapDefinitionId, defaultSeed = 12345,
                     geometry = new MapGeometryConfig
                     {
@@ -29,6 +29,11 @@ namespace Code_01.CombatPrototype.Map
                         mainPathGroundId = "grass", mainPathWidthMeters = 4f, minimumPathWidthMeters = 2f,
                         edgeKeepoutMeters = 2f, spawnSafeRadiusMeters = 6f,
                         combatClearRadiusMeters = 8f, enemySpawnMinDistanceMeters = 12f
+                    },
+                    movement = new MapMovementConfig
+                    {
+                        playerRadiusMeters = 0.4f, enemyRadiusMeters = 0.45f,
+                        collisionSkinMeters = 0.01f, maxSlideIterations = 3
                     },
                     population = new MapPopulationConfig { initialEnemyCount = 32 },
                     spawn = new MapSpawnConfig
@@ -74,6 +79,12 @@ namespace Code_01.CombatPrototype.Map
                     {
                         objectId = "decor_pebble", visualResourceKey = "decor_pebble",
                         footprintRadiusMeters = 0.3f, minimumSameTypeSpacingMeters = 2.5f
+                    },
+                    new MapObjectDefinitionConfig
+                    {
+                        objectId = "tree_normal", visualResourceKey = "tree_normal",
+                        footprintRadiusMeters = 0.5f, minimumSameTypeSpacingMeters = 3f,
+                        blocksMovement = true, interactionDistanceMeters = 2f, gatherDurationSeconds = 1f
                     }
                 }
             };
@@ -89,7 +100,7 @@ namespace Code_01.CombatPrototype.Map
             float tree, float gatherable, float rock) => new BiomeDefinitionConfig
         {
             biomeId = id, groundId = ground, decorationObjectId = "decor_grass",
-            rockObjectId = "decor_pebble", decorationDensityPer100m2 = grass,
+            rockObjectId = "decor_pebble", treeObjectId = "tree_normal", decorationDensityPer100m2 = grass,
             treeDensityPer100m2 = tree, gatherableDensityPer100m2 = gatherable,
             rockDensityPer100m2 = rock
         };

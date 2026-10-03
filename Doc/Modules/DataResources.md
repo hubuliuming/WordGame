@@ -192,7 +192,7 @@ EditorTest 声明以下菜单；三个重写菜单直接写入上表对应 JSON�
 
 [.gitignore](../../.gitignore) 仅新增 /UserSettings/CombatPrototypeStartupSettings.json 的忽略规则；其他 UserSettings 文件的管理方式保持。没有启动设置文件的开发环境可在该窗口明确保存候选值建立配置，启动入口自身不自动补配置。
 
-开发身份仍使用原 -combatPrototypePlayerId 优先及 CombatPrototypeDevelopmentIdentity.json 按 World.Name 读取规则。窗口只展示实际来源并提供文件定位，不复制或改写 PlayerId。原服务端存档路径、格式、固定 ID 契约以及正式 PlayerDataStore JSON 保持。生命、体力、攻击等玩法数值仍保存于各 Authoring 所属资源；地图默认来源提供尺寸、布局、出生原点与敌人总量，原 Spawner 保留列数/间距，两者沿烘焙链生效，配置契约归[战斗地图](Map.md)，均不加入启动 JSON。
+开发身份仍使用原 -combatPrototypePlayerId 优先及 CombatPrototypeDevelopmentIdentity.json 按 World.Name 读取规则。窗口只展示实际来源并提供文件定位，不复制或改写 PlayerId。原服务端存档路径、格式、固定 ID 契约以及正式 PlayerDataStore JSON 保持。生命、体力、攻击等玩法数值仍保存于各 Authoring 所属资源；地图配置来源提供尺寸、布局、出生原点与敌人总量，原 Spawner 保留列数/间距，两者沿烘焙链生效，配置契约归[战斗地图](Map.md)，均不加入启动 JSON。
 
 ## 【KNOWN ISSUES】Editor 启动配置验证范围
 
@@ -204,6 +204,6 @@ EditorTest 声明以下菜单；三个重写菜单直接写入上表对应 JSON�
 
 ## 【FACT】网络战斗地图配置与资源
 
-Assets/Scripts/CombatPrototype/Map/ 包含四类可序列化配置、配置集合、来源接口、默认来源、边界校验、Authoring/Baker 和地图数据/显示脚本。当前使用默认来源，没有实际地图 JSON 文件读取或运行状态写盘；资源键通过 SubScene 的 GroundMaterials、DecorationPrefabs 显式绑定，字段契约与资源映射统一归[战斗地图](Map.md)。
+Assets/Scripts/CombatPrototype/Map/ 包含四类配置、地图子段 MapMovementConfig、配置集合、来源接口、内置/JSON 来源、JSON 读取及边界校验、Authoring/Baker、地图数据/显示脚本及共享移动阻挡工具。当前 SubScene 的 SourceMode=Json，显式绑定 Assets/Config/CombatPrototype/Map/ 下的两份地图对象 JSON 与三份共享数组 JSON；原材质和装饰仍通过 GroundMaterials、DecorationPrefabs 按稳定键绑定。文件/字段契约、来源切换和错误处理统一归[战斗地图](Map.md)。当前整组配置契约为 schemaVersion=2，两份地图包含必填 movement 段，生态包含 treeObjectId，物体包含 tree_normal；JSON 在烘焙时读取为固定 ECS 数据及静态阻挡缓冲，两个相关 Baker 均登记使用文件的内容依赖。移动参数通过地图数据接入，不增加玩家/敌人 Prefab 字段；没有运行时外部配置加载、热重载或地图状态写盘。
 
-新资源位于 Assets/Art/Map/CombatPrototype/ 与 Assets/Prefabs/CombatPrototype/Map/，包括 4 个材质、2 个网格和 2 个静态装饰 Prefab。新增资源和脚本 meta 由 Unity 导入生成；既有玩家/敌人资源、旧 meta、Bundle、包与构建设置保持。地表运行网格及装饰实体由客户端地图显示系统拥有和清理，共享资源不随地图根实体释放而销毁。该模块没有调用背包或玩家存档 Load/SavePrepared，也不保存地图对象状态。
+新资源位于 Assets/Art/Map/CombatPrototype/ 与 Assets/Prefabs/CombatPrototype/Map/，包括 5 个材质、3 个网格和 3 个静态物体 Prefab，普通树木为 TreeNormal.mat、TreeNormal.asset、TreeNormal.prefab。新增资源和脚本 meta 由 Unity 导入生成；既有玩家/敌人资源、旧 meta、Bundle、包与构建设置保持。地表运行网格及草丛/碎石/树木实体由客户端地图显示系统拥有和清理，共享资源不随地图根实体释放而销毁。树木不是 Ghost，阻挡数据随原地图根实体存在；玩家预测与服务端敌人移动读取同一烘焙结构。该模块没有调用背包或玩家存档 Load/SavePrepared，也不保存地图对象状态。

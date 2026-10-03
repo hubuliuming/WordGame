@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 2,
+  "configRevision": 2,
+  "mapDefinitionId": "battle_forest_01",
+  "defaultSeed": 12345,
+  "geometry": {
+    "cellSizeMeters": 2.0,
+    "cellsPerChunk": 16,
+    "chunkCountX": 3,
+    "chunkCountZ": 3,
+    "baseHeightMeters": 0.0
+  },
+  "layout": {
+    "mainPathGroundId": "grass",
+    "mainPathWidthMeters": 4.0,
+    "minimumPathWidthMeters": 2.0,
+    "edgeKeepoutMeters": 2.0,
+    "spawnSafeRadiusMeters": 6.0,
+    "combatClearRadiusMeters": 8.0,
+    "enemySpawnMinDistanceMeters": 12.0
+  },
+  "movement": {
+    "playerRadiusMeters": 0.4,
+    "enemyRadiusMeters": 0.45,
+    "collisionSkinMeters": 0.01,
+    "maxSlideIterations": 3
+  },
+  "population": {
+    "initialEnemyCount": 32
+  },
+  "spawn": {
+    "playerOriginX": 0.0,
+    "playerOriginZ": 0.0,
+    "playerSpacingMeters": 2.0,
+    "actorHeightOffsetMeters": 1.0,
+    "enemyOriginX": 0.0,
+    "enemyOriginZ": 16.0
+  },
+  "biomeIds": [
+    "grassland",
+    "forest",
+    "rocky"
+  ],
+  "defaultBiomeId": "forest",
+  "biomeRegions": [
+    {
+      "biomeId": "grassland",
+      "minX": 0.3,
+      "minZ": 0.3,
+      "maxX": 0.7,
+      "maxZ": 0.7
+    },
+    {
+      "biomeId": "rocky",
+      "minX": 0.75,
+      "minZ": 0.0,
+      "maxX": 1.0,
+      "maxZ": 0.35
+    }
+  ]
+}

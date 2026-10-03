@@ -1,3 +1,4 @@
+using Code_01.CombatPrototype.Map;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -36,6 +37,7 @@ namespace Code_01.CombatPrototype.Networking
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<CombatPrototypePlayerSpawner>();
+            state.RequireForUpdate<CombatPrototypeMapData>();
         }
 
         public void OnUpdate(ref SystemState state)
@@ -66,6 +68,8 @@ namespace Code_01.CombatPrototype.Networking
                 });
             }
 
+            var map = SystemAPI.GetSingleton<CombatPrototypeMapData>();
+            var obstacles = SystemAPI.GetSingletonBuffer<CombatPrototypeMapObstacle>(true).AsNativeArray();
             var deltaTime = SystemAPI.Time.DeltaTime;
             foreach (var (transform, health, movement, target, attack) in SystemAPI.Query<
                          RefRW<LocalTransform>, RefRO<CombatPrototypeEnemyState>,
@@ -106,7 +110,10 @@ namespace Code_01.CombatPrototype.Networking
                 if (distance <= movement.ValueRO.StopDistance)
                     continue;
                 var step = math.min(movement.ValueRO.MoveSpeed * deltaTime, distance - movement.ValueRO.StopDistance);
-                transform.ValueRW.Position += direction * (step / distance);
+                var position = transform.ValueRO.Position;
+                var resolved = CombatPrototypeMapMovementUtility.Move(position.xz, direction.xz * (step / distance),
+                    map.EnemyRadius, in map, obstacles);
+                transform.ValueRW.Position = new float3(resolved.x, position.y, resolved.y);
             }
         }
     }

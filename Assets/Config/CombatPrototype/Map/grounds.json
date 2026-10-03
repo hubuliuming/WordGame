@@ -1,0 +1,20 @@
+[
+  {
+    "groundId": "grass",
+    "visualResourceKey": "ground_grass",
+    "walkable": true,
+    "movementMultiplier": 1.0
+  },
+  {
+    "groundId": "forest_floor",
+    "visualResourceKey": "ground_forest",
+    "walkable": true,
+    "movementMultiplier": 1.0
+  },
+  {
+    "groundId": "rock",
+    "visualResourceKey": "ground_rock",
+    "walkable": true,
+    "movementMultiplier": 1.0
+  }
+]

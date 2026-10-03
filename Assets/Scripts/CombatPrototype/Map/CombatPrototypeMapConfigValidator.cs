@@ -8,14 +8,14 @@ namespace Code_01.CombatPrototype.Map
         public static void Validate(CombatMapConfigSet config)
         {
             if (config == null || config.map == null || config.map.geometry == null ||
-                config.map.layout == null || config.map.population == null || config.map.spawn == null ||
+                config.map.layout == null || config.map.movement == null || config.map.population == null || config.map.spawn == null ||
                 config.biomes == null || config.grounds == null || config.objects == null ||
                 config.map.biomeIds == null || config.map.biomeRegions == null)
                 throw new InvalidOperationException("Map configuration is missing required sections.");
             var map = config.map;
             Id(map.mapDefinitionId, "mapDefinitionId");
-            if (map.schemaVersion != 1 || map.configRevision < 1 || map.defaultSeed < 1)
-                throw new InvalidOperationException("Map requires schemaVersion=1, positive revision and seed.");
+            if (map.schemaVersion != 2 || map.configRevision < 1 || map.defaultSeed < 1)
+                throw new InvalidOperationException("Map requires schemaVersion=2, positive revision and seed.");
             var geometry = map.geometry;
             Positive(geometry.cellSizeMeters, "cellSizeMeters");
             Finite(geometry.baseHeightMeters, "baseHeightMeters");
@@ -40,6 +40,17 @@ namespace Code_01.CombatPrototype.Map
                 halfExtent <= 0f || layout.mainPathWidthMeters * 0.5f > halfExtent ||
                 Math.Max(layout.spawnSafeRadiusMeters, layout.combatClearRadiusMeters) > halfExtent)
                 throw new InvalidOperationException("Map layout does not fit the configured bounds.");
+            var movement = map.movement;
+            Positive(movement.playerRadiusMeters, "movement.playerRadiusMeters");
+            Positive(movement.enemyRadiusMeters, "movement.enemyRadiusMeters");
+            Positive(movement.collisionSkinMeters, "movement.collisionSkinMeters");
+            if (movement.collisionSkinMeters >= Math.Min(movement.playerRadiusMeters, movement.enemyRadiusMeters))
+                throw new InvalidOperationException("movement.collisionSkinMeters must be smaller than both actor radii.");
+            if (movement.maxSlideIterations < 1 || movement.maxSlideIterations > 8)
+                throw new InvalidOperationException("movement.maxSlideIterations must be between 1 and 8.");
+            if (layout.minimumPathWidthMeters < 2f *
+                (Math.Max(movement.playerRadiusMeters, movement.enemyRadiusMeters) + movement.collisionSkinMeters))
+                throw new InvalidOperationException("minimumPathWidthMeters must fit the actor diameter and collision skin.");
             if (map.population.initialEnemyCount <= 0)
                 throw new InvalidOperationException("initialEnemyCount must be positive.");
             var spawn = map.spawn;
@@ -68,6 +79,8 @@ namespace Code_01.CombatPrototype.Map
                 Unique(objectIds, item.objectId, "objectId");
                 Id(item.visualResourceKey, "object.visualResourceKey");
                 Nonnegative(item.footprintRadiusMeters, "footprintRadiusMeters");
+                if (item.blocksMovement && item.footprintRadiusMeters <= 0f)
+                    throw new InvalidOperationException("Movement blocker requires a positive footprintRadiusMeters; objectId=" + item.objectId);
                 Positive(item.minimumSameTypeSpacingMeters, "minimumSameTypeSpacingMeters");
                 Nonnegative(item.interactionDistanceMeters, "interactionDistanceMeters");
                 Nonnegative(item.gatherDurationSeconds, "gatherDurationSeconds");
@@ -89,6 +102,7 @@ namespace Code_01.CombatPrototype.Map
                 Reference(groundIds, biome.groundId, "biome.groundId");
                 Reference(objectIds, biome.decorationObjectId, "biome.decorationObjectId");
                 Reference(objectIds, biome.rockObjectId, "biome.rockObjectId");
+                Reference(objectIds, biome.treeObjectId, "biome.treeObjectId");
                 Nonnegative(biome.decorationDensityPer100m2, "decorationDensityPer100m2");
                 Nonnegative(biome.treeDensityPer100m2, "treeDensityPer100m2");
                 Nonnegative(biome.gatherableDensityPer100m2, "gatherableDensityPer100m2");

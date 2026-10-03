@@ -77,7 +77,11 @@ ChangeAll 先得到本次最终上限，再据其约束本次有非零增量的�
 
 `CombatPrototypePlayerNetCodeAuthoring` 为玩家 Ghost 烘焙速度 `5`、`CombatPrototypePlayerInput` 和近战数据；NetCode 为 `IInputComponentData` 生成输入缓冲。服务端握手后设置 `GhostOwner.NetworkId`、启用 `AutoCommandTarget`，并把连接 `CommandTarget` 指向玩家；玩家加入连接 `LinkedEntityGroup`，跟随断线销毁。
 
-玩家 Ghost 使用 `OwnerPredicted`：本地拥有者预测，其他客户端插值。`CombatPrototypePlayerInputSystem` 只给 `GhostOwnerIsLocal` 写入由当前本地镜头水平角转换的世界 X/Z Move，以及空格/鼠标左键 `InputEvent` 攻击事件；第 6B 增加 R 键 `Respawn`，第 7A 增加 E 键 `UseItem` 输入事件。`CombatPrototypePlayerMovementSystem` 在 Client/Server 预测组中只处理带 `Simulate` 的实体，以相同输入更新 LocalTransform；移动输入拒绝非有限值并限制长度，旋转直接设置当前移动朝向。网络玩家仍不接第 1 阶段 CharacterController 脚本的移动、重力或碰撞链；网络镜头与输入转换采用本页“本地跟随镜头”定义的独立入口。
+玩家 Ghost 使用 `OwnerPredicted`：本地拥有者预测，其他客户端插值。`CombatPrototypePlayerInputSystem` 只给 `GhostOwnerIsLocal` 写入由当前本地镜头水平角转换的世界 X/Z Move，以及空格/鼠标左键 `InputEvent` 攻击事件；第 6B 增加 R 键 `Respawn`，第 7A 增加 E 键 `UseItem` 输入事件。`CombatPrototypePlayerMovementSystem` 等待地图数据，在 Client/Server 预测组中只处理带 `Simulate` 且存活的实体；移动输入拒绝非有限值并限制长度，位移通过共享的 CombatPrototypeMapMovementUtility 对静态阻挡圆进行扫掠及滑动，再更新 LocalTransform。角色 Y、速度和按输入设置朝向的规则保持；地图占地、留缝及烘焙阻挡数据归[战斗地图](Map.md)。网络玩家仍不接第 1 阶段 CharacterController 脚本的移动、重力或碰撞链；网络镜头与输入转换采用本页“本地跟随镜头”定义的独立入口。
+
+## 【KNOWN ISSUES】地图移动阻挡验收
+
+静态脚本与地图烘焙数据已核对，玩家树木阻挡、滑动手感、本地预测与远端同步、死亡/复活及原玩法回归的人工 GamePlayer 结果仍为 UNKNOWN，范围归[运行入口](Runtime.md)。既有网络玩家阶段人工通过不扩展为地图第三阶段通过。
 
 ## 【KNOWN ISSUES】第 2B 阶段玩家验收
 

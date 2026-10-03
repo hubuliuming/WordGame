@@ -7,6 +7,7 @@ using UnityEngine;
 namespace Code_01.CombatPrototype.Map
 {
     public enum CombatPrototypeMapPreset { Grassland, Forest }
+    public enum CombatPrototypeMapConfigSourceMode { BuiltIn, Json }
 
     [Serializable]
     public sealed class CombatPrototypeMapMaterialBinding
@@ -25,6 +26,12 @@ namespace Code_01.CombatPrototype.Map
     public sealed class CombatPrototypeMapAuthoring : MonoBehaviour
     {
         public CombatPrototypeMapPreset Preset = CombatPrototypeMapPreset.Forest;
+        public CombatPrototypeMapConfigSourceMode SourceMode = CombatPrototypeMapConfigSourceMode.BuiltIn;
+        public TextAsset GrasslandJson;
+        public TextAsset ForestJson;
+        public TextAsset BiomesJson;
+        public TextAsset GroundsJson;
+        public TextAsset ObjectsJson;
         public CombatPrototypeMapMaterialBinding[] GroundMaterials;
         public CombatPrototypeMapPrefabBinding[] DecorationPrefabs;
 
@@ -37,9 +44,40 @@ namespace Code_01.CombatPrototype.Map
                 case CombatPrototypeMapPreset.Forest: id = CombatPrototypeDefaultMapConfigSource.ForestId; break;
                 default: throw new InvalidOperationException("Unknown map preset: " + Preset);
             }
-            // Configuration data and Unity resource bindings remain separate.
-            ICombatMapConfigSource source = new CombatPrototypeDefaultMapConfigSource();
+            ICombatMapConfigSource source;
+            switch (SourceMode)
+            {
+                case CombatPrototypeMapConfigSourceMode.BuiltIn:
+                    source = new CombatPrototypeDefaultMapConfigSource();
+                    break;
+                case CombatPrototypeMapConfigSourceMode.Json:
+                    source = new CombatPrototypeJsonMapConfigSource(SelectedDefinitionJson(), BiomesJson, GroundsJson, ObjectsJson);
+                    break;
+                default:
+                    throw new InvalidOperationException("Unknown map configuration source: " + SourceMode);
+            }
             return source.LoadValidated(id);
+        }
+
+        public void RegisterConfigDependencies(IBaker baker)
+        {
+            if (SourceMode == CombatPrototypeMapConfigSourceMode.BuiltIn) return;
+            if (SourceMode != CombatPrototypeMapConfigSourceMode.Json)
+                throw new InvalidOperationException("Unknown map configuration source: " + SourceMode);
+            baker.DependsOn(SelectedDefinitionJson());
+            baker.DependsOn(BiomesJson);
+            baker.DependsOn(GroundsJson);
+            baker.DependsOn(ObjectsJson);
+        }
+
+        private TextAsset SelectedDefinitionJson()
+        {
+            switch (Preset)
+            {
+                case CombatPrototypeMapPreset.Grassland: return GrasslandJson;
+                case CombatPrototypeMapPreset.Forest: return ForestJson;
+                default: throw new InvalidOperationException("Unknown map preset: " + Preset);
+            }
         }
 
         private sealed class Baker : Baker<CombatPrototypeMapAuthoring>
@@ -49,6 +87,7 @@ namespace Code_01.CombatPrototype.Map
                 var spawner = GetComponent<CombatPrototypePlayerSpawnerAuthoring>();
                 if (spawner == null)
                     throw new InvalidOperationException("Map authoring requires the existing player spawner on the same root.");
+                authoring.RegisterConfigDependencies(this);
                 var config = authoring.LoadMapConfig();
                 var materials = ReadMaterials(authoring.GroundMaterials);
                 var prefabs = ReadPrefabs(authoring.DecorationPrefabs);
@@ -61,11 +100,16 @@ namespace Code_01.CombatPrototype.Map
                 foreach (var cell in layout.Cells) cells.Add(cell);
                 var decorations = AddBuffer<CombatPrototypeMapDecoration>(entity);
                 foreach (var decoration in layout.Decorations) decorations.Add(decoration);
+                var obstacles = AddBuffer<CombatPrototypeMapObstacle>(entity);
+                foreach (var obstacle in layout.Obstacles) obstacles.Add(obstacle);
                 var grounds = AddBuffer<CombatPrototypeMapGround>(entity);
                 foreach (var ground in config.grounds)
                 {
                     if (!materials.TryGetValue(ground.visualResourceKey, out var material))
-                        throw new InvalidOperationException("Missing map ground material: " + ground.visualResourceKey);
+                        throw new InvalidOperationException("Missing map ground material: " + ground.visualResourceKey +
+                            "; config=" + (authoring.SourceMode == CombatPrototypeMapConfigSourceMode.Json
+                                ? CombatPrototypeMapJsonReader.ResourcePath(authoring.GroundsJson) : "BuiltIn") +
+                            "; groundId=" + ground.groundId + "; field=visualResourceKey.");
                     DependsOn(material);
                     grounds.Add(new CombatPrototypeMapGround
                     {
@@ -84,7 +128,10 @@ namespace Code_01.CombatPrototype.Map
                 foreach (var item in config.objects)
                 {
                     if (!prefabs.TryGetValue(item.visualResourceKey, out var prefab))
-                        throw new InvalidOperationException("Missing map decoration prefab: " + item.visualResourceKey);
+                        throw new InvalidOperationException("Missing map decoration prefab: " + item.visualResourceKey +
+                            "; config=" + (authoring.SourceMode == CombatPrototypeMapConfigSourceMode.Json
+                                ? CombatPrototypeMapJsonReader.ResourcePath(authoring.ObjectsJson) : "BuiltIn") +
+                            "; objectId=" + item.objectId + "; field=visualResourceKey.");
                     objects.Add(new CombatPrototypeMapObject
                     {
                         ObjectId = item.objectId, ResourceKey = item.visualResourceKey,

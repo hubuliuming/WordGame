@@ -70,7 +70,11 @@ ChangeAll 对完整操作先校验再应用，保存一次；失败不留下局�
 
 参数沿用第 1 阶段：伤害 `25`、距离 `2`、角度 `100°`、前摇 `0.18s`、命中阶段 `0.08s`、后摇 `0.3s`，敌人初始 HP `100`。命中将 HP 降至不小于 0、递增 `HitSequence`，HP 为 0 时设置 `IsDead=1`。死亡敌人保留同步状态，不再承受伤害；客户端实体显示系统据同步死亡标记禁用根实体的 MaterialMeshInfo。
 
-攻击阶段与攻击序号、敌人 HP/受击序号/死亡标记使用 `GhostField`；客户端不自行扣血。群体复用原敌人 Interpolated Ghost，客户端实体表现的边界见第 3B-2 节，不调用正式 `AttackCommand`、PlayerModel、掉落或存档，不含寻路避障、伤害预测或敌人复活；独立奖励接在首次死亡之后，见第 4B 节，敌人反击与玩家受伤见第 6A 节。
+攻击阶段与攻击序号、敌人 HP/受击序号/死亡标记使用 `GhostField`；客户端不自行扣血。群体复用原敌人 Interpolated Ghost，客户端实体表现的边界见第 3B-2 节，不调用正式 `AttackCommand`、PlayerModel、掉落或存档，不含寻路绕行、伤害预测或敌人复活；独立奖励接在首次死亡之后，见第 4B 节，敌人反击与玩家受伤见第 6A 节。
+
+## 【KNOWN ISSUES】地图阻挡与战斗回归
+
+敌人移动已接入共享的静态物体扫掠/滑动工具，编译与实际地图阻挡缓冲已静态核对。树前停动、双端位置同步、目标切换、前后摇、近战/反击及奖励回归的人工 GamePlayer 仍为 UNKNOWN，范围归[运行入口](Runtime.md)。攻击遮挡未接入，既有战斗阶段人工通过不扩展为地图第三阶段通过。
 
 ## 【KNOWN ISSUES】第 2B 阶段战斗验收
 
@@ -78,7 +82,7 @@ Ghost 字段、Baker 和资源引用已形成实际烘焙数据；用户已确�
 
 ## 【CURRENT STRATEGY】第 3A 阶段目标、空间查询与事件结算
 
-- CombatPrototypeEnemyMovementSystem 每个服务端模拟 tick 从同时具备 NetworkStreamInGame、NetworkId、CommandTarget 且连接状态为 Connected 的连接读取有效存活玩家目标；在 X/Z 平面选择最近者，同距离时选择较小 NetworkId。以速度 2 直线追踪，到距离 1.5 停止并限制当次步长，保持敌人 Y 不变；无目标、敌人死亡或处于第 6A 前摇/后摇时停止移动和旋转。
+- CombatPrototypeEnemyMovementSystem 每个服务端模拟 tick 从同时具备 NetworkStreamInGame、NetworkId、CommandTarget 且连接状态为 Connected 的连接读取有效存活玩家目标；在 X/Z 平面选择最近者，同距离时选择较小 NetworkId。沿玩家方向以速度 2 追踪，到距离 1.5 停止并限制当次步长；位移经共享 CombatPrototypeMapMovementUtility 处理静态阻挡后可滑动或停止，保持敌人 Y 不变。没有路径规划，成片树木可能阻断追踪；参数与空间规则归[战斗地图](Map.md)。无目标、敌人死亡或处于第 6A 前摇/后摇时停止移动和旋转。
 - CombatPrototypeEnemySpatialSystem 在敌人移动后重建格宽 2 的 X/Z 空间索引，只加入存活敌人，每个敌人恰好属于一个格子；索引使用可复用的 NativeParallelMultiHashMap，随 World 销毁释放。
 - CombatPrototypeMeleeServerSystem 保留 Ready → Startup → Active → Recovery → Ready。Startup 结束只查询一次与攻击范围相交的格子，再执行距离 2 与扇形 100° 过滤，为每个命中目标添加一条包含攻击者 NetworkId、攻击序号及伤害 25 的事件。每个格子只遍历一次，配合每个敌人只入一格，保证一次攻击对同一敌人最多产生一次事件；Active 阶段不重复查询。
 - CombatPrototypeDamageSystem 在近战系统之后消费各敌人的事件缓冲，统一写入 HP、HitSequence 和 IsDead；已死亡目标不再结算后续事件，缓冲在同 tick 清空，下一 tick 不重放。客户端从 Ghost 读取状态，不参与权威扣血。

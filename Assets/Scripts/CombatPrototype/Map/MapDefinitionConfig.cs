@@ -11,6 +11,7 @@ namespace Code_01.CombatPrototype.Map
         public int defaultSeed;
         public MapGeometryConfig geometry;
         public MapLayoutConfig layout;
+        public MapMovementConfig movement;
         public MapPopulationConfig population;
         public MapSpawnConfig spawn;
         public string[] biomeIds;

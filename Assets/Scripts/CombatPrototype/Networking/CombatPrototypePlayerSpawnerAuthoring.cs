@@ -26,6 +26,7 @@ namespace Code_01.CombatPrototype.Networking
                 var mapAuthoring = GetComponent<CombatPrototypeMapAuthoring>();
                 if (mapAuthoring == null)
                     throw new global::System.InvalidOperationException("CombatPrototypeNetworkRoot requires map authoring.");
+                mapAuthoring.RegisterConfigDependencies(this);
                 var map = mapAuthoring.LoadMapConfig().map;
                 if (authoring.EnemyColumns <= 0 || !math.isfinite(authoring.EnemySpacing) || authoring.EnemySpacing <= 0f)
                     throw new global::System.InvalidOperationException("CombatPrototypeNetworkRoot requires a valid enemy grid configuration.");

@@ -359,3 +359,34 @@
 
 - 新增 Doc/Modules/Map.md；局部同步 AI_Understanding、Runtime、Player、Combat、DataResources，以及项目外战斗地图配置建议模板的实装状态和 JSON 字段形状。本记录保留此前建议模板导出记录。
 - 主线程代码/资源/文档静态验收通过；人工 GamePlayer 的地图显示、跨端一致性、原玩法回归与生命周期清理仍为 UNKNOWN。实际 JSON 读取、树木、采集、碰撞/寻路/攻击遮挡、动态对象、再生和地图状态存档未接入。AI 未启动 PlayMode、执行逻辑单元测试、命令行构建、发布、性能采样或读取图片，未提交 Git。
+
+## 2026-10-03：战斗地图第一阶段人工验收通过
+
+- 用户明确反馈“我已验收通过，继续第二阶段”；主线程结合既有代码、资源与文档静态核对，判定战斗地图第一阶段通过。
+- 人工验收范围限 Runtime.md 已列清单：两种模板的地表/装饰与保护区域、初始敌人和加入/复活位置、双客户端一致性及原玩法回归、停止重进/模板切换与 SubScene/World 清理。性能、平台构建和线上联调仍为 UNKNOWN。
+- 局部同步 Map.md、Runtime.md 和项目外战斗地图配置建议模板的当前验收状态，并追加本记录；本轮未修改代码或资源，未创建子Agent。AI 未启动 PlayMode、执行逻辑单元测试、命令行构建、发布、性能采样或读取图片。
+
+## 2026-10-03：战斗地图第二阶段 JSON 配置接入
+
+- 用户确认执行方案并授权新增 JSON/脚本与 Unity 生成新 meta，以及原 SubScene MapAuthoring 的来源与文件引用字段；由主线程执行，未创建子Agent。
+- 新增 Assets/Config/CombatPrototype/Map/ 下 battle_grassland_01.json、battle_forest_01.json 两份地图对象及 biomes.json、grounds.json、objects.json 三份共享数组。五份文件从第一阶段默认来源导出为 UTF-8 无 BOM，地图尺寸、生态/装饰/出生数值、schemaVersion/configRevision=1 和种子 12345 保持。
+- 新增 CombatPrototypeMapJsonReader、CombatPrototypeJsonMapConfigSource、CombatPrototypeMapJsonBinding；读取 TextAsset.bytes，严格 UTF-8（支持 BOM）解码，检查必填/未知/重复字段、类型与数值表示范围，再沿原校验器检查版本/ID/引用/区域。JSON 模板 ID 必须与 Preset 匹配，错误保留文件/字段或语义原因；未绑定材质/Prefab 键的错误补齐对应 JSON 文件、条目 ID 和 visualResourceKey 字段，无自动默认来源回退。
+- 原 MapAuthoring 增加 SourceMode 与五份显式 TextAsset 引用；当前 SubScene 保存 Json/Forest，原资源键、材质/装饰绑定、根节点与组件列表保持。Editor 绑定菜单先校验两种配置及敌人网格，只保存该 SubScene；Map Baker 和 Spawner Baker 在读取前登记所用四份 JSON 的依赖，运行仍使用现有烘焙 ECS 数据。
+- Unity 编译与三个新增类型已加载；两种 JSON 配置与内置 DTO 逐字段一致。隔离 Editor 烘焙结果与第一阶段一致：两种均为 1 地图、9 块、2304 格、452 禁止装饰格，敌人 32/8 列/间距 3/首点 (0,1,16)，NetworkId=1 玩家点 (2,1,0)。Forest 地表格 512/1588/204、装饰 601/20；Grassland 地表格 1478/636/190、装饰 743/21，材质、装饰 Prefab 与玩家/敌人 Ghost 引用有效。
+- 隔离核对脚本初次遗漏 AddEntityGUID，产生一条 Ghost 烘焙异常记录；补齐核对参数并按读取前依赖顺序重新编译、重烘焙后 Console 计数无新增，旧记录保留。全部隔离 World/BlobAssetStore/临时场景已释放，原主场景保持干净 EditMode；未改游戏系统以规避该核对参数错误。
+- 局部同步 Map、Runtime、DataResources、AI_Understanding 及项目外策划模板的当前事实/读取时机/来源切换和第二阶段人工清单；第一阶段人工通过保持，第二阶段人工 GamePlayer 仍为 UNKNOWN。AI 未启动 PlayMode、执行游戏模拟或显示系统、逻辑单元测试、命令行构建、发布、性能采样或读取图片，未提交 Git。
+- 主线程最终静态验收通过：28 份任务文本严格 UTF-8、五份 JSON 与示例语法、文档链接、11 个新 meta 的 GUID 唯一性及 git diff/空白检查已核对。2,924 份既有文本资源基线中仅九份授权代码/Scene/文档发生变化，旧资源、旧 meta、包与构建设置保持；导航 8,183 字节，地图模块文档低于 20 KiB。最终 Unity 编译无脚本错误，人工 GamePlayer/性能/平台与线上验证仍未执行。
+
+## 2026-10-03 战斗地图第三阶段：树木生成与基础移动阻挡
+
+- 用户确认并授权第三阶段方案，由主线程执行。范围为普通树木静态生成、JSON v2 配置、移动扫掠/滑动接入、新占位资源及原 MapAuthoring 的一次树木绑定；未新增采集、砍树、攻击遮挡、寻路、再生、动态对象或地图状态存档。
+- MapDefinitionConfig 增加 movement 子段，BiomeDefinitionConfig 增加 treeObjectId；新增 MapMovementConfig，内置来源与两份地图 JSON 升级为 schemaVersion=2、configRevision=2。生态和物体 JSON 接入 tree_normal，grounds.json、地图尺寸、种子 12345、生态密度、出生位置及 32 敌人总量保持。旧 v1、缺段、无效引用及非法移动参数明确失败，无补字段或来源回退。
+- 树木占地半径 0.5 米、同类间距 3 米、blocksMovement=true；草原/森林/岩地密度 0.4/1.5/0.1 每 100㎡。先完成全图树木布置，再补草丛/碎石；空间桶检查同类间距及非零占地互斥，阻挡物避让额外计入角色半径和留缝。Baker 增加 CombatPrototypeMapObstacle 缓冲，保留原布置/资源缓冲和两个 Baker 的 JSON 内容依赖登记。
+- 新增 CombatPrototypeMapMovementUtility，共享 X/Z 圆形扫掠及有限次数滑动。玩家原 Client/Server 预测移动与敌人原服务端移动接入只读阻挡缓冲，角色 Y、输入归一化、死亡停动、速度/朝向、敌人目标/前后摇/停止距离和系统先后关系保持。默认 playerRadiusMeters=0.4、enemyRadiusMeters=0.45、collisionSkinMeters=0.01、maxSlideIterations=3；次数校验 1～8，留缝为正且小于两类半径，最小道路宽度须容纳最大角色直径与留缝。未增加输入/Ghost 字段或玩家/敌人 Prefab 组件。
+- 新增 Editor 树木资源生成与绑定脚本。新建 TreeNormal.mat、TreeNormal.asset、TreeNormal.prefab，原资源目录保持；占位树高 4 米、最大视觉半径 1.25 米，单根对象、单网格/材质、46 顶点、64 三角形，仅 Transform/MeshFilter/MeshRenderer，无 Collider/Animator/Ghost。原 SubScene 只追加 tree_normal Prefab 引用，原层级、组件列表、五份 JSON 引用、Preset=Forest、SourceMode=Json、材质和装饰引用保持。
+- 执行时首次只请求脚本编译，尚未完成新脚本资产导入便调用菜单，Unity 记录“菜单不存在”；该次未生成树木资源或改 Scene。完成全资源导入并确认新类型加载后，调用正式 Editor 入口完成资源生成与一次绑定；生成/绑定和有效烘焙未新增错误。Console 保留先前第二阶段检查器的 EntityGuid 异常和本次提前调用菜单的错误，未清空。
+- Unity 6000.5.6f1 正常编译并加载新类型；最终输入字段仍为 Move、Attack、Respawn、UseItem。两个模板从原保存 SubScene 克隆至临时 Editor 场景，使用 SkipCreatingCompanions|AddEntityGUID 的隔离烘焙；没有更新游戏模拟/显示系统。Json 与当前 BuiltIn 配置逐字段一致，两种模板均为 1 地图、9 块、2304 格、452 禁止布置格、96×96 米，revision=2、seed=12345，32 敌人/8 列/间距 3、首点 (0,1,16)，NetworkId=1 玩家位置 (2,1,0)。
+- 默认 Forest 静态产物为草丛 601、碎石 23、树木/阻挡记录 89；Grassland 为 744、21、53。最小树木中心间距分别为约 3.0768/3.0634 米；全部同类间距违规、占地重叠、保护区域违规和敌人出生重叠计数均为 0。阻挡索引/位置/半径、移动参数、地表材质、三个可渲染 Prefab 及原玩家/敌人 Ghost 引用有效，树木不含 GhostType。烘焙前后 Console 计数均为 [2,1,2]。
+- 完成后 Editor 未进入 PlayMode，只保留未脏的原主场景，无临时烘焙 World。Map、Player、Combat、Runtime、DataResources 和策划模板按受影响条目更新，策划模板的“实际 JSON 尚未创建”残留已修正；第二阶段人工验收清单改用当前 v2 默认值，第三阶段人工清单已记录，第二/第三阶段人工结果仍为 UNKNOWN，第一阶段人工通过范围保持。
+- 主线程资源/文档静态验收通过：3139 个既有非视觉文件的原始散列基线中，21 个文件在授权范围内变化，无范围外变化；新增 14 个文件及 7 个 Unity 生成的唯一 GUID。35 个本阶段文本文件严格 UTF-8、文档链接及森林 JSON 示例一致性、Scene 仅追加树木引用检查和 git diff --check 通过。AI 导航保持 8183 字节，Map 为 19183 字节；其他已有较大模块只修改关联段落，没有全量拆分或重写。
+- 未新增/运行逻辑单元测试、人工 GamePlayer、PlayMode、命令行构建、平台发布、性能采样或图片检查。实际阻挡/滑动、显示/清理、双端预测同步、配置调整生效和原战斗/存档回归仍待用户人工验收；静态烘焙不代表这些运行结果通过。

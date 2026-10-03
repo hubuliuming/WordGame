@@ -1,0 +1,50 @@
+[
+  {
+    "objectId": "decor_grass",
+    "visualResourceKey": "decor_grass",
+    "footprintRadiusMeters": 0.0,
+    "minimumSameTypeSpacingMeters": 0.5,
+    "interactionDistanceMeters": 0.0,
+    "blocksMovement": false,
+    "blocksMelee": false,
+    "blocksProjectile": false,
+    "gatherable": false,
+    "gatherDurationSeconds": 0.0,
+    "yieldItemId": null,
+    "yieldQuantity": 0,
+    "regrowEnabled": false,
+    "regrowSeconds": 0.0
+  },
+  {
+    "objectId": "decor_pebble",
+    "visualResourceKey": "decor_pebble",
+    "footprintRadiusMeters": 0.3,
+    "minimumSameTypeSpacingMeters": 2.5,
+    "interactionDistanceMeters": 0.0,
+    "blocksMovement": false,
+    "blocksMelee": false,
+    "blocksProjectile": false,
+    "gatherable": false,
+    "gatherDurationSeconds": 0.0,
+    "yieldItemId": null,
+    "yieldQuantity": 0,
+    "regrowEnabled": false,
+    "regrowSeconds": 0.0
+  },
+  {
+    "objectId": "tree_normal",
+    "visualResourceKey": "tree_normal",
+    "footprintRadiusMeters": 0.5,
+    "minimumSameTypeSpacingMeters": 3.0,
+    "interactionDistanceMeters": 2.0,
+    "blocksMovement": true,
+    "blocksMelee": false,
+    "blocksProjectile": false,
+    "gatherable": false,
+    "gatherDurationSeconds": 1.0,
+    "yieldItemId": null,
+    "yieldQuantity": 0,
+    "regrowEnabled": false,
+    "regrowSeconds": 0.0
+  }
+]

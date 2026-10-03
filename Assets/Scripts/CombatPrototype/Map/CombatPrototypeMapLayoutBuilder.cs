@@ -10,6 +10,7 @@ namespace Code_01.CombatPrototype.Map
         public readonly List<CombatPrototypeMapChunk> Chunks = new List<CombatPrototypeMapChunk>();
         public readonly List<CombatPrototypeMapCell> Cells = new List<CombatPrototypeMapCell>();
         public readonly List<CombatPrototypeMapDecoration> Decorations = new List<CombatPrototypeMapDecoration>();
+        public readonly List<CombatPrototypeMapObstacle> Obstacles = new List<CombatPrototypeMapObstacle>();
     }
 
     public static class CombatPrototypeMapLayoutBuilder
@@ -32,7 +33,11 @@ namespace Code_01.CombatPrototype.Map
                     PlayerSpawnOrigin = new float3(definition.spawn.playerOriginX, height, definition.spawn.playerOriginZ),
                     PlayerSpawnSpacing = definition.spawn.playerSpacingMeters,
                     EnemySpawnOrigin = new float3(definition.spawn.enemyOriginX, height, definition.spawn.enemyOriginZ),
-                    EnemyCount = definition.population.initialEnemyCount
+                    EnemyCount = definition.population.initialEnemyCount,
+                    PlayerRadius = definition.movement.playerRadiusMeters,
+                    EnemyRadius = definition.movement.enemyRadiusMeters,
+                    CollisionSkin = definition.movement.collisionSkinMeters,
+                    MaxSlideIterations = definition.movement.maxSlideIterations
                 }
             };
             ValidateEnemyGrid(result.Data, definition.layout, enemyColumns, enemySpacing);
@@ -49,6 +54,7 @@ namespace Code_01.CombatPrototype.Map
             for (var i = 0; i < spacing.Length; i++)
                 spacing[i] = new PlacementSpacing(config.objects[i].minimumSameTypeSpacingMeters);
             var candidates = new List<int>();
+            var occupancy = new PlacementOccupancy(result.Data.CellSize);
             var countPerChunk = geometry.cellsPerChunk * geometry.cellsPerChunk;
 
             for (var chunkZ = 0; chunkZ < geometry.chunkCountZ; chunkZ++)
@@ -78,20 +84,36 @@ namespace Code_01.CombatPrototype.Map
                         Reserved = (byte)(IsReserved(center, 0f, result.Data, definition.layout, enemyColumns, enemySpacing) ? 1 : 0)
                     });
                 }
-                for (var biome = 0; biome < config.biomes.Length; biome++)
-                {
-                    candidates.Clear();
-                    for (var i = chunk.FirstCell; i < chunk.FirstCell + chunk.CellCount; i++)
-                        if (result.Cells[i].BiomeIndex == biome && result.Cells[i].Reserved == 0)
-                            candidates.Add(i);
-                    var configBiome = config.biomes[biome];
-                    Place(configBiome.decorationDensityPer100m2, objectIndices[configBiome.decorationObjectId],
-                        candidates, config, result, spacing, definition.layout, enemyColumns, enemySpacing, ref random);
-                    Place(configBiome.rockDensityPer100m2, objectIndices[configBiome.rockObjectId],
-                        candidates, config, result, spacing, definition.layout, enemyColumns, enemySpacing, ref random);
-                }
+            }
+            // All trees reserve their footprints before any grass or pebble is placed.
+            foreach (var chunk in result.Chunks)
+            for (var biome = 0; biome < config.biomes.Length; biome++)
+            {
+                ReadCandidates(result, chunk, biome, candidates);
+                var configBiome = config.biomes[biome];
+                Place(configBiome.treeDensityPer100m2, objectIndices[configBiome.treeObjectId],
+                    candidates, config, result, spacing, occupancy, definition.layout, enemyColumns, enemySpacing, ref random);
+            }
+            foreach (var chunk in result.Chunks)
+            for (var biome = 0; biome < config.biomes.Length; biome++)
+            {
+                ReadCandidates(result, chunk, biome, candidates);
+                var configBiome = config.biomes[biome];
+                Place(configBiome.decorationDensityPer100m2, objectIndices[configBiome.decorationObjectId],
+                    candidates, config, result, spacing, occupancy, definition.layout, enemyColumns, enemySpacing, ref random);
+                Place(configBiome.rockDensityPer100m2, objectIndices[configBiome.rockObjectId],
+                    candidates, config, result, spacing, occupancy, definition.layout, enemyColumns, enemySpacing, ref random);
             }
             return result;
+        }
+
+        private static void ReadCandidates(CombatPrototypeMapLayout result, CombatPrototypeMapChunk chunk,
+            int biome, List<int> candidates)
+        {
+            candidates.Clear();
+            for (var i = chunk.FirstCell; i < chunk.FirstCell + chunk.CellCount; i++)
+                if (result.Cells[i].BiomeIndex == biome && result.Cells[i].Reserved == 0)
+                    candidates.Add(i);
         }
 
         private static void ValidateEnemyGrid(CombatPrototypeMapData map, MapLayoutConfig layout, int columns, float spacing)
@@ -134,13 +156,13 @@ namespace Code_01.CombatPrototype.Map
         }
 
         private static void Place(float density, int objectIndex, List<int> candidates, CombatMapConfigSet config,
-            CombatPrototypeMapLayout result, PlacementSpacing[] spacing, MapLayoutConfig layout,
+            CombatPrototypeMapLayout result, PlacementSpacing[] spacing, PlacementOccupancy occupancy, MapLayoutConfig layout,
             int columns, float enemySpacing, ref Unity.Mathematics.Random random)
         {
             var expected = candidates.Count * result.Data.CellSize * result.Data.CellSize * density / 100f;
             var target = (int)math.floor(expected);
             if (random.NextFloat() < expected - target) target++;
-            // One candidate per cell is sufficient for the phase-one decoration densities.
+            // Each content category can place at most one candidate per cell.
             target = math.min(target, candidates.Count);
             for (var i = candidates.Count - 1; i > 0; i--)
             {
@@ -155,15 +177,69 @@ namespace Code_01.CombatPrototype.Map
                 var coordinate = result.Cells[cellIndex].Coordinate;
                 var point = result.Data.Origin + (new float2(coordinate.x, coordinate.y) +
                     0.5f + random.NextFloat2(-0.35f, 0.35f)) * result.Data.CellSize;
-                if (IsReserved(point, definition.footprintRadiusMeters, result.Data, layout, columns, enemySpacing) ||
-                    !spacing[objectIndex].TryAdd(point))
+                var clearance = definition.footprintRadiusMeters;
+                if (definition.blocksMovement)
+                    clearance += math.max(result.Data.PlayerRadius, result.Data.EnemyRadius) + result.Data.CollisionSkin;
+                if (IsReserved(point, clearance, result.Data, layout, columns, enemySpacing) ||
+                    !occupancy.CanPlace(point, definition.footprintRadiusMeters) || !spacing[objectIndex].TryAdd(point))
                     continue;
+                var placementIndex = result.Decorations.Count;
                 result.Decorations.Add(new CombatPrototypeMapDecoration
                 {
                     ObjectIndex = objectIndex, Position = new float3(point.x, result.Data.BaseHeight, point.y),
                     YawRadians = random.NextFloat(0f, math.PI * 2f)
                 });
+                occupancy.Add(point, definition.footprintRadiusMeters);
+                if (definition.blocksMovement)
+                    result.Obstacles.Add(new CombatPrototypeMapObstacle
+                    {
+                        PlacementIndex = placementIndex, ObjectIndex = objectIndex,
+                        Position = point, Radius = definition.footprintRadiusMeters
+                    });
                 placed++;
+            }
+        }
+
+        private sealed class PlacementOccupancy
+        {
+            private struct Footprint
+            {
+                public float2 Position;
+                public float Radius;
+            }
+            private readonly float _cellSize;
+            private float _maximumRadius;
+            private readonly Dictionary<int2, List<Footprint>> _buckets = new Dictionary<int2, List<Footprint>>();
+            public PlacementOccupancy(float cellSize) { _cellSize = cellSize; }
+
+            public bool CanPlace(float2 point, float radius)
+            {
+                if (radius == 0f) return true;
+                var reach = radius + _maximumRadius;
+                var lower = (int2)math.floor((point - reach) / _cellSize);
+                var upper = (int2)math.floor((point + reach) / _cellSize);
+                for (var z = lower.y; z <= upper.y; z++)
+                for (var x = lower.x; x <= upper.x; x++)
+                    if (_buckets.TryGetValue(new int2(x, z), out var footprints))
+                        foreach (var footprint in footprints)
+                        {
+                            var separation = radius + footprint.Radius;
+                            if (math.distancesq(point, footprint.Position) < separation * separation) return false;
+                        }
+                return true;
+            }
+
+            public void Add(float2 point, float radius)
+            {
+                if (radius == 0f) return;
+                var key = (int2)math.floor(point / _cellSize);
+                if (!_buckets.TryGetValue(key, out var bucket))
+                {
+                    bucket = new List<Footprint>();
+                    _buckets.Add(key, bucket);
+                }
+                bucket.Add(new Footprint { Position = point, Radius = radius });
+                _maximumRadius = math.max(_maximumRadius, radius);
             }
         }
 

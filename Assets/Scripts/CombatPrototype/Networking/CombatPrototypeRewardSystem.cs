@@ -33,6 +33,7 @@ namespace Code_01.CombatPrototype.Networking
             var rewards = SystemAPI.GetComponentLookup<CombatPrototypePlayerReward>();
             var inventories = SystemAPI.GetBufferLookup<CombatPrototypeInventoryItem>();
             var identities = SystemAPI.GetComponentLookup<CombatPrototypePlayerIdentity>(true);
+            var ownedTools = SystemAPI.GetBufferLookup<Code_01.CombatPrototype.Map.CombatPrototypeMapGatherTool>(true);
             foreach (var (events, enemy) in SystemAPI.Query<DynamicBuffer<CombatPrototypeKillRewardEvent>>()
                          .WithEntityAccess())
             {
@@ -90,7 +91,8 @@ namespace Code_01.CombatPrototype.Networking
                         else
                             inventory.EnsureCapacity(checked(inventory.Length + 1));
 
-                        var candidate = CombatPrototypePlayerSaveStore.PrepareReward(playerId, next, inventory, itemIndex, nextItem);
+                        var tools = ownedTools[player];
+                        var candidate = CombatPrototypePlayerSaveStore.PrepareReward(playerId, next, inventory, tools, itemIndex, nextItem);
                         CombatPrototypePlayerSaveStore.SavePrepared(candidate);
 
                         // No structural changes or allocations occur between these writes.

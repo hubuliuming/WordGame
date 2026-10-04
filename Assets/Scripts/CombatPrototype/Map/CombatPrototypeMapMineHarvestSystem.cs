@@ -94,6 +94,7 @@ namespace Code_01.CombatPrototype.Map
                     var current = EntityManager.GetComponentData<CombatPrototypeMapMineState>(mine);
                     if (current.Phase != CombatPrototypeMapMinePhase.Mining) continue;
                     var progress = EntityManager.GetComponentData<CombatPrototypeMapMineProgress>(mine);
+                    var durabilitySaved = false;
                     try
                     {
                         var index = FindCollector(players, progress.Collector, current.CollectorNetworkId);
@@ -115,7 +116,7 @@ namespace Code_01.CombatPrototype.Map
                             continue;
                         }
                         if (time >= progress.FinishAt)
-                            Complete(source, mine, current, player, map, settings, tick, dropOwner);
+                            Complete(source, mine, current, player, map, settings, tick, dropOwner, out durabilitySaved);
                     }
                     catch (Exception exception)
                     {
@@ -124,9 +125,12 @@ namespace Code_01.CombatPrototype.Map
                             current.CollectorNetworkId + ", mine=" + mine + ", resource=" + settings.ResourceKey + ". " + exception);
                         try
                         {
+                        if (!durabilitySaved)
+                        {
                             var latest = EntityManager.GetComponentData<CombatPrototypeMapMineState>(mine);
                             if (latest.Phase == CombatPrototypeMapMinePhase.Mining)
                                 Cancel(mine, latest, map.MapDefinitionId, "ProcessingFailed");
+                        }
                         }
                         catch (Exception cleanup)
                         {
@@ -141,21 +145,23 @@ namespace Code_01.CombatPrototype.Map
         }
 
         internal bool TryBegin(Entity mine, Entity player, int networkId, uint hitSequence,
-            double time, FixedString64Bytes mapId, CombatPrototypeMapMineSettings settings)
+            double time, FixedString64Bytes mapId, CombatPrototypeMapMineSettings settings, Entity source)
         {
             var state = EntityManager.GetComponentData<CombatPrototypeMapMineState>(mine);
             if (state.Phase != CombatPrototypeMapMinePhase.Available) return false;
-            var progress = EntityManager.GetComponentData<CombatPrototypeMapMineProgress>(mine);
-            progress = new CombatPrototypeMapMineProgress
+            var toolKind = CombatPrototypeMapGatherToolUtility.SelectForWork(EntityManager, source, player,
+                CombatPrototypeMapGatherToolKind.Pickaxe, settings.HarvestDuration, out var duration);
+            var progress = new CombatPrototypeMapMineProgress
             {
-                Collector = player, StartHitSequence = hitSequence, FinishAt = time + settings.HarvestDuration
+                Collector = player, StartHitSequence = hitSequence, FinishAt = time + duration,
+                ToolKind = toolKind, ActualDuration = duration
             };
             state.Phase = CombatPrototypeMapMinePhase.Mining;
             state.CollectorNetworkId = networkId;
             EntityManager.SetComponentData(mine, progress);
             EntityManager.SetComponentData(mine, state);
             Debug.Log("[CombatPrototype.Map] Mine harvest started; map=" + mapId + ", placement=" +
-                state.PlacementIndex + ", NetworkId=" + networkId + ", duration=" + settings.HarvestDuration + ".");
+                state.PlacementIndex + ", NetworkId=" + networkId + ", tool=" + toolKind + ", duration=" + duration + ".");
             return true;
         }
 
@@ -202,65 +208,96 @@ namespace Code_01.CombatPrototype.Map
 
         private void Complete(Entity source, Entity mine, CombatPrototypeMapMineState state, OnlinePlayer player,
             CombatPrototypeMapData map, CombatPrototypeMapMineSettings settings, NetworkTick tick,
-            CombatPrototypeMapDropSpawnSystem dropOwner)
+            CombatPrototypeMapDropSpawnSystem dropOwner, out bool durabilitySaved)
         {
+            durabilitySaved = false;
             var index = _obstacles[state.PlacementIndex];
             var oldObstacle = EntityManager.GetBuffer<CombatPrototypeMapObstacle>(source)[index];
             var position = EntityManager.GetComponentData<LocalTransform>(mine).Position;
+            var toolKind = EntityManager.GetComponentData<CombatPrototypeMapMineProgress>(mine).ToolKind;
             var drop = Entity.Null;
             var dropId = 0;
             var historyLength = EntityManager.GetBuffer<CombatPrototypeMapMineBlockingEvent>(mine).Length;
+            var stage = "PrepareDrop";
             try
             {
                 drop = dropOwner.SpawnOwnedDrop(source, settings.DropPrefab, settings.DropResourceKey,
                     settings.DropItemId, settings.DropQuantity, position, out dropId);
-                // Instantiate invalidated handles; prepare history capacity before the nonstructural commit.
+                // Instantiate invalidated handles. Acquire every commit reference and capacity before saving.
+                stage = "PrepareCommit";
                 var history = EntityManager.GetBuffer<CombatPrototypeMapMineBlockingEvent>(mine);
                 history.EnsureCapacity(checked(historyLength + 1));
-                EntityManager.SetComponentData(mine, new CombatPrototypeMapMineProgress
+                var obstacles = EntityManager.GetBuffer<CombatPrototypeMapObstacle>(source);
+                var stateAccess = SystemAPI.GetComponentLookup<CombatPrototypeMapMineState>().GetRefRW(mine);
+                var progressAccess = SystemAPI.GetComponentLookup<CombatPrototypeMapMineProgress>().GetRefRW(mine);
+                var tools = EntityManager.GetBuffer<CombatPrototypeMapGatherTool>(player.Entity);
+                var nextProgress = new CombatPrototypeMapMineProgress
                 {
                     RegrowAt = settings.RegrowEnabled != 0 ? SystemAPI.Time.ElapsedTime + settings.RegrowSeconds : 0d
-                });
-                history.Add(new CombatPrototypeMapMineBlockingEvent { TransitionTick = tick.SerializedData, Disabled = 1 });
+                };
                 var obstacle = oldObstacle;
                 obstacle.Disabled = 1;
-                var obstacles = EntityManager.GetBuffer<CombatPrototypeMapObstacle>(source);
+                var nextState = state;
+                nextState.Phase = CombatPrototypeMapMinePhase.Depleted;
+                nextState.CollectorNetworkId = 0;
+                nextState.MinedTick = tick.SerializedData;
+                var transition = new CombatPrototypeMapMineBlockingEvent { TransitionTick = tick.SerializedData, Disabled = 1 };
+                var toolIndex = -1;
+                var nextTool = default(CombatPrototypeMapGatherTool);
+                if (toolKind != CombatPrototypeMapGatherToolKind.None)
+                {
+                    var definitions = EntityManager.GetBuffer<CombatPrototypeMapGatherToolDefinition>(source, true);
+                    nextTool = CombatPrototypeMapGatherToolUtility.PrepareConsumption(definitions, tools, toolKind, out toolIndex);
+                    var identity = EntityManager.GetComponentData<CombatPrototypePlayerIdentity>(player.Entity).PlayerId;
+                    var reward = EntityManager.GetComponentData<CombatPrototypePlayerReward>(player.Entity);
+                    var inventory = EntityManager.GetBuffer<CombatPrototypeInventoryItem>(player.Entity, true);
+                    var candidate = CombatPrototypePlayerSaveStore.PrepareToolUse(identity, reward, inventory, tools, toolIndex, nextTool);
+                    stage = "SaveDurability";
+                    CombatPrototypePlayerSaveStore.SavePrepared(candidate);
+                    durabilitySaved = true;
+                }
+                stage = "CommitCompletion";
+                // No structural changes, allocation or reference acquisition after successful SavePrepared.
+                if (toolIndex >= 0) tools[toolIndex] = nextTool;
+                progressAccess.ValueRW = nextProgress;
+                history.Add(transition);
                 obstacles[index] = obstacle;
-                state.Phase = CombatPrototypeMapMinePhase.Depleted;
-                state.CollectorNetworkId = 0;
-                state.MinedTick = tick.SerializedData;
-                EntityManager.SetComponentData(mine, state);
-                Debug.Log("[CombatPrototype.Map] Mine depleted and drop spawned; map=" + map.MapDefinitionId +
+                stateAccess.ValueRW = nextState;
+                Debug.Log("[CombatPrototype.Map] Mine completed and drop spawned; map=" + map.MapDefinitionId +
                     ", placement=" + state.PlacementIndex + ", NetworkId=" + player.NetworkId + ", DropId=" + dropId +
                     ", itemId=" + settings.DropItemId + ", quantity=" + settings.DropQuantity +
-                    ", resource=" + settings.DropResourceKey + ".");
+                    ", tool=" + toolKind + ", durability=" + nextTool.Durability + ", resource=" + settings.DropResourceKey + ".");
             }
             catch (Exception exception)
             {
-                if (drop != Entity.Null)
+                // A persisted cost is final. Unexpected faults beyond this boundary cannot be compensated with an old save.
+                if (!durabilitySaved)
                 {
-                    try { dropOwner.ReleaseDrop(drop); }
-                    catch (Exception cleanup)
+                    if (drop != Entity.Null)
                     {
-                        Debug.LogError("[CombatPrototype.Map] Mine drop cleanup failed; stage=ReleaseCurrentDrop, map=" +
-                            map.MapDefinitionId + ", placement=" + state.PlacementIndex + ", DropId=" + dropId + ". " + cleanup);
+                        try { dropOwner.ReleaseDrop(drop); }
+                        catch (Exception cleanup)
+                        {
+                            Debug.LogError("[CombatPrototype.Map] Mine drop cleanup failed; stage=ReleaseCurrentDrop, map=" +
+                                map.MapDefinitionId + ", placement=" + state.PlacementIndex + ", DropId=" + dropId + ". " + cleanup);
+                        }
+                    }
+                    try
+                    {
+                        var obstacles = EntityManager.GetBuffer<CombatPrototypeMapObstacle>(source);
+                        obstacles[index] = oldObstacle;
+                        EntityManager.GetBuffer<CombatPrototypeMapMineBlockingEvent>(mine).ResizeUninitialized(historyLength);
+                        Cancel(mine, state, map.MapDefinitionId, "DropOrSaveOrCommitFailed");
+                    }
+                    catch (Exception rollback)
+                    {
+                        Debug.LogError("[CombatPrototype.Map] Mine rollback failed; stage=RollbackMine, map=" +
+                            map.MapDefinitionId + ", placement=" + state.PlacementIndex + ", DropId=" + dropId +
+                            ", resource=" + settings.DropResourceKey + ". " + rollback);
                     }
                 }
-                try
-                {
-                    var obstacles = EntityManager.GetBuffer<CombatPrototypeMapObstacle>(source);
-                    obstacles[index] = oldObstacle;
-                    EntityManager.GetBuffer<CombatPrototypeMapMineBlockingEvent>(mine).ResizeUninitialized(historyLength);
-                    Cancel(mine, state, map.MapDefinitionId, "DropOrCommitFailed");
-                }
-                catch (Exception rollback)
-                {
-                    Debug.LogError("[CombatPrototype.Map] Mine rollback failed; stage=RollbackMine, map=" +
-                        map.MapDefinitionId + ", placement=" + state.PlacementIndex + ", DropId=" + dropId +
-                        ", resource=" + settings.DropResourceKey + ". " + rollback);
-                }
-                throw new InvalidOperationException("Mine completion failed; placement=" + state.PlacementIndex +
-                    ", DropId=" + dropId + ", itemId=" + settings.DropItemId +
+                throw new InvalidOperationException("Mine completion failed; stage=" + stage + ", durabilitySaved=" + durabilitySaved +
+                    ", placement=" + state.PlacementIndex + ", DropId=" + dropId + ", itemId=" + settings.DropItemId +
                     ", resource=" + settings.DropResourceKey + ".", exception);
             }
         }

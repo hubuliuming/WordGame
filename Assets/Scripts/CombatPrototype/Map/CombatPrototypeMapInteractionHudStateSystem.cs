@@ -141,7 +141,7 @@ namespace Code_01.CombatPrototype.Map
                         var treeProgress = EntityManager.GetComponentData<CombatPrototypeMapTreeProgress>(entity);
                         collector = treeProgress.Collector;
                         finishAt = treeProgress.FinishAt;
-                        duration = tree.HarvestDuration;
+                        duration = treeProgress.ActualDuration;
                         break;
                     case CombatPrototypeMapInteractionKind.Mine:
                         var mineState = EntityManager.GetComponentData<CombatPrototypeMapMineState>(entity);
@@ -150,7 +150,7 @@ namespace Code_01.CombatPrototype.Map
                         var mineProgress = EntityManager.GetComponentData<CombatPrototypeMapMineProgress>(entity);
                         collector = mineProgress.Collector;
                         finishAt = mineProgress.FinishAt;
-                        duration = mine.HarvestDuration;
+                        duration = mineProgress.ActualDuration;
                         break;
                     default:
                         throw new InvalidOperationException("Unsupported HUD interaction kind: " + kind);

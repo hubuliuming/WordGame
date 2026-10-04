@@ -21,7 +21,7 @@
 
 ## 【FACT】JSON 契约与当前默认值
 
-[battle_forest_01.json](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[battle_grassland_01.json](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn 来源](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 均为 schemaVersion=6、默认 configRevision=9，必填 drops 对象。原空间、移动、出生及 drops/grounds 数值保持；mining 与生态矿点字段归采矿专题，tree_normal/gather_apple/mine_rock 均默认 600 秒再生。配置在烘焙时读取，不支持运行热重载；不同端须使用相同版本、输入布局和资源，未新增配置一致性协议。
+[battle_forest_01.json](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[battle_grassland_01.json](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn来源](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)均为schemaVersion=8/configRevision=11，drops必填，工具配置归[采集工具](MapGatherTools.md)。原空间、移动、出生及drops/grounds值保持；mining与生态矿点字段归采矿专题，tree_normal/gather_apple/mine_rock均默认600秒再生。配置只在烘焙时读取，不支持热重载；各端须相同版本、输入布局与资源，未新增一致性协议。
 
 | 字段 | 默认值 | 校验/行为 |
 |---|---|---|
@@ -37,7 +37,7 @@
 | visualScale | 0.5 | 有限正数，实例 LocalTransform 的统一缩放 |
 | lifetimeSeconds | 600 | 有限非负数；从生成时刻计时，0 关闭自动到期 |
 
-全部字段均显式填写。字符串遵循既有小写 ASCII/数字/下划线及最长 61 字符约束；缺失/未知/重复字段、类型错误及非法数值沿原严格 UTF-8 JSON 边界报错。旧 v1/v2/v3/v4 不自动迁移或补字段，Json 失败不回退 BuiltIn。配置中的资源键由原 MapAuthoring.DecorationPrefabs 解析，不查找或临时创建资源兜底。
+全部字段显式填写。字符串遵循原小写ASCII/数字/下划线及最长61字符；缺失/未知/重复字段、错类型或非法值沿严格UTF-8 JSON边界报错。旧地图v1～v7不迁移或补字段，Json失败不回退BuiltIn。资源键由原MapAuthoring.DecorationPrefabs解析，不查找或临时创建兜底。
 
 ## 【CURRENT STRATEGY】死亡、生成与飞行
 
@@ -53,7 +53,7 @@ Pickup 为原 IInputComponentData 的新增 InputEvent，客户端只对 GhostOw
 
 目标仅为本人 X/Z 距离内的 Landed、尚未到期掉落。选最近一个，精确同距取较小 DropId；一次请求只提交一份，任何合格玩家均可拾取。没有合格目标时日志 NoLandedTarget，持续按住 G 不持续发放。即使移动被树木阻挡，非零移动输入仍拒绝。
 
-提交前按目标 DropState.ItemId 解析实际物品名，取得库存和状态可写引用，以 checked 合并同名数量，新条目先预留容量。PrepareReward 投影保持当前金币/经验的完整库存候选，SavePrepared 成功返回后才提交库存及 Consumed；这段提交不做结构变更、分配或第二次组件查找。后续同次请求读取 Consumed，不能重复入包。原 v1 存储类、格式、临时文件及正式档替换规则保持。
+提交前按目标DropState.ItemId解析实际物品名，取得库存与状态可写引用，checked合并同名数量，新条目先预留容量。PrepareReward投影保持当前金币/经验/Tools的完整库存v2候选，SavePrepared成功才提交库存及Consumed；提交不做结构变更、分配或第二次查找。同次后续请求读取Consumed，不能重复入包；读取v1迁移，临时文件与正式档替换规则保持。
 
 准备/保存失败记录 NetworkId、DropId、物品、阶段及原异常，不提交库存数量或未到期掉落消耗，继续其他玩家请求；恢复后须新 G，不自动重试。到期规则仍生效，不为失败拾取延长寿命。背包沿原 Ghost 缓冲及每 2 秒日志同步观察；苹果/木材/石材没有新增使用效果或正式 UI，E 仍只用小块肉。F 预约、取消、保存后耗尽及 600 秒原点再生保持。
 
@@ -63,7 +63,7 @@ Map Baker 在原地图根实体写入 DropSettings，配置标注 Server 且仅�
 
 lifetimeSeconds>0 时 ExpiresAt=生成时的 Server World 模拟时间+寿命；为 0 时期限为 0。到期目标在拾取选择中直接排除。DropCleanup 在拾取之后、统一 F 入口之前把已消耗/到期实体置 Consumed，并排队至 EndSimulation ECB 销毁；CleanupQueued 防止多次模拟 tick 重复排队。地图源更换/失效、系统停止及 World 销毁时，DropSpawn 清理其拥有的实体及死亡记录；已排队项保留给 ECB 执行，避免重复销毁。共享 Prefab、网格和材质不随实例销毁。
 
-地面掉落的位置、DropId、飞行/落地/消耗及期限只保留本局，不写玩家或地图存档；重启服务端清空未拾取掉落，新局重新分配 ID。成功入包的苹果/木材/石材沿原固定玩家 ID 的 v1 库存保存/恢复。计时使用 SystemAPI.Time.ElapsedTime，不使用客户端时间或系统墙钟；到期和释放不发奖励、不写盘。运行中地图切换仍未接入，模板/来源切换须 PlayMode 前保存并重新进入。
+地面掉落的位置、DropId、飞行/落地/消耗及期限只保留本局，不写玩家或地图存档；重启服务端清空未拾取掉落，新局重新分配 ID。成功入包的苹果/木材/石材沿原固定ID的v2库存保存/恢复，候选保留Tools并兼容读取v1。计时使用 SystemAPI.Time.ElapsedTime，不使用客户端时间或系统墙钟；到期和释放不发奖励、不写盘。运行中地图切换仍未接入，模板/来源切换须 PlayMode 前保存并重新进入。
 
 ## 【FACT】资源与 Editor 边界
 
@@ -99,4 +99,8 @@ MineHarvest 调用原 SpawnOwnedDrop 生成 DroppedStone，stone 显式映射 Ms
 
 ## 【FACT】F 交互显示边界
 
-v7/revision=10 接入 F 三类资源的目标提示与原服务端采集进度，规则归[交互显示](MapInteractionHud.md)。HUD 不显示 G 拾取提示，不创建掉落、提交库存/Consumed 或调用保存；原 DropId、飞行/落地、G、到期及释放链保持。新阶段掉落回归人工 GamePlayer 为 UNKNOWN，归[运行入口](Runtime.md)HUD 清单，既有通过保持各自原范围。
+v7/revision=10 接入 F 三类资源的目标提示与原服务端采集进度，规则归[交互显示](MapInteractionHud.md)。HUD 不显示 G 拾取提示，不创建掉落、提交库存/Consumed 或调用保存；原 DropId、飞行/落地、G、到期及释放链保持。本阶段掉落回归已获用户人工通过反馈，限[运行入口](Runtime.md)HUD 八项清单及 v7/revision=10；未实际触发的独立创建/提交/清理/回滚失败仍为 UNKNOWN，既有通过保持各自原范围。
+
+## 【FACT】工具完成与掉落边界
+
+[采集工具](MapGatherTools.md)不改变DropId、产出数量、飞行、G或释放链；使用斧头/镐子完成先准备并登记当前掉落、保存耐久，再提交资源完成。保存前失败只清理本次掉落并取消预约；保存成功后的意外ECS故障不执行旧资源回滚，恢复保证为UNKNOWN。G保存候选携带当前Tools，防止拾取覆盖耐久。本阶段编译/隔离烘焙已静态核对，人工事务与回归均为UNKNOWN，旧掉落用户通过范围保持。

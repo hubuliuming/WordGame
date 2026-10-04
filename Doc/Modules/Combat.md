@@ -210,4 +210,8 @@ MineHarvest 使用独立 Available/Mining/Depleted 状态与服务端计时，�
 
 ## 【FACT】资源交互 HUD 的战斗边界
 
-[交互显示](MapInteractionHud.md)复用统一 F 原玩家可交互条件，攻击/非 Ready/死亡等状态隐藏提示；取消和完成仍由原资源系统维护。HUD 仅写显示快照，不改伤害、反击、资源/生命、移动阻挡或敌人组件。新阶段攻击/受击中断、死亡/R 和原战斗回归人工 GamePlayer 为 UNKNOWN，归[运行入口](Runtime.md)HUD 八项清单。
+[交互显示](MapInteractionHud.md)复用统一 F 原玩家可交互条件，攻击/非 Ready/死亡等状态隐藏提示；取消和完成仍由原资源系统维护。HUD 仅写显示快照，不改伤害、反击、资源/生命、移动阻挡或敌人组件。本阶段攻击/受击中断、死亡/R 和原战斗回归已获用户人工通过反馈，限[运行入口](Runtime.md)HUD 八项清单及 v7/revision=10，未实际触发的边界/预测时序和独立失败仍为 UNKNOWN。
+
+## 【FACT】工具与战斗奖励保存边界
+
+[采集工具](MapGatherTools.md)制作复用无Attack请求且近战Ready等F资格，任意资源预约时拒绝制作，服务端在PlayerDamage后、统一F入口/PlayerRespawn前处理；攻击/受击/死亡中断工具作业不扣耐久，R不补满工具。战斗奖励仍按原金币/经验/库存事务提交，新增候选携带当前Tools并写v2，普通攻击不消耗工具，未改伤害、攻击阶段或敌人逻辑。当前编译/烘焙静态通过，本阶段战斗保存回归/独立失败与人工结果为UNKNOWN；旧战斗用户通过保持原版本/清单，见[运行入口](Runtime.md)。

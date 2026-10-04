@@ -17,7 +17,7 @@ namespace Code_01.CombatPrototype.Map
             {
                 map = new MapDefinitionConfig
                 {
-                    schemaVersion = 7, configRevision = 10,
+                    schemaVersion = 8, configRevision = 11,
                     mapDefinitionId = mapDefinitionId, defaultSeed = 12345,
                     geometry = new MapGeometryConfig
                     {
@@ -55,9 +55,28 @@ namespace Code_01.CombatPrototype.Map
                         harvestDurationSeconds = 3f, dropItemId = CombatPrototypeMapYieldItemResolver.StoneId,
                         dropQuantity = 3, dropVisualResourceKey = "drop_stone"
                     },
+                    gatherTools = new MapGatherToolsConfig
+                    {
+                        enabled = true, craftFeedbackSeconds = 2f,
+                        tools = new[]
+                        {
+                            new MapGatherToolDefinitionConfig
+                            {
+                                toolId = "stone_axe", displayName = "Axe", targetKind = "tree",
+                                maxDurability = 60, durabilityCostPerCompletion = 1, durationMultiplier = 0.75f,
+                                craftWoodQuantity = 3, craftStoneQuantity = 2
+                            },
+                            new MapGatherToolDefinitionConfig
+                            {
+                                toolId = "stone_pickaxe", displayName = "Pickaxe", targetKind = "mine",
+                                maxDurability = 40, durabilityCostPerCompletion = 1, durationMultiplier = 0.75f,
+                                craftWoodQuantity = 2, craftStoneQuantity = 3
+                            }
+                        }
+                    },
                     interactionHud = new MapInteractionHudConfig
                     {
-                        enabled = true, panelWidthPixels = 320f, panelHeightPixels = 76f,
+                        enabled = true, panelWidthPixels = 320f, panelHeightPixels = 104f,
                         bottomMarginPixels = 48f, fontSize = 20, progressBarHeightPixels = 10f,
                         gatherLabel = "Gather Apple", treeLabel = "Chop Tree", mineLabel = "Mine Rock"
                     },

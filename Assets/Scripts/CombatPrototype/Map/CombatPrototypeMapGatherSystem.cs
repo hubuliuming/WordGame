@@ -32,6 +32,7 @@ namespace Code_01.CombatPrototype.Map
             public ComponentLookup<CombatPrototypePlayerIdentity> Identities;
             public ComponentLookup<CombatPrototypePlayerReward> Rewards;
             public BufferLookup<CombatPrototypeInventoryItem> Inventories;
+            public BufferLookup<CombatPrototypeMapGatherTool> Tools;
         }
 
         private EntityQuery _points;
@@ -84,7 +85,8 @@ namespace Code_01.CombatPrototype.Map
                     Transforms = SystemAPI.GetComponentLookup<LocalTransform>(true),
                     Identities = SystemAPI.GetComponentLookup<CombatPrototypePlayerIdentity>(true),
                     Rewards = SystemAPI.GetComponentLookup<CombatPrototypePlayerReward>(true),
-                    Inventories = SystemAPI.GetBufferLookup<CombatPrototypeInventoryItem>()
+                    Inventories = SystemAPI.GetBufferLookup<CombatPrototypeInventoryItem>(),
+                    Tools = SystemAPI.GetBufferLookup<CombatPrototypeMapGatherTool>(true)
                 };
                 var states = SystemAPI.GetComponentLookup<CombatPrototypeMapGatherState>();
                 var progresses = SystemAPI.GetComponentLookup<CombatPrototypeMapGatherProgress>();
@@ -217,7 +219,7 @@ namespace Code_01.CombatPrototype.Map
                 var next = new CombatPrototypeInventoryItem { ItemName = config.YieldItemName, Quantity = config.YieldQuantity };
                 if (itemIndex >= 0) next.Quantity = checked(inventory[itemIndex].Quantity + config.YieldQuantity);
                 else inventory.EnsureCapacity(checked(inventory.Length + 1));
-                var candidate = CombatPrototypePlayerSaveStore.PrepareReward(playerId, reward, inventory, itemIndex, next);
+                var candidate = CombatPrototypePlayerSaveStore.PrepareReward(playerId, reward, inventory, access.Tools[player.Entity], itemIndex, next);
                 var regrowAt = config.RegrowEnabled != 0 ? time + config.RegrowSeconds : 0d;
 
                 stage = "SavePrepared";

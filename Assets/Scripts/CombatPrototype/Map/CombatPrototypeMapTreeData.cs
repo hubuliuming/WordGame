@@ -43,6 +43,8 @@ namespace Code_01.CombatPrototype.Map
         public Entity Collector;
         public uint StartHitSequence;
         public double FinishAt;
+        public CombatPrototypeMapGatherToolKind ToolKind;
+        public float ActualDuration;
         public double RegrowAt;
     }
 }

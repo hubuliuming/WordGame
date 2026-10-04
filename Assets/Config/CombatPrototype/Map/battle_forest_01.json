@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 7,
-  "configRevision": 10,
+  "schemaVersion": 8,
+  "configRevision": 11,
   "mapDefinitionId": "battle_forest_01",
   "defaultSeed": 12345,
   "geometry": {
@@ -56,10 +56,36 @@
     "dropQuantity": 3,
     "dropVisualResourceKey": "drop_stone"
   },
+  "gatherTools": {
+    "enabled": true,
+    "craftFeedbackSeconds": 2.0,
+    "tools": [
+      {
+        "toolId": "stone_axe",
+        "displayName": "Axe",
+        "targetKind": "tree",
+        "maxDurability": 60,
+        "durabilityCostPerCompletion": 1,
+        "durationMultiplier": 0.75,
+        "craftWoodQuantity": 3,
+        "craftStoneQuantity": 2
+      },
+      {
+        "toolId": "stone_pickaxe",
+        "displayName": "Pickaxe",
+        "targetKind": "mine",
+        "maxDurability": 40,
+        "durabilityCostPerCompletion": 1,
+        "durationMultiplier": 0.75,
+        "craftWoodQuantity": 2,
+        "craftStoneQuantity": 3
+      }
+    ]
+  },
   "interactionHud": {
     "enabled": true,
     "panelWidthPixels": 320.0,
-    "panelHeightPixels": 76.0,
+    "panelHeightPixels": 104.0,
     "bottomMarginPixels": 48.0,
     "fontSize": 20,
     "progressBarHeightPixels": 10.0,

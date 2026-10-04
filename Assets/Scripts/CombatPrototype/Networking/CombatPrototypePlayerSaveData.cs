@@ -10,6 +10,7 @@ namespace Code_01.CombatPrototype.Networking
         public int Coin;
         public int Experience;
         public CombatPrototypePlayerSaveItem[] Items;
+        public CombatPrototypePlayerSaveTool[] Tools;
     }
 
     [Serializable]

@@ -1,4 +1,5 @@
 using System;
+using Unity.Entities;
 using Unity.NetCode;
 using UnityEngine;
 
@@ -10,11 +11,26 @@ namespace Code_01.CombatPrototype.Map
         private Unity.Entities.World _clientWorld;
         private CombatPrototypeMapInteractionHudBindingSystem _binding;
         private CombatPrototypeMapInteractionHudSettings _settings;
+        private CombatPrototypeMapGatherToolSettings _toolSettings;
+        private CombatPrototypeMapGatherToolDefinition _axe;
+        private CombatPrototypeMapGatherToolDefinition _pickaxe;
         private GUIStyle _labelStyle;
         private string _gatherLabel;
         private string _treeLabel;
         private string _mineLabel;
         private string _text;
+        private string _toolText;
+        private string _feedbackText;
+        private string _axeName;
+        private string _pickaxeName;
+        private string _axeStatus;
+        private string _pickaxeStatus;
+        private int _axeDurability = int.MinValue;
+        private int _pickaxeDurability = int.MinValue;
+        private uint _feedbackSequence;
+        private bool _observedFeedback;
+        private CombatPrototypeMapGatherToolKind _feedbackKind;
+        private double _feedbackUntil;
         private CombatPrototypeMapInteractionHudMode _mode;
         private byte _kind;
         private int _percent = -1;
@@ -55,30 +71,43 @@ namespace Code_01.CombatPrototype.Map
 
         private void Unbind()
         {
-            Clear();
+            Reset();
             if (_binding != null && _clientWorld.IsCreated) _binding.UnregisterHud(this);
             _binding = null;
             _clientWorld = null;
         }
 
-        internal void Configure(CombatPrototypeMapInteractionHudSettings settings)
+        internal void Configure(CombatPrototypeMapInteractionHudSettings settings,
+            CombatPrototypeMapGatherToolSettings toolSettings, CombatPrototypeMapGatherToolDefinition axe,
+            CombatPrototypeMapGatherToolDefinition pickaxe)
         {
+            Reset();
             _settings = settings;
+            _toolSettings = toolSettings;
+            _axe = axe;
+            _pickaxe = pickaxe;
+            _axeName = axe.DisplayName.ToString();
+            _pickaxeName = pickaxe.DisplayName.ToString();
             _gatherLabel = settings.GatherLabel.ToString();
             _treeLabel = settings.TreeLabel.ToString();
             _mineLabel = settings.MineLabel.ToString();
-            _labelStyle = null;
-            _mode = CombatPrototypeMapInteractionHudMode.Hidden;
-            _kind = 0;
-            _percent = -1;
-            Clear();
         }
 
-        internal void Show(CombatPrototypeMapInteractionHudState state)
+        internal void Show(CombatPrototypeMapInteractionHudState state, DynamicBuffer<CombatPrototypeMapGatherTool> tools,
+            CombatPrototypeMapToolCraftFeedback feedback)
         {
+            RefreshToolStatus(tools);
+            ObserveFeedback(feedback);
+            var hasFeedback = Time.unscaledTimeAsDouble < _feedbackUntil;
             if (state.Mode == CombatPrototypeMapInteractionHudMode.Hidden)
             {
-                Clear();
+                _mode = state.Mode;
+                _kind = 0;
+                _percent = -1;
+                _progress = 0f;
+                _visible = hasFeedback;
+                _text = hasFeedback ? _feedbackText : string.Empty;
+                _toolText = hasFeedback ? ToolStatus(_feedbackKind) : string.Empty;
                 return;
             }
             if ((state.Mode != CombatPrototypeMapInteractionHudMode.Ready && state.Mode != CombatPrototypeMapInteractionHudMode.Working) ||
@@ -97,12 +126,113 @@ namespace Code_01.CombatPrototype.Map
                 _percent = percent;
             }
             _progress = state.ProgressPermille / 1000f;
+            _toolText = hasFeedback ? _feedbackText :
+                state.Kind == (byte)CombatPrototypeMapInteractionKind.Gather ? "Hands" :
+                ToolStatus(state.Kind == (byte)CombatPrototypeMapInteractionKind.Tree ?
+                    CombatPrototypeMapGatherToolKind.Axe : CombatPrototypeMapGatherToolKind.Pickaxe);
             _visible = true;
+        }
+
+        private void RefreshToolStatus(DynamicBuffer<CombatPrototypeMapGatherTool> tools)
+        {
+            if (tools.Length > 2) throw new InvalidOperationException("Invalid owner tool snapshot: too many tools.");
+            var axeDurability = -1;
+            var pickaxeDurability = -1;
+            foreach (var tool in tools)
+            {
+                if (tool.ToolId.Equals(_axe.ToolId))
+                {
+                    if (axeDurability >= 0 || tool.Durability < 0 || tool.Durability > _axe.MaxDurability)
+                        throw new InvalidOperationException("Invalid owner axe snapshot.");
+                    axeDurability = tool.Durability;
+                }
+                else if (tool.ToolId.Equals(_pickaxe.ToolId))
+                {
+                    if (pickaxeDurability >= 0 || tool.Durability < 0 || tool.Durability > _pickaxe.MaxDurability)
+                        throw new InvalidOperationException("Invalid owner pickaxe snapshot.");
+                    pickaxeDurability = tool.Durability;
+                }
+                else throw new InvalidOperationException("Unknown owner tool ID: " + tool.ToolId);
+            }
+            if (_axeDurability != axeDurability)
+            {
+                _axeDurability = axeDurability;
+                _axeStatus = FormatTool(_axe, _axeName, axeDurability, "1");
+            }
+            if (_pickaxeDurability != pickaxeDurability)
+            {
+                _pickaxeDurability = pickaxeDurability;
+                _pickaxeStatus = FormatTool(_pickaxe, _pickaxeName, pickaxeDurability, "2");
+            }
+        }
+
+        private string FormatTool(CombatPrototypeMapGatherToolDefinition definition, string name, int durability, string key)
+        {
+            if (_toolSettings.Enabled == 0) return "Hands";
+            if (durability < 0) return "Hands  [" + key + ": Craft " + name + "]";
+            var status = name + "  " + durability + "/" + definition.MaxDurability;
+            return durability < definition.DurabilityCostPerCompletion ? status + "  [" + key + ": Craft]" : status;
+        }
+
+        private string ToolStatus(CombatPrototypeMapGatherToolKind kind)
+        {
+            return kind == CombatPrototypeMapGatherToolKind.Axe ? _axeStatus : _pickaxeStatus;
+        }
+
+        private void ObserveFeedback(CombatPrototypeMapToolCraftFeedback feedback)
+        {
+            if (feedback.Result > CombatPrototypeMapToolCraftResult.Failed ||
+                (feedback.Result == CombatPrototypeMapToolCraftResult.None ? feedback.Kind != CombatPrototypeMapGatherToolKind.None :
+                    feedback.Kind != CombatPrototypeMapGatherToolKind.Axe && feedback.Kind != CombatPrototypeMapGatherToolKind.Pickaxe))
+                throw new InvalidOperationException("Invalid owner craft feedback snapshot.");
+            if (!_observedFeedback)
+            {
+                // Observe the initial sequence without replaying a result from a prior binding or connection.
+                _feedbackSequence = feedback.Sequence;
+                _observedFeedback = true;
+                return;
+            }
+            if (_feedbackSequence == feedback.Sequence) return;
+            _feedbackSequence = feedback.Sequence;
+            if (feedback.Result == CombatPrototypeMapToolCraftResult.None) { _feedbackUntil = 0d; return; }
+            _feedbackKind = feedback.Kind;
+            var name = feedback.Kind == CombatPrototypeMapGatherToolKind.Axe ? _axeName : _pickaxeName;
+            switch (feedback.Result)
+            {
+                case CombatPrototypeMapToolCraftResult.Success: _feedbackText = "Crafted " + name; break;
+                case CombatPrototypeMapToolCraftResult.Disabled: _feedbackText = "Tool crafting disabled"; break;
+                case CombatPrototypeMapToolCraftResult.AlreadyUsable: _feedbackText = name + " is still usable"; break;
+                case CombatPrototypeMapToolCraftResult.InsufficientMaterials: _feedbackText = "Need wood and stone"; break;
+                case CombatPrototypeMapToolCraftResult.Busy: _feedbackText = "Finish gathering first"; break;
+                case CombatPrototypeMapToolCraftResult.FHasPriority: _feedbackText = "F interaction has priority"; break;
+                case CombatPrototypeMapToolCraftResult.PlayerUnavailable: _feedbackText = "Stand still to craft"; break;
+                case CombatPrototypeMapToolCraftResult.Failed: _feedbackText = "Craft failed"; break;
+                default: throw new InvalidOperationException("Unsupported craft feedback: " + feedback.Result);
+            }
+            // This timer controls only presentation; authoritative work timing remains in the server HUD state.
+            _feedbackUntil = Time.unscaledTimeAsDouble + _toolSettings.CraftFeedbackSeconds;
         }
 
         internal void Clear()
         {
             _visible = false;
+        }
+
+        internal void Reset()
+        {
+            Clear();
+            _labelStyle = null;
+            _text = _toolText = _feedbackText = string.Empty;
+            _mode = CombatPrototypeMapInteractionHudMode.Hidden;
+            _kind = 0;
+            _percent = -1;
+            _progress = 0f;
+            _axeDurability = _pickaxeDurability = int.MinValue;
+            _axeStatus = _pickaxeStatus = string.Empty;
+            _observedFeedback = false;
+            _feedbackSequence = 0;
+            _feedbackKind = CombatPrototypeMapGatherToolKind.None;
+            _feedbackUntil = 0d;
         }
 
         private void OnGUI()
@@ -129,6 +259,8 @@ namespace Code_01.CombatPrototype.Map
                 GUI.DrawTexture(panel, Texture2D.whiteTexture);
                 GUI.color = Color.white;
                 GUI.Label(new Rect(panel.x + 12f, panel.y + 12f, panel.width - 24f, _settings.FontSize + 8f), _text, _labelStyle);
+                GUI.Label(new Rect(panel.x + 12f, panel.y + 20f + _settings.FontSize, panel.width - 24f, _settings.FontSize + 8f),
+                    _toolText, _labelStyle);
                 if (_mode != CombatPrototypeMapInteractionHudMode.Working) return;
                 var bar = new Rect(panel.x + 16f, panel.yMax - 16f - _settings.ProgressBarHeightPixels,
                     panel.width - 32f, _settings.ProgressBarHeightPixels);

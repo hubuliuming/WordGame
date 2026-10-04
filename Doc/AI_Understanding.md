@@ -2,17 +2,17 @@
 
 ## 项目身份与使用规则
 
-- 工程产品名为 `Code_01`，Unity 版本为 `6000.5.6f1 (0e0577a1a2ac)`。依据：[项目设置](../ProjectSettings/ProjectSettings.asset)、[版本文件](../ProjectSettings/ProjectVersion.txt)。
-- 执行流程与授权边界见 [AGENTS.md](../AGENTS.md)，代码写法见 [CodeRule.md](../CodeRule.md)。本导航不替代二者。
+- 产品名 `Code_01`，Unity版本 `6000.5.6f1 (0e0577a1a2ac)`。依据：[项目设置](../ProjectSettings/ProjectSettings.asset)、[版本文件](../ProjectSettings/ProjectVersion.txt)。
+- 执行流程与授权边界见 [AGENTS.md](../AGENTS.md)，代码写法见 [CodeRule.md](../CodeRule.md)。导航不替代执行规则。
 - 文档中的【FACT】记录已核实的源码、配置或序列化文本状态；源码只能证明当前实现，不自动成为已确认业务约定。【CURRENT STRATEGY】描述现有实现采用的路径；【KNOWN ISSUES】区分静态可见问题与运行验收结果。
 - 业务意图、未读范围和未验证运行结果保持 `UNKNOWN`。本库的静态记录不能作为 GamePlayer PlayMode 已通过的依据。
-- 先按下表进入命中模块，跨模块问题再沿相关链接读取。历史不属于默认阅读范围。
+- 按表进入模块，再沿链接跨模块读取；历史默认不读。
 
 ## 按任务阅读
 
 | 任务、问题或搜索词 | 先读 | 需要时再读 |
 |---|---|---|
-| 地图F/HUD | [地图](Modules/Map.md) | — |
+| 地图F/HUD/工具 | [地图](Modules/Map.md) | [工具](Modules/MapGatherTools.md) |
 | 从哪里启动、Map、按键、场景按钮、OnStart | [运行入口](Modules/Runtime.md) | [资源与数据](Modules/DataResources.md) |
 | 属性、生命、体力、等级、金币、刷新 | [玩家](Modules/Player.md) | [数据文件](Modules/DataResources.md) |
 | 野猪、BtnAttack、伤害、掉落、战斗奖励 | [战斗](Modules/Combat.md) | [玩家](Modules/Player.md) |

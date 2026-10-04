@@ -30,6 +30,7 @@ namespace Code_01.CombatPrototype.Networking
             var inventories = SystemAPI.GetBufferLookup<CombatPrototypeInventoryItem>();
             var identities = SystemAPI.GetComponentLookup<CombatPrototypePlayerIdentity>(true);
             var rewards = SystemAPI.GetComponentLookup<CombatPrototypePlayerReward>(true);
+            var ownedTools = SystemAPI.GetBufferLookup<Code_01.CombatPrototype.Map.CombatPrototypeMapGatherTool>(true);
 
             foreach (var (stream, command, id, connection) in SystemAPI.Query<
                          RefRO<NetworkStreamConnection>, RefRO<CommandTarget>, RefRO<NetworkId>>()
@@ -97,7 +98,7 @@ namespace Code_01.CombatPrototype.Networking
                         resource.ValueRO.UpperPower - resource.ValueRO.CurrentPower);
                     var nextPower = resource.ValueRO.CurrentPower + recoveredPower;
                     var candidate = CombatPrototypePlayerSaveStore.PrepareItemConsumption(
-                        playerId, reward, inventory, itemIndex, nextItem);
+                        playerId, reward, inventory, ownedTools[player], itemIndex, nextItem);
 
                     stage = "SavePrepared";
                     CombatPrototypePlayerSaveStore.SavePrepared(candidate);

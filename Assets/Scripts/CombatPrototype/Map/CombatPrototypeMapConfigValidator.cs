@@ -9,7 +9,8 @@ namespace Code_01.CombatPrototype.Map
         {
             if (config == null || config.map == null || config.map.geometry == null ||
                 config.map.layout == null || config.map.movement == null || config.map.drops == null || config.map.treeHarvest == null ||
-                config.map.mining == null || config.map.interactionHud == null || config.map.population == null || config.map.spawn == null ||
+                config.map.mining == null || config.map.gatherTools == null || config.map.gatherTools.tools == null ||
+                config.map.interactionHud == null || config.map.population == null || config.map.spawn == null ||
                 config.biomes == null || config.grounds == null || config.objects == null ||
                 config.map.biomeIds == null || config.map.biomeRegions == null)
                 throw new InvalidOperationException("Map configuration is missing required sections.");
@@ -21,15 +22,15 @@ namespace Code_01.CombatPrototype.Map
             Positive(hud.progressBarHeightPixels, "interactionHud.progressBarHeightPixels");
             if (hud.fontSize <= 0 || hud.panelWidthPixels <= 32f || hud.panelWidthPixels > 1920f ||
                 hud.panelHeightPixels + hud.bottomMarginPixels > 1080f ||
-                hud.panelHeightPixels < (double)hud.fontSize + hud.progressBarHeightPixels + 40d)
+                hud.panelHeightPixels < 2d * hud.fontSize + hud.progressBarHeightPixels + 54d)
                 throw new InvalidOperationException("interactionHud requires a positive font size, panel width in (32,1920], " +
-                    "panel height >= fontSize + progressBarHeightPixels + 40, and panel height + bottom margin <= 1080.");
+                    "panel height >= 2*fontSize + progressBarHeightPixels + 54, and panel height + bottom margin <= 1080.");
             HudLabel(hud.gatherLabel, "interactionHud.gatherLabel");
             HudLabel(hud.treeLabel, "interactionHud.treeLabel");
             HudLabel(hud.mineLabel, "interactionHud.mineLabel");
             Id(map.mapDefinitionId, "mapDefinitionId");
-            if (map.schemaVersion != 7 || map.configRevision < 1 || map.defaultSeed < 1)
-                throw new InvalidOperationException("Map requires schemaVersion=7, positive revision and seed.");
+            if (map.schemaVersion != 8 || map.configRevision < 1 || map.defaultSeed < 1)
+                throw new InvalidOperationException("Map requires schemaVersion=8, positive revision and seed.");
             var drops = map.drops;
             Id(drops.itemId, "drops.itemId");
             Id(drops.visualResourceKey, "drops.visualResourceKey");
@@ -61,6 +62,32 @@ namespace Code_01.CombatPrototype.Map
             if (mining.dropQuantity <= 0)
                 throw new InvalidOperationException("mining.dropQuantity must be a positive integer.");
             Id(mining.dropVisualResourceKey, "mining.dropVisualResourceKey");
+            var gatheringTools = map.gatherTools;
+            Positive(gatheringTools.craftFeedbackSeconds, "gatherTools.craftFeedbackSeconds");
+            if (gatheringTools.tools.Length != 2)
+                throw new InvalidOperationException("gatherTools requires exactly stone_axe and stone_pickaxe.");
+            var toolIds = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var tool in gatheringTools.tools)
+            {
+                if (tool == null) throw new InvalidOperationException("gatherTools.tools does not allow null entries.");
+                Unique(toolIds, tool.toolId, "gatherTools.toolId");
+                var kind = CombatPrototypeMapGatherToolUtility.ResolveKind(tool.toolId);
+                var expectedTarget = kind == CombatPrototypeMapGatherToolKind.Axe ? "tree" : "mine";
+                if (tool.targetKind != expectedTarget)
+                    throw new InvalidOperationException("gatherTools targetKind mismatch for " + tool.toolId);
+                HudLabel(tool.displayName, "gatherTools.displayName");
+                if (tool.maxDurability <= 0 || tool.durabilityCostPerCompletion <= 0 ||
+                    tool.durabilityCostPerCompletion > tool.maxDurability)
+                    throw new InvalidOperationException("gatherTools requires 0 < durability cost <= maximum for " + tool.toolId);
+                Positive(tool.durationMultiplier, "gatherTools.durationMultiplier");
+                if (tool.durationMultiplier > 1f)
+                    throw new InvalidOperationException("gatherTools durationMultiplier must be <= 1 for " + tool.toolId);
+                Positive((kind == CombatPrototypeMapGatherToolKind.Axe ? treeHarvest.harvestDurationSeconds : mining.harvestDurationSeconds)
+                    * tool.durationMultiplier, "gatherTools.actualDuration");
+                if (tool.craftWoodQuantity < 0 || tool.craftStoneQuantity < 0 ||
+                    (long)tool.craftWoodQuantity + tool.craftStoneQuantity == 0)
+                    throw new InvalidOperationException("gatherTools recipe requires nonnegative material quantities and a nonzero cost for " + tool.toolId);
+            }
             var geometry = map.geometry;
             Positive(geometry.cellSizeMeters, "cellSizeMeters");
             Finite(geometry.baseHeightMeters, "baseHeightMeters");

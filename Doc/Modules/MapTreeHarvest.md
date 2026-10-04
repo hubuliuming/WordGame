@@ -23,7 +23,7 @@
 
 ## 【FACT】JSON 契约与当前默认值
 
-当前两份地图定义与 BuiltIn 均为 schemaVersion=7、configRevision=10，treeHarvest 段及全部字段必填。树木配置仍为 2 米/2 秒/wood ×3，再生复用 objects.tree_normal 的 true/600 秒；原空间、种子、树木/采集物密度、出生及 movement/drops/grounds 数值保持。新增 mining 段与生态矿点字段归[采矿](MapMining.md)，树木规则独立。配置在 SubScene 烘焙时读取，Json 失败不回退 BuiltIn，不支持热重载或新的联网配置校验协议。
+当前两份地图定义与 BuiltIn 均为 schemaVersion=8、configRevision=11，treeHarvest 段及全部字段必填。树木基础配置仍为2米/徒手2秒/wood×3；[斧头](MapGatherTools.md)可用时1.5秒，再生复用 objects.tree_normal 的 true/600 秒；原空间、种子、树木/采集物密度、出生及 movement/drops/grounds 数值保持。新增 mining 段与生态矿点字段归[采矿](MapMining.md)，树木规则独立。配置在 SubScene 烘焙时读取，Json 失败不回退 BuiltIn，不支持热重载或新的联网配置校验协议。
 
 | 字段 | 当前默认值 | 校验与作用 |
 |---|---|---|
@@ -39,7 +39,7 @@
 
 再生复用 objects 中所选树木的 regrowEnabled=true、regrowSeconds=600，Map Baker 复制到地图根的服务端 TreeSettings。间隔必须有限且非负，启用时须大于 0；关闭时允许 0，沿原校验器检查，不新增 DTO 或默认补字段。开关只控制成功砍倒后的本局再生，砍伐开关关闭时仍是原静态树。gather_apple 的独立再生配置保持。
 
-字符串沿既有小写 ASCII/数字/下划线、最长 61 字符约束。物品 ID 白名单为 vitality_apple/wood；未知 ID 明确失败。旧 v1/v2/v3/v4、缺段/字段、未知/重复字段或类型错误沿原严格 UTF-8 JSON 边界报错，不补默认字段。enabled=false 时其余字段与资源绑定仍必须有效。
+字符串沿原小写ASCII/数字/下划线、最长61字符约束；产出ID由原Resolver校验vitality_apple/wood/stone，砍伐默认wood，未知ID失败。旧地图v1～v7、缺段/字段、未知/重复字段或错类型沿严格UTF-8边界报错，不补默认字段；enabled=false仍校验其余字段与资源绑定。工具定义归[采集工具](MapGatherTools.md)。
 
 木材复用 drops 的 pickupDistanceMeters=2、flightDurationSeconds=0.4、scatterRadiusMeters=0.6、arcHeightMeters=0.6、groundOffsetMeters=0.05、visualScale=0.5、lifetimeSeconds=600；寿命 0 关闭自动到期。drops.enabled 只控制敌人额外掉落，treeHarvest.enabled 控制树木产出，二者独立；数值、运动、G 和清理规则归掉落专题。
 
@@ -51,7 +51,7 @@ TreeSpawn 在服务端地图就绪后、准入前复制物体/布置缓冲，逐
 
 启用再生时状态为 Standing → Chopping → Felled → Standing；关闭再生时 Felled 保持至当前 World 释放。服务端从 Connected、NetworkStreamInGame、无断线请求的连接 CommandTarget 取当前启用 Simulate 的玩家；要求 GhostOwner 与 NetworkId 一致、存活、有限零 Move、没有攻击请求且近战 Ready。非零移动输入即使被树挡住仍拒绝。
 
-统一入口按 NetworkId 升序跨采集点/树木/矿点选最近有效目标，并立即调用指定树木的 TryBegin；只接受 Standing。保存 Collector、StartHitSequence 和 FinishAt=当前模拟时间+时长，进入 Chopping。重复 F 不重置、不换目标，按住不自动连续砍伐；精确同距、每类型范围和互斥规则归[战斗地图](Map.md)。
+统一入口按 NetworkId 升序跨采集点/树木/矿点选最近有效目标，并立即调用指定树木的 TryBegin；只接受 Standing。保存Collector、StartHitSequence、ToolKind、ActualDuration和FinishAt=当前模拟时间+锁定时长，进入 Chopping。重复 F 不重置、不换目标，按住不自动连续砍伐；精确同距、每类型范围和互斥规则归[战斗地图](Map.md)。
 
 TreeHarvest 在统一入口/Gather 之后、R 复活之前只维护预约。移动、攻击、受击序号变化、死亡、超距、归属变化或断线取消，恢复 Standing，不产木材。旧 F 采集优先判断已移除；入口记录本 tick 已交互玩家，完成/取消后须新 F，不能同 tick 启动另一资源交互。G/E/R 资格与效果保持。
 
@@ -59,11 +59,11 @@ TreeHarvest 在统一入口/Gather 之后、R 复活之前只维护预约。移�
 
 到时后先核对树木对应的原阻挡记录，再调用原 DropSpawnSystem.SpawnOwnedDrop 创建一份木材堆。苹果和木材共用同一地图源的 DropId 顺序、有效所有权与释放；ID 不复用，生成失败可能留空号。共用 DropSpawnUtility 根据地图种子、DropId 和 drops 数值初始化位置、进度及 Airborne 状态。木材初始位置为树根位置，生成在本次运动/拾取系统之后，后续模拟 tick 进入原飞行/落地链。
 
-木材完全初始化并登记后，重新获取结构变更失效的组件/缓冲访问，先为新增阻挡记录预留容量，再提交 Felled/CollectorNetworkId=0、FelledTick 和阻挡 Disabled=1，并追加该权威 tick 的 Disabled=1 历史。清空砍伐进度，启用再生时 RegrowAt=本次 Server World 模拟时间+间隔，否则为 0。Felled 保留为本局 Ghost，恢复 Standing 前不能预约或重复掉落；成功再生后须新 F。砍伐只生成地面资源，不直接入包，不改变金币、经验或战斗奖励。
+木材完全初始化并登记后，重新获取结构变更失效的组件/缓冲访问，先为新增阻挡记录预留容量并取得全部提交引用；使用斧头时先保存扣耐久候选，成功后再提交耐久及Felled/CollectorNetworkId=0、FelledTick 和阻挡 Disabled=1，并追加该权威 tick 的 Disabled=1 历史。清空砍伐进度，启用再生时 RegrowAt=本次 Server World 模拟时间+间隔，否则为 0。Felled 保留为本局 Ghost，恢复 Standing 前不能预约或重复掉落；成功再生后须新 F。砍伐只生成地面资源，不直接入包，不改变金币、经验或战斗奖励。
 
-创建/提交失败时释放当前新掉落、恢复原阻挡记录和历史长度并取消预约；不安排再生，既往轮次历史仍保留。错误保留阶段、地图/布置/玩家、DropId、物品/资源和原异常，其他条目继续。清理/回滚失败另记错误，不伪装成功。恢复条件后必须新 F，不自动补发。运行失败与多人争抢的人工通过边界归运行入口；不能实际触发的失败分支仍为 UNKNOWN。
+保存前创建/准备/保存失败时释放当前新掉落、恢复原阻挡记录和历史长度并取消预约；不安排再生，既往轮次历史仍保留。错误保留阶段、地图/布置/玩家、DropId、物品/资源和原异常，其他条目继续。清理/回滚失败另记错误，不伪装成功；耐久保存成功后不执行此回滚，意外ECS提交故障暴露durabilitySaved=true，其恢复保证为UNKNOWN。恢复条件后必须新 F，不自动补发。运行失败与多人争抢的人工通过边界归运行入口；不能实际触发的失败分支仍为 UNKNOWN。
 
-G 按目标 DropState.ItemId 解析实际物品名称，苹果和木材分别同名合并；沿 PrepareReward → SavePrepared 成功后才提交库存及 Consumed。木材不新增使用效果、正式背包 UI 或存档字段；原 v1 固定玩家 ID 库存可保存“木材”。拾取失败与到期边界归掉落专题。
+G 按目标 DropState.ItemId 解析实际物品名称，苹果和木材分别同名合并；沿 PrepareReward → SavePrepared 成功后才提交库存及 Consumed。木材不新增使用效果或正式背包UI；G候选保留当前Tools，玩家v2固定ID库存可保存“木材”，v1读取迁移。拾取失败与到期边界归掉落专题。
 
 ## 【CURRENT STRATEGY】原点再生与占位
 
@@ -75,13 +75,13 @@ G 按目标 DropState.ItemId 解析实际物品名称，苹果和木材分别同
 
 ## 【CURRENT STRATEGY】同步、阻挡与生命周期
 
-TreeState 的 PlacementIndex、Phase、CollectorNetworkId、FelledTick 四字段通过 Ghost 同步。另有 CombatPrototypeMapTreeBlockingEvent 动态缓冲，每条同步 TransitionTick(uint) 与 Disabled(byte，0 启用/1 禁用)；tick 保存 NetworkTime.ServerTick.SerializedData，包含有效性位。TreeProgress 标注仅服务端，含 Collector、StartHitSequence、FinishAt、RegrowAt，不同步预约实体或期限。地图根 TreeSettings 标注 Server，由服务端生成/砍伐/再生消费；地图根本身仍不是 Ghost。
+TreeState 的 PlacementIndex、Phase、CollectorNetworkId、FelledTick 四字段通过 Ghost 同步。另有 CombatPrototypeMapTreeBlockingEvent 动态缓冲，每条同步 TransitionTick(uint) 与 Disabled(byte，0 启用/1 禁用)；tick 保存 NetworkTime.ServerTick.SerializedData，包含有效性位。TreeProgress 标注仅服务端，含Collector、StartHitSequence、FinishAt、ToolKind、ActualDuration、RegrowAt，不同步预约实体或期限。地图根 TreeSettings 标注 Server，由服务端生成/砍伐/再生消费；地图根本身仍不是 Ghost。
 
 TreeObstacle 在 Client/Server 预测组、玩家与敌人移动之前执行，只处理 Harvestable 对应记录。每次先恢复原启用状态，对 Standing/Chopping/Felled 均从历史末尾查找当前模拟 tick 严格晚于的最近转换，再写入其 Disabled。砍倒和再生均在该 tick 的移动后提交，阻挡转换从下一模拟 tick 生效；回放到转换之前或两次转换之间按历史恢复对应状态，不能只用最新 Phase/FelledTick。无快照/空历史时保留原阻挡；缺历史或无效记录明确报错。显示系统不推断或修改服务端状态。阻挡历史内部容量为 4，每完整砍倒/再生轮次增加两条；保留当前 World 全部轮次，不截断，随树木实体释放。取消预约及重新 F 不清空已有历史。第八阶段多轮跨端/晚加入的人工通过边界归[运行入口](Runtime.md)；未实际触发的延迟/回放时序仍为 UNKNOWN。
 
 MapMovementUtility 跳过 Disabled 记录，玩家预测与服务端敌人继续复用原扫掠/滑动算法。TreeRender 在客户端 Presentation、EntitiesGraphics 前按 Felled 禁用 MaterialMeshInfo；树木没有物理倒伏、Collider、Rigidbody、树桩、Animator 或砍伐动画。
 
-树木状态、再生期限、阻挡历史与地面木材只保留当前 Server World，不写世界存档。重启后按原布局重新生成 Standing 树木，未拾取掉落清空；已成功入包的木材沿原玩家 v1 存档恢复。原 F 采集物 600 秒原点再生、原奖励与存储类保持。
+树木状态、再生期限、阻挡历史与地面木材只保留当前 Server World，不写世界存档。重启后按原布局重新生成 Standing 树木，未拾取掉落清空；已入包木材沿玩家v2存档恢复，读取v1迁移；原F采集物600秒再生保持，全部保存候选保留Tools。
 
 ## 【FACT】资源与 Editor 边界
 
@@ -102,8 +102,10 @@ Tools/CombatPrototype/地图 下“生成第七阶段砍伐资源”预检原目
 
 第八阶段正常编译、仅服务端 RegrowAt/系统顺序、两种模板隔离烘焙及原资源不变已静态核对，主线程静态验收通过；用户已确认第八阶段人工 GamePlayer 通过，主线程结合既有静态核对与用户反馈判定该阶段通过，范围限[运行入口](Runtime.md)第八阶段八项清单及 v5/revision=7。人工结论来自用户反馈；未实际触发的精确边界、同 tick、延迟/预测回放和创建/清理/回滚失败仍为 UNKNOWN。第七阶段通过仍限原版本/清单。阻挡历史随轮次增长，其内存/网络开销未测量。
 
-未接斧头装备、工具耐久、砍伐动作、树桩、世界状态持久化、攻击遮挡、寻路、通用动态对象框架或物品使用效果；F 目标提示/进度归[交互显示](MapInteractionHud.md)。同步写盘耗时、规模性能、平台构建和线上联调未验收。AI 未运行 GamePlayer/PlayMode、游戏模拟/显示系统、逻辑单元测试、命令行构建、发布、性能采样或图片检查，未创建子Agent、未提交 Git。
+斧头自动使用/耐久归[采集工具](MapGatherTools.md)，未接手动装备、砍伐动作、树桩、世界状态持久化、攻击遮挡、寻路、通用动态对象框架或物品使用效果；F 目标提示/进度归[交互显示](MapInteractionHud.md)。同步写盘耗时、规模性能、平台构建和线上联调未验收。AI 未运行 GamePlayer/PlayMode、游戏模拟/显示系统、逻辑单元测试、命令行构建、发布、性能采样或图片检查，未创建子Agent、未提交 Git。
 
 相关规则：[掉落与拾取](MapDrops.md)、[背包与道具](Inventory.md)、[玩家](Player.md)、[战斗](Combat.md)、[资源与数据](DataResources.md)。
 
 采集点、树木和矿点现共用 F、跨类型最近选择，无 F/H/J 类型优先；旧 H 第七/第八阶段通过仍限原版本，统一 F 已获用户人工通过反馈，范围与未触发用例归[运行入口](Runtime.md)。
+
+当前工具v8/revision=11完成保存与锁定字段已编译/静态烘焙核对，人工扣耐久/失败/取消仍为UNKNOWN；旧树木用户通过只覆盖原版本/清单，见[工具](MapGatherTools.md)/[运行入口](Runtime.md)。

@@ -12,6 +12,7 @@ namespace Code_01.CombatPrototype.Map
         private EntityQuery _map;
         private CombatPrototypeMapInteractionHud _hud;
         private Entity _source;
+        private Entity _player;
 
         protected override void OnCreate()
         {
@@ -26,15 +27,17 @@ namespace Code_01.CombatPrototype.Map
                 throw new InvalidOperationException("[CombatPrototype.Map] World=" + World.Name + " already has a registered HUD.");
             _hud = hud;
             _source = Entity.Null;
-            _hud.Clear();
+            _player = Entity.Null;
+            _hud.Reset();
         }
 
         public void UnregisterHud(CombatPrototypeMapInteractionHud hud)
         {
             if (_hud != hud) return;
-            _hud.Clear();
+            _hud.Reset();
             _hud = null;
             _source = Entity.Null;
+            _player = Entity.Null;
         }
 
         protected override void OnUpdate()
@@ -45,21 +48,28 @@ namespace Code_01.CombatPrototype.Map
             var settings = EntityManager.GetComponentData<CombatPrototypeMapInteractionHudSettings>(source);
             if (settings.Enabled == 0)
             {
-                _source = Entity.Null;
+                ResetBinding();
                 return;
             }
             var player = GetLocalPlayer();
-            if (player == Entity.Null) return;
+            if (player == Entity.Null) { ResetBinding(); return; }
             if (_hud == null)
                 throw new InvalidOperationException("[CombatPrototype.Map] World=" + World.Name + ", player=" + player +
                     " requires the HUD component registered by Main Camera.");
-            if (EntityManager.GetComponentData<CombatPrototypePlayerHealth>(player).IsDead != 0) return;
-            if (source != _source)
+            if (EntityManager.GetComponentData<CombatPrototypePlayerHealth>(player).IsDead != 0) { ResetBinding(); return; }
+            if (source != _source || player != _player)
             {
-                _hud.Configure(settings);
+                var toolSettings = EntityManager.GetComponentData<CombatPrototypeMapGatherToolSettings>(source);
+                var definitions = EntityManager.GetBuffer<CombatPrototypeMapGatherToolDefinition>(source, true);
+                _hud.Configure(settings, toolSettings,
+                    CombatPrototypeMapGatherToolUtility.RequireDefinition(definitions, CombatPrototypeMapGatherToolKind.Axe),
+                    CombatPrototypeMapGatherToolUtility.RequireDefinition(definitions, CombatPrototypeMapGatherToolKind.Pickaxe));
                 _source = source;
+                _player = player;
             }
-            _hud.Show(EntityManager.GetComponentData<CombatPrototypeMapInteractionHudState>(player));
+            _hud.Show(EntityManager.GetComponentData<CombatPrototypeMapInteractionHudState>(player),
+                EntityManager.GetBuffer<CombatPrototypeMapGatherTool>(player, true),
+                EntityManager.GetComponentData<CombatPrototypeMapToolCraftFeedback>(player));
         }
 
         private Entity GetLocalPlayer()
@@ -76,17 +86,22 @@ namespace Code_01.CombatPrototype.Map
             return player;
         }
 
+        private void ResetBinding()
+        {
+            if (_hud != null) _hud.Reset();
+            _source = Entity.Null;
+            _player = Entity.Null;
+        }
+
         protected override void OnStopRunning()
         {
-            if (_hud != null) _hud.Clear();
-            _source = Entity.Null;
+            ResetBinding();
         }
 
         protected override void OnDestroy()
         {
-            if (_hud != null) _hud.Clear();
+            ResetBinding();
             _hud = null;
-            _source = Entity.Null;
         }
     }
 }

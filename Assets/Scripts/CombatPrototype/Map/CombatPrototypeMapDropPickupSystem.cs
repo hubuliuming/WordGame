@@ -133,7 +133,7 @@ namespace Code_01.CombatPrototype.Map
                         if (itemIndex >= 0) next.Quantity = checked(inventory[itemIndex].Quantity + quantity);
                         else inventory.EnsureCapacity(checked(inventory.Length + 1));
                         var candidate = CombatPrototypePlayerSaveStore.PrepareReward(
-                            playerId, rewards[player.Entity], inventory, itemIndex, next);
+                            playerId, rewards[player.Entity], inventory, EntityManager.GetBuffer<CombatPrototypeMapGatherTool>(player.Entity, true), itemIndex, next);
 
                         stage = "SavePrepared";
                         CombatPrototypePlayerSaveStore.SavePrepared(candidate);

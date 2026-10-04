@@ -20,13 +20,13 @@
 
 ## 【FACT】当前 JSON 契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 为 schemaVersion=7/configRevision=10，新增必填 interactionHud；全部九个字段必填，沿原严格 UTF-8/字段/类型/重复键检查。旧 v1～v6 明确失败，不补默认段或回退来源；JSON 只在正常导入和烘焙后生效，无运行热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 为 schemaVersion=8/configRevision=11，interactionHud与[工具配置](MapGatherTools.md)均必填；全部九个字段必填，沿原严格 UTF-8/字段/类型/重复键检查。旧 v1～v7 明确失败，不补默认段或回退来源；JSON 只在正常导入和烘焙后生效，无运行热重载。
 
 | 字段 | 默认值 | 契约 |
 |---|---|---|
 | enabled | true | 仅控制显示；false 时服务器快照 Hidden，原 F/G 与资源链继续 |
 | panelWidthPixels | 320 | 有限，32 < 宽度 <= 1920 |
-| panelHeightPixels | 76 | 有限正数；高度 >= fontSize + progressBarHeightPixels + 40 |
+| panelHeightPixels | 104 | 有限正数；高度 >= 2×fontSize + progressBarHeightPixels + 54 |
 | bottomMarginPixels | 48 | 有限非负；高度 + 底距 <= 1080 |
 | fontSize | 20 | 正整数 |
 | progressBarHeightPixels | 10 | 有限正数 |
@@ -40,9 +40,9 @@
 
 服务端 HUDStateSystem 在 PredictedSimulation、PlayerRespawn 后执行；原采集/砍伐/采矿及其再生均在复活前完成。每次读取原地图和三类资源，仅为 Connected、InGame、未请求断线、CommandTarget 指向当前启用 Simulate 玩家的连接采样。可交互条件调用原 RejectPlayer：所有权匹配、存活、有限零 Move、无攻击请求且近战 Ready。非法归属连接不覆盖真实所属玩家快照。
 
-本人正在 Collecting/Chopping/Mining 时固定使用原 Collector 实体对应目标，不因其他资源更近而切换。进度由服务端模拟时间和原 FinishAt、原对应 duration 计算 round(clamp(1-(FinishAt-now)/duration,0,1)×1000)。默认三类耗时为 1/2/3 秒；不另起计时器、不提前完成、不改变原取消或完成行为。
+本人正在 Collecting/Chopping/Mining 时固定使用原 Collector 实体对应目标，不因其他资源更近而切换。进度由服务端模拟时间和原 FinishAt、本次锁定的 ActualDuration（植物仍为原 GatherDuration） 计算 round(clamp(1-(FinishAt-now)/duration,0,1)×1000)。默认徒手耗时1/2/3秒，斧头/镐子为1.5/2.25秒；工具完成保存归[采集工具](MapGatherTools.md)，HUD不另起工作计时器或提前完成。
 
-空闲时复用同一 Select：各类型原交互距离筛选，只选 Available/Standing/Available，按 X/Z 中心距离最近、同距较小 PlacementIndex；关闭砍伐/采矿不选相应类型。提示本身不预约资源，按 F 时仍由原当 tick 选择/预约。移动、攻击、死亡等不可交互条件隐藏；收到取消/完成后的状态后清掉进度，可重新显示下一可用目标或隐藏。提示与进度仅代表最近收到的权威状态，网络延迟下可能滞后；Working 的百分比不是发奖或保存成功标志。
+空闲时复用同一Select：各类型原交互距离筛选，只选Available/Standing/Available，按X/Z中心最近、同距较小PlacementIndex；关闭砍伐/采矿不选相应类型。提示不预约，按F仍由当tick选择/预约。不可交互时F提示/进度隐藏，工具制作反馈可独立临时显示；死亡时整个HUD收起。收到取消/完成状态后清进度，可显示下一有效目标或隐藏；显示代表最近权威快照，网络延迟可滞后，Working百分比不是发奖/保存成功标志。
 
 CombatPrototypeMapInteractionHudState 用 OwnerSendType=SendToOwner 同步给所属玩家：
 
@@ -53,16 +53,18 @@ CombatPrototypeMapInteractionHudState 用 OwnerSendType=SendToOwner 同步给所
 | PlacementIndex | int；Hidden 为 -1，其余是原布置索引 |
 | ProgressPermille | ushort，0～1000；非 Working 为 0 |
 
-状态仅含显示数据；FinishAt、RegrowAt、Collector 和玩法配置仍仅服务端。HUD 不写原资源 Phase/Collector/历史/障碍、玩家输入/属性/库存、掉落或存档。原三类资源 Ghost 字段和 F/G/E/R 保持。服务器缓存每 tick 重建，状态字段不变时不重复写组件；关闭 HUD、连接无效、未采样玩家或地图停止时清为 Hidden。
+状态仅含显示数据；FinishAt、RegrowAt、Collector和原资源计时配置仍仅服务端，工具Definitions由各端烘焙供所属工具行读取。HUD不写资源Phase/Collector/历史/障碍、玩家输入/属性/库存、掉落或存档。原资源Ghost字段与F/G/E/R效果保持，数字1/2制作归工具专题。服务器每tick重建缓存，字段不变不重复写；关闭HUD、连接无效、未采样或地图停止时清为Hidden。
 
-客户端枚举启用的 GhostOwnerIsLocal，不在含该可启用组件的查询上调用单例 API；只显示本地所属玩家且死亡时收起，不显示远端玩家进度。Presentation 不读取 PlayerView 或世界位置，不替代官方 Transform 显示桥接。Main Camera 组件随 Client World 变更注册/解绑；无客户端、准入未完成、没有本地 Ghost 或地图停止时隐藏。World/Scene 释放清掉显示和引用，不保留上一局目标/进度。
+客户端枚举启用的 GhostOwnerIsLocal，不在含该可启用组件的查询上调用单例 API；只显示本地所属玩家且死亡时收起，不显示远端玩家进度。Presentation 不读取 PlayerView 或世界位置，不替代官方 Transform 显示桥接。Main Camera 组件随 Client World 变更注册/解绑；无客户端、准入未完成、没有本地 Ghost 或地图停止时隐藏。World/Scene 释放清掉显示和引用，不保留上一局目标/进度/制作反馈；本地玩家或地图源变化也重置反馈序号观察。
 
-Ready 显示“F  文案”；Working 显示“文案  百分比%”和按千分比填充的进度条，整数百分比为 ProgressPermille/10。OnGUI 仅 Repaint 绘制，不接按钮、鼠标或按键；缓存文案和样式，绘制后恢复 GUI.matrix/color。HUD 不显示掉落拾取提示、库存面板、世界标记或再生倒计时。
+Ready 显示“F  文案”；Working 显示“文案  百分比%”和按千分比填充的进度条，整数百分比为 ProgressPermille/10。第二行读取所属工具缓冲显示对应名称/耐久、Hands或制作提示，制作反馈2秒；无F目标可临时显示结果，交互中只替换第二行。初次绑定只观察现有Sequence，不重播旧结果；只有反馈显示使用客户端unscaledTime。OnGUI仅Repaint绘制，不接按钮、鼠标或按键；缓存文案和样式，绘制后恢复 GUI.matrix/color。HUD 不显示掉落拾取提示、库存面板、世界标记或再生倒计时。
 
 资源采样错误按单项暴露地图、类型、布置索引、实体和原异常并继续；玩家帧错误按连接隔离，未生成有效快照者清为 Hidden。必需服务、地图 Settings、HUD 挂载或本地 HUD 数据缺失明确报错，不查找节点、不创建替代组件或默认配置；非法非隐藏网络快照明确报错并保持隐藏。
 
 ## 【KNOWN ISSUES】静态核对与人工边界
 
-正常 Unity 编译无 C# Error；生成的 HUD Serializer/Snapshot 四字段、SendToOwner、系统顺序及五个脚本导入已静态核对。Forest/Grassland 各覆盖 Json 默认、BuiltIn 默认、Json 关闭采矿、Json 关闭矿点再生（仍 600 秒）、Json 关闭 HUD，共十次隔离 Editor 烘焙；v7/revision=10、HUD 参数、玩家 Prefab 初始 Hidden/Kind=0/PlacementIndex=-1/进度=0 均一致。默认森林/草原仍为矿点 20/18、阻挡 109/71、树木 89/53、采集点 36/38；HUD 关闭不改布局，采矿关闭恢复原四类布局。全部初始布置位置/朝向、资源引用、保护区/占地/间距及敌人初始重叠均通过。烘焙 Console 前后 [0 Error,9 Warning,53 Log]，无新增烘焙警告；主场景已保存，临时烘焙 World/Scene 已释放。
+下述静态与用户通过保留HUD v7/revision=10范围。正常Unity编译无C# Error；生成的 HUD Serializer/Snapshot 四字段、SendToOwner、系统顺序及五个脚本导入已静态核对。Forest/Grassland 各覆盖 Json 默认、BuiltIn 默认、Json 关闭采矿、Json 关闭矿点再生（仍 600 秒）、Json 关闭 HUD，共十次隔离 Editor 烘焙；v7/revision=10、HUD 参数、玩家 Prefab 初始 Hidden/Kind=0/PlacementIndex=-1/进度=0 均一致。默认森林/草原仍为矿点 20/18、阻挡 109/71、树木 89/53、采集点 36/38；HUD 关闭不改布局，采矿关闭恢复原四类布局。全部初始布置位置/朝向、资源引用、保护区/占地/间距及敌人初始重叠均通过。烘焙 Console 前后 [0 Error,9 Warning,53 Log]，无新增烘焙警告；主场景已保存，临时烘焙 World/Scene 已释放。
 
-主线程静态验收通过；实际 HUD 画面/字体/分辨率、三类进度、双端所属显示、延迟/预测时序、输入/争抢/取消/生命周期与配置人工 GamePlayer 为 UNKNOWN，八项清单归[运行入口](Runtime.md)。既有矿点再生、统一 F 与各旧阶段用户通过保持原版本/清单，不覆盖 HUD。性能/带宽开销、平台构建和线上联调未测量。AI 未运行 GamePlayer/PlayMode、游戏模拟/显示系统、逻辑单元测试、命令行构建、发布、性能采样或图片检查，未创建子Agent或提交 Git。
+主线程静态验收通过；用户已确认本阶段人工 GamePlayer 通过，主线程结合既有静态核对与用户反馈判定通过，范围限 CombatPrototypeNetCode、v7/revision=10 和[运行入口](Runtime.md)HUD 八项清单。人工结论来自用户反馈；未实际触发的精确距离/同距、同 tick、延迟/预测回放、晚加入和独立保存/创建/提交/清理/回滚失败仍为 UNKNOWN，中文字体/字形覆盖未确认。既有矿点再生、统一 F 与各旧阶段通过保持原版本/清单；第九阶段原 J、第二阶段独立 JSON 人工 UNKNOWN 保持。性能/带宽开销、平台构建和线上联调未测量。AI 未运行 GamePlayer/PlayMode、游戏模拟/显示系统、逻辑单元测试、命令行构建、发布、性能采样或图片检查，未创建子Agent或提交 Git。
+
+当前v8/revision=11新增工具第二行和制作反馈，实际锁定耗时用于服务器进度；正常编译和十次工具隔离烘焙已核对，显示人工结果仍为UNKNOWN，完整静态与人工边界见[采集工具](MapGatherTools.md)/[运行入口](Runtime.md)。原HUD八项用户通过不覆盖本次新行为。

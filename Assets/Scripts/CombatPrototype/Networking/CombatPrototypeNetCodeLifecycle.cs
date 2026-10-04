@@ -67,6 +67,8 @@ namespace Code_01.CombatPrototype.Networking
         {
             var spawner = SystemAPI.GetSingleton<CombatPrototypePlayerSpawner>();
             var map = SystemAPI.GetSingleton<CombatPrototypeMapData>();
+            var mapSource = SystemAPI.GetSingletonEntity<CombatPrototypeMapData>();
+            var toolDefinitions = state.EntityManager.GetBuffer<CombatPrototypeMapGatherToolDefinition>(mapSource, true);
             using var ecb = new EntityCommandBuffer(Allocator.Temp);
             using var handledThisUpdate = new NativeHashSet<Entity>(4, Allocator.Temp);
             using var occupiedPlayerIds = new NativeHashSet<FixedString64Bytes>(4, Allocator.Temp);
@@ -105,7 +107,7 @@ namespace Code_01.CombatPrototype.Networking
                         continue;
                     }
                     savePath = CombatPrototypePlayerSaveStore.GetSavePath(playerId.ToString());
-                    var data = CombatPrototypePlayerSaveStore.Load(playerId.ToString(), out var restored);
+                    var data = CombatPrototypePlayerSaveStore.Load(playerId.ToString(), toolDefinitions, out var restored);
                     var restoredItems = new CombatPrototypeInventoryItem[data.Items.Length];
                     for (var index = 0; index < data.Items.Length; index++)
                         restoredItems[index] = new CombatPrototypeInventoryItem
@@ -114,6 +116,12 @@ namespace Code_01.CombatPrototype.Networking
                             Quantity = data.Items[index].Quantity
                         };
 
+                    var restoredTools = new CombatPrototypeMapGatherTool[data.Tools.Length];
+                    for (var index = 0; index < data.Tools.Length; index++)
+                        restoredTools[index] = new CombatPrototypeMapGatherTool
+                        {
+                            ToolId = new FixedString64Bytes(data.Tools[index].ToolId), Durability = data.Tools[index].Durability
+                        };
                     createdPlayer = ecb.Instantiate(spawner.PlayerPrefab);
                     ecb.AddComponent(createdPlayer, new CombatPrototypePlayerIdentity { PlayerId = playerId });
                     ecb.SetComponent(createdPlayer, new CombatPrototypePlayerReward { Coin = data.Coin, Experience = data.Experience });
@@ -121,6 +129,9 @@ namespace Code_01.CombatPrototype.Networking
                     inventory.EnsureCapacity(restoredItems.Length);
                     foreach (var item in restoredItems)
                         inventory.Add(item);
+                    var tools = ecb.SetBuffer<CombatPrototypeMapGatherTool>(createdPlayer);
+                    tools.EnsureCapacity(restoredTools.Length);
+                    foreach (var tool in restoredTools) tools.Add(tool);
                     ecb.SetComponent(createdPlayer, new GhostOwner { NetworkId = networkId });
                     ecb.SetComponent(createdPlayer, new AutoCommandTarget { Enabled = true });
                     ecb.SetComponent(createdPlayer, LocalTransform.FromPosition(CombatPrototypeMapSpawnUtility.PlayerPosition(map, networkId)));
@@ -128,7 +139,7 @@ namespace Code_01.CombatPrototype.Networking
                     ecb.AppendToBuffer(connection, new LinkedEntityGroup { Value = createdPlayer });
                     ecb.AddComponent<NetworkStreamInGame>(connection);
                     occupiedPlayerIds.Add(playerId);
-                    Debug.Log($"[CombatPrototype.NetCode] Server accepted NetworkId={networkId}, PlayerId={playerId}, restored={restored}, coin={data.Coin}, experience={data.Experience}, inventoryEntries={data.Items.Length}, path={savePath}; player ghost linked to connection lifetime.");
+                    Debug.Log($"[CombatPrototype.NetCode] Server accepted NetworkId={networkId}, PlayerId={playerId}, restored={restored}, coin={data.Coin}, experience={data.Experience}, inventoryEntries={data.Items.Length}, toolEntries={data.Tools.Length}, path={savePath}; player ghost linked to connection lifetime.");
                 }
                 catch (global::System.Exception exception)
                 {

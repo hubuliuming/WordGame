@@ -160,11 +160,11 @@ namespace Code_01.CombatPrototype.Map
                                 break;
                             case CombatPrototypeMapInteractionKind.Tree:
                                 started = treeHarvest.TryBegin(target.Entity, request.Player, request.NetworkId,
-                                    health.HitSequence, time, map.MapDefinitionId, treeSettings);
+                                    health.HitSequence, time, map.MapDefinitionId, treeSettings, source);
                                 break;
                             case CombatPrototypeMapInteractionKind.Mine:
                                 started = mineHarvest.TryBegin(target.Entity, request.Player, request.NetworkId,
-                                    health.HitSequence, time, map.MapDefinitionId, mineSettings);
+                                    health.HitSequence, time, map.MapDefinitionId, mineSettings, source);
                                 break;
                             default:
                                 throw new InvalidOperationException("Unsupported resource interaction kind: " + target.Kind);

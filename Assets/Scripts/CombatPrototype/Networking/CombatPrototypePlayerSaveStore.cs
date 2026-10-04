@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using Code_01.CombatPrototype.Map;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Unity.Collections;
@@ -13,7 +14,7 @@ namespace Code_01.CombatPrototype.Networking
 {
     public static class CombatPrototypePlayerSaveStore
     {
-        public const int CurrentVersion = 1;
+        public const int CurrentVersion = 2;
         private static readonly UTF8Encoding WriteEncoding = new UTF8Encoding(false, true);
         private static readonly ProfilerMarker LoadMarker = new ProfilerMarker("CombatPrototype.PlayerSave.Load");
         private static readonly ProfilerMarker SaveMarker = new ProfilerMarker("CombatPrototype.PlayerSave.SavePrepared");
@@ -24,7 +25,8 @@ namespace Code_01.CombatPrototype.Networking
             return Path.Combine(Application.persistentDataPath, "CombatPrototype", "Players", playerId + ".json");
         }
 
-        public static CombatPrototypePlayerSaveData Load(string playerId, out bool restored)
+        public static CombatPrototypePlayerSaveData Load(string playerId,
+            DynamicBuffer<CombatPrototypeMapGatherToolDefinition> toolDefinitions, out bool restored)
         {
             using var profilingScope = LoadMarker.Auto();
             FileStream stream;
@@ -50,9 +52,9 @@ namespace Code_01.CombatPrototype.Networking
                 {
                     DuplicatePropertyNameHandling = DuplicatePropertyNameHandling.Error
                 });
-                if (root.Count != 5)
-                    throw new InvalidDataException("Save requires exactly Version, PlayerId, Coin, Experience and Items.");
-                var version = ReadInteger(root, "Version", CurrentVersion, CurrentVersion);
+                var version = ReadInteger(root, "Version", 1, CurrentVersion);
+                if (root.Count != (version == 1 ? 5 : 6))
+                    throw new InvalidDataException("Save v1 requires five original fields; v2 additionally requires Tools.");
                 var identity = root["PlayerId"];
                 if (identity == null || identity.Type != JTokenType.String ||
                     !string.Equals(identity.Value<string>(), playerId, StringComparison.Ordinal))
@@ -82,20 +84,44 @@ namespace Code_01.CombatPrototype.Networking
                         Quantity = ReadInteger(item, "Quantity", 1, int.MaxValue)
                     };
                 }
+                var loadedTools = Array.Empty<CombatPrototypePlayerSaveTool>();
+                if (version == 2)
+                {
+                    if (!(root["Tools"] is JArray tools) || tools.Count > 2)
+                        throw new InvalidDataException("Save Tools must be an array of at most two unique tools.");
+                    loadedTools = new CombatPrototypePlayerSaveTool[tools.Count];
+                    var toolIds = new HashSet<string>(StringComparer.Ordinal);
+                    for (var index = 0; index < tools.Count; index++)
+                    {
+                        if (!(tools[index] is JObject tool) || tool.Count != 2 ||
+                            tool["ToolId"] == null || tool["ToolId"].Type != JTokenType.String)
+                            throw new InvalidDataException("Invalid saved tool at index=" + index);
+                        var toolId = tool["ToolId"].Value<string>();
+                        if (!toolIds.Add(toolId)) throw new InvalidDataException("Duplicate saved tool at index=" + index);
+                        var kind = CombatPrototypeMapGatherToolUtility.ResolveKind(toolId);
+                        var definition = CombatPrototypeMapGatherToolUtility.RequireDefinition(toolDefinitions, kind);
+                        loadedTools[index] = new CombatPrototypePlayerSaveTool
+                        {
+                            ToolId = toolId, Durability = ReadInteger(tool, "Durability", 0, definition.MaxDurability)
+                        };
+                    }
+                }
                 restored = true;
                 return new CombatPrototypePlayerSaveData
                 {
-                    Version = version,
+                    Version = CurrentVersion,
                     PlayerId = playerId,
                     Coin = coin,
                     Experience = experience,
-                    Items = loadedItems
+                    Items = loadedItems,
+                    Tools = loadedTools
                 };
             }
         }
 
         public static CombatPrototypePlayerSaveData PrepareReward(FixedString64Bytes playerId,
             CombatPrototypePlayerReward reward, DynamicBuffer<CombatPrototypeInventoryItem> inventory,
+            DynamicBuffer<CombatPrototypeMapGatherTool> tools,
             int itemIndex, CombatPrototypeInventoryItem nextItem)
         {
             // This projection is the serialized candidate, not a second mutable ECS inventory.
@@ -114,12 +140,14 @@ namespace Code_01.CombatPrototype.Networking
                 PlayerId = playerId.ToString(),
                 Coin = reward.Coin,
                 Experience = reward.Experience,
-                Items = items
+                Items = items,
+                Tools = ProjectTools(tools)
             };
         }
 
         public static CombatPrototypePlayerSaveData PrepareItemConsumption(FixedString64Bytes playerId,
             CombatPrototypePlayerReward reward, DynamicBuffer<CombatPrototypeInventoryItem> inventory,
+            DynamicBuffer<CombatPrototypeMapGatherTool> tools,
             int itemIndex, CombatPrototypeInventoryItem nextItem)
         {
             var removeItem = nextItem.Quantity == 0;
@@ -142,8 +170,72 @@ namespace Code_01.CombatPrototype.Networking
                 PlayerId = playerId.ToString(),
                 Coin = reward.Coin,
                 Experience = reward.Experience,
-                Items = items
+                Items = items,
+                Tools = ProjectTools(tools)
             };
+        }
+
+        public static CombatPrototypePlayerSaveData PrepareToolCraft(FixedString64Bytes playerId,
+            CombatPrototypePlayerReward reward, DynamicBuffer<CombatPrototypeInventoryItem> inventory,
+            DynamicBuffer<CombatPrototypeMapGatherTool> tools, int woodIndex, int nextWood,
+            int stoneIndex, int nextStone, int toolIndex, CombatPrototypeMapGatherTool nextTool)
+        {
+            var count = inventory.Length - (woodIndex >= 0 && nextWood == 0 ? 1 : 0) -
+                        (stoneIndex >= 0 && nextStone == 0 ? 1 : 0);
+            var items = new CombatPrototypePlayerSaveItem[count];
+            var targetIndex = 0;
+            for (var index = 0; index < inventory.Length; index++)
+            {
+                var item = inventory[index];
+                if (index == woodIndex) item.Quantity = nextWood;
+                if (index == stoneIndex) item.Quantity = nextStone;
+                if (item.Quantity == 0) continue;
+                items[targetIndex++] = new CombatPrototypePlayerSaveItem { ItemName = item.ItemName.ToString(), Quantity = item.Quantity };
+            }
+            return new CombatPrototypePlayerSaveData
+            {
+                Version = CurrentVersion, PlayerId = playerId.ToString(), Coin = reward.Coin, Experience = reward.Experience,
+                Items = items, Tools = ProjectTools(tools, toolIndex, nextTool)
+            };
+        }
+
+        public static CombatPrototypePlayerSaveData PrepareToolUse(FixedString64Bytes playerId,
+            CombatPrototypePlayerReward reward, DynamicBuffer<CombatPrototypeInventoryItem> inventory,
+            DynamicBuffer<CombatPrototypeMapGatherTool> tools, int toolIndex, CombatPrototypeMapGatherTool nextTool)
+        {
+            var items = new CombatPrototypePlayerSaveItem[inventory.Length];
+            for (var index = 0; index < inventory.Length; index++)
+                items[index] = new CombatPrototypePlayerSaveItem
+                {
+                    ItemName = inventory[index].ItemName.ToString(), Quantity = inventory[index].Quantity
+                };
+            return new CombatPrototypePlayerSaveData
+            {
+                Version = CurrentVersion, PlayerId = playerId.ToString(), Coin = reward.Coin, Experience = reward.Experience,
+                Items = items, Tools = ProjectTools(tools, toolIndex, nextTool)
+            };
+        }
+
+        private static CombatPrototypePlayerSaveTool[] ProjectTools(DynamicBuffer<CombatPrototypeMapGatherTool> tools)
+        {
+            var result = new CombatPrototypePlayerSaveTool[tools.Length];
+            for (var index = 0; index < tools.Length; index++)
+                result[index] = new CombatPrototypePlayerSaveTool { ToolId = tools[index].ToolId.ToString(), Durability = tools[index].Durability };
+            return result;
+        }
+
+        private static CombatPrototypePlayerSaveTool[] ProjectTools(DynamicBuffer<CombatPrototypeMapGatherTool> tools,
+            int toolIndex, CombatPrototypeMapGatherTool nextTool)
+        {
+            var result = new CombatPrototypePlayerSaveTool[checked(tools.Length + (toolIndex < 0 ? 1 : 0))];
+            for (var index = 0; index < tools.Length; index++)
+            {
+                var tool = index == toolIndex ? nextTool : tools[index];
+                result[index] = new CombatPrototypePlayerSaveTool { ToolId = tool.ToolId.ToString(), Durability = tool.Durability };
+            }
+            if (toolIndex < 0)
+                result[tools.Length] = new CombatPrototypePlayerSaveTool { ToolId = nextTool.ToolId.ToString(), Durability = nextTool.Durability };
+            return result;
         }
 
         public static void SavePrepared(CombatPrototypePlayerSaveData data)
@@ -174,7 +266,8 @@ namespace Code_01.CombatPrototype.Networking
                 PlayerId = playerId,
                 Coin = 0,
                 Experience = 0,
-                Items = Array.Empty<CombatPrototypePlayerSaveItem>()
+                Items = Array.Empty<CombatPrototypePlayerSaveItem>(),
+                Tools = Array.Empty<CombatPrototypePlayerSaveTool>()
             };
         }
 

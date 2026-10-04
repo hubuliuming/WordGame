@@ -561,7 +561,7 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 
 ## 【KNOWN ISSUES】资源交互提示与进度显示的人工验收
 
-入口为 CombatPrototypeNetCode，当前两份地图 Json/BuiltIn 为 schemaVersion=7/configRevision=10、interactionHud.enabled=true。Main Camera 已追加一个 HUD 组件，原三根对象和其他组件保持；Player Baker 新增所属玩家 HUD Ghost 数据，各端须使用同版代码、输入、配置和重新烘焙的数据。正常 Unity 编译、SendToOwner 与四字段 Serializer、系统顺序、十次隔离烘焙及显式挂载已静态核对，主线程静态验收通过。下列人工 GamePlayer 结果为 UNKNOWN，旧阶段用户通过不覆盖 HUD：
+本节保留 HUD 已验收的 v7/revision=10 口径；当前工具 v8/revision=11 的新清单见后节。入口为 CombatPrototypeNetCode，原两份地图 Json/BuiltIn 为 schemaVersion=7/configRevision=10、interactionHud.enabled=true。Main Camera 已追加一个 HUD 组件，原三根对象和其他组件保持；Player Baker 新增所属玩家 HUD Ghost 数据，各端须使用同版代码、输入、配置和重新烘焙的数据。正常 Unity 编译、SendToOwner 与四字段 Serializer、系统顺序、十次隔离烘焙及显式挂载已静态核对，主线程静态验收通过。用户已确认本阶段人工 GamePlayer 通过，主线程结合既有静态核对与用户反馈判定通过，范围限本节八项清单及 v7/revision=10。人工结论来自用户反馈，未实际触发的独立用例仍为 UNKNOWN：
 
 1. 在森林/草地靠近采集点、树木、矿点并静止，2 米内分别显示 F Gather Apple/F Chop Tree/F Mine Rock；无可用目标、移动、攻击或死亡时收起。跨三类重叠区域核对当前最近有效目标、较近目标被他人预约后改选、同距按原 PlacementIndex；提示不提前预约，真正开始由 F 服务端日志/状态确认。未触发的精确同距/临界距离保持 UNKNOWN。
 2. 新 F 后三类分别显示当前目标、递增百分比和进度条，原耗时仍 1/2/3 秒。交互中另一类型更近不切换目标；重复/按住 F 不重置计时、切换或连续自动采集。完成收到权威状态后清掉进度，再显示下一有效提示或隐藏；采集仍保存后入包，砍树/采矿仍只生成一堆新 DropId 的木材/石材。
@@ -574,4 +574,25 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 
 验收结束恢复 SourceMode=Json、Preset=Forest、schemaVersion=7/configRevision=10、HUD enabled=true、320×76/底距48/字号20/条高10、英文 Gather Apple/Chop Tree/Mine Rock；原 seed=12345、32 敌人、空间/出生/movement、drops、treeHarvest、mining 及三类 true/600 秒再生保持。
 
-规则与静态产物归[交互显示](MapInteractionHud.md)。人工 GamePlayer、实际显示效果、未触发失败/延迟/预测时序、HUD 与历史内存/网络开销、规模性能、平台构建和线上联调仍为 UNKNOWN。矿点再生 v6/revision=9、统一 F v6/revision=8 及其他阶段用户通过保持原版本/清单；第九阶段原 J、第二阶段独立 JSON 旧 UNKNOWN 保持。AI 未新增/运行逻辑单元测试、GamePlayer/PlayMode、游戏模拟/显示系统、命令行构建、发布、性能采样或图片检查。
+规则与静态产物归[交互显示](MapInteractionHud.md)。用户已确认 HUD 人工 GamePlayer 通过，范围限本节八项清单及 v7/revision=10；未实际触发的精确距离/同距、同 tick、延迟/预测回放、晚加入和独立保存/创建/提交/清理/回滚失败仍为 UNKNOWN，中文字体/字形覆盖未确认。HUD 与历史内存/网络开销、规模性能、平台构建和线上联调未验收。矿点再生 v6/revision=9、统一 F v6/revision=8 及其他阶段用户通过保持原版本/清单；第九阶段原 J、第二阶段独立 JSON 旧 UNKNOWN 保持。AI 未新增/运行逻辑单元测试、GamePlayer/PlayMode、游戏模拟/显示系统、命令行构建、发布、性能采样或图片检查。
+
+## 【KNOWN ISSUES】采集工具与耐久的人工验收
+
+入口为 CombatPrototypeNetCode，当前两份地图 Json/BuiltIn 为 schemaVersion=8/configRevision=11、gatherTools.enabled=true，玩家存档写 v2/读取 v1 迁移。数字 1/2 分别制作 Axe/Pickaxe，沿原 F 自动使用；各端须同版代码、输入、配置及重新烘焙数据。本阶段正常编译、新 Serializer/所属同步、系统声明顺序和十次隔离 Editor 烘焙已静态核对，主线程静态验收通过；人工 GamePlayer 未执行，以下清单均为 UNKNOWN，未由此前通过替代：
+
+1. 使用无档的新固定 ID 准入，工具为空；不用工具分别新 F 完成植物1秒、树木2秒、矿点3秒，仍是苹果×1直接保存入包和 wood/stone×3地面掉落，G/E/R及原最近目标规则保持。
+2. 用原 F/G 获取材料后静止，数字1单次扣木材3/石材2并获得 Axe 60/60，数字2扣木材2/石材3并获得 Pickaxe 40/40。数量归零移除该材料项，其他库存/金币/经验保持；按住不连续制作。材料不足、仍有可用工具均拒绝，不扣材料或补满。
+3. 进入树木/矿点新 F，分别锁定斧头1.5秒/镐子2.25秒，成功只产一堆新 DropId 的原数量资源，耐久恰扣1并保存；植物仍1秒且两类工具不扣耐久。普通攻击不扣工具，G 拾取保持原库存提交。
+4. 分别用移动、攻击、受击、死亡、超距、断线/归属失效中断两类工具交互；取消、未赢预约、重复F均不扣耐久/发资源，须新F。交互中工具/目标/实际耗时不换；新近目标不抢占。不能触发的边界条件保持 UNKNOWN。
+5. 用测试固定 ID 的有效档案或自然使用将工具耐久降至1，最后一次正常完成1→0，损坏记录保留；下一F徒手，数字1/2重新制作才扣完整材料并恢复对应满耐久。配置单次成本>1时，低于成本也不可用/允许重制，不能用不足成本完成。
+6. 移动、攻击、死亡或任意三类预约期间制作均拒绝；同输入tick按F+1/2时只执行F、不扣制作材料，同时1+2只处理斧头。非法CommandTarget归属不修改真正所属玩家工具/反馈，R同tick不补办被拒绝制作。
+7. 可控条件下使制作保存或工具完成保存失败，旧正式档、材料/耐久保持，完成失败只清理本次掉落并取消、不安排再生，恢复后须新按键。分别覆盖创建/准备/清理/回滚错误并核对其他条目继续、原异常/阶段被暴露；未触发独立失败保持 UNKNOWN。文件替换成功后的意外ECS故障不以旧档补偿，不宣称跨文件系统事务完整回滚。
+8. 两个固定 ID、双端核对独立材料与工具，仅本地所属客户端接收工具/制作反馈；重连和服务端重启恢复各自耐久/损坏记录，死亡/R不补满。奖励、E、植物F、各物品G之后重新准入仍保存工具，验证全部旧保存候选不会覆盖Tools。
+9. 在人工准备的原v1测试档核对金币/经验/库存原样、Tools空、读取不立即改盘；下一次正常保存写v2。v2缺Tools、未知/重复工具ID、超过两条、额外/重复字段、错误类型/负值/超过当前最大耐久均拒绝该玩家并保留旧档，其他玩家可准入；不批量重写已有正式档。
+10. HUD第一行与进度保留，第二行显示工具耐久/Hands/损坏制作提示；Working进度按实际1.5/2.25秒计算。制作成功/各类拒绝/失败显示2秒，没有F目标也可反馈；新绑定不重播旧Sequence，死亡/R、无本地Ghost、断线、停止、地图/World/Scene释放无旧反馈残留。人工核对320×104底部面板和不同窗口尺寸，中文字体/字形保持 UNKNOWN。
+11. PlayMode前覆盖两模板/Json与BuiltIn、工具关闭、HUD关闭；工具关闭拒绝制作、F徒手且档中工具保留，HUD关闭不改变玩法。修改合法耐久/成本/配方/倍率/显示秒数后正常烘焙生效；旧地图v7、缺段/未知或重复字段、非整数/非法数值、错目标类型、空白/控制字符/超61字节名称明确失败、不回退来源或热重载。未触发运行错误保持 UNKNOWN。
+12. 回归至少两轮三类原点再生/占位等待与新F、原G飞行/到期/保存、移动/阻挡、战斗/奖励/E/R、镜头/出生及停止重进的实例清理；世界资源和期限仍不保存。徒手与工具完成保持原产出和600秒再生，不补工具，不改变既有资源布局/绑定。
+
+验收结束恢复 SourceMode=Json、Preset=Forest、schemaVersion=8/configRevision=11；gatherTools=true、反馈2秒、Axe60/成本1/倍率0.75/木3石2、Pickaxe40/成本1/倍率0.75/木2石3；HUD enabled=true、320×104/底距48/字号20/条高10、原英文文案。原seed=12345、32敌人、空间/出生/movement、drops、treeHarvest2秒/wood×3、mining3秒/stone×3和三类true/600秒再生保持。
+
+工具规则归[采集工具](MapGatherTools.md)，显示归[交互HUD](MapInteractionHud.md)，档案归[资源与数据](DataResources.md)。本阶段人工GamePlayer仍为 UNKNOWN；既有HUD v7/revision=10、矿点再生v6/revision=9、统一F v6/revision=8及其他通过保持各自版本/清单，未触发用例不替代。新增同步保存耗时/性能、带宽、平台与线上联调未验收。AI未执行PlayMode、游戏模拟/显示系统、逻辑单元测试、命令行构建、发布、性能采样或图片检查。

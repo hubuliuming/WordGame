@@ -46,6 +46,8 @@ namespace Code_01.CombatPrototype.Networking
                 AddBuffer<CombatPrototypePlayerDamageEvent>(entity);
                 AddComponent<CombatPrototypePlayerReward>(entity);
                 AddBuffer<CombatPrototypeInventoryItem>(entity);
+                AddBuffer<CombatPrototypeMapGatherTool>(entity);
+                AddComponent<CombatPrototypeMapToolCraftFeedback>(entity);
                 AddComponent(entity, new CombatPrototypePlayerResource
                 {
                     CurrentPower = authoring.InitialPower,

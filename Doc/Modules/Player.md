@@ -143,7 +143,7 @@ F 由服务端跨采集点/树木/矿点确认最近有效目标，采集点由�
 
 已进入游戏的同一连接重复 RPC 沿原规则消费，不生成第二个玩家；同一更新内每个连接只处理一次。服务端从 Connected、NetworkStreamInGame、NetworkId、CommandTarget 指向的有效玩家收集占用 ID，并在接受本次请求后立即占用该 ID，覆盖同一更新内不同连接竞争同一 ID 的情况。已在线 ID 拒绝新连接，保留原玩家；无效 ID、坏档或读取失败记录错误并请求断开，仅终止当前请求。
 
-完整恢复 Coin、Experience 和库存后，沿原 GhostOwner、AutoCommandTarget、CommandTarget、生成位置及 LinkedEntityGroup 绑定。仅无档新玩家采用 0/0、空库存；体力仍为烘焙 100/100，第 6A 生命也从烘焙 100/100 开始，攻击状态与位置重新初始化。断线销毁仍由原 NetCode 生命周期负责；存档在成功奖励及第 7A 物品使用时保存，不增加断线补存或退出回调。
+完整恢复Coin、Experience、库存与Tools后，沿原 GhostOwner、AutoCommandTarget、CommandTarget、生成位置及 LinkedEntityGroup 绑定。仅无档新玩家采用0/0、空库存/工具；v1读取迁移工具为空；体力仍为烘焙 100/100，第 6A 生命也从烘焙 100/100 开始，攻击状态与位置重新初始化。断线销毁仍由原 NetCode 生命周期负责；成功奖励/E/F植物/G/工具制作或工具完成时保存，候选保留Tools；不增加断线补存或退出回调。
 
 ## 【KNOWN ISSUES】第 4D 阶段玩家验收
 
@@ -237,4 +237,8 @@ PlayerView 的现有网络 Owner 连接客户端表现脚本，后者只读取�
 
 ## 【FACT】资源交互 HUD 的所属玩家数据
 
-当前 Player Baker 在原玩家实体追加初始 Hidden 的 HUD State，四字段按 SendToOwner 同步；客户端仅枚举启用 GhostOwnerIsLocal 的玩家并在死亡/断线/地图停止时收起。HUD 只展示原 F 目标/进度，原玩家属性、输入和复活流程保持；字段、Main Camera 挂载、注册/解绑及 JSON 归[交互显示](MapInteractionHud.md)。正常编译/所属 Serializer/初始烘焙已静态核对，双端本地显示及输入/死亡/复活/重连人工 GamePlayer 为 UNKNOWN，归[运行入口](Runtime.md)HUD 八项清单。
+当前 Player Baker 在原玩家实体追加初始 Hidden 的 HUD State，四字段按 SendToOwner 同步；客户端仅枚举启用 GhostOwnerIsLocal 的玩家并在死亡/断线/地图停止时收起。HUD 只展示原 F 目标/进度，原玩家属性、输入和复活流程保持；字段、Main Camera 挂载、注册/解绑及 JSON 归[交互显示](MapInteractionHud.md)。正常编译/所属 Serializer/初始烘焙已静态核对；用户已确认本阶段人工 GamePlayer 通过，限[运行入口](Runtime.md)HUD 八项清单及 v7/revision=10，未实际触发的跨端/预测时序/生命周期和独立失败仍为 UNKNOWN。
+
+## 【FACT】所属工具、输入与生命边界
+
+原Player Baker追加空GatherTool缓冲与零CraftFeedback，两者SendToOwner；数字1/2单次InputEvent只由本地GhostOwnerIsLocal写入，F沿原选择自动使用对应工具。准入先完整校验v1/v2存档及当前工具定义，再恢复耐久；死亡/R保留工具，重连不补满。原生命/体力/近战/位置、Prefab/Animator与镜头规则保持，工具资格复用原F条件并拒绝资源预约期间制作。所属HUD读取工具/反馈，详细规则归[采集工具](MapGatherTools.md)/[交互HUD](MapInteractionHud.md)。v8/revision=11正常编译/烘焙静态通过，人工归属、死亡/R/重连及HUD仍为UNKNOWN，见[运行入口](Runtime.md)新清单；旧用户通过保持原范围。

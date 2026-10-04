@@ -94,6 +94,7 @@ namespace Code_01.CombatPrototype.Map
                     var current = EntityManager.GetComponentData<CombatPrototypeMapTreeState>(tree);
                     if (current.Phase != CombatPrototypeMapTreePhase.Chopping) continue;
                     var progress = EntityManager.GetComponentData<CombatPrototypeMapTreeProgress>(tree);
+                    var durabilitySaved = false;
                     try
                     {
                         var index = FindCollector(players, progress.Collector, current.CollectorNetworkId);
@@ -115,16 +116,19 @@ namespace Code_01.CombatPrototype.Map
                             continue;
                         }
                         if (time >= progress.FinishAt)
-                            Complete(source, tree, current, player, map, settings, tick, dropOwner);
+                            Complete(source, tree, current, player, map, settings, tick, dropOwner, out durabilitySaved);
                     }
                     catch (Exception exception)
                     {
                         Debug.LogError("[CombatPrototype.Map] Tree harvest update failed; stage=UpdateReservation, map=" +
                             map.MapDefinitionId + ", placement=" + current.PlacementIndex + ", NetworkId=" +
                             current.CollectorNetworkId + ", tree=" + tree + ", resource=" + settings.ResourceKey + ". " + exception);
-                        var latest = EntityManager.GetComponentData<CombatPrototypeMapTreeState>(tree);
-                        if (latest.Phase == CombatPrototypeMapTreePhase.Chopping)
-                            Cancel(tree, latest, map.MapDefinitionId, "ProcessingFailed");
+                        if (!durabilitySaved)
+                        {
+                            var latest = EntityManager.GetComponentData<CombatPrototypeMapTreeState>(tree);
+                            if (latest.Phase == CombatPrototypeMapTreePhase.Chopping)
+                                Cancel(tree, latest, map.MapDefinitionId, "ProcessingFailed");
+                        }
                     }
                 }
 
@@ -133,21 +137,23 @@ namespace Code_01.CombatPrototype.Map
         }
 
         internal bool TryBegin(Entity tree, Entity player, int networkId, uint hitSequence,
-            double time, FixedString64Bytes mapId, CombatPrototypeMapTreeSettings settings)
+            double time, FixedString64Bytes mapId, CombatPrototypeMapTreeSettings settings, Entity source)
         {
             var state = EntityManager.GetComponentData<CombatPrototypeMapTreeState>(tree);
             if (state.Phase != CombatPrototypeMapTreePhase.Standing) return false;
-            var progress = EntityManager.GetComponentData<CombatPrototypeMapTreeProgress>(tree);
-            progress = new CombatPrototypeMapTreeProgress
+            var toolKind = CombatPrototypeMapGatherToolUtility.SelectForWork(EntityManager, source, player,
+                CombatPrototypeMapGatherToolKind.Axe, settings.HarvestDuration, out var duration);
+            var progress = new CombatPrototypeMapTreeProgress
             {
-                Collector = player, StartHitSequence = hitSequence, FinishAt = time + settings.HarvestDuration
+                Collector = player, StartHitSequence = hitSequence, FinishAt = time + duration,
+                ToolKind = toolKind, ActualDuration = duration
             };
             state.Phase = CombatPrototypeMapTreePhase.Chopping;
             state.CollectorNetworkId = networkId;
             EntityManager.SetComponentData(tree, progress);
             EntityManager.SetComponentData(tree, state);
             Debug.Log("[CombatPrototype.Map] Tree harvest started; map=" + mapId + ", placement=" +
-                state.PlacementIndex + ", NetworkId=" + networkId + ", duration=" + settings.HarvestDuration + ".");
+                state.PlacementIndex + ", NetworkId=" + networkId + ", tool=" + toolKind + ", duration=" + duration + ".");
             return true;
         }
 
@@ -194,57 +200,96 @@ namespace Code_01.CombatPrototype.Map
 
         private void Complete(Entity source, Entity tree, CombatPrototypeMapTreeState state, OnlinePlayer player,
             CombatPrototypeMapData map, CombatPrototypeMapTreeSettings settings, NetworkTick tick,
-            CombatPrototypeMapDropSpawnSystem dropOwner)
+            CombatPrototypeMapDropSpawnSystem dropOwner, out bool durabilitySaved)
         {
+            durabilitySaved = false;
             var index = _obstacles[state.PlacementIndex];
             var oldObstacle = EntityManager.GetBuffer<CombatPrototypeMapObstacle>(source)[index];
             var position = EntityManager.GetComponentData<LocalTransform>(tree).Position;
+            var toolKind = EntityManager.GetComponentData<CombatPrototypeMapTreeProgress>(tree).ToolKind;
             var drop = Entity.Null;
             var dropId = 0;
             var historyLength = EntityManager.GetBuffer<CombatPrototypeMapTreeBlockingEvent>(tree).Length;
+            var stage = "PrepareDrop";
             try
             {
                 drop = dropOwner.SpawnOwnedDrop(source, settings.DropPrefab, settings.DropResourceKey,
                     settings.DropItemId, settings.DropQuantity, position, out dropId);
-                // Instantiate invalidated handles; prepare history capacity before the nonstructural commit.
+                // Instantiate invalidated handles. Acquire every commit reference and capacity before saving.
+                stage = "PrepareCommit";
                 var history = EntityManager.GetBuffer<CombatPrototypeMapTreeBlockingEvent>(tree);
                 history.EnsureCapacity(checked(historyLength + 1));
-                EntityManager.SetComponentData(tree, new CombatPrototypeMapTreeProgress
+                var obstacles = EntityManager.GetBuffer<CombatPrototypeMapObstacle>(source);
+                var stateAccess = SystemAPI.GetComponentLookup<CombatPrototypeMapTreeState>().GetRefRW(tree);
+                var progressAccess = SystemAPI.GetComponentLookup<CombatPrototypeMapTreeProgress>().GetRefRW(tree);
+                var tools = EntityManager.GetBuffer<CombatPrototypeMapGatherTool>(player.Entity);
+                var nextProgress = new CombatPrototypeMapTreeProgress
                 {
                     RegrowAt = settings.RegrowEnabled != 0 ? SystemAPI.Time.ElapsedTime + settings.RegrowSeconds : 0d
-                });
-                history.Add(new CombatPrototypeMapTreeBlockingEvent { TransitionTick = tick.SerializedData, Disabled = 1 });
+                };
                 var obstacle = oldObstacle;
                 obstacle.Disabled = 1;
-                var obstacles = EntityManager.GetBuffer<CombatPrototypeMapObstacle>(source);
+                var nextState = state;
+                nextState.Phase = CombatPrototypeMapTreePhase.Felled;
+                nextState.CollectorNetworkId = 0;
+                nextState.FelledTick = tick.SerializedData;
+                var transition = new CombatPrototypeMapTreeBlockingEvent { TransitionTick = tick.SerializedData, Disabled = 1 };
+                var toolIndex = -1;
+                var nextTool = default(CombatPrototypeMapGatherTool);
+                if (toolKind != CombatPrototypeMapGatherToolKind.None)
+                {
+                    var definitions = EntityManager.GetBuffer<CombatPrototypeMapGatherToolDefinition>(source, true);
+                    nextTool = CombatPrototypeMapGatherToolUtility.PrepareConsumption(definitions, tools, toolKind, out toolIndex);
+                    var identity = EntityManager.GetComponentData<CombatPrototypePlayerIdentity>(player.Entity).PlayerId;
+                    var reward = EntityManager.GetComponentData<CombatPrototypePlayerReward>(player.Entity);
+                    var inventory = EntityManager.GetBuffer<CombatPrototypeInventoryItem>(player.Entity, true);
+                    var candidate = CombatPrototypePlayerSaveStore.PrepareToolUse(identity, reward, inventory, tools, toolIndex, nextTool);
+                    stage = "SaveDurability";
+                    CombatPrototypePlayerSaveStore.SavePrepared(candidate);
+                    durabilitySaved = true;
+                }
+                stage = "CommitCompletion";
+                // No structural changes, allocation or reference acquisition after successful SavePrepared.
+                if (toolIndex >= 0) tools[toolIndex] = nextTool;
+                progressAccess.ValueRW = nextProgress;
+                history.Add(transition);
                 obstacles[index] = obstacle;
-                state.Phase = CombatPrototypeMapTreePhase.Felled;
-                state.CollectorNetworkId = 0;
-                state.FelledTick = tick.SerializedData;
-                EntityManager.SetComponentData(tree, state);
-                Debug.Log("[CombatPrototype.Map] Tree felled and drop spawned; map=" + map.MapDefinitionId +
+                stateAccess.ValueRW = nextState;
+                Debug.Log("[CombatPrototype.Map] Tree completed and drop spawned; map=" + map.MapDefinitionId +
                     ", placement=" + state.PlacementIndex + ", NetworkId=" + player.NetworkId + ", DropId=" + dropId +
                     ", itemId=" + settings.DropItemId + ", quantity=" + settings.DropQuantity +
-                    ", resource=" + settings.DropResourceKey + ".");
+                    ", tool=" + toolKind + ", durability=" + nextTool.Durability + ", resource=" + settings.DropResourceKey + ".");
             }
             catch (Exception exception)
             {
-                if (drop != Entity.Null) dropOwner.ReleaseDrop(drop);
-                try
+                // A persisted cost is final. Unexpected faults beyond this boundary cannot be compensated with an old save.
+                if (!durabilitySaved)
                 {
-                    var obstacles = EntityManager.GetBuffer<CombatPrototypeMapObstacle>(source);
-                    obstacles[index] = oldObstacle;
-                    EntityManager.GetBuffer<CombatPrototypeMapTreeBlockingEvent>(tree).ResizeUninitialized(historyLength);
-                    Cancel(tree, state, map.MapDefinitionId, "DropOrCommitFailed");
+                    if (drop != Entity.Null)
+                    {
+                        try { dropOwner.ReleaseDrop(drop); }
+                        catch (Exception cleanup)
+                        {
+                            Debug.LogError("[CombatPrototype.Map] Tree drop cleanup failed; stage=ReleaseCurrentDrop, map=" +
+                                map.MapDefinitionId + ", placement=" + state.PlacementIndex + ", DropId=" + dropId + ". " + cleanup);
+                        }
+                    }
+                    try
+                    {
+                        var obstacles = EntityManager.GetBuffer<CombatPrototypeMapObstacle>(source);
+                        obstacles[index] = oldObstacle;
+                        EntityManager.GetBuffer<CombatPrototypeMapTreeBlockingEvent>(tree).ResizeUninitialized(historyLength);
+                        Cancel(tree, state, map.MapDefinitionId, "DropOrSaveOrCommitFailed");
+                    }
+                    catch (Exception rollback)
+                    {
+                        Debug.LogError("[CombatPrototype.Map] Tree rollback failed; stage=RollbackTree, map=" +
+                            map.MapDefinitionId + ", placement=" + state.PlacementIndex + ", DropId=" + dropId +
+                            ", resource=" + settings.DropResourceKey + ". " + rollback);
+                    }
                 }
-                catch (Exception rollback)
-                {
-                    Debug.LogError("[CombatPrototype.Map] Tree rollback failed; stage=RollbackTree, map=" +
-                        map.MapDefinitionId + ", placement=" + state.PlacementIndex + ", DropId=" + dropId +
-                        ", resource=" + settings.DropResourceKey + ". " + rollback);
-                }
-                throw new InvalidOperationException("Tree completion failed; placement=" + state.PlacementIndex +
-                    ", DropId=" + dropId + ", itemId=" + settings.DropItemId +
+                throw new InvalidOperationException("Tree completion failed; stage=" + stage + ", durabilitySaved=" + durabilitySaved +
+                    ", placement=" + state.PlacementIndex + ", DropId=" + dropId + ", itemId=" + settings.DropItemId +
                     ", resource=" + settings.DropResourceKey + ".", exception);
             }
         }

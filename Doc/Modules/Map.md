@@ -15,11 +15,11 @@
 
 ## 【FACT】当前默认配置
 
-Json/BuiltIn 当前一致为 v7/revision=10；SubScene 选 Json。三类资源默认 600 秒原点再生；F 最近目标与[HUD](MapInteractionHud.md)、[树木](MapTreeHarvest.md)、[采矿](MapMining.md)、G [掉落](MapDrops.md)各按专题。
+Json/BuiltIn 为 v8/revision=11；三类资源600秒再生。F/HUD、[工具](MapGatherTools.md)、[树木](MapTreeHarvest.md)、[采矿](MapMining.md)、G[掉落](MapDrops.md)各按专题。
 
 | 配置字段 | 当前值与用途 |
 |---|---|
-| schemaVersion / configRevision | 7 / 10 |
+| schemaVersion / configRevision | 8 / 11 |
 | defaultSeed | 12345，用于确定性布置 |
 | geometry.cellSizeMeters | 2 米 |
 | geometry.cellsPerChunk | 每块单边 16 格，即 32×32 米 |
@@ -53,7 +53,7 @@ gather_apple 的 footprintRadiusMeters=0.3、minimumSameTypeSpacingMeters=1.5、
 
 ## 【FACT】JSON 文件与配置入口
 
-Assets/Config/CombatPrototype/Map/ 有五份 UTF-8 无 BOM JSON。当前地图 v7/revision=10，movement/drops/treeHarvest/mining/interactionHud 必填；生态含 treeObjectId/gatherObjectId/mineObjectId、mineDensityPer100m2，物体新增 mine_rock。原地表、空间、种子和出生值保持。
+Assets/Config/CombatPrototype/Map/ 有五份 UTF-8 无 BOM JSON。当前地图v8/revision=11，movement/drops/treeHarvest/mining/gatherTools/interactionHud必填；生态含 treeObjectId/gatherObjectId/mineObjectId、mineDensityPer100m2，物体新增 mine_rock。原地表、空间、种子和出生值保持。
 
 | MapAuthoring 字段 | 显式绑定文件 | JSON 根类型 |
 |---|---|---|
@@ -63,7 +63,7 @@ Assets/Config/CombatPrototype/Map/ 有五份 UTF-8 无 BOM JSON。当前地图 v
 | GroundsJson | [grounds.json](../../Assets/Config/CombatPrototype/Map/grounds.json) | GroundDefinitionConfig 数组 |
 | ObjectsJson | [objects.json](../../Assets/Config/CombatPrototype/Map/objects.json) | MapObjectDefinitionConfig 数组 |
 
-SourceMode=BuiltIn 时明确使用内置来源，SourceMode=Json 时使用选中地图 JSON 和三份共享 JSON；Json 来源失败不自动回退 BuiltIn。Preset=Grassland 要求地图 ID 为 battle_grassland_01，Preset=Forest 要求 battle_forest_01。schemaVersion=7 管理当前整组配置契约，configRevision 为正整数修订号；不会自动递增。旧 v1～v6 或缺少 movement/drops/treeHarvest/mining/interactionHud/treeObjectId/gatherObjectId/mineObjectId/mineDensityPer100m2 的文件明确失败，不补默认字段或回退来源。
+SourceMode=BuiltIn 时明确使用内置来源，SourceMode=Json 时使用选中地图 JSON 和三份共享 JSON；Json 来源失败不自动回退 BuiltIn。Preset=Grassland 要求地图 ID 为 battle_grassland_01，Preset=Forest 要求 battle_forest_01。schemaVersion=8管理当前整组配置契约，configRevision 为正整数修订号；不会自动递增。旧v1～v7或缺少movement/drops/treeHarvest/mining/gatherTools/interactionHud/treeObjectId/gatherObjectId/mineObjectId/mineDensityPer100m2 的文件明确失败，不补默认字段或回退来源。
 
 [MapMovementConfig.cs](../../Assets/Scripts/CombatPrototype/Map/MapMovementConfig.cs) 是地图定义的必填 movement 段：
 
@@ -143,7 +143,7 @@ Map Baker 将再生开关/间隔写入物体定义，GatherSpawnSystem 复制到
 
 [CombatPrototypeMapGatherAssetBuilder.cs](../../Assets/Scripts/Editor/CombatPrototypeMapGatherAssetBuilder.cs) 提供“生成第四阶段采集资源”，只处理 GatherApple 的三个新资源路径；[CombatPrototypeMapGatherBinding.cs](../../Assets/Scripts/Editor/CombatPrototypeMapGatherBinding.cs) 提供“绑定第四阶段采集物”，校验干净 SubScene、两个模板及完整网格后仅追加 gather_apple Prefab 引用，拒绝重复绑定。菜单均位于 Tools/CombatPrototype/地图。
 
-原主场景、镜头、玩家/敌人 Ghost 及 PlayerView Prefab、Animator、旧 meta、包与构建设置保持。采集复用网络背包及玩家 v1 存档，不接正式 QFramework Map/UI 链；地图资源耗尽及再生期限仅属于本局，服务端重启从 Available 重新生成，已有玩家库存按原固定 ID 恢复。
+原主场景、镜头、玩家/敌人 Ghost 及 PlayerView Prefab、Animator、旧 meta、包与构建设置保持。采集复用网络背包及玩家v2存档（读取v1迁移），不接正式 QFramework Map/UI 链；地图资源耗尽及再生期限仅属于本局，服务端重启从 Available 重新生成，已有玩家库存按原固定 ID 恢复。
 
 ## 【KNOWN ISSUES】当前验收边界
 
@@ -159,4 +159,4 @@ Map Baker 将再生开关/间隔写入物体定义，GatherSpawnSystem 复制到
 
 森林/草原：20/18 矿点、109/71 阻挡，关闭采矿后原布局保持；矿点再生编译/八次隔离烘焙已核对，用户确认人工通过，范围见[运行入口](Runtime.md)/[采矿](MapMining.md)。
 
-HUD 编译/所属序列化/十次隔离烘焙已核对，人工 UNKNOWN，见[交互显示](MapInteractionHud.md)。
+HUD用户通过限v7/revision=10；工具v8/revision=11静态通过、人工UNKNOWN，见[工具](MapGatherTools.md)。

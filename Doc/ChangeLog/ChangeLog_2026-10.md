@@ -571,3 +571,17 @@
 - 在授权主场景 Main Camera 一次追加一个 HUD 组件并保存，fileID=329441056、脚本 GUID=55daeba957df67347a415a043d00bd70；三根对象、原四个 Camera 组件和 Prefab/Animator/旧 meta/其他资源保持。只清掉保存产生的两个受影响 m_Name 行尾空格。
 - 正常 Unity 编译无 C# Error，所属 Serializer 四字段和顺序已核对。森林/草地各覆盖 Json/BuiltIn 默认与 Json 关闭采矿/矿点再生/HUD，共十次隔离 Editor 烘焙，初始 HUD、引用、全部布局及空间约束通过；默认矿点20/18、阻挡109/71，Console 前后 [0 Error,9 Warning,53 Log]，无新增烘焙警告。临时烘焙 Scene/World 已释放，主场景干净。
 - 增量同步导航、地图与相关模块，新增交互显示专题、Runtime 八项人工清单及外部配置模板；先前矿点再生人工通过记录保持原 v6/revision=9 范围。HUD 实际显示/字形/分辨率、跨端/预测/取消/生命周期人工 GamePlayer 与性能/带宽、平台构建、线上联调为 UNKNOWN；未运行游戏系统、PlayMode、逻辑单元测试、命令行构建、发布、性能采样或图片检查，未创建子Agent、未提交 Git。
+
+## 2026-10-04 资源交互提示与进度显示人工验收反馈
+
+- 用户反馈“我已验收通过，接下来下一阶段”；主线程结合既有静态核对与该人工反馈判定资源交互提示与进度显示阶段通过，范围限 CombatPrototypeNetCode、schemaVersion=7/configRevision=10 及 Runtime HUD 八项清单。人工结论来自用户反馈，AI 未运行 GamePlayer/PlayMode 或游戏模拟/显示系统。
+- 同步交互显示专题、地图、玩家、战斗、掉落、背包、资源与运行入口的当前验收状态及外部配置模板；保留 HUD 八项清单、恢复默认配置要求和各旧阶段的原版本/清单。未实际触发的精确距离/同距、同 tick、延迟/预测回放、晚加入和独立保存/创建/提交/清理/回滚失败仍为 UNKNOWN，中文字体/字形覆盖未确认；性能、带宽、平台构建和线上联调未验收。
+- 此次仅同步九份项目文档与一份外部模板，未改脚本、JSON、Scene、Prefab、Animator、meta 或导航；未新增/运行逻辑单元测试、命令行构建、发布、性能采样或图片检查，未创建子Agent或提交 Git。
+
+## 2026-10-04 采集工具与耐久按确认方案落地
+
+- 在CombatPrototypeNetCode接入石斧/石镐，数字1/2单次制作、F按目标自动使用；默认耐久60/40、成本1、耗时倍率0.75、配方木3石2/木2石3，无工具仍徒手1/2/3秒。制作先保存扣料/满耐久候选，工具完成先保存耐久；取消不扣、损坏记录保留、R/重连不补满。
+- 新增五个职责脚本及Unity生成meta；地图Json/BuiltIn改为v8/revision=11和必填gatherTools，玩家工具/反馈SendToOwner，实际耗时锁定仅服务端。沿原Main Camera HUD增加第二行和2秒制作反馈，面板320×104；未改Scene/Prefab/Animator/旧meta/其他资源或包/构建设置。
+- PlayerSave写v2/Tools，严格读取v1并只在内存迁移为Tools空，不赠工具、不立即或批量重写；奖励/E/F植物/G候选保留Tools，固定路径与正式档替换保持。保存前完成失败清理当前掉落；保存成功后的意外ECS异常明确暴露，不以旧档补偿。
+- 正常Unity编译无C# Error，新Serializer/输入/仅服务端字段/系统声明顺序及五脚本导入已静态核对；十次隔离Editor烘焙覆盖两模板Json/BuiltIn及关闭采矿/工具/HUD，v8/11、工具/初值/HUD参数一致，布局/旧资源绑定保持、空间违规0，Console前后[0 Error,2 Warning,0 Log]，无新增烘焙警告，原场景干净且临时World释放。
+- 增量同步[工具专题](../Modules/MapGatherTools.md)、受影响模块、导航、外部配置建议模板与Runtime新12项人工清单。主线程静态验收通过；本阶段GamePlayer/PlayMode人工结果为UNKNOWN，既有通过仅保留各自旧版本/清单。未运行游戏模拟/显示系统、逻辑单元测试、命令行构建、发布、性能采样或图片检查，未创建子Agent或提交Git；同步存档耗时/性能、带宽、字体、平台、线上及文件替换后意外ECS故障仍未验证。

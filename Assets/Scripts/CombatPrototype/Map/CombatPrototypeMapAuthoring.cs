@@ -107,6 +107,20 @@ namespace Code_01.CombatPrototype.Map
                     TreeLabel = new FixedString64Bytes(hud.treeLabel),
                     MineLabel = new FixedString64Bytes(hud.mineLabel)
                 });
+                var gatheringTools = config.map.gatherTools;
+                AddComponent(entity, new CombatPrototypeMapGatherToolSettings
+                {
+                    Enabled = (byte)(gatheringTools.enabled ? 1 : 0), CraftFeedbackSeconds = gatheringTools.craftFeedbackSeconds
+                });
+                var toolDefinitions = AddBuffer<CombatPrototypeMapGatherToolDefinition>(entity);
+                foreach (var tool in gatheringTools.tools)
+                    toolDefinitions.Add(new CombatPrototypeMapGatherToolDefinition
+                    {
+                        ToolId = new FixedString64Bytes(tool.toolId), DisplayName = new FixedString64Bytes(tool.displayName),
+                        Kind = CombatPrototypeMapGatherToolUtility.ResolveKind(tool.toolId), MaxDurability = tool.maxDurability,
+                        DurabilityCostPerCompletion = tool.durabilityCostPerCompletion, DurationMultiplier = tool.durationMultiplier,
+                        CraftWoodQuantity = tool.craftWoodQuantity, CraftStoneQuantity = tool.craftStoneQuantity
+                    });
                 var chunks = AddBuffer<CombatPrototypeMapChunk>(entity);
                 foreach (var chunk in layout.Chunks) chunks.Add(chunk);
                 var cells = AddBuffer<CombatPrototypeMapCell>(entity);

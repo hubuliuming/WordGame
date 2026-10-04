@@ -25,7 +25,7 @@
 
 ## 【FACT】JSON 契约与默认值
 
-[battle_forest_01.json](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[battle_grassland_01.json](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 为 schemaVersion=7/configRevision=10。mining 及全部字段必填，interactionHud 归[交互显示](MapInteractionHud.md)；旧 v1～v6、缺失/未知/重复字段、错误类型或无效引用明确失败，不补字段、不回退来源。配置只在烘焙时读取，无运行热重载或新联网配置校验协议。各端须使用相同代码、输入布局、Ghost、配置及资源。
+[battle_forest_01.json](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[battle_grassland_01.json](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 为 schemaVersion=8/configRevision=11。mining 及全部字段必填，interactionHud归[交互显示](MapInteractionHud.md)，gatherTools归[采集工具](MapGatherTools.md)；旧v1～v7、缺失/未知/重复字段、错误类型或无效引用明确失败，不补字段、不回退来源。配置只在烘焙时读取，无运行热重载或新联网配置校验协议。各端须使用相同代码、输入布局、Ghost、配置及资源。
 
 ```json
 "mining": {
@@ -71,17 +71,17 @@ MapPresentation 在校验和实例化两处均跳过 Mineable，不创建静态�
 - 玩家存活、Move 有限且为零、无 Attack 请求且近战 Ready 才合格；即使位移被障碍挡住，非零 Move 仍拒绝/取消。
 - 玩家同时只持有一种资源预约，已有交互期间 F 不重置、不切换；旧 F/H 优先判断移除。G/E/R 仍独立，R 不补发死亡时的 F。
 - 统一入口按各类型配置的 X/Z 交互距离筛选三类最近可用目标，矿点须 Available；精确同距取小 PlacementIndex，请求按 NetworkId 升序且立即预约，已占用点不覆盖，下一玩家可取其他有效目标。当前矿点距离 2 米。
-- 预约保存 Collector、当前 HitSequence 与 FinishAt=服务端模拟时间+3 秒，状态 Mining、CollectorNetworkId=该玩家。重复 F 不重置期限；持续按住不自动连续采矿。
+- 预约保存Collector、当前HitSequence、ToolKind、ActualDuration及FinishAt=模拟时间+锁定耗时（徒手3秒，镐子默认2.25秒），状态 Mining、CollectorNetworkId=该玩家。重复 F 不重置期限；持续按住不自动连续采矿。
 - 每次更新核对在线/归属、生命、Move/攻击、HitSequence 和距离。移动/攻击/受击/死亡/超距/在线或归属失效均取消，清空进度/再生期限、恢复 Available/CollectorNetworkId=0/MinedTick=0，不创建石材、不解除阻挡；已有轮次历史保持，重新 F 也不清空历史。
 - 统一入口在资源系统更新前记录已有交互，完成/取消玩家本 tick 不再预约，后续须新 F。启动失败只清理该玩家部分预约，不自动转选另一目标；日志保留阶段/地图/类型/布置/玩家及原异常，清理错误单独记录，继续其他请求。
 
 ## 【CURRENT STRATEGY】完成、掉落与回滚
 
-到期仍合格时，MineHarvest 保存原障碍值与历史长度，调用原 DropSpawnSystem.SpawnOwnedDrop，传入明确 map source、石材 Prefab/资源键、stone/3 与矿点起点。DropSpawnUtility 完整初始化 Transform/DropState/DropProgress，并登记共享掉落所有权后才返回；沿原统一 DropId 递增、不复用，可有失败空号。Instantiate 后重新获取所需组件/缓冲，先准备历史容量，再结束预约并写入 RegrowAt=启用时的当次 Server World 模拟时间+间隔（关闭为 0）、追加当前权威 tick 的 Disabled=1 历史、设置对应障碍 Disabled=1，提交 Depleted/CollectorNetworkId=0/MinedTick=当前权威 tick。只有完整掉落与矿点提交成功才保留期限；采矿完成不直接改库存/金币/经验，不调用存档。
+到期仍合格时，MineHarvest 保存原障碍值与历史长度，调用原 DropSpawnSystem.SpawnOwnedDrop，传入明确 map source、石材 Prefab/资源键、stone/3 与矿点起点。DropSpawnUtility 完整初始化 Transform/DropState/DropProgress，并登记共享掉落所有权后才返回；沿原统一 DropId 递增、不复用，可有失败空号。Instantiate 后重新获取所需组件/缓冲，先准备历史容量及全部提交引用；使用镐子时先保存扣耐久候选，成功后再提交耐久并结束预约并写入 RegrowAt=启用时的当次 Server World 模拟时间+间隔（关闭为 0）、追加当前权威 tick 的 Disabled=1 历史、设置对应障碍 Disabled=1，提交 Depleted/CollectorNetworkId=0/MinedTick=当前权威 tick。只有完整掉落与矿点提交成功才保留期限；采矿完成不直接改库存/金币/经验；徒手不新增保存，使用镐子时保存耐久，规则归工具专题。
 
-生成或提交失败只释放本次石材，尝试恢复原障碍与历史长度并取消到 Available、清空期限；既往轮次历史保留，不安排失败项再生。记录原异常、当前 DropId/物品/资源及独立清理/回滚错误。若回滚本身失败，日志暴露实际错误，不宣称恢复成功；其他矿点/玩家继续，不自动补发或重试。无法实际触发的运行失败分支为 UNKNOWN。
+保存前生成/准备/保存失败只释放本次石材，尝试恢复原障碍与历史长度并取消到 Available、清空期限；既往轮次历史保留，不安排失败项再生。记录原异常、当前 DropId/物品/资源及独立清理/回滚错误。若回滚失败，日志暴露实际错误，不宣称恢复成功；耐久保存成功后不执行此回滚，意外ECS提交故障暴露durabilitySaved=true，恢复保证为UNKNOWN；其他矿点/玩家继续，不自动补发或重试。无法实际触发的运行失败分支为 UNKNOWN。
 
-石材复用 drops 的 0.4 秒飞行、0.6 米散落/弧高、0.05 米贴地、0.5 缩放、600 秒寿命和 2 米 G 拾取距离。drops.enabled 只关闭敌人额外掉落，mining.enabled 独立；没有落点物理碰撞或避障。DropPickup 按实际 ItemId 解析石材并合并同名库存，PrepareReward → SavePrepared 成功才提交库存及 Consumed；失败保留旧正式档、库存数量和未到期掉落，恢复后须新 G。原 v1 存储类/格式保持，已入包石材随固定 ID 恢复，矿点耗尽/进度及地面掉落只保留本局。
+石材复用 drops 的 0.4 秒飞行、0.6 米散落/弧高、0.05 米贴地、0.5 缩放、600 秒寿命和 2 米 G 拾取距离。drops.enabled 只关闭敌人额外掉落，mining.enabled 独立；没有落点物理碰撞或避障。DropPickup 按实际 ItemId 解析石材并合并同名库存，PrepareReward → SavePrepared 成功才提交库存及 Consumed；失败保留旧正式档、库存数量和未到期掉落，恢复后须新 G。G候选保留当前Tools、沿玩家v2保存并兼容读取v1，已入包石材随固定ID恢复，矿点耗尽/进度及地面掉落只保留本局。
 
 ## 【CURRENT STRATEGY】原点再生与占位等待
 
@@ -89,7 +89,7 @@ MineRegrow 在仅服务端的 PredictedSimulation、MineHarvest 之后和 Player
 
 有到期点时收集全部存活 PlayerNetCode/PlayerHealth 和 EnemyState 的 X/Z 位置，包含未启用 Simulate 的存活玩家；IsDead!=0 不占位。角色位置非有限时记录具体错误并停止该次占位批次。原障碍圆中心到角色中心的距离小于等于“矿点 footprintRadius+角色半径+collisionSkin”即占位；当前玩家为 0.75+0.4+0.01=1.16 米，敌人为 0.75+0.45+0.01=1.21 米。占位时保持 Depleted、隐藏和解除阻挡，保留原到期时间，后续更新继续检查；不推开角色、不移动矿点或重置倒计时。
 
-原点空闲时先准备历史容量，再追加当前权威 tick 的 Disabled=0，清空 MineProgress（含 RegrowAt）、恢复 Available/CollectorNetworkId=0/MinedTick=0 及对应障碍。原 Ghost/布置/位置/朝向不变，显示由原 MineRender 恢复。再生本身不生成石材、不改库存或写盘；之后必须新 F 预约，继续默认 3 秒、stone ×3、原 G 保存链。
+原点空闲时先准备历史容量，再追加当前权威 tick 的 Disabled=0，清空 MineProgress（含 RegrowAt）、恢复 Available/CollectorNetworkId=0/MinedTick=0 及对应障碍。原 Ghost/布置/位置/朝向不变，显示由原 MineRender 恢复。再生本身不生成石材、不改库存或写盘；之后必须新 F 预约，继续基础徒手3秒、可用镐子2.25秒、stone×3及原G保存链。
 
 各到期矿点独立隔离错误；恢复失败尝试还原耗尽状态、原期限、障碍与历史长度，保留原异常，回滚失败另记具体错误，其他条目继续。成功回滚后可在之后更新重新检查，不宣称回滚失败已恢复。取消/失败采矿没有再生期限。再生开关关闭时矿点保持本局耗尽，mining.enabled=false 时无矿点；开关和参数须 PlayMode 前配置并完成烘焙。
 
@@ -97,7 +97,7 @@ MineRegrow 在仅服务端的 PredictedSimulation、MineHarvest 之后和 Player
 
 MineObstacle 在 Client/Server 的 PredictedSimulation、TreeObstacle 之前执行，后者再先于玩家/敌人移动。按地图源建立 Mineable 的 PlacementIndex→障碍索引；每个预测 tick 先恢复这些记录的初始 Disabled=0。对 Available/Mining/Depleted 均从历史末尾查找当前 ServerTick 严格晚于的最近有效转换，再应用该条 Disabled；没有匹配转换或历史为空时保持初始阻挡。耗尽/再生在移动后提交，从下一模拟 tick 生效；回放到转换前或两次转换间按历史恢复，不能只用最新 Phase/MinedTick。仅处理 Mineable 索引；缺索引、缺历史、无效 tick/Disabled 记录具体错误并隔离当前项。每完整轮次增加两条，本局全部历史不截断；取消/新 F 不清空，随矿点实例释放。系统停止恢复本系统索引的初始阻挡，MineRegrow 只清理自己的索引缓存。
 
-矿点由 MineSpawn 在地图根更换/失效、停止及 World 销毁时清理本系统拥有的实体；石材由原 DropSpawn/DropCleanup 清理。共享网格/材质/Prefab 不随实例销毁。没有世界存档、运行中地图切换、工具装备/耐久、采矿动画、物理碰撞或石材使用效果；F 目标提示/进度归[交互显示](MapInteractionHud.md)；E 仍只使用小块肉。
+矿点由 MineSpawn 在地图根更换/失效、停止及 World 销毁时清理本系统拥有的实体；石材由原 DropSpawn/DropCleanup 清理。共享网格/材质/Prefab 不随实例销毁。没有世界存档、运行中地图切换、手动工具装备、采矿动画、物理碰撞或石材使用效果；F 目标提示/进度归[交互显示](MapInteractionHud.md)；E 仍只使用小块肉。
 
 ## 【FACT】资源与 Editor 边界
 
@@ -123,3 +123,5 @@ Tools/CombatPrototype/地图/生成第九阶段采矿资源 要求空闲 EditMod
 矿点原点再生的正常 Unity 编译无 C# Error，MineState 与 MineBlockingEvent Ghost Serializer/Snapshot、仅服务端再生字段及系统顺序已静态核对。Forest/Grassland 的 Json/BuiltIn 各一次，另各一次 Json mining=false 和 regrowEnabled=false（间隔仍为 600），共八次隔离 Editor 烘焙；schemaVersion=6/configRevision=9、默认 true/600、Prefab 空历史/零期限、资源键与全部初始布置位置/朝向一致。默认森林/草原仍为矿点 20/18、阻挡 109/71、树木 89/53、采集点 36/38；关闭采矿为 0 矿点、89/53 阻挡，关闭再生保持启用矿点布局。占地/间距/保护区/敌人初始重叠违规为 0，Console 前后均 [0 Error,3 Warning,7 Log]，无新增烘焙警告，原场景干净，无临时 World 遗留。
 
 用户已确认矿点原点再生人工 GamePlayer 验收通过，主线程结合既有代码/烘焙静态核对与用户反馈判定该阶段通过；范围限 schemaVersion=6/configRevision=9 及[运行入口](Runtime.md)矿点再生八项清单。人工结论来自用户反馈，未实际触发的精确距离/特殊 Simulate、同 tick/延迟/预测回放、晚加入及独立失败分支仍为 UNKNOWN。已有统一 F 及第七/第八阶段用户通过仅限各自原版本/清单，不扩展到新行为。矿点历史随本局轮次增长，其内存/网络开销及规模性能、平台构建与线上联调未测量；AI 未运行 GamePlayer/PlayMode、游戏模拟/显示系统、逻辑单元测试、命令行构建、发布、性能采样或图片检查。
+
+当前自动镐子/耐久归[采集工具](MapGatherTools.md)，v8/revision=11锁定字段/保存链已编译和静态烘焙核对，人工仍为UNKNOWN；旧采矿/再生用户通过仅限各自原版本与清单。

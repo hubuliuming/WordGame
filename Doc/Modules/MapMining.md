@@ -25,7 +25,7 @@
 
 ## 【FACT】JSON 契约与默认值
 
-[battle_forest_01.json](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[battle_grassland_01.json](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 为 schemaVersion=14/configRevision=17。mining 及全部字段必填，interactionHud归[交互显示](MapInteractionHud.md)，gatherTools归[采集工具](MapGatherTools.md)；旧v1～v13、缺失/未知/重复字段、错误类型或无效引用明确失败，不补字段、不回退来源。配置只在烘焙时读取，无运行热重载或新联网配置校验协议。各端须使用相同代码、输入布局、Ghost、配置及资源。
+[battle_forest_01.json](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[battle_grassland_01.json](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 为 schemaVersion=15/configRevision=18。mining 及全部字段必填，interactionHud归[交互显示](MapInteractionHud.md)，gatherTools归[采集工具](MapGatherTools.md)；旧v1～v14、缺失/未知/重复字段、错误类型或无效引用明确失败，不补字段、不回退来源。配置只在烘焙时读取，无运行热重载或新联网配置校验协议。各端须使用相同代码、输入布局、Ghost、配置及资源。
 
 ```json
 "mining": {
@@ -59,7 +59,7 @@ LayoutBuilder 使用原 seed/随机流，先跨全图完成树木，再采集植
 
 MineSpawn 在服务端 Simulation、NetworkReceive 后、GoInGameServer 前取得原地图单例；只生成 Mineable 定义的已布置矿点，settings.Enabled=0 时直接结束。Instantiate 前复制对象/布置缓冲；保留原 Position/Yaw/PlacementIndex，写入 Available、CollectorNetworkId=0、MinedTick=0 和空进度/RegrowAt=0、空 MineBlockingEvent 历史后才登记有效所有权。逐项生成失败记录地图/布置/对象/资源/阶段及原异常，清理当前半成品，继续其他条目，不自动重放整批。
 
-MineState 同步 PlacementIndex、Phase、CollectorNetworkId、MinedTick 四字段，阶段为 Available → Mining → Depleted → Available；MineSettings/Progress 标注 Server，再生配置及 Collector/StartHitSequence/FinishAt/RegrowAt 只由服务端消费。MineBlockingEvent 是独立 Ghost 缓冲，内部容量 4、同步 TransitionTick/Disabled，保留本局全部耗尽/再生转换。耗尽矿点保留原实体，供晚加入接收；再生复用同一 Position/Yaw/PlacementIndex/Ghost，不补生成新实例。新 Server World 从原布局 Available、零期限及空历史重新开始。
+MineState 同步 PlacementIndex、Phase、CollectorNetworkId、MinedTick 四字段，阶段为 Available → Mining → Depleted → Available；MineSettings/Progress 标注 Server，再生配置及 Collector/StartHitSequence/FinishAt/RegrowAt 只由服务端消费。MineBlockingEvent 是独立 Ghost 缓冲，内部容量 4、同步 TransitionTick/Disabled，保留本局全部耗尽/再生转换。耗尽矿点保留原实体，供晚加入接收；再生复用同一 Position/Yaw/PlacementIndex/Ghost，不补生成新实例。[资源存档](MapResourcePersistence.md)开启时恢复耗尽/剩余秒数并重建本局阻挡基态，关闭时从原布局Available、零期限及空历史重置。
 
 MapPresentation 在校验和实例化两处均跳过 Mineable，不创建静态矿点副本；标记按矿点对象角色写入，关闭时因无布置记录也不会显示矿点。MineRender 在客户端 Presentation、EntitiesGraphics 前按 Depleted 禁用 MaterialMeshInfo，Available/Mining 显示；不提交玩法或存档状态。
 
@@ -97,7 +97,7 @@ MineRegrow 在仅服务端的 PredictedSimulation、MineHarvest 之后和 Player
 
 MineObstacle 在 Client/Server 的 PredictedSimulation、TreeObstacle 之前执行，后者再先于玩家/敌人移动。按地图源建立 Mineable 的 PlacementIndex→障碍索引；每个预测 tick 先恢复这些记录的初始 Disabled=0。对 Available/Mining/Depleted 均从历史末尾查找当前 ServerTick 严格晚于的最近有效转换，再应用该条 Disabled；没有匹配转换或历史为空时保持初始阻挡。耗尽/再生在移动后提交，从下一模拟 tick 生效；回放到转换前或两次转换间按历史恢复，不能只用最新 Phase/MinedTick。仅处理 Mineable 索引；缺索引、缺历史、无效 tick/Disabled 记录具体错误并隔离当前项。每完整轮次增加两条，本局全部历史不截断；取消/新 F 不清空，随矿点实例释放。系统停止恢复本系统索引的初始阻挡，MineRegrow 只清理自己的索引缓存。
 
-矿点由 MineSpawn 在地图根更换/失效、停止及 World 销毁时清理本系统拥有的实体；石材由原 DropSpawn/DropCleanup 清理。共享网格/材质/Prefab 不随实例销毁。没有世界存档、运行中地图切换、手动工具装备、采矿动画、物理碰撞或石材使用效果；F 目标提示/进度归[交互显示](MapInteractionHud.md)；E 仍只使用小块肉。
+矿点由 MineSpawn 在地图根更换/失效、停止及 World 销毁时清理本系统拥有的实体；石材由原 DropSpawn/DropCleanup 清理。共享网格/材质/Prefab 不随实例销毁。世界资源档归独立服务；没有运行中地图切换、手动工具装备、采矿动画、物理碰撞或石材使用效果；F 目标提示/进度归[交互显示](MapInteractionHud.md)；E 仍只使用小块肉。
 
 ## 【FACT】资源与 Editor 边界
 
@@ -128,7 +128,7 @@ Tools/CombatPrototype/地图/生成第九阶段采矿资源 要求空闲 EditMod
 
 v9/revision12阶段的[材料面板](MapInventoryPanel.md)只展示石材库存/镐子耐久和原配方，按钮沿原制作链；采矿/石材/阻挡/再生逻辑保持，用户确认面板人工通过限[运行入口](Runtime.md)v9/revision12十二项，未触发的独立显示/输入失败仍UNKNOWN。
 
-当前地图v14/17必填[背包丢弃](MapInventoryDrop.md)，复用原掉落资源及保存链；本专题原交互/工具/产出/再生行为保持。新增丢弃静态及用户人工通过限[运行入口](Runtime.md)v10/13十二项，未触发用例UNKNOWN；旧通过仍限原版本/清单。
+当前地图v15/18必填[背包丢弃](MapInventoryDrop.md)，复用原掉落资源及保存链；本专题原交互/工具/产出/再生行为保持。新增丢弃静态及用户人工通过限[运行入口](Runtime.md)v10/13十二项，未触发用例UNKNOWN；旧通过仍限原版本/清单。
 
 v11/14阶段的[G提示](MapPickupHud.md)只读共用掉落目标，与原F目标/工具进度独立；不修改本专题资源状态、产出、工具耐久、再生或保存。新显示编译/十次隔离烘焙静态通过；用户确认人工通过限v11/14十项，未触发用例UNKNOWN，旧用户通过保持各自版本/清单。
 
@@ -136,4 +136,4 @@ v12/15的[高亮](MapInteractionHighlight.md)按原Kind/PlacementIndex解析矿�
 
 v13/16的[资源状态](MapResourceStatusHud.md)只读Available/Mining/Depleted与原服务端RegrowAt；到期仍Depleted显示等待再生，实际恢复后才显示可用；mining关闭时不选择矿点。原采矿/掉落/占位/阻挡及保存行为保持。新显示静态及用户人工通过，限v13/16十项，未触发用例UNKNOWN，旧通过保持原范围。
 
-当前v14/17的[工具修理](MapToolRepair.md)：Busy期间拒绝修理；原已锁定镐子、ActualDuration/FinishAt、成功扣耐久、地面stone×3、600秒再生/占位/阻挡与保存链保持。新链静态通过、人工UNKNOWN，旧矿点用户通过保持原版本/清单。
+当前v15/18的[工具修理](MapToolRepair.md)：Busy期间拒绝修理；原已锁定镐子、ActualDuration/FinishAt、成功扣耐久、地面stone×3、600秒再生/占位/阻挡与保存链保持。新链静态及用户人工通过，限v14/17十二项，未触发用例UNKNOWN，旧矿点用户通过保持原版本/清单。

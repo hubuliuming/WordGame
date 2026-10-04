@@ -96,6 +96,17 @@ namespace Code_01.CombatPrototype.Map
                 var layout = CombatPrototypeMapLayoutBuilder.Build(config, spawner.EnemyColumns, spawner.EnemySpacing);
                 var entity = GetEntity(TransformUsageFlags.None);
                 AddComponent(entity, layout.Data);
+                var persistence = config.map.resourcePersistence;
+                AddComponent(entity, new CombatPrototypeMapResourcePersistenceSettings
+                {
+                    Enabled = (byte)(persistence.enabled ? 1 : 0), SaveSlotId = persistence.saveSlotId,
+                    SaveIntervalSeconds = persistence.saveIntervalSeconds,
+                    LayoutSignature = new FixedString128Bytes(CombatPrototypeMapResourceLayoutSignature.Compute(config, layout))
+                });
+                AddComponent(entity, new CombatPrototypeMapResourceRestoreState
+                {
+                    Phase = persistence.enabled ? CombatPrototypeMapResourceRestorePhase.Pending : CombatPrototypeMapResourceRestorePhase.Ready
+                });
                 var hud = config.map.interactionHud;
                 AddComponent(entity, new CombatPrototypeMapInteractionHudSettings
                 {

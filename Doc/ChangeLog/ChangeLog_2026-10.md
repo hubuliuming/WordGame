@@ -685,3 +685,17 @@
 - 客户端受击由原 HitSequence 驱动，死亡播放侧倒后隐藏，晚加入直接隐藏已死敌人；保留原死亡实体与统计。表现只读取 Ghost 状态并写模型关节/可见性，完成官方 Transform 桥接依赖后再读取根位置；没有新增敌人复活或客户端伤害事件。
 - Unity 编译、生成的表现 Ghost Serializer、七状态、全部曲线目标、缺失脚本为 0、无事件与静态接地采样已核对。现有 SubScene 的隔离 Editor 烘焙确认 32/8列/间距3、实际 EnemyPrefab 标签/LocalTransform/两实体 LinkedEntityGroup、新表现初态及 ClientPrefab，原 HP100、伤害10、范围1.75、前摇0.5/后摇1保持；主场景仍干净，临时 World/Scene 已释放。主线程判定代码和资源静态落地通过。
 - 增量同步 EnemyArt、战斗、运行入口、资源与数据、性能边界、总导航与本月 ChangeLog，仅检查本次新设定图与新 Clip 预览。工作区工具修理任务的并行改动保留，不计入本次修改与验收。人工 GamePlayer 的双端动画/光照/脚步、攻击取消、死亡隐藏、晚加入/重连及原战斗回归仍 UNKNOWN；未执行逻辑单元测试、PlayMode、命令行构建、发布或性能采样，未创建子Agent或提交 Git。
+
+## 2026-10-05 采集工具修理与耐久恢复人工验收通过
+
+- 用户反馈“我已验收通过”，主线程结合既有Unity编译/Serializer及18次隔离Editor烘焙静态核对，判定修理阶段通过；范围限CombatPrototypeNetCode、schemaVersion=14/configRevision=17及Runtime十二项人工清单，结论来自用户反馈。
+- 增量同步修理专题、运行清单、相关模块/导航和项目外配置模板的验收状态；189项人工编号/内容、旧通过版本/清单及未实际触发的独立失败/时序/网络/生命周期、字形、性能/带宽、平台/线上、跨文件/ECS故障恢复UNKNOWN保持。
+- 本次只修改文档，不改代码、配置、Scene/Prefab/Animator或资源；敌人美术与动画等并行工作保留。AI未运行逻辑单元测试、GamePlayer/PlayMode、游戏模拟/GUI回调、构建、发布、性能采样或图片检查，未创建子Agent或提交Git。
+
+## 2026-10-05 地图资源状态存档接入
+
+- 按用户确认方案接入CombatPrototypeNetCode的独立世界资源v1存档；地图Json/BuiltIn升级schema15/revision18，新增必填resourcePersistence=true/default_world/10秒，旧v1～v14拒绝，原数值/布局保持。
+- 七个新职责脚本及Unity生成meta、原地图根Settings/恢复状态与准入门落地；资源生成后整体校验/恢复，离线暂停、预约/进度清空，树/矿重建本次阻挡基态。状态变化/检查点/关闭独立保存，严格身份/签名/UTF-8/JSON与.tmp/Flush(true)/原子替换；坏档拒绝准入，写失败保留旧档并下个保存点重试，不回滚原结算。
+- 原资源/工具/修理/玩家SaveStore/G及掉落脚本、15输入/原Ghost字段、Scene/SubScene/Prefab/Animator、旧meta/资源引用、包/构建配置保持。玩家写v2/读v1迁移，地面掉落不存档；跨玩家/世界文件事务、同槽多服务端协调未接入。
+- 正常Unity编译/实际Assembly字段反射和Forest/Grassland各9种隔离Editor烘焙共18次通过，新四Settings/恢复初值/签名兼容及完整原布局/反馈/Prefab一致；Console前后[1 Error,4 Warning,4 Log]相同，既有Error为UnityConnect网络错误，无新编译/烘焙错误，主场景干净、临时对象释放。
+- 增量同步资源存档专题、相关模块/导航、外部配置模板及Runtime新增十二项，原189项内容/编号与用户通过边界保持。主线程静态验收通过，新GamePlayer/I-O/坏档/关闭恢复/占位预测/跨文件ECS/多人并发生命周期/性能带宽平台线上UNKNOWN；AI未运行真实存档读写、游戏/显示系统、GUI回调、逻辑单元测试、PlayMode、构建、发布、采样或图片检查，未创建子Agent或提交Git。

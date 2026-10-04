@@ -21,7 +21,7 @@
 
 ## 【FACT】当前JSON契约与建议默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=14/configRevision=17。interactionHighlight段及14字段必填，沿原严格UTF-8、缺失/未知/重复字段、对象形状及标量类型检查；旧v1～v13明确失败，不迁移、补段或回退来源。正常导入/烘焙后生效，没有运行热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=15/configRevision=18。interactionHighlight段及14字段必填，沿原严格UTF-8、缺失/未知/重复字段、对象形状及标量类型检查；旧v1～v14明确失败，不迁移、补段或回退来源。正常导入/烘焙后生效，没有运行热重载。
 
 | 字段 | 当前默认值 | 契约/用途 |
 |---|---|---|
@@ -84,4 +84,8 @@ AI未执行GamePlayer/PlayMode、游戏模拟/显示系统/GUI回调、逻辑单
 
 v13/16的[资源状态](MapResourceStatusHud.md)独立显示文字、在原G面板上方绘制；F Ready/Working身份优先，无F目标才选择附近状态目标。状态目标不新增圆环，不改原圈的资格/身份/颜色/半径。状态开启可保留F采样及绑定，新增所属四字段静态及用户人工通过，限v13/16十项，未触发用例UNKNOWN；高亮用户通过仍限v12/15十项。
 
-当前v14/17的[工具修理](MapToolRepair.md)只恢复既有工具耐久，不预约资源或新增圆环；F/G四字段身份、颜色/投影及生命周期保持。新增输入与所属结果要求各端同版重新烘焙，修理静态通过、人工UNKNOWN。
+当前v15/18的[工具修理](MapToolRepair.md)只恢复既有工具耐久，不预约资源或新增圆环；F/G四字段身份、颜色/投影及生命周期保持。新增输入与所属结果要求各端同版重新烘焙，修理静态及用户人工通过，限v14/17十二项，未触发用例UNKNOWN。
+
+## 【FACT】地图资源存档接入边界
+
+资源恢复重建耗尽阶段和本次阻挡基态，圆环仍沿原F/G权威身份/阶段绘制，不读取文件或增加Ghost字段。新阶段人工UNKNOWN，见[资源存档](MapResourcePersistence.md)。

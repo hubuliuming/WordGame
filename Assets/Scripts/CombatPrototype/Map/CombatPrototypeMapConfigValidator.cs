@@ -8,7 +8,7 @@ namespace Code_01.CombatPrototype.Map
         public static void Validate(CombatMapConfigSet config)
         {
             if (config == null || config.map == null || config.map.geometry == null ||
-                config.map.layout == null || config.map.movement == null || config.map.drops == null || config.map.treeHarvest == null ||
+                config.map.resourcePersistence == null || config.map.layout == null || config.map.movement == null || config.map.drops == null || config.map.treeHarvest == null ||
                 config.map.mining == null || config.map.gatherTools == null || config.map.gatherTools.tools == null ||
                 config.map.interactionHud == null || config.map.pickupHud == null || config.map.interactionHighlight == null || config.map.resourceStatusHud == null || config.map.inventoryPanel == null || config.map.inventoryDrop == null || config.map.inventoryDrop.items == null ||
                 config.map.population == null || config.map.spawn == null ||
@@ -16,6 +16,14 @@ namespace Code_01.CombatPrototype.Map
                 config.map.biomeIds == null || config.map.biomeRegions == null)
                 throw new InvalidOperationException("Map configuration is missing required sections.");
             var map = config.map;
+            var persistence = map.resourcePersistence;
+            Id(persistence.saveSlotId, "resourcePersistence.saveSlotId");
+            var slot = persistence.saveSlotId;
+            if (slot == "con" || slot == "prn" || slot == "aux" || slot == "nul" ||
+                (slot.Length == 4 && (slot.StartsWith("com", StringComparison.Ordinal) || slot.StartsWith("lpt", StringComparison.Ordinal)) &&
+                 slot[3] >= '1' && slot[3] <= '9'))
+                throw new InvalidOperationException("resourcePersistence.saveSlotId cannot be a reserved file name.");
+            Positive(persistence.saveIntervalSeconds, "resourcePersistence.saveIntervalSeconds");
             var hud = map.interactionHud;
             Positive(hud.panelWidthPixels, "interactionHud.panelWidthPixels");
             Positive(hud.panelHeightPixels, "interactionHud.panelHeightPixels");
@@ -35,8 +43,8 @@ namespace Code_01.CombatPrototype.Map
             ValidateInventoryPanel(map.inventoryPanel);
             ValidateInventoryDrop(map.inventoryDrop);
             Id(map.mapDefinitionId, "mapDefinitionId");
-            if (map.schemaVersion != 14 || map.configRevision < 1 || map.defaultSeed < 1)
-                throw new InvalidOperationException("Map requires schemaVersion=14, positive revision and seed.");
+            if (map.schemaVersion != 15 || map.configRevision < 1 || map.defaultSeed < 1)
+                throw new InvalidOperationException("Map requires schemaVersion=15, positive revision and seed.");
             var drops = map.drops;
             Id(drops.itemId, "drops.itemId");
             Id(drops.visualResourceKey, "drops.visualResourceKey");

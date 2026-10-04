@@ -1,6 +1,6 @@
 # 背包展示与道具使用
 
-返回[导航](../AI_Understanding.md)。本页负责背包格子/事件/道具；字段与映射见[数据](DataResources.md)，工具修理见[修理](MapToolRepair.md)。
+返回[导航](../AI_Understanding.md)。背包/道具规则；[数据](DataResources.md)、[修理通过](MapToolRepair.md)、[资源存档](MapResourcePersistence.md)。
 
 ## 入口文件
 
@@ -119,7 +119,7 @@ KnapsackControl.OnStart 缓存当前 PlayerModel 与 FactoryUISystem，记录 Co
 
 统一入口先记录本 tick 已有交互，采集系统随后维护预约。移动输入、攻击请求或非 Ready、受击序号改变、死亡、超距、断线/目标失效均取消并释放为 Available，不发物品。期间采集者不强制锁定移动或攻击，取消不恢复体力；完成时间到达仍须先满足当次资格与范围。Available/Collecting 显示，Depleted 由客户端按 Ghost 状态隐藏，进度归[交互HUD](MapInteractionHud.md)，没有自动重试；耗尽后的再生沿下述独立服务端计时链。
 
-完成前取得库存与状态引用；按既有 ItemName 合并或新增，检查数量溢出并预留新增缓冲容量。PrepareReward 生成保持当前金币/经验的完整库存候选，SavePrepared 成功返回后同次提交库存、清除预约并设置 Depleted，同时按配置记录再生期限。准备/保存失败记录地图、布置索引、NetworkId、物品、阶段与原异常，库存数量及资源耗尽不提交，释放预约并继续其他点；玩家须重新按 F。全部奖励/消费/采集候选均保留Tools并写v2，地图耗尽及再生期限不写盘；客户端背包沿原Ghost缓冲同步、每2秒日志及[网络面板](MapInventoryPanel.md)查看。
+完成前取得库存与状态引用；按既有 ItemName 合并或新增，检查数量溢出并预留新增缓冲容量。PrepareReward 生成保持当前金币/经验的完整库存候选，SavePrepared 成功返回后同次提交库存、清除预约并设置 Depleted，同时按配置记录再生期限。准备/保存失败记录地图、布置索引、NetworkId、物品、阶段与原异常，库存数量及资源耗尽不提交，释放预约并继续其他点；玩家须重新按 F。全部奖励/消费/采集候选均保留Tools并写v2，地图状态另存世界档；客户端背包沿原Ghost缓冲同步、每2秒日志及[网络面板](MapInventoryPanel.md)查看。
 
 ## 【CURRENT STRATEGY】采集物原点再生
 
@@ -129,7 +129,7 @@ KnapsackControl.OnStart 缓存当前 PlayerModel 与 FactoryUISystem，记录 Co
 
 ## 【KNOWN ISSUES】战斗地图第四阶段采集验收
 
-输入及新系统正常编译，状态 Ghost Serializer、服务端配置/进度特性、系统顺序、两种模板隔离烘焙与引用已静态核对。用户已确认第四阶段人工 GamePlayer 验收通过，主线程结合静态核对与用户反馈判定该阶段通过；范围来自第四阶段 v3/revision=3、再生关闭的版本，含 F 目标选择/计时、中断与争抢、保存失败不发物品、不耗尽并释放预约、耗尽跨端隐藏、晚加入和重启库存恢复，完整边界归 [运行入口](Runtime.md)。人工结论来自用户反馈，AI 未运行游戏系统、PlayMode 或逻辑单元测试。玩家 v1 存档保留苹果，地图耗尽及再生期限只保留本局；停止服务端再进入会重新生成采集点。第五阶段正常编译、参数烘焙和仅服务端字段已静态核对；用户已确认第五阶段人工 GamePlayer 通过，主线程结合静态核对与用户反馈判定该阶段通过，范围限至少两轮原点再生、新 F 再采集、跨端恢复/晚加入、再生关闭及失败/取消不安排再生，完整边界归 [运行入口](Runtime.md)。写盘仍同步阻塞服务端，性能未测量。
+输入及新系统正常编译，状态 Ghost Serializer、服务端配置/进度特性、系统顺序、两种模板隔离烘焙与引用已静态核对。用户已确认第四阶段人工 GamePlayer 验收通过，主线程结合静态核对与用户反馈判定该阶段通过；范围来自第四阶段 v3/revision=3、再生关闭的版本，含 F 目标选择/计时、中断与争抢、保存失败不发物品、不耗尽并释放预约、耗尽跨端隐藏、晚加入和重启库存恢复，完整边界归 [运行入口](Runtime.md)。人工结论来自用户反馈，AI 未运行游戏系统、PlayMode 或逻辑单元测试。当时玩家v1存档保留苹果，地图耗尽及再生期限只保留本局；停止服务端再进入会重新生成采集点。第五阶段正常编译、参数烘焙和仅服务端字段已静态核对；用户已确认第五阶段人工 GamePlayer 通过，主线程结合静态核对与用户反馈判定该阶段通过，范围限至少两轮原点再生、新 F 再采集、跨端恢复/晚加入、再生关闭及失败/取消不安排再生，完整边界归 [运行入口](Runtime.md)。写盘仍同步阻塞服务端，性能未测量。
 
 ## 【FACT】地图动态掉落与 G 拾取入包
 
@@ -139,7 +139,7 @@ KnapsackControl.OnStart 缓存当前 PlayerModel 与 FactoryUISystem，记录 Co
 
 ## 【FACT】砍伐木材与库存提交
 
-F 统一选中树木后由 TreeHarvest 预约/计时，默认2米/徒手2秒（斧头1.5秒）后生成一份 wood ×3 地面掉落，砍倒时不直接入包。DropPickup 改按目标实际 ItemId 解析名称；vitality_apple/wood 分别映射活力苹果/Msg.ItemName.木材，同名 checked 累加，仍先 PrepareReward → SavePrepared，再提交库存及 Consumed。存储类写v2/读取v1迁移、候选保留Tools，金币/经验、E和玩家Prefab保持；树木和未拾取木材不保存，已入包木材随固定 ID 恢复。砍伐规则归[树木砍伐](MapTreeHarvest.md)，拾取规则归[掉落与拾取](MapDrops.md)。用户已确认第七阶段人工 GamePlayer 通过，主线程结合静态核对判定该阶段通过；库存范围限木材/苹果分别入包、累计/争抢、保存失败保留和固定 ID 恢复，完整边界归[运行入口](Runtime.md)第七阶段十项清单。人工结论来自用户反馈，未实际触发的独立用例仍为 UNKNOWN，原通过边界保持。
+F 统一选中树木后由 TreeHarvest 预约/计时，默认2米/徒手2秒（斧头1.5秒）后生成一份 wood ×3 地面掉落，砍倒时不直接入包。DropPickup 改按目标实际 ItemId 解析名称；vitality_apple/wood 分别映射活力苹果/Msg.ItemName.木材，同名 checked 累加，仍先 PrepareReward → SavePrepared，再提交库存及 Consumed。存储类写v2/读取v1迁移、候选保留Tools，金币/经验、E和玩家Prefab保持；当时树木和未拾取木材不保存，已入包木材随固定 ID 恢复。砍伐规则归[树木砍伐](MapTreeHarvest.md)，拾取规则归[掉落与拾取](MapDrops.md)。用户已确认第七阶段人工 GamePlayer 通过，主线程结合静态核对判定该阶段通过；库存范围限木材/苹果分别入包、累计/争抢、保存失败保留和固定 ID 恢复，完整边界归[运行入口](Runtime.md)第七阶段十项清单。人工结论来自用户反馈，未实际触发的独立用例仍为 UNKNOWN，原通过边界保持。
 
 ## 【FACT】树木原点再生的库存边界
 
@@ -147,9 +147,9 @@ F 统一选中树木后由 TreeHarvest 预约/计时，默认2米/徒手2秒（�
 
 ## 【FACT】采矿石材与库存提交
 
-统一 F 选中矿点后，服务端默认2米/徒手3秒（镐子2.25秒）完成只生成 stone ×3 地面掉落，完成时不直接入包。stone 显式映射新增 Msg.ItemName.石材；G 继续按实际 ItemId 调用原 PrepareReward → SavePrepared，再提交同名库存及 Consumed，原金币/经验保持，候选保留Tools、写v2并读取v1迁移。保存失败不改库存或未到期掉落，恢复后须新 G；已入包石材随固定 ID 库存恢复，矿点/未拾取石材只保留本局。石材没有新增使用效果，库存显示归[网络面板](MapInventoryPanel.md)，E 仍只用小块肉。规则归[采矿](MapMining.md)/[掉落](MapDrops.md)，第九阶段人工库存/保存/恢复验收为 UNKNOWN，归[运行入口](Runtime.md)。
+统一 F 选中矿点后，服务端默认2米/徒手3秒（镐子2.25秒）完成只生成 stone ×3 地面掉落，完成时不直接入包。stone 显式映射新增 Msg.ItemName.石材；G 继续按实际 ItemId 调用原 PrepareReward → SavePrepared，再提交同名库存及 Consumed，原金币/经验保持，候选保留Tools、写v2并读取v1迁移。保存失败不改库存或未到期掉落，恢复后须新 G；已入包石材随固定 ID 库存恢复，当时矿点/未拾取石材只保留本局。石材没有新增使用效果，库存显示归[网络面板](MapInventoryPanel.md)，E 仍只用小块肉。规则归[采矿](MapMining.md)/[掉落](MapDrops.md)，第九阶段人工库存/保存/恢复验收为 UNKNOWN，归[运行入口](Runtime.md)。
 
-矿点默认耗尽提交后 600 秒原点再生，占位等待；再生不发石材、不提交库存或存档，再次产出须新 F 完成后 G 保存入包。矿点期限/历史只属于当前 Server World，已入包石材沿v2固定ID恢复，读取v1迁移。规则归[采矿](MapMining.md)，用户已确认该阶段人工 GamePlayer 通过；库存范围限再生不发物品、新 F 石材/G 提交与 v1 库存恢复，完整边界归[运行入口](Runtime.md)矿点再生八项清单及 v6/revision=9，未触发独立失败分支仍为 UNKNOWN。
+矿点默认耗尽提交后 600 秒原点再生，占位等待；再生不发石材、不提交库存或存档，再次产出须新 F 完成后 G 保存入包。该阶段期限/历史只属本局，已入包石材沿v2固定ID恢复，读取v1迁移。规则归[采矿](MapMining.md)，用户已确认该阶段人工 GamePlayer 通过；库存范围限再生不发物品、新 F 石材/G 提交与 v1 库存恢复，完整边界归[运行入口](Runtime.md)矿点再生八项清单及 v6/revision=9，未触发独立失败分支仍为 UNKNOWN。
 
 当前采集、砍树、采矿共用 F，统一规则归[战斗地图](Map.md)。原第四至第八阶段人工通过保留其旧版本/清单，新增跨类型交互及保存/产出回归已获用户人工通过反馈，结论限[运行入口](Runtime.md)统一 F 八项清单，未触发的独立失败用例仍为 UNKNOWN。
 

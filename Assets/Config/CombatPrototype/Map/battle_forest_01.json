@@ -1,8 +1,13 @@
 {
-  "schemaVersion": 14,
-  "configRevision": 17,
+  "schemaVersion": 15,
+  "configRevision": 18,
   "mapDefinitionId": "battle_forest_01",
   "defaultSeed": 12345,
+  "resourcePersistence": {
+    "enabled": true,
+    "saveSlotId": "default_world",
+    "saveIntervalSeconds": 10
+  },
   "geometry": {
     "cellSizeMeters": 2.0,
     "cellsPerChunk": 16,

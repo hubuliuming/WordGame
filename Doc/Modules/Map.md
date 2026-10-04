@@ -15,11 +15,11 @@
 
 ## 【FACT】当前默认配置
 
-Json/BuiltIn v14/17，三类资源600秒再生。[工具](MapGatherTools.md)、[树](MapTreeHarvest.md)、[矿](MapMining.md)、[G](MapPickupHud.md)/[掉落](MapDrops.md)、[高亮](MapInteractionHighlight.md)归专题；[状态](MapResourceStatusHud.md)静态及用户人工通过，限v13/16十项。
+Json/BuiltIn v15/18，三类资源600秒再生。[工具](MapGatherTools.md)、[树](MapTreeHarvest.md)、[矿](MapMining.md)、[G](MapPickupHud.md)/[掉落](MapDrops.md)、[高亮](MapInteractionHighlight.md)归专题；[状态](MapResourceStatusHud.md)静态及用户人工通过，限v13/16十项。
 
 | 配置字段 | 当前值与用途 |
 |---|---|
-| schemaVersion / configRevision | 14 / 17 |
+| schemaVersion / configRevision | 15 / 18 |
 | defaultSeed | 12345，用于确定性布置 |
 | geometry.cellSizeMeters | 2 米 |
 | geometry.cellsPerChunk | 每块单边 16 格，即 32×32 米 |
@@ -53,7 +53,7 @@ gather_apple 的 footprintRadiusMeters=0.3、minimumSameTypeSpacingMeters=1.5、
 
 ## 【FACT】JSON 文件与配置入口
 
-五份UTF-8无BOM JSON，地图v14/17；必填契约归[修理](MapToolRepair.md)，静态通过/人工UNKNOWN。生态含treeObjectId/gatherObjectId/mineObjectId、mineDensityPer100m2，物体含mine_rock；原地表、空间、种子和出生保持。
+五份UTF-8无BOM JSON，地图v15/18；新增存档契约见[资源存档](MapResourcePersistence.md)。生态含treeObjectId/gatherObjectId/mineObjectId、mineDensityPer100m2，物体含mine_rock；原地表、空间、种子和出生保持。
 
 | MapAuthoring 字段 | 显式绑定文件 | JSON 根类型 |
 |---|---|---|
@@ -63,7 +63,7 @@ gather_apple 的 footprintRadiusMeters=0.3、minimumSameTypeSpacingMeters=1.5、
 | GroundsJson | [grounds.json](../../Assets/Config/CombatPrototype/Map/grounds.json) | GroundDefinitionConfig 数组 |
 | ObjectsJson | [objects.json](../../Assets/Config/CombatPrototype/Map/objects.json) | MapObjectDefinitionConfig 数组 |
 
-SourceMode=BuiltIn 时明确使用内置来源，SourceMode=Json 时使用选中地图 JSON 和三份共享 JSON；Json 来源失败不自动回退 BuiltIn。Preset=Grassland 要求地图 ID 为 battle_grassland_01，Preset=Forest 要求 battle_forest_01。schemaVersion=14为契约版本，configRevision须为正整数；旧v1～v13或缺少必填字段明确失败，不补字段或回退来源。
+SourceMode=BuiltIn 时明确使用内置来源，SourceMode=Json 时使用选中地图 JSON 和三份共享 JSON；Json 来源失败不自动回退 BuiltIn。Preset=Grassland 要求地图 ID 为 battle_grassland_01，Preset=Forest 要求 battle_forest_01。schemaVersion=15为契约版本，configRevision须为正整数；旧v1～v14或缺少必填字段明确失败，不补字段或回退来源。
 
 [MapMovementConfig.cs](../../Assets/Scripts/CombatPrototype/Map/MapMovementConfig.cs) 是地图定义的必填 movement 段：
 
@@ -88,7 +88,7 @@ layout.minimumPathWidthMeters 须不小于 2×(最大角色半径+collisionSkinM
 
 MapAuthoring.LoadMapConfig 是当前配置来源接入点，按 SourceMode 和 Preset 取得模板；内置与 JSON 来源都在返回前通过 [配置校验器](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapConfigValidator.cs) 检查必填段、版本、数值范围、ID 唯一性、引用及区域范围。ID 使用小写 ASCII 字母、数字、下划线，最长 61 字符。LayoutBuilder 在烘焙边界结合原 Spawner 的列数/间距检查完整敌人网格和地图边界；缺失配置或绑定明确失败，没有其他模板或资源查找兜底。
 
-实际地图 JSON 已通过显式 TextAsset 在烘焙阶段读取；没有运行时外部 JSON 文件加载、热重载、地图状态存档或地图实例持久化。能力字段包含 footprintRadiusMeters、minimumSameTypeSpacingMeters、blocksMovement、blocksMelee、blocksProjectile、gatherable、interactionDistanceMeters、gatherDurationSeconds、yieldItemId、yieldQuantity、regrowEnabled、regrowSeconds；footprintRadiusMeters 参与布置占地及移动阻挡半径，minimumSameTypeSpacingMeters 控制同类间距，blocksMovement 决定阻挡记录；采集能力、距离、时长、产出及再生字段进入烘焙物体定义，供服务端生成、结算与再生使用；攻击遮挡字段未驱动运行行为。
+地图配置通过TextAsset在烘焙时读取，无外部配置热重载；资源状态存档归独立服务端系统。能力字段包含 footprintRadiusMeters、minimumSameTypeSpacingMeters、blocksMovement、blocksMelee、blocksProjectile、gatherable、interactionDistanceMeters、gatherDurationSeconds、yieldItemId、yieldQuantity、regrowEnabled、regrowSeconds；footprintRadiusMeters 参与布置占地及移动阻挡半径，minimumSameTypeSpacingMeters 控制同类间距，blocksMovement 决定阻挡记录；采集能力、距离、时长、产出及再生字段进入烘焙物体定义，供服务端生成、结算与再生使用；攻击遮挡字段未驱动运行行为。
 
 烘焙得到 [CombatPrototypeMapData.cs](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapData.cs) 中的地图单例和区块、格子、静态物体布置、阻挡、生态、地表材质、Prefab 缓冲。CombatPrototypeMapData 保存两类角色半径、碰撞留缝与滑动次数；CombatPrototypeMapObstacle 保存布置索引、物体索引、X/Z 位置、占地半径和 Disabled 开关。地图不是 Ghost；各 World 使用同一 SubScene 烘焙配置。原准入客户端/服务端、敌人生成与复活系统等待地图数据就绪。
 
@@ -100,7 +100,7 @@ MapAuthoring.LoadMapConfig 是当前配置来源接入点，按 SourceMode 和 P
 
 [采集状态](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapGatherData.cs) 同步 PlacementIndex、Available/Collecting/Depleted 和 CollectorNetworkId，配置与计时组件仅服务端保留。[GatherRenderSystem](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapGatherRenderSystem.cs) 按耗尽状态禁用客户端 MaterialMeshInfo，回到 Available 时恢复；Ghost 保留至本局地图释放，供晚加入接收。采集计时/中断及保存后入包归[背包](Inventory.md)，F 统一选目标见下节，人工范围归[运行入口](Runtime.md)。
 
-Map Baker 将再生开关/间隔写入物体定义，GatherSpawnSystem 复制到服务端采集配置。采集仅在 SavePrepared 成功、提交库存并耗尽时写入 RegrowAt=当次服务端模拟时间+间隔；取消/保存失败清空进度且不安排再生。独立 [GatherRegrowSystem](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapGatherRegrowSystem.cs) 在服务端预测组的采集之后、复活之前检查 Depleted、启用再生且期限已到的点，清空进度/采集者并恢复 Available。位置、布置索引及原 Ghost 保持，不实例化新点、不发物品或写盘；再次采集须有新 F 请求。关闭再生时点保持本局耗尽。期限仅属于当前 Server World，不使用客户端或系统墙钟。
+Map Baker 将再生开关/间隔写入物体定义，GatherSpawnSystem 复制到服务端采集配置。采集仅在 SavePrepared 成功、提交库存并耗尽时写入 RegrowAt=当次服务端模拟时间+间隔；取消/保存失败清空进度且不安排再生。独立 [GatherRegrowSystem](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapGatherRegrowSystem.cs) 在服务端预测组的采集之后、复活之前检查 Depleted、启用再生且期限已到的点，清空进度/采集者并恢复 Available。位置、布置索引及原 Ghost 保持，不实例化新点、不发物品；原再生系统不写盘，独立资源保存系统记录最终状态。再次采集须有新 F 请求。关闭再生时点保持本局耗尽。期限仅属于当前 Server World，不使用客户端或系统墙钟。
 
 ## 【CURRENT STRATEGY】统一 F 资源交互
 
@@ -143,7 +143,7 @@ Map Baker 将再生开关/间隔写入物体定义，GatherSpawnSystem 复制到
 
 [CombatPrototypeMapGatherAssetBuilder.cs](../../Assets/Scripts/Editor/CombatPrototypeMapGatherAssetBuilder.cs) 提供“生成第四阶段采集资源”，只处理 GatherApple 的三个新资源路径；[CombatPrototypeMapGatherBinding.cs](../../Assets/Scripts/Editor/CombatPrototypeMapGatherBinding.cs) 提供“绑定第四阶段采集物”，校验干净 SubScene、两个模板及完整网格后仅追加 gather_apple Prefab 引用，拒绝重复绑定。菜单均位于 Tools/CombatPrototype/地图。
 
-原主场景、镜头、玩家/敌人 Ghost 及 PlayerView Prefab、Animator、旧 meta、包与构建设置保持。采集复用网络背包及玩家v2存档（读取v1迁移），不接正式 QFramework Map/UI 链；地图资源耗尽及再生期限仅属于本局，服务端重启从 Available 重新生成，已有玩家库存按原固定 ID 恢复。
+原主场景、镜头、玩家/敌人 Ghost 及 PlayerView Prefab、Animator、旧 meta、包与构建设置保持。采集复用网络背包及玩家v2存档（读取v1迁移），不接正式 QFramework Map/UI 链；资源存档开启时恢复耗尽与剩余期限，关闭时按原布局重置；玩家库存仍按固定ID恢复。
 
 ## 【KNOWN ISSUES】当前验收边界
 

@@ -9,6 +9,7 @@ namespace Code_01.CombatPrototype.Map
         public int configRevision;
         public string mapDefinitionId;
         public int defaultSeed;
+        public MapResourcePersistenceConfig resourcePersistence;
         public MapGeometryConfig geometry;
         public MapLayoutConfig layout;
         public MapMovementConfig movement;

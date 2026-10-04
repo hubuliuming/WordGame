@@ -68,6 +68,8 @@ namespace Code_01.CombatPrototype.Networking
             var spawner = SystemAPI.GetSingleton<CombatPrototypePlayerSpawner>();
             var map = SystemAPI.GetSingleton<CombatPrototypeMapData>();
             var mapSource = SystemAPI.GetSingletonEntity<CombatPrototypeMapData>();
+            var resourceRestore = state.EntityManager.GetComponentData<CombatPrototypeMapResourceRestoreState>(mapSource);
+            if (resourceRestore.Phase == CombatPrototypeMapResourceRestorePhase.Pending) return;
             var toolDefinitions = state.EntityManager.GetBuffer<CombatPrototypeMapGatherToolDefinition>(mapSource, true);
             using var ecb = new EntityCommandBuffer(Allocator.Temp);
             using var handledThisUpdate = new NativeHashSet<Entity>(4, Allocator.Temp);
@@ -95,6 +97,13 @@ namespace Code_01.CombatPrototype.Networking
                     continue;
 
                 var networkId = state.EntityManager.GetComponentData<NetworkId>(connection).Value;
+                if (resourceRestore.Phase == CombatPrototypeMapResourceRestorePhase.Failed)
+                {
+                    ecb.AddComponent(connection, new NetworkStreamRequestDisconnect { Reason = NetworkStreamDisconnectReason.ConnectionClose });
+                    var persistence = state.EntityManager.GetComponentData<CombatPrototypeMapResourcePersistenceSettings>(mapSource);
+                    Debug.LogWarning($"[CombatPrototype.NetCode] Server admission rejected; NetworkId={networkId}, PlayerId={admission.ValueRO.PlayerId}, map={map.MapDefinitionId}, slot={persistence.SaveSlotId}, reason=MapResourceRestoreFailed.");
+                    continue;
+                }
                 var createdPlayer = Entity.Null;
                 var savePath = string.Empty;
                 try

@@ -17,8 +17,12 @@ namespace Code_01.CombatPrototype.Map
             {
                 map = new MapDefinitionConfig
                 {
-                    schemaVersion = 14, configRevision = 17,
+                    schemaVersion = 15, configRevision = 18,
                     mapDefinitionId = mapDefinitionId, defaultSeed = 12345,
+                    resourcePersistence = new MapResourcePersistenceConfig
+                    {
+                        enabled = true, saveSlotId = "default_world", saveIntervalSeconds = 10f
+                    },
                     geometry = new MapGeometryConfig
                     {
                         cellSizeMeters = 2f, cellsPerChunk = 16, chunkCountX = 3,

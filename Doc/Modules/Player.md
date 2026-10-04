@@ -255,4 +255,8 @@ v12/15的[高亮](MapInteractionHighlight.md)沿原本地所属存活玩家/Conn
 
 v13/16的[资源状态](MapResourceStatusHud.md)由Player Baker追加所属Mode/Kind/PlacementIndex/RemainingSeconds四字段，初始Hidden/0/-1/0；原13输入、F/G各四字段、生命/体力/工具/存档保持。仅Connected/InGame、所有权匹配、启用Simulate且存活者获得状态，死亡/断线与World/Scene变化清显示。新布局/编译/烘焙静态及用户人工通过，限v13/16十项，未触发用例UNKNOWN，旧通过保持原范围。
 
-当前v14/17的[工具修理](MapToolRepair.md)：Player Baker追加零修理反馈Sequence/Kind/Result，仅SendToOwner；新增RepairAxe/RepairPickaxe输入，共15字段。复用原所属资格/唯一Tools与v2保存，生命/体力/R及资源显示快照保持；各端同版重新烘焙。新链静态通过、人工UNKNOWN，旧玩家用户通过保持原版本/清单。
+当前v15/18的[工具修理](MapToolRepair.md)：Player Baker追加零修理反馈Sequence/Kind/Result，仅SendToOwner；新增RepairAxe/RepairPickaxe输入，共15字段。复用原所属资格/唯一Tools与v2保存，生命/体力/R及资源显示快照保持；各端同版重新烘焙。新链静态及用户人工通过，限v14/17十二项，未触发用例UNKNOWN，旧玩家用户通过保持原版本/清单。
+
+## 【FACT】地图资源存档接入边界
+
+地图资源恢复为Pending时原准入等待，Failed时断开，Ready才沿原身份/玩家v2恢复；新门位于三类资源生成之后。原玩家Ghost/15输入、生命/体力/R与保存保持，完整边界归[资源存档](MapResourcePersistence.md)，新人工UNKNOWN。

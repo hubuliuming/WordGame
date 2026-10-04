@@ -21,7 +21,7 @@
 
 ## 【FACT】当前配置契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=14/configRevision=17。原geometry/layout/movement/drops/treeHarvest/mining/gatherTools/interactionHud/pickupHud/interactionHighlight/resourceStatusHud/inventoryPanel/inventoryDrop/population/spawn均必填；新增字段沿原严格UTF-8、对象形状、缺失/未知/重复字段与标量类型校验。旧v1～v13明确拒绝，不迁移、补默认或回退来源；正常导入/烘焙后生效，无热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=15/configRevision=18。resourcePersistence/geometry/layout/movement/drops/treeHarvest/mining/gatherTools/interactionHud/pickupHud/interactionHighlight/resourceStatusHud/inventoryPanel/inventoryDrop/population/spawn均必填；新增字段沿原严格UTF-8、对象形状、缺失/未知/重复字段与标量类型校验。旧v1～v14明确拒绝，不迁移、补默认或回退来源；正常导入/烘焙后生效，无热重载。
 
 | 配置位置/字段 | 默认值 | 校验或行为 |
 |---|---|---|
@@ -73,4 +73,8 @@ Result依次为None、Success、Disabled、NotOwned、AlreadyFull、Insufficient
 
 正常Unity编译无C# Error，新所属Ghost Serializer已生成；3反馈字段/SendToOwner、15输入、F/G/资源状态各4、工具定义11、工具Settings4、面板配置28经静态反射核对。Forest/Grassland各9次隔离Editor烘焙共18次：Json默认、BuiltIn默认、修理关闭、工具关闭、面板关闭、F文字关闭、全部显示关闭、采矿关闭及自定义修理值/文案（单类材料为0）。两来源等价，4个工具Settings/两条11字段定义/全部28面板设置、玩家零修理/制作反馈和空工具、原F/G/资源状态初值、掉落Prepared/Prefab与完整配置对应布局核对通过。默认树89/53、采集36/38、矿20/18、阻挡109/71保持；烘焙Console前后均[0 Error,8 Warning,47 Log]，主场景干净，临时World/Scene/TextAsset释放。
 
-主线程静态验收通过；本阶段GamePlayer人工UNKNOWN，十二项清单见[运行入口](Runtime.md)。旧资源状态v13/16十项、高亮v12/15十项、G文字v11/14十项、丢弃v10/13十二项、面板v9/12十二项、工具v8/11十二项及更早用户通过保持原版本/清单，不扩展为本阶段通过。修理快捷键/鼠标/上限/扣料、损坏工具、忙碌与同tick、存档恢复、多玩家/晚加入/生命周期及独立配置/快照/保存/提交失败未运行；字形/排版、性能/带宽、平台/线上与原文件替换后意外ECS故障恢复仍UNKNOWN。AI未执行GamePlayer/PlayMode、游戏模拟/显示系统/GUI回调、逻辑单元测试、命令行构建、发布、性能采样或图片检查，未创建子Agent或提交Git。
+用户已确认本阶段人工GamePlayer验收通过，主线程结合既有静态核对与用户反馈判定阶段通过；范围限CombatPrototypeNetCode、schemaVersion=14/configRevision=17及[运行入口](Runtime.md)十二项清单。人工结论来自用户反馈；旧资源状态v13/16十项、高亮v12/15十项、G文字v11/14十项、丢弃v10/13十二项、面板v9/12十二项、工具v8/11十二项及更早用户通过保持原版本/清单。未实际触发的独立资格/同tick/延迟/预测、配置/快照/保存/提交/恢复、多玩家/晚加入/生命周期分支，以及未覆盖字形/排版、性能/带宽、平台/线上与文件替换后意外ECS故障恢复仍UNKNOWN。AI未执行GamePlayer/PlayMode、游戏模拟/显示系统/GUI回调、逻辑单元测试、命令行构建、发布、性能采样或图片检查，未创建子Agent或提交Git。
+
+## 【FACT】地图资源存档接入边界
+
+当前地图另接[资源存档](MapResourcePersistence.md)，原修理先保存后扣料/耐久、15输入及所属结果保持；世界档不保存Tools或修理反馈。修理用户通过限v14/17十二项，新资源存档人工UNKNOWN。

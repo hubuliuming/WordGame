@@ -1,3 +1,4 @@
+using Code_01.CombatPrototype.Map;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
@@ -61,6 +62,7 @@ namespace Code_01.CombatPrototype.Networking
                     RecoverySeconds = authoring.RecoverySeconds
                 });
                 AddComponent<CombatPrototypeMeleeState>(entity);
+                AddComponent(entity, CombatPrototypeMapInteractionHudState.Hidden);
             }
         }
     }

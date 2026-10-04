@@ -529,7 +529,7 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 
 ## 【KNOWN ISSUES】地图资源统一 F 的人工验收
 
-本节保留统一 F 的 v6/revision=8 原版本验收口径，入口为 CombatPrototypeNetCode；当前 v6/revision=9 的矿点再生清单见下节。客户端 F 单次按下提交已有 Gather，H/J 不再触发或消费，G/E/R 保持；所有端须同步当前代码、输入布局、配置及资源。正常 Unity 编译及两个新脚本、三类 TryBegin/CancelBegin、保留输入字段和顺序特性已静态核对，未运行游戏系统或 PlayMode。用户已确认统一 F 人工 GamePlayer 验收通过，主线程结合既有静态核对与用户反馈判定该阶段通过，范围限下列八项清单。人工结论来自用户反馈，未实际触发的临界距离、精确同距、同 tick、独立失败及延迟/预测回放时序仍为 UNKNOWN：
+本节保留统一 F 的 v6/revision=8 原版本验收口径，入口为 CombatPrototypeNetCode；矿点再生 v6/revision=9 清单见下节，当前 v7/revision=10 的 HUD 清单见后节。客户端 F 单次按下提交已有 Gather，H/J 不再触发或消费，G/E/R 保持；所有端须同步当前代码、输入布局、配置及资源。正常 Unity 编译及两个新脚本、三类 TryBegin/CancelBegin、保留输入字段和顺序特性已静态核对，未运行游戏系统或 PlayMode。用户已确认统一 F 人工 GamePlayer 验收通过，主线程结合既有静态核对与用户反馈判定该阶段通过，范围限下列八项清单。人工结论来自用户反馈，未实际触发的临界距离、精确同距、同 tick、独立失败及延迟/预测回放时序仍为 UNKNOWN：
 
 1. 分别在采集点、树木、矿点旁单次 F：默认 2 米内开始，分别 1/2/3 秒完成；苹果 ×1 保存成功直接入包，木材/石材各 ×3 生成地面掉落并沿原 G 保存入包。H/J 单独按下无对应资源请求，原 G/E/R 和攻击保持。
 2. 交互范围相交时跨三类选择 X/Z 最近有效目标，无类型优先；用 Interaction selected 的 type/placement/distance 核对。最近目标已占用/耗尽或功能关闭时排除，可选择另一有效目标；不同类型配置距离分别生效，范围外拒绝。精确同距取小 PlacementIndex，未触发边界用例保持 UNKNOWN。
@@ -544,7 +544,7 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 
 ## 【KNOWN ISSUES】矿点原点再生的人工验收
 
-入口为 CombatPrototypeNetCode；当前 Json 与 BuiltIn 为 schemaVersion=6/configRevision=9，mine_rock 默认 regrowEnabled=true/regrowSeconds=600。正常 Unity 编译、历史 Ghost Serializer、仅服务端期限及系统顺序、八次隔离 Editor 烘焙已静态核对，主线程静态验收通过；未运行游戏模拟/显示系统或 PlayMode。以下人工 GamePlayer 结果为 UNKNOWN，既有统一 F/v6/revision=8 通过不覆盖本阶段：
+本节保留矿点原点再生的 v6/revision=9 原版本验收口径，当前 v7/revision=10 的 HUD 清单见后节。入口为 CombatPrototypeNetCode；原 Json 与 BuiltIn 为 schemaVersion=6/configRevision=9，mine_rock 默认 regrowEnabled=true/regrowSeconds=600。正常 Unity 编译、历史 Ghost Serializer、仅服务端期限及系统顺序、八次隔离 Editor 烘焙已静态核对，主线程静态验收通过；未运行游戏模拟/显示系统或 PlayMode。用户已确认本阶段人工 GamePlayer 验收通过；主线程结合既有静态核对与用户反馈判定通过，范围限下列八项清单及 v6/revision=9。人工结论来自用户反馈，未实际触发的精确距离/特殊 Simulate、同 tick/延迟/预测回放、晚加入及独立失败分支仍为 UNKNOWN；既有统一 F/v6/revision=8 通过保持原口径：
 
 1. PlayMode 前临时将 mine_rock.regrowSeconds=5，完成导入/烘焙且各端一致；2 米内新 F 仍 3 秒采矿，成功才生成 stone ×3 并开始 5 秒服务端模拟计时。矿点耗尽隐藏/解除阻挡，原点空闲后同一 Ghost、PlacementIndex、位置/朝向恢复 Available/显示/阻挡；暂停不按系统墙钟推进，恢复本身不发石材或保存。
 2. 矿点耗尽后让存活玩家占原点至期限到达，X/Z 中心距离<=1.16 米时保持耗尽/隐藏/可通行；包含未启用 Simulate 的存活玩家，不推开、不换点、不重置期限。离开占位范围后恢复；死亡玩家不占位。精确边界或特殊 Simulate 条件未触发时保持 UNKNOWN。
@@ -557,4 +557,21 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 
 验收结束恢复 SourceMode=Json、Preset=Forest、两份地图 schemaVersion=6/configRevision=9、seed=12345、32 敌人及原空间/movement/出生；mine_rock 再生恢复 true/600 秒、占地 0.75/间距 2.5/交互 2 米、只阻挡移动/非 gatherable。mining 恢复 enabled=true、mine_rock、3 秒、stone ×3、drop_stone，生态矿点密度 0.1/0.2/1；树木/采集物 true/600 秒、treeHarvest 2 秒/wood ×3、drops enabled=true 与原距离/运动/寿命及其他配置保持。
 
-规则归[采矿](MapMining.md)，F 入口归[地图](Map.md)，掉落/库存归[掉落](MapDrops.md)/[背包](Inventory.md)。矿点再生人工 GamePlayer 为 UNKNOWN，未实际触发的边界/独立失败/预测时序、历史内存/网络开销、规模性能、平台构建和线上联调未验收。第九阶段原 J 和第二阶段独立 JSON 人工 UNKNOWN 保持；统一 F 与第七/第八及其他通过仍限各自原版本/清单。AI 未新增/运行逻辑单元测试、GamePlayer/PlayMode、游戏模拟/显示系统、命令行构建、发布、性能采样或图片检查。
+规则归[采矿](MapMining.md)，F 入口归[地图](Map.md)，掉落/库存归[掉落](MapDrops.md)/[背包](Inventory.md)。用户已确认矿点再生人工 GamePlayer 通过，范围限本节八项清单及 v6/revision=9；未实际触发的边界/独立失败/预测时序/晚加入仍为 UNKNOWN，历史内存/网络开销、规模性能、平台构建和线上联调未验收。第九阶段原 J 和第二阶段独立 JSON 人工 UNKNOWN 保持；统一 F 与第七/第八及其他通过仍限各自原版本/清单。AI 未新增/运行逻辑单元测试、GamePlayer/PlayMode、游戏模拟/显示系统、命令行构建、发布、性能采样或图片检查。
+
+## 【KNOWN ISSUES】资源交互提示与进度显示的人工验收
+
+入口为 CombatPrototypeNetCode，当前两份地图 Json/BuiltIn 为 schemaVersion=7/configRevision=10、interactionHud.enabled=true。Main Camera 已追加一个 HUD 组件，原三根对象和其他组件保持；Player Baker 新增所属玩家 HUD Ghost 数据，各端须使用同版代码、输入、配置和重新烘焙的数据。正常 Unity 编译、SendToOwner 与四字段 Serializer、系统顺序、十次隔离烘焙及显式挂载已静态核对，主线程静态验收通过。下列人工 GamePlayer 结果为 UNKNOWN，旧阶段用户通过不覆盖 HUD：
+
+1. 在森林/草地靠近采集点、树木、矿点并静止，2 米内分别显示 F Gather Apple/F Chop Tree/F Mine Rock；无可用目标、移动、攻击或死亡时收起。跨三类重叠区域核对当前最近有效目标、较近目标被他人预约后改选、同距按原 PlacementIndex；提示不提前预约，真正开始由 F 服务端日志/状态确认。未触发的精确同距/临界距离保持 UNKNOWN。
+2. 新 F 后三类分别显示当前目标、递增百分比和进度条，原耗时仍 1/2/3 秒。交互中另一类型更近不切换目标；重复/按住 F 不重置计时、切换或连续自动采集。完成收到权威状态后清掉进度，再显示下一有效提示或隐藏；采集仍保存后入包，砍树/采矿仍只生成一堆新 DropId 的木材/石材。
+3. 覆盖移动、攻击、受击、死亡、超距、断线/归属失效中断，收到取消状态后进度清掉，重新开始须新 F。可控条件下覆盖采集保存失败和树木/矿点生成/提交失败：HUD 不显示额外成功/发奖，不自行完成或改变原资源/库存；独立失败和回滚若未实际触发仍为 UNKNOWN。
+4. 两个客户端同时在不同目标交互，只显示各自本地所属玩家进度；争抢同一目标仅原赢家 Working，输家不展示他人进度，按原规则改选或隐藏。双端/晚加入/重连核对初始 Hidden 与新状态、取消/完成一致性；网络延迟/预测纠正时进度来自最新权威快照，不能用本地秒表提前完成。未覆盖时序保持 UNKNOWN。
+5. 在 1920×1080 及其他窗口尺寸/长宽比核对底部居中、等比缩放、文字清晰、面板/进度布局和英文文案；HUD 不截获鼠标或 F/G/E/R、WASD、镜头操作。此项由人工观察，AI 未查看图片或调用 HUD 绘制进行验收；中文字体/字形覆盖仍未确认。
+6. PlayMode 前修改 interactionHud 尺寸、底距、字号、条高及三类文案，正常导入/烘焙后生效；关闭 enabled 后 HUD 隐藏，原 F 三类行为及 G/存档保持。Json/BuiltIn、两种模板和关闭采矿/再生回归。缺段/未知或重复键/错误类型、尺寸不合法、空白/控制字符/超 61 UTF-8 字节文案、旧 v6 明确报错且不回退来源；无热重载。不能触发的运行错误保持 UNKNOWN。
+7. 准入未完成、无本地 Ghost、玩家死亡/R、断线重连、停止重进、模板/来源切换及 World/SubScene/主场景释放时，不残留上一局提示/进度；没有客户端的 Server 启动保持隐藏。Main Camera 不增加第二个 HUD，原共享资源和实例释放保持，原 PlayerView/跟随镜头正常。
+8. 回归至少两轮采集物/树木/矿点原点再生与占位等待、新 F 再产出，原移动/阻挡、玩家与敌人战斗/奖励、G 苹果/木材/石材、E 小块肉、R、v1 固定库存保存恢复和清理。未实际触发的保存/清理/预测失败、边界及规模性能保持 UNKNOWN。
+
+验收结束恢复 SourceMode=Json、Preset=Forest、schemaVersion=7/configRevision=10、HUD enabled=true、320×76/底距48/字号20/条高10、英文 Gather Apple/Chop Tree/Mine Rock；原 seed=12345、32 敌人、空间/出生/movement、drops、treeHarvest、mining 及三类 true/600 秒再生保持。
+
+规则与静态产物归[交互显示](MapInteractionHud.md)。人工 GamePlayer、实际显示效果、未触发失败/延迟/预测时序、HUD 与历史内存/网络开销、规模性能、平台构建和线上联调仍为 UNKNOWN。矿点再生 v6/revision=9、统一 F v6/revision=8 及其他阶段用户通过保持原版本/清单；第九阶段原 J、第二阶段独立 JSON 旧 UNKNOWN 保持。AI 未新增/运行逻辑单元测试、GamePlayer/PlayMode、游戏模拟/显示系统、命令行构建、发布、性能采样或图片检查。

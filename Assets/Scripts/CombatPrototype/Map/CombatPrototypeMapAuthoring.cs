@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Unity.Collections;
 using Code_01.CombatPrototype.Networking;
 using Unity.Entities;
 using Unity.NetCode;
@@ -95,6 +96,17 @@ namespace Code_01.CombatPrototype.Map
                 var layout = CombatPrototypeMapLayoutBuilder.Build(config, spawner.EnemyColumns, spawner.EnemySpacing);
                 var entity = GetEntity(TransformUsageFlags.None);
                 AddComponent(entity, layout.Data);
+                var hud = config.map.interactionHud;
+                AddComponent(entity, new CombatPrototypeMapInteractionHudSettings
+                {
+                    Enabled = (byte)(hud.enabled ? 1 : 0),
+                    PanelWidthPixels = hud.panelWidthPixels, PanelHeightPixels = hud.panelHeightPixels,
+                    BottomMarginPixels = hud.bottomMarginPixels, FontSize = hud.fontSize,
+                    ProgressBarHeightPixels = hud.progressBarHeightPixels,
+                    GatherLabel = new FixedString64Bytes(hud.gatherLabel),
+                    TreeLabel = new FixedString64Bytes(hud.treeLabel),
+                    MineLabel = new FixedString64Bytes(hud.mineLabel)
+                });
                 var chunks = AddBuffer<CombatPrototypeMapChunk>(entity);
                 foreach (var chunk in layout.Chunks) chunks.Add(chunk);
                 var cells = AddBuffer<CombatPrototypeMapCell>(entity);

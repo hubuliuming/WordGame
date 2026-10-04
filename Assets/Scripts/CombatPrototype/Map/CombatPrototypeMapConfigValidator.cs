@@ -9,14 +9,27 @@ namespace Code_01.CombatPrototype.Map
         {
             if (config == null || config.map == null || config.map.geometry == null ||
                 config.map.layout == null || config.map.movement == null || config.map.drops == null || config.map.treeHarvest == null ||
-                config.map.mining == null || config.map.population == null || config.map.spawn == null ||
+                config.map.mining == null || config.map.interactionHud == null || config.map.population == null || config.map.spawn == null ||
                 config.biomes == null || config.grounds == null || config.objects == null ||
                 config.map.biomeIds == null || config.map.biomeRegions == null)
                 throw new InvalidOperationException("Map configuration is missing required sections.");
             var map = config.map;
+            var hud = map.interactionHud;
+            Positive(hud.panelWidthPixels, "interactionHud.panelWidthPixels");
+            Positive(hud.panelHeightPixels, "interactionHud.panelHeightPixels");
+            Nonnegative(hud.bottomMarginPixels, "interactionHud.bottomMarginPixels");
+            Positive(hud.progressBarHeightPixels, "interactionHud.progressBarHeightPixels");
+            if (hud.fontSize <= 0 || hud.panelWidthPixels <= 32f || hud.panelWidthPixels > 1920f ||
+                hud.panelHeightPixels + hud.bottomMarginPixels > 1080f ||
+                hud.panelHeightPixels < (double)hud.fontSize + hud.progressBarHeightPixels + 40d)
+                throw new InvalidOperationException("interactionHud requires a positive font size, panel width in (32,1920], " +
+                    "panel height >= fontSize + progressBarHeightPixels + 40, and panel height + bottom margin <= 1080.");
+            HudLabel(hud.gatherLabel, "interactionHud.gatherLabel");
+            HudLabel(hud.treeLabel, "interactionHud.treeLabel");
+            HudLabel(hud.mineLabel, "interactionHud.mineLabel");
             Id(map.mapDefinitionId, "mapDefinitionId");
-            if (map.schemaVersion != 6 || map.configRevision < 1 || map.defaultSeed < 1)
-                throw new InvalidOperationException("Map requires schemaVersion=6, positive revision and seed.");
+            if (map.schemaVersion != 7 || map.configRevision < 1 || map.defaultSeed < 1)
+                throw new InvalidOperationException("Map requires schemaVersion=7, positive revision and seed.");
             var drops = map.drops;
             Id(drops.itemId, "drops.itemId");
             Id(drops.visualResourceKey, "drops.visualResourceKey");
@@ -181,6 +194,15 @@ namespace Code_01.CombatPrototype.Map
                     region.minX >= region.maxX || region.minZ >= region.maxZ)
                     throw new InvalidOperationException("Biome region must be a nonempty normalized rectangle.");
             }
+        }
+
+        private static void HudLabel(string value, string field)
+        {
+            if (string.IsNullOrWhiteSpace(value) || global::System.Text.Encoding.UTF8.GetByteCount(value) > 61)
+                throw new InvalidOperationException(field + " requires a nonempty label up to 61 UTF-8 bytes.");
+            foreach (var character in value)
+                if (char.IsControl(character))
+                    throw new InvalidOperationException(field + " does not allow control characters.");
         }
 
         private static void Finite(float value, string field)

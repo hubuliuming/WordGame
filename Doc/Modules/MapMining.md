@@ -25,7 +25,7 @@
 
 ## 【FACT】JSON 契约与默认值
 
-[battle_forest_01.json](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[battle_grassland_01.json](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 为 schemaVersion=6/configRevision=9。mining 及全部字段必填；旧 v1～v5、缺失/未知/重复字段、错误类型或无效引用明确失败，不补字段、不回退来源。配置只在烘焙时读取，无运行热重载或新联网配置校验协议。各端须使用相同代码、输入布局、Ghost、配置及资源。
+[battle_forest_01.json](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[battle_grassland_01.json](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 为 schemaVersion=7/configRevision=10。mining 及全部字段必填，interactionHud 归[交互显示](MapInteractionHud.md)；旧 v1～v6、缺失/未知/重复字段、错误类型或无效引用明确失败，不补字段、不回退来源。配置只在烘焙时读取，无运行热重载或新联网配置校验协议。各端须使用相同代码、输入布局、Ghost、配置及资源。
 
 ```json
 "mining": {
@@ -97,7 +97,7 @@ MineRegrow 在仅服务端的 PredictedSimulation、MineHarvest 之后和 Player
 
 MineObstacle 在 Client/Server 的 PredictedSimulation、TreeObstacle 之前执行，后者再先于玩家/敌人移动。按地图源建立 Mineable 的 PlacementIndex→障碍索引；每个预测 tick 先恢复这些记录的初始 Disabled=0。对 Available/Mining/Depleted 均从历史末尾查找当前 ServerTick 严格晚于的最近有效转换，再应用该条 Disabled；没有匹配转换或历史为空时保持初始阻挡。耗尽/再生在移动后提交，从下一模拟 tick 生效；回放到转换前或两次转换间按历史恢复，不能只用最新 Phase/MinedTick。仅处理 Mineable 索引；缺索引、缺历史、无效 tick/Disabled 记录具体错误并隔离当前项。每完整轮次增加两条，本局全部历史不截断；取消/新 F 不清空，随矿点实例释放。系统停止恢复本系统索引的初始阻挡，MineRegrow 只清理自己的索引缓存。
 
-矿点由 MineSpawn 在地图根更换/失效、停止及 World 销毁时清理本系统拥有的实体；石材由原 DropSpawn/DropCleanup 清理。共享网格/材质/Prefab 不随实例销毁。没有世界存档、运行中地图切换、工具装备/耐久、采矿动画、物理碰撞、新 UI 或石材使用效果；E 仍只使用小块肉。
+矿点由 MineSpawn 在地图根更换/失效、停止及 World 销毁时清理本系统拥有的实体；石材由原 DropSpawn/DropCleanup 清理。共享网格/材质/Prefab 不随实例销毁。没有世界存档、运行中地图切换、工具装备/耐久、采矿动画、物理碰撞或石材使用效果；F 目标提示/进度归[交互显示](MapInteractionHud.md)；E 仍只使用小块肉。
 
 ## 【FACT】资源与 Editor 边界
 
@@ -122,4 +122,4 @@ Tools/CombatPrototype/地图/生成第九阶段采矿资源 要求空闲 EditMod
 
 矿点原点再生的正常 Unity 编译无 C# Error，MineState 与 MineBlockingEvent Ghost Serializer/Snapshot、仅服务端再生字段及系统顺序已静态核对。Forest/Grassland 的 Json/BuiltIn 各一次，另各一次 Json mining=false 和 regrowEnabled=false（间隔仍为 600），共八次隔离 Editor 烘焙；schemaVersion=6/configRevision=9、默认 true/600、Prefab 空历史/零期限、资源键与全部初始布置位置/朝向一致。默认森林/草原仍为矿点 20/18、阻挡 109/71、树木 89/53、采集点 36/38；关闭采矿为 0 矿点、89/53 阻挡，关闭再生保持启用矿点布局。占地/间距/保护区/敌人初始重叠违规为 0，Console 前后均 [0 Error,3 Warning,7 Log]，无新增烘焙警告，原场景干净，无临时 World 遗留。
 
-主线程代码/烘焙静态验收通过；矿点再生的到期/占位、多轮 F/G、实际跨端历史/下一 tick 阻挡、延迟/预测回放/晚加入、创建/恢复/清理/回滚失败与生命周期回归的人工 GamePlayer 为 UNKNOWN，八项清单归[运行入口](Runtime.md)。已有统一 F 及第七/第八阶段用户通过仅限各自原版本/清单，不扩展到新行为。矿点历史随本局轮次增长，其内存/网络开销及规模性能、平台构建与线上联调未测量；AI 未运行 GamePlayer/PlayMode、游戏模拟/显示系统、逻辑单元测试、命令行构建、发布、性能采样或图片检查。
+用户已确认矿点原点再生人工 GamePlayer 验收通过，主线程结合既有代码/烘焙静态核对与用户反馈判定该阶段通过；范围限 schemaVersion=6/configRevision=9 及[运行入口](Runtime.md)矿点再生八项清单。人工结论来自用户反馈，未实际触发的精确距离/特殊 Simulate、同 tick/延迟/预测回放、晚加入及独立失败分支仍为 UNKNOWN。已有统一 F 及第七/第八阶段用户通过仅限各自原版本/清单，不扩展到新行为。矿点历史随本局轮次增长，其内存/网络开销及规模性能、平台构建与线上联调未测量；AI 未运行 GamePlayer/PlayMode、游戏模拟/显示系统、逻辑单元测试、命令行构建、发布、性能采样或图片检查。

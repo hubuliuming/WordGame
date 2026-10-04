@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 6,
-  "configRevision": 9,
+  "schemaVersion": 7,
+  "configRevision": 10,
   "mapDefinitionId": "battle_forest_01",
   "defaultSeed": 12345,
   "geometry": {
@@ -55,6 +55,17 @@
     "dropItemId": "stone",
     "dropQuantity": 3,
     "dropVisualResourceKey": "drop_stone"
+  },
+  "interactionHud": {
+    "enabled": true,
+    "panelWidthPixels": 320.0,
+    "panelHeightPixels": 76.0,
+    "bottomMarginPixels": 48.0,
+    "fontSize": 20,
+    "progressBarHeightPixels": 10.0,
+    "gatherLabel": "Gather Apple",
+    "treeLabel": "Chop Tree",
+    "mineLabel": "Mine Rock"
   },
   "population": {
     "initialEnemyCount": 32

@@ -23,7 +23,7 @@
 
 ## 【FACT】JSON 契约与当前默认值
 
-当前两份地图定义与 BuiltIn 均为 schemaVersion=6、configRevision=9，treeHarvest 段及全部字段必填。树木配置仍为 2 米/2 秒/wood ×3，再生复用 objects.tree_normal 的 true/600 秒；原空间、种子、树木/采集物密度、出生及 movement/drops/grounds 数值保持。新增 mining 段与生态矿点字段归[采矿](MapMining.md)，树木规则独立。配置在 SubScene 烘焙时读取，Json 失败不回退 BuiltIn，不支持热重载或新的联网配置校验协议。
+当前两份地图定义与 BuiltIn 均为 schemaVersion=7、configRevision=10，treeHarvest 段及全部字段必填。树木配置仍为 2 米/2 秒/wood ×3，再生复用 objects.tree_normal 的 true/600 秒；原空间、种子、树木/采集物密度、出生及 movement/drops/grounds 数值保持。新增 mining 段与生态矿点字段归[采矿](MapMining.md)，树木规则独立。配置在 SubScene 烘焙时读取，Json 失败不回退 BuiltIn，不支持热重载或新的联网配置校验协议。
 
 | 字段 | 当前默认值 | 校验与作用 |
 |---|---|---|
@@ -102,7 +102,7 @@ Tools/CombatPrototype/地图 下“生成第七阶段砍伐资源”预检原目
 
 第八阶段正常编译、仅服务端 RegrowAt/系统顺序、两种模板隔离烘焙及原资源不变已静态核对，主线程静态验收通过；用户已确认第八阶段人工 GamePlayer 通过，主线程结合既有静态核对与用户反馈判定该阶段通过，范围限[运行入口](Runtime.md)第八阶段八项清单及 v5/revision=7。人工结论来自用户反馈；未实际触发的精确边界、同 tick、延迟/预测回放和创建/清理/回滚失败仍为 UNKNOWN。第七阶段通过仍限原版本/清单。阻挡历史随轮次增长，其内存/网络开销未测量。
 
-未接斧头装备、工具耐久、砍伐动作、树桩、世界状态持久化、攻击遮挡、寻路、通用动态对象框架、物品使用效果或新 UI。同步写盘耗时、规模性能、平台构建和线上联调未验收。AI 未运行 GamePlayer/PlayMode、游戏模拟/显示系统、逻辑单元测试、命令行构建、发布、性能采样或图片检查，未创建子Agent、未提交 Git。
+未接斧头装备、工具耐久、砍伐动作、树桩、世界状态持久化、攻击遮挡、寻路、通用动态对象框架或物品使用效果；F 目标提示/进度归[交互显示](MapInteractionHud.md)。同步写盘耗时、规模性能、平台构建和线上联调未验收。AI 未运行 GamePlayer/PlayMode、游戏模拟/显示系统、逻辑单元测试、命令行构建、发布、性能采样或图片检查，未创建子Agent、未提交 Git。
 
 相关规则：[掉落与拾取](MapDrops.md)、[背包与道具](Inventory.md)、[玩家](Player.md)、[战斗](Combat.md)、[资源与数据](DataResources.md)。
 

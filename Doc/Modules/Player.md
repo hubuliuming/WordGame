@@ -233,4 +233,8 @@ PlayerView 的现有网络 Owner 连接客户端表现脚本，后者只读取�
 
 当前 F 由服务端统一选择最近有效资源目标，选中矿点时调用 MineHarvest.TryBegin；Mine 字段保留，J 不再触发/消费。有效在线 CommandTarget/归属、启用 Simulate、存活、零 Move、无攻击且近战 Ready 才合格。玩家只持有一个资源预约，重复 F 不重置或切换，完成/取消本 tick 不再启动；旧 F/H 优先判断移除。原资格/中断及玩家 Prefab/镜头/移动/动画和 G/E/R 保持；矿点阻挡按转换历史重建。规则归[采矿](MapMining.md)/[统一交互](Map.md)，第九阶段原 J 人工仍为 UNKNOWN；统一 F 已获用户人工通过反馈，范围与未触发用例归[运行入口](Runtime.md)八项清单。
 
-矿点默认 600 秒原点再生前收集全部存活玩家位置，包含未启用 Simulate 的实体；X/Z 中心距离小于等于 0.75+0.4+0.01=1.16 米时等待，死亡玩家不占位。空闲后原矿点恢复 Available，须新 F 再次采矿；不推开玩家或新增玩家组件。规则归[采矿](MapMining.md)，再生阶段的人工占位/移动阻挡/输入回归为 UNKNOWN，归[运行入口](Runtime.md)。
+矿点默认 600 秒原点再生前收集全部存活玩家位置，包含未启用 Simulate 的实体；X/Z 中心距离小于等于 0.75+0.4+0.01=1.16 米时等待，死亡玩家不占位。空闲后原矿点恢复 Available，须新 F 再次采矿；不推开玩家或新增玩家组件。规则归[采矿](MapMining.md)，用户已确认该阶段人工 GamePlayer 通过；玩家范围限原点占位等待、离开/死亡后恢复及移动阻挡/输入回归，完整边界归[运行入口](Runtime.md)矿点再生八项清单及 v6/revision=9，未触发的精确距离/特殊 Simulate/预测时序仍为 UNKNOWN。
+
+## 【FACT】资源交互 HUD 的所属玩家数据
+
+当前 Player Baker 在原玩家实体追加初始 Hidden 的 HUD State，四字段按 SendToOwner 同步；客户端仅枚举启用 GhostOwnerIsLocal 的玩家并在死亡/断线/地图停止时收起。HUD 只展示原 F 目标/进度，原玩家属性、输入和复活流程保持；字段、Main Camera 挂载、注册/解绑及 JSON 归[交互显示](MapInteractionHud.md)。正常编译/所属 Serializer/初始烘焙已静态核对，双端本地显示及输入/死亡/复活/重连人工 GamePlayer 为 UNKNOWN，归[运行入口](Runtime.md)HUD 八项清单。

@@ -214,6 +214,11 @@ namespace Code_01.CombatPrototype.Map
             finally { requests.Dispose(); }
         }
 
+        internal string GetInteractionHintRejection(Entity player, int networkId, CombatPrototypePlayerInput input)
+        {
+            return RejectPlayer(new Request { Player = player, NetworkId = networkId, Input = input }, out _);
+        }
+
         private string RejectPlayer(Request request, out CombatPrototypePlayerHealth health)
         {
             health = EntityManager.GetComponentData<CombatPrototypePlayerHealth>(request.Player);

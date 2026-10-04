@@ -198,6 +198,7 @@ GameObject:
   - component: {fileID: 329441053}
   - component: {fileID: 329441052}
   - component: {fileID: 329441055}
+  - component: {fileID: 329441056}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -302,6 +303,18 @@ MonoBehaviour:
   followSmoothTime: 0.12
   rotationStep: 45
   rotationDuration: 0.18
+--- !u!114 &329441056
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 329441051}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55daeba957df67347a415a043d00bd70, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::Code_01.CombatPrototype.Map.CombatPrototypeMapInteractionHud
 --- !u!1 &2108281770
 GameObject:
   m_ObjectHideFlags: 0

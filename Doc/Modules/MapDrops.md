@@ -93,6 +93,10 @@ DropSpawnSystem.SpawnOwnedDrop 接收明确来源、Prefab、资源键、ItemId/
 
 MineHarvest 调用原 SpawnOwnedDrop 生成 DroppedStone，stone 显式映射 Msg.ItemName.石材。石材、木材、敌人苹果共享同局 DropId、运动/落地、G 实际 ItemId 解析、SavePrepared 先于库存/Consumed 提交、到期和实例释放；drops.enabled 只控制敌人额外掉落，采矿由 mining.enabled 控制。矿点提交失败只释放当前石材并尝试恢复原阻挡/历史长度/Available 并清空再生期限，原异常及清理/回滚错误保留，需新 F；完整事务边界归[采矿](MapMining.md)。第九阶段资源/烘焙已静态核对，采矿/G/保存失败及跨端的人工 GamePlayer 为 UNKNOWN，归[运行入口](Runtime.md)；第六至第八阶段通过仍限各自旧版本和清单。
 
-矿点默认成功耗尽后 600 秒原点空闲才恢复，再生本身不创建石材、不修改库存或保存；恢复后新 F 完成再次走原 SpawnOwnedDrop 与同局共享 DropId、G/保存/到期/释放链。规则归[采矿](MapMining.md)，再生阶段的人工回归仍为 UNKNOWN，归[运行入口](Runtime.md)。
+矿点默认成功耗尽后 600 秒原点空闲才恢复，再生本身不创建石材、不修改库存或保存；恢复后新 F 完成再次走原 SpawnOwnedDrop 与同局共享 DropId、G/保存/到期/释放链。规则归[采矿](MapMining.md)，用户已确认再生阶段人工 GamePlayer 通过；掉落范围限新 F 再次产出、G/保存/到期/释放回归，完整边界归[运行入口](Runtime.md)矿点再生八项清单及 v6/revision=9，未触发独立失败分支仍为 UNKNOWN。
 
 砍树/采矿现由统一 F 选目标并启动，产出的木材/石材仍走原地面掉落和 G 保存链；跨类型交互及产出回归已获用户人工通过反馈，结论限[运行入口](Runtime.md)统一 F 八项清单，未实际触发的独立用例仍为 UNKNOWN。旧阶段人工通过范围保持。
+
+## 【FACT】F 交互显示边界
+
+v7/revision=10 接入 F 三类资源的目标提示与原服务端采集进度，规则归[交互显示](MapInteractionHud.md)。HUD 不显示 G 拾取提示，不创建掉落、提交库存/Consumed 或调用保存；原 DropId、飞行/落地、G、到期及释放链保持。新阶段掉落回归人工 GamePlayer 为 UNKNOWN，归[运行入口](Runtime.md)HUD 清单，既有通过保持各自原范围。

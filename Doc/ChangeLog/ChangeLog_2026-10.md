@@ -557,3 +557,17 @@
 - 增量同步 MapMining 当前规则、地图/树木/掉落/背包/玩家/战斗/资源文档、导航及策划模板；Runtime 新增矿点再生八项人工清单，统一 F 的原 v6/revision=8 已通过清单保留原口径，第九阶段原 J 与第二阶段独立 JSON 人工 UNKNOWN 保持。当前矿点再生主线程代码/烘焙静态验收通过，人工 GamePlayer、未触发独立时序/失败、历史内存/网络开销、规模性能、平台构建与线上联调为 UNKNOWN。
 - 只修改方案内矿点链/配置和受影响文档；新系统 meta 由 Unity 导入生成，GUID=9da8de47253e52f4ba3b80983082bcc3。Scene/Prefab/Animator 层级、旧 meta/资源、统一 F/G/E/R 输入链、树木/采集物系统、存储类、包与构建设置保持。AI 未新增/运行逻辑单元测试、GamePlayer/PlayMode、游戏模拟/显示系统、命令行构建、发布、性能采样或图片检查，未提交 Git。
 - 最终范围核对：相对本阶段开始快照，22 个既有文件变化（8 脚本、3 JSON、11 文档），新增 1 脚本及 Unity 生成的 meta，另同步策划模板，无删除/越界。旧 Scene/Prefab/Animator/资源/meta 及原 F/G 输入与树木/采集系统散列保持；MineHarvest 的 TryBegin/CancelBegin/RejectPlayer/FindCollector/Cancel 原方法及统一 F 原八项人工清单逐字保持。25 份任务文本 UTF-8、496 个本地链接、JSON/策划示例一致性、GUID 唯一性及受影响文件 git diff --check 通过；导航 8192 字节、地图 24500 字节，矿点专题在 24 KiB 内。加载元数据确认状态 Snapshot 四字段及历史 Snapshot 两字段，临时烘焙 World 已释放；矿点再生人工 GamePlayer 仍为 UNKNOWN。
+
+## 2026-10-04 矿点原点再生人工验收反馈
+
+- 用户反馈“我已验收通过，接下来下一阶段”；主线程结合既有静态核对与该人工反馈判定矿点原点再生阶段通过，范围限 CombatPrototypeNetCode、schemaVersion=6/configRevision=9 及 Runtime 矿点再生八项清单。人工结果来自用户反馈，AI 未运行 GamePlayer/PlayMode 或游戏模拟/显示系统。
+- 同步地图、采矿、掉落、背包、玩家、战斗、资源与运行入口的当前验收状态及外部配置模板；保留原八项清单和恢复默认配置要求。未实际触发的精确距离/特殊 Simulate、同 tick/延迟/预测回放、晚加入与独立创建/提交/清理/回滚失败分支仍为 UNKNOWN；历史内存/网络开销、规模性能、平台构建和线上联调未验收。
+- 第二阶段独立 JSON、第九阶段原 J 等旧人工 UNKNOWN 及其他阶段原版本/清单保持。此次仅同步验收文档，未改脚本、JSON、Scene、Prefab、Animator、meta 或导航；未新增/运行逻辑单元测试、命令行构建、发布、性能采样或图片检查。
+
+## 2026-10-04 资源交互提示与进度显示
+
+- 用户确认并授权后由主线程按方案执行。新增 HUD JSON 配置、所属玩家快照、服务端只读状态采样、客户端绑定与 OnGUI 显示五个独立脚本及 Unity 生成的 meta；原 Player Baker 初始 Hidden，Map Baker 烘焙 Settings，统一 F 仅开放原 RejectPlayer 的只读接口。HUD 共用 Select，读取原 FinishAt/模拟时间和 1/2/3 秒耗时，SendToOwner 同步 Mode/Kind/PlacementIndex/ProgressPermille；不提交原玩法、库存、掉落或存档。
+- 两份地图 JSON 与 BuiltIn 更新为 schemaVersion=7/configRevision=10，新增必填 interactionHud 九字段；默认 true、320×76、底距48、字号20、条高10及三类英文文案，严格尺寸/标签校验，旧 v1～v6 明确失败。其他 JSON 数值与共享数组保持，关闭 HUD 只清显示。
+- 在授权主场景 Main Camera 一次追加一个 HUD 组件并保存，fileID=329441056、脚本 GUID=55daeba957df67347a415a043d00bd70；三根对象、原四个 Camera 组件和 Prefab/Animator/旧 meta/其他资源保持。只清掉保存产生的两个受影响 m_Name 行尾空格。
+- 正常 Unity 编译无 C# Error，所属 Serializer 四字段和顺序已核对。森林/草地各覆盖 Json/BuiltIn 默认与 Json 关闭采矿/矿点再生/HUD，共十次隔离 Editor 烘焙，初始 HUD、引用、全部布局及空间约束通过；默认矿点20/18、阻挡109/71，Console 前后 [0 Error,9 Warning,53 Log]，无新增烘焙警告。临时烘焙 Scene/World 已释放，主场景干净。
+- 增量同步导航、地图与相关模块，新增交互显示专题、Runtime 八项人工清单及外部配置模板；先前矿点再生人工通过记录保持原 v6/revision=9 范围。HUD 实际显示/字形/分辨率、跨端/预测/取消/生命周期人工 GamePlayer 与性能/带宽、平台构建、线上联调为 UNKNOWN；未运行游戏系统、PlayMode、逻辑单元测试、命令行构建、发布、性能采样或图片检查，未创建子Agent、未提交 Git。

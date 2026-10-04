@@ -10,7 +10,7 @@ namespace Code_01.CombatPrototype.Map
             if (config == null || config.map == null || config.map.geometry == null ||
                 config.map.layout == null || config.map.movement == null || config.map.drops == null || config.map.treeHarvest == null ||
                 config.map.mining == null || config.map.gatherTools == null || config.map.gatherTools.tools == null ||
-                config.map.interactionHud == null || config.map.inventoryPanel == null || config.map.inventoryDrop == null || config.map.inventoryDrop.items == null ||
+                config.map.interactionHud == null || config.map.pickupHud == null || config.map.inventoryPanel == null || config.map.inventoryDrop == null || config.map.inventoryDrop.items == null ||
                 config.map.population == null || config.map.spawn == null ||
                 config.biomes == null || config.grounds == null || config.objects == null ||
                 config.map.biomeIds == null || config.map.biomeRegions == null)
@@ -29,11 +29,12 @@ namespace Code_01.CombatPrototype.Map
             HudLabel(hud.gatherLabel, "interactionHud.gatherLabel");
             HudLabel(hud.treeLabel, "interactionHud.treeLabel");
             HudLabel(hud.mineLabel, "interactionHud.mineLabel");
+            ValidatePickupHud(map.pickupHud, hud);
             ValidateInventoryPanel(map.inventoryPanel);
             ValidateInventoryDrop(map.inventoryDrop);
             Id(map.mapDefinitionId, "mapDefinitionId");
-            if (map.schemaVersion != 10 || map.configRevision < 1 || map.defaultSeed < 1)
-                throw new InvalidOperationException("Map requires schemaVersion=10, positive revision and seed.");
+            if (map.schemaVersion != 11 || map.configRevision < 1 || map.defaultSeed < 1)
+                throw new InvalidOperationException("Map requires schemaVersion=11, positive revision and seed.");
             var drops = map.drops;
             Id(drops.itemId, "drops.itemId");
             Id(drops.visualResourceKey, "drops.visualResourceKey");
@@ -224,6 +225,23 @@ namespace Code_01.CombatPrototype.Map
                     region.minX >= region.maxX || region.minZ >= region.maxZ)
                     throw new InvalidOperationException("Biome region must be a nonempty normalized rectangle.");
             }
+        }
+
+        private static void ValidatePickupHud(MapPickupHudConfig pickup, MapInteractionHudConfig interaction)
+        {
+            Positive(pickup.panelWidthPixels, "pickupHud.panelWidthPixels");
+            Positive(pickup.panelHeightPixels, "pickupHud.panelHeightPixels");
+            Nonnegative(pickup.bottomMarginPixels, "pickupHud.bottomMarginPixels");
+            if (pickup.fontSize <= 0 || pickup.panelWidthPixels <= 32f || pickup.panelWidthPixels > 1920f ||
+                pickup.panelHeightPixels < (double)pickup.fontSize + 32d ||
+                (double)pickup.panelHeightPixels + pickup.bottomMarginPixels > 1080d ||
+                pickup.bottomMarginPixels < (double)interaction.bottomMarginPixels + interaction.panelHeightPixels + 16d)
+                throw new InvalidOperationException("pickupHud requires positive font size, width in (32,1920], " +
+                    "height >= fontSize+32, height+bottom margin <= 1080, and bottom margin at least 16 pixels above the F panel.");
+            HudLabel(pickup.pickupLabel, "pickupHud.pickupLabel");
+            HudLabel(pickup.appleLabel, "pickupHud.appleLabel");
+            HudLabel(pickup.woodLabel, "pickupHud.woodLabel");
+            HudLabel(pickup.stoneLabel, "pickupHud.stoneLabel");
         }
 
         private static void ValidateInventoryDrop(MapInventoryDropConfig drop)

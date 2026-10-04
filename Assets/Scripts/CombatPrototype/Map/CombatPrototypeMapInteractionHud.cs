@@ -39,6 +39,7 @@ namespace Code_01.CombatPrototype.Map
         private float _progress;
         private bool _visible;
         private readonly CombatPrototypeMapInventoryPanel _inventoryPanel = new CombatPrototypeMapInventoryPanel();
+        private readonly CombatPrototypeMapPickupHudClient _pickupHud = new CombatPrototypeMapPickupHudClient();
 
         private void OnEnable()
         {
@@ -83,7 +84,7 @@ namespace Code_01.CombatPrototype.Map
         internal void Configure(CombatPrototypeMapInteractionHudSettings settings,
             CombatPrototypeMapInventoryPanelSettings inventorySettings, CombatPrototypeMapGatherToolSettings toolSettings, CombatPrototypeMapGatherToolDefinition axe,
             CombatPrototypeMapGatherToolDefinition pickaxe, CombatPrototypeMapInventoryDropSettings dropSettings,
-            DynamicBuffer<CombatPrototypeMapInventoryDropDefinition> dropDefinitions)
+            DynamicBuffer<CombatPrototypeMapInventoryDropDefinition> dropDefinitions, CombatPrototypeMapPickupHudSettings pickupSettings)
         {
             Reset();
             _settings = settings;
@@ -96,13 +97,15 @@ namespace Code_01.CombatPrototype.Map
             _treeLabel = settings.TreeLabel.ToString();
             _mineLabel = settings.MineLabel.ToString();
             _inventoryPanel.Configure(inventorySettings, toolSettings, axe, pickaxe, dropSettings, dropDefinitions);
+            _pickupHud.Configure(pickupSettings);
         }
 
         internal void Show(CombatPrototypeMapInteractionHudState state, DynamicBuffer<CombatPrototypeMapGatherTool> tools,
             CombatPrototypeMapToolCraftFeedback feedback, CombatPrototypeMapInventoryDropFeedback dropFeedback,
             DynamicBuffer<CombatPrototypeInventoryItem> inventory,
-            Entity source, Entity player)
+            Entity source, Entity player, CombatPrototypeMapPickupHudState pickupState)
         {
+            _pickupHud.Show(pickupState);
             RefreshToolStatus(tools);
             ObserveFeedback(feedback);
             var hasFeedback = Time.unscaledTimeAsDouble < _feedbackUntil;
@@ -231,12 +234,14 @@ namespace Code_01.CombatPrototype.Map
         {
             _visible = false;
             _inventoryPanel.Clear();
+            _pickupHud.Clear();
         }
 
         internal void Reset()
         {
             Clear();
             _inventoryPanel.Reset();
+            _pickupHud.Reset();
             _labelStyle = null;
             _text = _toolText = _feedbackText = string.Empty;
             _mode = CombatPrototypeMapInteractionHudMode.Hidden;
@@ -254,6 +259,7 @@ namespace Code_01.CombatPrototype.Map
         private void OnGUI()
         {
             _inventoryPanel.Draw();
+            _pickupHud.Draw();
             if (!_visible || Event.current.type != EventType.Repaint || Screen.width <= 0 || Screen.height <= 0) return;
             if (_labelStyle == null)
             {

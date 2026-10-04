@@ -21,7 +21,7 @@
 
 ## 【FACT】JSON 契约与当前默认值
 
-[battle_forest_01.json](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[battle_grassland_01.json](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn来源](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)均为schemaVersion=10/configRevision=13，drops必填，工具配置归[采集工具](MapGatherTools.md)。原空间、移动、出生及drops/grounds值保持；mining与生态矿点字段归采矿专题，tree_normal/gather_apple/mine_rock均默认600秒再生。配置只在烘焙时读取，不支持热重载；各端须相同版本、输入布局与资源，未新增一致性协议。
+[battle_forest_01.json](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[battle_grassland_01.json](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn来源](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)均为schemaVersion=11/configRevision=14，drops必填，工具配置归[采集工具](MapGatherTools.md)。原空间、移动、出生及drops/grounds值保持；mining与生态矿点字段归采矿专题，tree_normal/gather_apple/mine_rock均默认600秒再生。配置只在烘焙时读取，不支持热重载；各端须相同版本、输入布局与资源，未新增一致性协议。
 
 | 字段 | 默认值 | 校验/行为 |
 |---|---|---|
@@ -37,7 +37,7 @@
 | visualScale | 0.5 | 有限正数，实例 LocalTransform 的统一缩放 |
 | lifetimeSeconds | 600 | 有限非负数；从生成时刻计时，0 关闭自动到期 |
 
-全部字段显式填写。字符串遵循原小写ASCII/数字/下划线及最长61字符；缺失/未知/重复字段、错类型或非法值沿严格UTF-8 JSON边界报错。旧地图v1～v9不迁移或补字段，Json失败不回退BuiltIn。资源键由原MapAuthoring.DecorationPrefabs解析，不查找或临时创建兜底。
+全部字段显式填写。字符串遵循原小写ASCII/数字/下划线及最长61字符；缺失/未知/重复字段、错类型或非法值沿严格UTF-8 JSON边界报错。旧地图v1～v10不迁移或补字段，Json失败不回退BuiltIn。资源键由原MapAuthoring.DecorationPrefabs解析，不查找或临时创建兜底。
 
 ## 【CURRENT STRATEGY】死亡、生成与飞行
 
@@ -75,7 +75,7 @@ Tools/CombatPrototype/地图 下的“生成第六阶段掉落资源”只创建
 
 正常 Unity 编译、生成输入/状态类型、系统顺序、两种模板隔离 Editor 烘焙、drops 参数与资源绑定已静态核对，主线程静态验收通过。用户已明确确认第六阶段人工 GamePlayer 验收通过，主线程结合既有静态核对与用户反馈判定该阶段通过。范围限[运行入口](Runtime.md)第六阶段九项清单的一次性掉落、飞行/落地、G 资格与最近选择、多人争抢、保存失败、晚加入/重启、配置/到期/释放和原玩法回归；人工结论来自用户反馈，未实际触发的临界距离、精确同距与同 tick 用例仍为 UNKNOWN。原第一/第三/第四/第五阶段通过范围保持，第二阶段独立 JSON 人工清单仍为 UNKNOWN。
 
-没有物理碰撞、拾取动画/UI、客户端自动拾取、苹果/木材/石材使用效果、通用动态对象框架、世界掉落持久化、运行热重载或新增联网配置校验协议。同步写盘继续占用服务端线程，运行性能、平台构建与线上联调未验收。AI 未运行游戏模拟/显示系统、GamePlayer/PlayMode、逻辑单元测试、命令行构建、发布、性能采样或图片检查。
+没有物理碰撞、拾取动画、客户端自动拾取、苹果/木材/石材使用效果、通用动态对象框架、世界掉落持久化、运行热重载或新增联网配置校验协议。同步写盘继续占用服务端线程，运行性能、平台构建与线上联调未验收。AI 未运行游戏模拟/显示系统、GamePlayer/PlayMode、逻辑单元测试、命令行构建、发布、性能采样或图片检查。
 
 相关规则：[背包与道具](Inventory.md)、[玩家](Player.md)、[战斗](Combat.md)、[资源与数据](DataResources.md)。
 
@@ -99,7 +99,7 @@ MineHarvest 调用原 SpawnOwnedDrop 生成 DroppedStone，stone 显式映射 Ms
 
 ## 【FACT】F 交互显示边界
 
-v7/revision=10 接入 F 三类资源的目标提示与原服务端采集进度，规则归[交互显示](MapInteractionHud.md)。HUD 不显示 G 拾取提示，不创建掉落、提交库存/Consumed 或调用保存；原 DropId、飞行/落地、G、到期及释放链保持。本阶段掉落回归已获用户人工通过反馈，限[运行入口](Runtime.md)HUD 八项清单及 v7/revision=10；未实际触发的独立创建/提交/清理/回滚失败仍为 UNKNOWN，既有通过保持各自原范围。
+v7/revision=10 接入 F 三类资源的目标提示与原服务端采集进度，规则归[交互显示](MapInteractionHud.md)。F 面板不显示 G 拾取提示，独立 G 显示归[拾取提示](MapPickupHud.md)；HUD 不创建掉落、提交库存/Consumed 或调用保存；原 DropId、飞行/落地、G、到期及释放链保持。本阶段掉落回归已获用户人工通过反馈，限[运行入口](Runtime.md)HUD 八项清单及 v7/revision=10；未实际触发的独立创建/提交/清理/回滚失败仍为 UNKNOWN，既有通过保持各自原范围。
 
 ## 【FACT】工具完成与掉落边界
 
@@ -107,4 +107,6 @@ v7/revision=10 接入 F 三类资源的目标提示与原服务端采集进度�
 
 v9阶段[材料面板](MapInventoryPanel.md)仅读取已入包库存并沿原工具事件请求制作，不接管G、掉落状态/生命周期或存档；拾取后显示随原Ghost刷新。v9/revision12显示接入静态通过，用户确认面板人工通过限[运行入口](Runtime.md)v9/revision12十二项，未实际触发的独立创建/保存/清理失败仍UNKNOWN；原用户通过保持各自清单。
 
-当前v10/13的[背包丢弃](MapInventoryDrop.md)调用原SpawnOwnedDrop并显式指定Prepared，保存扣减候选成功才激活Airborne；ReleaseDrop可携带InventoryDropRollback阶段，仅清理本次准备态实例。Single/All与其他掉落共用DropId/运动/G/到期/World所有权，任意合格玩家可拾取；drops.enabled不关闭背包丢弃。存档扣减已保存、未拾取物重启消失。编译/16次隔离烘焙静态通过，新增丢弃人工UNKNOWN，原用户通过保持各自版本/清单。
+v10/13接入的[背包丢弃](MapInventoryDrop.md)调用原SpawnOwnedDrop并显式指定Prepared，保存扣减候选成功才激活Airborne；ReleaseDrop可携带InventoryDropRollback阶段，仅清理本次准备态实例。Single/All与其他掉落共用DropId/运动/G/到期/World所有权，任意合格玩家可拾取；drops.enabled不关闭背包丢弃。存档扣减已保存、未拾取物重启消失。编译/16次隔离烘焙静态通过，用户确认丢弃人工通过限[运行入口](Runtime.md)v10/13十二项，未触发的独立用例UNKNOWN；原用户通过保持各自版本/清单。
+
+当前v11/14的[G提示](MapPickupHud.md)与实际G共用资格和DropTargetSelector，只有所属四字段显示数据；原保存入包、DropId及生命周期保持。编译/十次隔离烘焙静态通过，新显示人工UNKNOWN，旧用户通过保持原版本/清单。

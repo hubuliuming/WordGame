@@ -23,7 +23,7 @@
 
 ## 【FACT】JSON 契约与当前默认值
 
-当前两份地图定义与 BuiltIn 均为 schemaVersion=10、configRevision=13，treeHarvest 段及全部字段必填。树木基础配置仍为2米/徒手2秒/wood×3；[斧头](MapGatherTools.md)可用时1.5秒，再生复用 objects.tree_normal 的 true/600 秒；原空间、种子、树木/采集物密度、出生及 movement/drops/grounds 数值保持。新增 mining 段与生态矿点字段归[采矿](MapMining.md)，树木规则独立。配置在 SubScene 烘焙时读取，Json 失败不回退 BuiltIn，不支持热重载或新的联网配置校验协议。
+当前两份地图定义与 BuiltIn 均为 schemaVersion=11、configRevision=14，treeHarvest 段及全部字段必填。树木基础配置仍为2米/徒手2秒/wood×3；[斧头](MapGatherTools.md)可用时1.5秒，再生复用 objects.tree_normal 的 true/600 秒；原空间、种子、树木/采集物密度、出生及 movement/drops/grounds 数值保持。新增 mining 段与生态矿点字段归[采矿](MapMining.md)，树木规则独立。配置在 SubScene 烘焙时读取，Json 失败不回退 BuiltIn，不支持热重载或新的联网配置校验协议。
 
 | 字段 | 当前默认值 | 校验与作用 |
 |---|---|---|
@@ -112,4 +112,6 @@ Tools/CombatPrototype/地图 下“生成第七阶段砍伐资源”预检原目
 
 v9/revision12阶段的[材料面板](MapInventoryPanel.md)只展示木材库存/斧头耐久和原配方，按钮沿原制作链；砍伐/木材/阻挡/再生逻辑保持，用户确认面板人工通过限[运行入口](Runtime.md)v9/revision12十二项，未触发的独立显示/输入失败仍UNKNOWN。
 
-当前地图v10/13必填[背包丢弃](MapInventoryDrop.md)，复用原掉落资源及保存链；本专题原交互/工具/产出/再生行为保持。新增丢弃静态通过、人工UNKNOWN，旧通过仍限原版本/清单。
+当前地图v11/14必填[背包丢弃](MapInventoryDrop.md)，复用原掉落资源及保存链；本专题原交互/工具/产出/再生行为保持。新增丢弃静态及用户人工通过限[运行入口](Runtime.md)v10/13十二项，未触发用例UNKNOWN；旧通过仍限原版本/清单。
+
+当前v11/14的[G提示](MapPickupHud.md)只读共用掉落目标，与原F目标/工具进度独立；不修改本专题资源状态、产出、工具耐久、再生或保存。新显示编译/十次隔离烘焙静态通过、人工UNKNOWN，旧用户通过保持各自版本/清单。

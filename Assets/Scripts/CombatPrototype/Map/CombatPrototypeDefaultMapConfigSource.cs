@@ -17,7 +17,7 @@ namespace Code_01.CombatPrototype.Map
             {
                 map = new MapDefinitionConfig
                 {
-                    schemaVersion = 10, configRevision = 13,
+                    schemaVersion = 11, configRevision = 14,
                     mapDefinitionId = mapDefinitionId, defaultSeed = 12345,
                     geometry = new MapGeometryConfig
                     {
@@ -79,6 +79,12 @@ namespace Code_01.CombatPrototype.Map
                         enabled = true, panelWidthPixels = 320f, panelHeightPixels = 104f,
                         bottomMarginPixels = 48f, fontSize = 20, progressBarHeightPixels = 10f,
                         gatherLabel = "Gather Apple", treeLabel = "Chop Tree", mineLabel = "Mine Rock"
+                    },
+                    pickupHud = new MapPickupHudConfig
+                    {
+                        enabled = true, panelWidthPixels = 400f, panelHeightPixels = 52f,
+                        bottomMarginPixels = 168f, fontSize = 20, pickupLabel = "Pick up",
+                        appleLabel = "Vitality Apple", woodLabel = "Wood", stoneLabel = "Stone"
                     },
                     inventoryPanel = new MapInventoryPanelConfig
                     {

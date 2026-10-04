@@ -247,4 +247,6 @@ PlayerView 的现有网络 Owner 连接客户端表现脚本，后者只读取�
 
 [制作面板](MapInventoryPanel.md)读取本地启用GhostOwnerIsLocal的玩家及其Connected/InGame所属连接；B仅本地开关，按钮沿原CraftAxe/CraftPickaxe字段提交，未增Ghost/命令字段。面板内左键不触发攻击、滚轮不传镜头，面板外及键盘操作保持；死亡/断线/玩家或地图源变化/World释放清掉未提交按钮请求、投影与旧反馈。原生命、体力、R、库存/工具恢复和v2存档保持，正常编译/十四次隔离烘焙静态通过，用户确认人工通过限v9/revision12及[运行入口](Runtime.md)面板十二项；未触发的归属/生命周期/预测时序及独立失败仍UNKNOWN。
 
-当前v10/13的[背包丢弃](MapInventoryDrop.md)已接入。玩家输入新增DropInventory事件、InventoryDropItem/InventoryDropMode byte，玩家Baker增加Sequence/Kind/Quantity/Result所属反馈；原身份、生命/体力、工具、R和v2存档行为保持。编译/16次隔离烘焙静态通过，人工UNKNOWN，原用户通过限各自版本/清单。
+v10/13接入的[背包丢弃](MapInventoryDrop.md)已接入。玩家输入新增DropInventory事件、InventoryDropItem/InventoryDropMode byte，玩家Baker增加Sequence/Kind/Quantity/Result所属反馈；原身份、生命/体力、工具、R和v2存档行为保持。编译/16次隔离烘焙静态通过，用户确认丢弃人工通过限[运行入口](Runtime.md)v10/13十二项，未触发独立用例UNKNOWN；原用户通过限各自版本/清单。
+
+当前v11/14的[G提示](MapPickupHud.md)由玩家Baker追加Hidden初值、Mode/DropId/ItemId/Quantity四字段所属Ghost；原13输入、F四字段、丢弃反馈、生命/体力/R/库存/Tools及v2存档保持。客户端沿原本地玩家/Connected/InGame绑定，死亡/断线及World/玩家/地图源变化清掉旧提示；显示不开辟客户端结算入口。编译/十次隔离烘焙静态通过，新显示人工UNKNOWN，旧通过保持原范围。

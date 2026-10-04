@@ -1,0 +1,18 @@
+using System;
+
+namespace Code_01.CombatPrototype.Map
+{
+    [Serializable]
+    public sealed class MapPickupHudConfig
+    {
+        public bool enabled;
+        public float panelWidthPixels;
+        public float panelHeightPixels;
+        public float bottomMarginPixels;
+        public int fontSize;
+        public string pickupLabel;
+        public string appleLabel;
+        public string woodLabel;
+        public string stoneLabel;
+    }
+}

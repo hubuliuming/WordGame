@@ -15,11 +15,11 @@
 | [HUD 宿主](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapInteractionHud.cs) | 复用 Main Camera 原组件，委托绘制并共享原制作反馈 |
 | [PlayerInput](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypePlayerInput.cs) | B 本地开关、按钮与原1/2合并、面板指针隔离 |
 
-新 Snapshot/Panel 是普通 C# 类，没有新 MonoBehaviour 挂载。v9面板阶段四个脚本及对应meta由正常Unity导入生成。主场景、SubScene、Prefab、Animator、旧 meta、资源绑定、图片/字体、包和构建设置保持。v9面板接入只增加显示烘焙数据；当前v10丢弃另有输入与玩家所属反馈布局变化，归[丢弃](MapInventoryDrop.md)，各端须同版代码/配置及重新烘焙。正式 Map 的 QFramework 背包/99拆格与道具详情保持原边界。
+新 Snapshot/Panel 是普通 C# 类，没有新 MonoBehaviour 挂载。v9面板阶段四个脚本及对应meta由正常Unity导入生成。主场景、SubScene、Prefab、Animator、旧 meta、资源绑定、图片/字体、包和构建设置保持。v9面板接入只增加显示烘焙数据；v10丢弃另有输入与玩家所属反馈布局变化，归[丢弃](MapInventoryDrop.md)；v11新增所属G显示数据，归[拾取提示](MapPickupHud.md)，各端须同版代码/配置及重新烘焙。正式 Map 的 QFramework 背包/99拆格与道具详情保持原边界。
 
 ## 【FACT】JSON 契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 当前一致为 schemaVersion=10/configRevision=13。必填 inventoryPanel 共25字段，沿原严格UTF-8、完整字段/类型及未知/重复键检查；即使关闭面板也校验全部字段。旧地图v1～v9明确失败，不补段/默认值或回退来源；正常导入/烘焙后生效，无运行热重载。原工具配方/耐久仍从 gatherTools 唯一读取，面板不复制配置真值。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 当前一致为 schemaVersion=11/configRevision=14。必填 inventoryPanel 共25字段，沿原严格UTF-8、完整字段/类型及未知/重复键检查；即使关闭面板也校验全部字段。旧地图v1～v10明确失败，不补段/默认值或回退来源；正常导入/烘焙后生效，无运行热重载。原工具配方/耐久仍从 gatherTools 唯一读取，面板不复制配置真值。
 
 | 字段 | 默认值 | 契约 |
 |---|---|---|
@@ -78,4 +78,6 @@ v9面板阶段正常Unity编译无C# Error，四个脚本导入、配置/烘焙�
 
 用户已确认本阶段人工GamePlayer验收通过，主线程结合既有静态核对与用户反馈判定通过，范围限CombatPrototypeNetCode、schemaVersion=9/configRevision=12及[运行入口](Runtime.md)材料面板十二项清单。人工结论来自用户反馈；未实际触发的精确排版/命中边界、事件顺序、同tick、延迟/预测回放、晚加入和独立配置/网络条目/创建/准备/保存/提交/清理失败仍为UNKNOWN。旧工具v8/revision11十二项用户通过、HUD v7/revision10八项及其他通过保持原版本/清单，不覆盖本阶段新显示/按钮行为。字体、运行性能/带宽、平台构建和线上联调未验证；保存成功后意外ECS故障恢复仍沿工具原未知边界。AI未执行GamePlayer/PlayMode、游戏模拟/GUI显示回调、逻辑单元测试、命令行构建、发布、性能采样或图片检查，未创建子Agent或提交Git。
 
-当前v10/13在材料行下接入[Drop/All](MapInventoryDrop.md)，页脚优先展示未到期丢弃结果，再显示原制作反馈。普通客户端帮助类缓存一个未提交请求；关闭和原绑定失效均清空。原面板尺寸/滚动/鼠标隔离、配方与F显示开关保持；本阶段编译/16次隔离烘焙静态通过，新增丢弃人工UNKNOWN，不扩展上述v9面板用户通过。
+v10/13在材料行下接入[Drop/All](MapInventoryDrop.md)，页脚优先展示未到期丢弃结果，再显示原制作反馈。普通客户端帮助类缓存一个未提交请求；关闭和原绑定失效均清空。原面板尺寸/滚动/鼠标隔离、配方与F显示开关保持；本阶段编译/16次隔离烘焙静态通过，用户确认丢弃人工通过限[运行入口](Runtime.md)v10/13十二项，未触发的独立用例UNKNOWN；不扩展上述v9面板用户通过。
+
+当前v11/14的[G提示](MapPickupHud.md)与F HUD/本面板三开关独立，共用原宿主/连接及生命周期绑定；关闭本面板仍可显示G，三者全关闭收起绑定。未修改B、列表/按钮、鼠标隔离或制作/丢弃事务，原13输入保持；新显示编译/十次隔离烘焙静态通过、人工UNKNOWN。

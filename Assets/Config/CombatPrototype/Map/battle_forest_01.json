@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 10,
-  "configRevision": 13,
+  "schemaVersion": 11,
+  "configRevision": 14,
   "mapDefinitionId": "battle_forest_01",
   "defaultSeed": 12345,
   "geometry": {
@@ -92,6 +92,17 @@
     "gatherLabel": "Gather Apple",
     "treeLabel": "Chop Tree",
     "mineLabel": "Mine Rock"
+  },
+  "pickupHud": {
+    "enabled": true,
+    "panelWidthPixels": 400.0,
+    "panelHeightPixels": 52.0,
+    "bottomMarginPixels": 168.0,
+    "fontSize": 20,
+    "pickupLabel": "Pick up",
+    "appleLabel": "Vitality Apple",
+    "woodLabel": "Wood",
+    "stoneLabel": "Stone"
   },
   "inventoryPanel": {
     "enabled": true,

@@ -107,6 +107,17 @@ namespace Code_01.CombatPrototype.Map
                     TreeLabel = new FixedString64Bytes(hud.treeLabel),
                     MineLabel = new FixedString64Bytes(hud.mineLabel)
                 });
+                var pickupHud = config.map.pickupHud;
+                AddComponent(entity, new CombatPrototypeMapPickupHudSettings
+                {
+                    Enabled = (byte)(pickupHud.enabled ? 1 : 0),
+                    PanelWidthPixels = pickupHud.panelWidthPixels, PanelHeightPixels = pickupHud.panelHeightPixels,
+                    BottomMarginPixels = pickupHud.bottomMarginPixels, FontSize = pickupHud.fontSize,
+                    PickupLabel = new FixedString64Bytes(pickupHud.pickupLabel),
+                    AppleLabel = new FixedString64Bytes(pickupHud.appleLabel),
+                    WoodLabel = new FixedString64Bytes(pickupHud.woodLabel),
+                    StoneLabel = new FixedString64Bytes(pickupHud.stoneLabel)
+                });
                 var inventoryPanel = config.map.inventoryPanel;
                 AddComponent(entity, new CombatPrototypeMapInventoryPanelSettings
                 {

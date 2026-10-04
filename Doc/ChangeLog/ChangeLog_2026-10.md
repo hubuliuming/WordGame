@@ -615,3 +615,18 @@
 - 服务端复用原资格/预约互斥，同tick原操作优先；PrepareItemConsumption后创建Prepared，重取引用、SavePrepared成功才扣原库存并激活。DropPhase追加Prepared=3、Prefab初值Prepared/隐藏/不可拾取；原敌人/树木/矿点成功生成默认Airborne，复用原DropId/运动/G/到期/所有权。保存前失败仅释放当前准备态；文件替换后意外ECS故障不宣称完整回滚。世界掉落不保存，未拾取物重启消失且扣减已保存。
 - 正常Unity编译、13输入字段/新反馈Serializer、两模板/两来源及六种配置变体共16次隔离Editor烘焙静态通过，设置/原Prefab/玩家初值/默认布局符合契约；主场景干净、临时World/Scene已释放，原SubScene正常重新导入。导入过渡有两条旧程序集未知inventoryDrop字段异常，完成编译后严格读取/烘焙成功，Console前后[2 Error,2 Warning,0 Log]未新增错误/警告，保留原日志；两条编译警告为未修改第三方/工具文件。
 - 增量同步丢弃专题、相关模块、导航、项目外配置建议模板和Runtime十二项人工清单；主线程静态验收通过，GamePlayer人工UNKNOWN。原面板v9/12、工具v8/11、HUD v7/10及其他用户通过保持原版本/清单，全部旧验收编号保持。未修改Scene/SubScene、Prefab、Animator结构、旧meta、资源绑定/图片/字体、存储类、包/构建配置；AI未运行PlayMode、游戏模拟/GUI回调、逻辑单元测试、命令行构建、发布、性能采样或图片检查，未创建子Agent或提交Git。
+
+## 2026-10-04 用户确认背包物品丢弃与地面掉落人工验收通过
+
+- 用户明确反馈“我已验收通过”。主线程结合此前代码/编译/16次隔离Editor烘焙静态核对与本次反馈判定阶段通过，范围限CombatPrototypeNetCode、schemaVersion=10/configRevision=13及运行入口丢弃十二项清单；玩家存档v2/v1迁移及本局地面掉落边界保持。
+- 增量同步丢弃专题、运行入口、地图、背包、材料面板、工具、交互HUD、掉落、树木、采矿、玩家、战斗、资源与数据及项目外配置建议模板的验收状态；原参数、配置示例、全部人工验收编号与旧阶段通过范围保持。
+- 人工结论来自用户反馈；未实际触发的布局/命中、事件顺序、同tick、延迟/预测回放、多玩家/晚加入及独立配置/创建/准备/保存/提交/清理失败仍UNKNOWN。未拾取地面物重启消失、已保存扣减不返还保持；文件替换后意外ECS故障恢复、字体、运行性能/带宽、平台/线上未验证。
+- 本次只同步文档，未修改脚本、JSON、Scene、Prefab、Animator、旧meta/资源绑定、导航、包或构建配置；AI未执行GamePlayer/PlayMode、游戏模拟/GUI回调、逻辑单元测试、命令行构建、发布、性能采样或图片检查，未创建子Agent或提交Git。
+
+## 2026-10-04 掉落物拾取提示与目标显示落地
+
+- 按用户确认范围在CombatPrototypeNetCode接入G物品名/实际数量文字提示；五新职责脚本及Unity正常导入meta，原Main Camera HUD/绑定委托独立帮助类，不新增MonoBehaviour挂载或Scene/SubScene/Prefab/Animator结构。
+- Forest/Grassland Json与BuiltIn升级schemaVersion=11/configRevision=14，必填pickupHud九字段，默认true/400×52/底168/字号20及Pick up、Vitality Apple、Wood、Stone；严格字段/类型/几何/F间隔16与61UTF-8字节文案校验，关闭仍验证、旧v1～v10不迁移或补段/回退。
+- 原G资格及最近Landed/未到期/XZ距离/同距DropId选择抽为共用只读入口，结算、请求排序/次序及SavePrepared先于库存/Consumed保持；服务端在PlayerRespawn后采样，仅写Mode/DropId/ItemId/Quantity所属快照。原13输入、F四字段、丢弃反馈与v2/v1存储保持；三显示开关独立，生命周期失效清缓存，新提示不控制输入、产出、运动/到期或保存。
+- 正常Unity编译无C# Error，新Serializer/SendToOwner与类型、十次隔离Editor烘焙静态通过；两模板/两来源、G关闭、F/面板关闭但保留G、三者全关的设置/玩家初值/原Prefab及布置一致。编译前Console[0 Error,5 Warning,48 Log]，新增两条未修改第三方/工具代码警告；烘焙前后[0 Error,7 Warning,48 Log]，无新增烘焙错误/警告，旧运行警告保留且未清Console，主场景干净、临时World/Scene/TextAsset释放。
+- 增量同步新专题、相关模块、导航、项目外配置模板与Runtime十项人工清单，原147项人工编号/内容及旧版本用户通过范围保持。主线程静态验收通过，新显示GamePlayer人工UNKNOWN；未修改旧meta/资源绑定/图片/字体/网格/材质、包/构建设置或存储类。AI未运行GamePlayer/PlayMode、游戏模拟/显示系统/GUI回调、逻辑单元测试、命令行构建、发布、性能采样或图片检查，未创建子Agent或提交Git。

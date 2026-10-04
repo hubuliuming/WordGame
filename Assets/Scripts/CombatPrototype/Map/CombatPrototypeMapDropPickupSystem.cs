@@ -81,13 +81,7 @@ namespace Code_01.CombatPrototype.Map
                         var input = inputs[player.Entity];
                         if (!input.Pickup.IsSet) continue;
                         stage = "ValidatePlayer";
-                        string reason = null;
-                        if (owners[player.Entity].NetworkId != player.NetworkId) reason = "CommandTargetOwnerMismatch";
-                        else if (healths[player.Entity].IsDead != 0) reason = "PlayerDead";
-                        else if (input.Attack.IsSet || melees[player.Entity].Phase != CombatPrototypeAttackPhase.Ready)
-                            reason = "AttackInProgress";
-                        else if (!math.all(math.isfinite(input.Move))) reason = "InvalidMoveInput";
-                        else if (math.lengthsq(input.Move) != 0f) reason = "PlayerMoving";
+                        var reason = GetPickupHintRejection(player.Entity, player.NetworkId, input, owners, healths, melees);
                         if (reason != null)
                         {
                             Reject(map.MapDefinitionId, player, reason);
@@ -95,23 +89,8 @@ namespace Code_01.CombatPrototype.Map
                         }
 
                         stage = "SelectDrop";
-                        var position = transforms[player.Entity].Position.xz;
-                        var target = Entity.Null;
-                        var bestDistance = float.PositiveInfinity;
-                        var bestId = int.MaxValue;
-                        foreach (var entity in drops)
-                        {
-                            var drop = states[entity];
-                            if (drop.Phase != CombatPrototypeMapDropPhase.Landed) continue;
-                            var expiresAt = progresses[entity].ExpiresAt;
-                            if (expiresAt > 0d && time >= expiresAt) continue;
-                            var distance = math.distancesq(position, transforms[entity].Position.xz);
-                            if (distance > settings.PickupDistance * settings.PickupDistance || distance > bestDistance ||
-                                (distance == bestDistance && drop.DropId >= bestId)) continue;
-                            target = entity;
-                            bestDistance = distance;
-                            bestId = drop.DropId;
-                        }
+                        var target = CombatPrototypeMapDropTargetSelector.Select(transforms[player.Entity].Position.xz,
+                            settings.PickupDistance, time, drops, states, progresses, transforms);
                         if (target == Entity.Null)
                         {
                             Reject(map.MapDefinitionId, player, "NoLandedTarget");
@@ -157,6 +136,18 @@ namespace Code_01.CombatPrototype.Map
                 }
             }
             finally { players.Dispose(); }
+        }
+
+        internal static string GetPickupHintRejection(Entity player, int networkId, CombatPrototypePlayerInput input,
+            ComponentLookup<GhostOwner> owners, ComponentLookup<CombatPrototypePlayerHealth> healths,
+            ComponentLookup<CombatPrototypeMeleeState> melees)
+        {
+            if (owners[player].NetworkId != networkId) return "CommandTargetOwnerMismatch";
+            if (healths[player].IsDead != 0) return "PlayerDead";
+            if (input.Attack.IsSet || melees[player].Phase != CombatPrototypeAttackPhase.Ready) return "AttackInProgress";
+            if (!math.all(math.isfinite(input.Move))) return "InvalidMoveInput";
+            if (math.lengthsq(input.Move) != 0f) return "PlayerMoving";
+            return null;
         }
 
         private static void Reject(FixedString64Bytes mapId, OnlinePlayer player, string reason)

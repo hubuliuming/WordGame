@@ -17,6 +17,7 @@ namespace Code_01.CombatPrototype.Map
         public MapMiningConfig mining;
         public MapGatherToolsConfig gatherTools;
         public MapInteractionHudConfig interactionHud;
+        public MapPickupHudConfig pickupHud;
         public MapInventoryPanelConfig inventoryPanel;
         public MapInventoryDropConfig inventoryDrop;
         public MapPopulationConfig population;

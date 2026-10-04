@@ -618,7 +618,7 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 
 ## 【KNOWN ISSUES】背包物品丢弃与地面掉落的人工验收
 
-入口CombatPrototypeNetCode，当前Forest/Grassland的Json/BuiltIn为schemaVersion=10/configRevision=13，inventoryDrop=true、singleDropQuantity=1、allowDropAll=true、feedbackSeconds=2；苹果/木材/石材各用原资源键。正常Unity编译、新输入/所属反馈序列化及16次隔离Editor烘焙静态通过，未改原地图布置/结构/资源绑定。主线程静态验收通过；本阶段GamePlayer人工结果UNKNOWN，以下清单尚未执行：
+入口CombatPrototypeNetCode，丢弃验收时Forest/Grassland的Json/BuiltIn为schemaVersion=10/configRevision=13，inventoryDrop=true、singleDropQuantity=1、allowDropAll=true、feedbackSeconds=2；苹果/木材/石材各用原资源键。正常Unity编译、新输入/所属反馈序列化及16次隔离Editor烘焙静态通过，未改原地图布置/结构/资源绑定。用户已确认本阶段人工GamePlayer验收通过，主线程结合既有静态核对与用户反馈判定通过，范围限本入口、schemaVersion=10/configRevision=13及以下十二项清单；未实际触发的独立用例仍为UNKNOWN：
 
 1. B打开面板，苹果/木材/石材正数量行显示Drop x1和All，小块肉及未配置库存显示Unavailable；工具两槽无丢弃按钮。默认空库存和材料不足单次数量时无非法操作，丢弃开关关闭保留原列表/制作/玩法。
 2. 静止存活且近战Ready，分别单次丢弃三种物品：原库存各扣1，其余条目顺序/金币/经验/Tools保持，一份对应Ghost从玩家位置飞行、落地；客户端不提前扣包。库存归零移除条目，面板随后显示服务器结果。
@@ -633,4 +633,21 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 11. 可控旧v9、缺inventoryDrop/字段、未知/重复字段、错误类型、非正单次数量/非有限反馈、空/超3条/未知或重复itemId、非法或未绑定资源键、空白/控制字符/超61字节文案均明确失败，不补默认或回退来源。配置关闭仍校验全部字段；未触发独立异常保持UNKNOWN。
 12. 丢弃后重连恢复已扣库存，未拾取地面物仍只属于本局；服务器重启清掉未拾取物，已保存扣减保持，G成功后物品随拾取者库存恢复。回归原三类F/工具耐久/制作、飞行/G/到期、再生/占位、战斗奖励/E/R/镜头/阻挡及停止释放；原空间/资源/产出/600秒再生保持。
 
-验收后恢复SourceMode=Json/Preset=Forest/schema10/revision13、inventoryDrop=true/Single1/Alltrue/反馈2秒、三种默认映射和六个英文文案，原面板/工具/HUD/drops/空间/种子/出生及600秒再生默认保持。规则归[背包丢弃](MapInventoryDrop.md)，运动/拾取归[掉落](MapDrops.md)。地面物重启消失且不返还已保存库存，这是当前边界；未触发的独立保存/创建/提交/清理、预测/网络/反馈/命中仍UNKNOWN。原面板v9/12十二项、工具v8/11十二项、HUD v7/10八项及其他用户通过保持各自原版本/清单，不覆盖新增丢弃。AI未执行GamePlayer/PlayMode、游戏模拟/GUI回调、逻辑单元测试、命令行构建、发布、性能采样或图片检查；字体、运行性能/带宽、平台/线上及文件替换后意外ECS恢复未验证。
+丢弃清单对应SourceMode=Json/Preset=Forest/schema10/revision13、inventoryDrop=true/Single1/Alltrue/反馈2秒、三种默认映射和六个英文文案，原面板/工具/HUD/drops/空间/种子/出生及600秒再生默认保持。规则归[背包丢弃](MapInventoryDrop.md)，运动/拾取归[掉落](MapDrops.md)。本阶段人工通过来自用户反馈；地面物重启消失且不返还已保存库存保持当前边界，未触发的独立保存/创建/提交/清理、预测/网络/反馈/命中仍UNKNOWN。原面板v9/12十二项、工具v8/11十二项、HUD v7/10八项及其他用户通过保持各自原版本/清单，不覆盖新增丢弃。AI未执行GamePlayer/PlayMode、游戏模拟/GUI回调、逻辑单元测试、命令行构建、发布、性能采样或图片检查；字体、运行性能/带宽、平台/线上及文件替换后意外ECS恢复未验证。
+
+## 【KNOWN ISSUES】掉落物拾取提示与目标显示的人工验收
+
+入口CombatPrototypeNetCode，当前Forest/Grassland的Json/BuiltIn为schemaVersion=11/configRevision=14，pickupHud=true/400×52/底168/字号20，四文案Pick up、Vitality Apple、Wood、Stone。原F HUD和背包面板默认开启，G距离仍为drops的2米。正常Unity编译、新所属四字段Serializer/SendToOwner/原13输入、十次隔离Editor烘焙静态通过；原地图布置/资源引用及F初值保持。主线程静态验收通过，本阶段GamePlayer人工结果UNKNOWN，以下十项尚未执行：
+
+1. 按原敌人掉落、砍树、采矿与背包丢弃分别取得苹果/木材/石材，落地且具备资格时显示G、正确物品文案及目标实际数量；All生成的一份Ghost显示其实际总量，不显示固定1。默认G面板在F面板上方16像素，两者无覆盖；无目标时G隐藏。
+2. 多份已落地物同时进入2米范围，仅显示X/Z最近一个；改变站位并停下后按最近目标切换，新G沿实际处理tick选择。精确同距取较小DropId、恰好边界距离及不可精确构造用例保持UNKNOWN，不凭目测推定通过。
+3. Prepared、Airborne、Consumed、已到期和超范围物体没有有效G提示；飞行落地后可显示，成功消耗或到期后随权威快照隐藏或切换下一目标。关闭自动到期的原lifetime=0仍按原规则，未触发的准备态/期限独立用例保持UNKNOWN。
+4. 移动输入（含被障碍挡住）、Attack请求或近战非Ready时隐藏；重新静止且Ready后恢复。死亡、无准入连接、断线及本地玩家失效不保留旧目标，R复活后重新采样；有限输入、特殊Simulate/归属失效等未触发用例保持UNKNOWN。
+5. F Ready/Working与G目标同时存在时分别显示，F工具行/真实进度保持，G不创建资源预约或中断F。B背包的列表/滚动/制作/Drop与鼠标隔离保持，G面板没有点击按钮或输入事件拦截；同tick F/G及其他原操作规则不因提示改变。
+6. 新G成功后仍先保存，再入包/Consumed，提示随快照隐藏或显示下一目标；不由提示预扣/预发。可控保存失败时原库存和未到期地面物保持、提示仍可显示、须新G重试；提示不是成功标志，实际未触发保存/提交失败保持UNKNOWN。
+7. 多玩家各自只显示本人权威目标，远端玩家状态不覆盖本地；争抢沿原NetworkId顺序只入包一次。晚加入/重连不重播旧目标；延迟下可短暂显示过期快照，按G时仍由当前服务端选择，不锁定旧提示目标。未触发的同tick/预测回放/晚加入/争抢用例保持UNKNOWN。
+8. PlayMode前分别关闭pickupHud、关闭interactionHud与inventoryPanel但保留pickupHud、三者全关并重新导入/烘焙：关闭G显示仍可G拾取，关闭其余两显示仍可独立G提示，三者全关仅收起显示。drops.enabled=false只关闭敌人新掉落，已有/树木/矿点/背包掉落的G显示与拾取保持。
+9. PlayMode前调整尺寸/底距/字号和四文案、正常导入/烘焙后核对等比显示。旧v10/缺段/缺字段/未知或重复字段/错类型、非有限或非法几何、字号非正、F间隔不足16、空白/控制字符/超61UTF-8字节标签明确失败，不补默认或回退。关闭显示仍校验全部字段；中文/乘号字形与未触发的独立异常保持UNKNOWN。
+10. 停止/释放和再次进入后不显示上一局目标，原宿主/绑定保留、没有新场景UI或世界标记。回归原G保存/数量/飞行/到期/释放，F采集/砍树/采矿及600秒再生、工具耐久/制作、背包Drop/All、战斗奖励/E/R/镜头/阻挡；原地面物本局不存档、重启清空且已保存扣减不返还边界保持。
+
+完成人工核对后恢复SourceMode=Json/Preset=Forest/schema11/revision14、pickupHud=true/400×52/底168/字号20及四个默认文案，原F HUD/面板/工具/丢弃/drops/空间/资源/600秒再生值保持。规则归[拾取提示](MapPickupHud.md)，实际结算归[掉落](MapDrops.md)。原147项验收编号/内容和各旧版本用户通过保持，本阶段不扩展旧通过。AI未执行GamePlayer/PlayMode、游戏模拟/显示系统/GUI回调、逻辑单元测试、命令行构建、发布、性能采样或图片检查；新显示人工及未触发的独立配置/网络/保存分支、字体/布局/预测/性能/带宽/平台/线上仍UNKNOWN。

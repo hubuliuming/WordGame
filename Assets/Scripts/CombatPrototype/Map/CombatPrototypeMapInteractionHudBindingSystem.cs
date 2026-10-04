@@ -48,7 +48,8 @@ namespace Code_01.CombatPrototype.Map
             var source = _map.GetSingletonEntity();
             var settings = EntityManager.GetComponentData<CombatPrototypeMapInteractionHudSettings>(source);
             var inventorySettings = EntityManager.GetComponentData<CombatPrototypeMapInventoryPanelSettings>(source);
-            if (settings.Enabled == 0 && inventorySettings.Enabled == 0)
+            var pickupSettings = EntityManager.GetComponentData<CombatPrototypeMapPickupHudSettings>(source);
+            if (settings.Enabled == 0 && inventorySettings.Enabled == 0 && pickupSettings.Enabled == 0)
             {
                 ResetBinding();
                 return;
@@ -67,7 +68,7 @@ namespace Code_01.CombatPrototype.Map
                     CombatPrototypeMapGatherToolUtility.RequireDefinition(definitions, CombatPrototypeMapGatherToolKind.Axe),
                     CombatPrototypeMapGatherToolUtility.RequireDefinition(definitions, CombatPrototypeMapGatherToolKind.Pickaxe),
                     EntityManager.GetComponentData<CombatPrototypeMapInventoryDropSettings>(source),
-                    EntityManager.GetBuffer<CombatPrototypeMapInventoryDropDefinition>(source, true));
+                    EntityManager.GetBuffer<CombatPrototypeMapInventoryDropDefinition>(source, true), pickupSettings);
                 _source = source;
                 _player = player;
             }
@@ -75,7 +76,8 @@ namespace Code_01.CombatPrototype.Map
                 EntityManager.GetBuffer<CombatPrototypeMapGatherTool>(player, true),
                 EntityManager.GetComponentData<CombatPrototypeMapToolCraftFeedback>(player),
                 EntityManager.GetComponentData<CombatPrototypeMapInventoryDropFeedback>(player),
-                EntityManager.GetBuffer<CombatPrototypeInventoryItem>(player, true), source, player);
+                EntityManager.GetBuffer<CombatPrototypeInventoryItem>(player, true), source, player,
+                EntityManager.GetComponentData<CombatPrototypeMapPickupHudState>(player));
         }
 
         internal bool ReadPanelInput(Keyboard keyboard, Mouse mouse, out bool craftAxe, out bool craftPickaxe,

@@ -179,7 +179,8 @@ namespace Code_01.CombatPrototype.Map
         }
 
         private static bool HasPriorOperation(CombatPrototypePlayerInput input) => input.Gather.IsSet || input.Pickup.IsSet ||
-            input.UseItem.IsSet || input.CraftAxe.IsSet || input.CraftPickaxe.IsSet || input.Respawn.IsSet;
+            input.UseItem.IsSet || input.CraftAxe.IsSet || input.CraftPickaxe.IsSet || input.Respawn.IsSet ||
+            input.RepairAxe.IsSet || input.RepairPickaxe.IsSet;
 
         private static int FindItem(DynamicBuffer<CombatPrototypeInventoryItem> inventory, FixedString64Bytes name)
         {

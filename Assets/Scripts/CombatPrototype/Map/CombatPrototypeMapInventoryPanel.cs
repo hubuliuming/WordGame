@@ -10,6 +10,7 @@ namespace Code_01.CombatPrototype.Map
     {
         private readonly CombatPrototypeMapInventoryPanelSnapshot _snapshot = new CombatPrototypeMapInventoryPanelSnapshot();
         private readonly CombatPrototypeMapInventoryDropClient _drop = new CombatPrototypeMapInventoryDropClient();
+        private readonly CombatPrototypeMapGatherToolRepairPanel _repair = new CombatPrototypeMapGatherToolRepairPanel();
         private CombatPrototypeMapInventoryPanelSettings _settings;
         private CombatPrototypeMapGatherToolSettings _toolSettings;
         private CombatPrototypeMapGatherToolDefinition _axe;
@@ -56,6 +57,7 @@ namespace Code_01.CombatPrototype.Map
             _pickaxeButton = "2: " + _craftButton + " " + _pickaxeName;
             _snapshot.Configure(settings);
             _drop.Configure(dropSettings, dropDefinitions, settings);
+            _repair.Configure(settings, toolSettings, axe, pickaxe);
             _configured = true;
             _open = settings.Enabled != 0 && settings.InitiallyOpen != 0;
         }
@@ -67,6 +69,7 @@ namespace Code_01.CombatPrototype.Map
             _snapshot.Capture(inventory, axeDurability, pickaxeDurability, source, player);
             _canCraftAxe = CanCraft(_axe, axeDurability);
             _canCraftPickaxe = CanCraft(_pickaxe, pickaxeDurability);
+            _repair.Capture(_snapshot.WoodQuantity, _snapshot.StoneQuantity, _snapshot.InventoryValid, axeDurability, pickaxeDurability);
             if (_woodQuantity != _snapshot.WoodQuantity || _stoneQuantity != _snapshot.StoneQuantity ||
                 _axeDurability != axeDurability || _pickaxeDurability != pickaxeDurability ||
                 _lastInventoryValid != _snapshot.InventoryValid)
@@ -118,15 +121,16 @@ namespace Code_01.CombatPrototype.Map
         }
 
         // Called once the binding has rechecked the current World/map/local living player.
-        public bool ReadInput(Keyboard keyboard, Mouse mouse, out bool craftAxe, out bool craftPickaxe,
+        public bool ReadInput(Keyboard keyboard, Mouse mouse, out bool craftAxe, out bool craftPickaxe, out bool repairAxe, out bool repairPickaxe,
             out CombatPrototypeMapInventoryDropRequest dropRequest)
         {
-            craftAxe = craftPickaxe = false;
+            craftAxe = craftPickaxe = repairAxe = repairPickaxe = false;
             dropRequest = default;
             if (!_configured || !_ready || _settings.Enabled == 0)
             {
                 _craftAxe = _craftPickaxe = _mousePressAccepted = false;
                 _drop.ClearPending();
+                _repair.ClearPending();
                 return false;
             }
             var wasInside = ContainsMouse(mouse);
@@ -147,6 +151,7 @@ namespace Code_01.CombatPrototype.Map
                 craftAxe = _craftAxe;
                 craftPickaxe = _craftPickaxe;
                 dropRequest = _drop.ReadRequest();
+                _repair.ReadRequest(out repairAxe, out repairPickaxe);
             }
             _craftAxe = _craftPickaxe = false;
             // Closing by B must also consume the mouse press that began over this panel.
@@ -190,7 +195,7 @@ namespace Code_01.CombatPrototype.Map
                 GUI.Label(new Rect(panel.x + 12f, panel.y + 12f, panel.width - 24f, _settings.RowHeightPixels), _title, _labelStyle);
                 var viewport = new Rect(panel.x + 12f, panel.y + 12f + _settings.RowHeightPixels,
                     panel.width - 24f, panel.height - 3f * _settings.RowHeightPixels - 24f);
-                var rows = Mathf.Max(_snapshot.Items.Count * 2, 1) + 13;
+                var rows = Mathf.Max(_snapshot.Items.Count * 2, 1) + 13 + CombatPrototypeMapGatherToolRepairPanel.RowCount;
                 var content = new Rect(0f, 0f, viewport.width - 18f, rows * _settings.RowHeightPixels);
                 _scroll = GUI.BeginScrollView(viewport, _scroll, content);
                 try { DrawBody(content.width); }
@@ -227,6 +232,7 @@ namespace Code_01.CombatPrototype.Map
             Label(width, ref y, _craft);
             DrawRecipe(width, ref y, _axeCraftTitle, _axeButton, _axeRecipe, _axeMissing, _canCraftAxe, true);
             DrawRecipe(width, ref y, _pickaxeCraftTitle, _pickaxeButton, _pickaxeRecipe, _pickaxeMissing, _canCraftPickaxe, false);
+            _repair.Draw(width, ref y, _settings.RowHeightPixels, _labelStyle, _buttonStyle, _mousePressAccepted);
         }
 
         private void Label(float width, ref float y, string text)
@@ -260,6 +266,7 @@ namespace Code_01.CombatPrototype.Map
         {
             _open = _craftAxe = _craftPickaxe = _mousePressAccepted = false;
             _drop.ClearPending();
+            _repair.ClearPending();
             _scroll = Vector2.zero;
         }
 
@@ -271,6 +278,7 @@ namespace Code_01.CombatPrototype.Map
             _configured = _ready = false;
             _snapshot.Reset();
             _drop.Reset();
+            _repair.Reset();
             _labelStyle = _buttonStyle = null;
             _feedback = string.Empty;
             _woodQuantity = _stoneQuantity = -1;

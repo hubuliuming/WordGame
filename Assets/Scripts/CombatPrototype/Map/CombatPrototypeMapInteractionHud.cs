@@ -42,6 +42,7 @@ namespace Code_01.CombatPrototype.Map
         private readonly CombatPrototypeMapPickupHudClient _pickupHud = new CombatPrototypeMapPickupHudClient();
         private readonly CombatPrototypeMapInteractionHighlightClient _highlight = new CombatPrototypeMapInteractionHighlightClient();
         private readonly CombatPrototypeMapResourceStatusHudClient _resourceStatus = new CombatPrototypeMapResourceStatusHudClient();
+        private readonly CombatPrototypeMapGatherToolRepairFeedbackClient _repairFeedback = new CombatPrototypeMapGatherToolRepairFeedbackClient();
         private Camera _highlightCamera;
 
         private void Awake()
@@ -112,19 +113,27 @@ namespace Code_01.CombatPrototype.Map
             _pickupHud.Configure(pickupSettings);
             _highlight.Configure(highlightSettings, mapId, _highlightCamera);
             _resourceStatus.Configure(resourceStatusSettings, settings, mapId);
+            _repairFeedback.Configure(toolSettings, inventorySettings, axe, pickaxe, mapId);
         }
 
         internal void Show(CombatPrototypeMapInteractionHudState state, DynamicBuffer<CombatPrototypeMapGatherTool> tools,
-            CombatPrototypeMapToolCraftFeedback feedback, CombatPrototypeMapInventoryDropFeedback dropFeedback,
+            CombatPrototypeMapToolCraftFeedback feedback, CombatPrototypeMapToolRepairFeedback repairFeedback,
+            CombatPrototypeMapInventoryDropFeedback dropFeedback,
             DynamicBuffer<CombatPrototypeInventoryItem> inventory,
             Entity source, Entity player, CombatPrototypeMapPickupHudState pickupState)
         {
             _pickupHud.Show(pickupState);
             RefreshToolStatus(tools);
             ObserveFeedback(feedback);
-            var hasFeedback = Time.unscaledTimeAsDouble < _feedbackUntil;
+            _repairFeedback.Observe(repairFeedback);
+            var repairText = _repairFeedback.Feedback;
+            var hasRepairFeedback = !string.IsNullOrEmpty(repairText);
+            var hasCraftFeedback = Time.unscaledTimeAsDouble < _feedbackUntil;
+            var hasFeedback = hasRepairFeedback || hasCraftFeedback;
+            var displayFeedback = hasRepairFeedback ? repairText : hasCraftFeedback ? _feedbackText : string.Empty;
+            var feedbackKind = hasRepairFeedback ? _repairFeedback.Kind : _feedbackKind;
             _inventoryPanel.Show(inventory, _axeDurability, _pickaxeDurability,
-                hasFeedback ? _feedbackText : string.Empty, dropFeedback, source, player);
+                displayFeedback, dropFeedback, source, player);
             if (_settings.Enabled == 0) { _visible = false; return; }
             if (state.Mode == CombatPrototypeMapInteractionHudMode.Hidden)
             {
@@ -133,8 +142,8 @@ namespace Code_01.CombatPrototype.Map
                 _percent = -1;
                 _progress = 0f;
                 _visible = hasFeedback;
-                _text = hasFeedback ? _feedbackText : string.Empty;
-                _toolText = hasFeedback ? ToolStatus(_feedbackKind) : string.Empty;
+                _text = displayFeedback;
+                _toolText = hasFeedback ? ToolStatus(feedbackKind) : string.Empty;
                 return;
             }
             if ((state.Mode != CombatPrototypeMapInteractionHudMode.Ready && state.Mode != CombatPrototypeMapInteractionHudMode.Working) ||
@@ -153,7 +162,7 @@ namespace Code_01.CombatPrototype.Map
                 _percent = percent;
             }
             _progress = state.ProgressPermille / 1000f;
-            _toolText = hasFeedback ? _feedbackText :
+            _toolText = hasFeedback ? displayFeedback :
                 state.Kind == (byte)CombatPrototypeMapInteractionKind.Gather ? "Hands" :
                 ToolStatus(state.Kind == (byte)CombatPrototypeMapInteractionKind.Tree ?
                     CombatPrototypeMapGatherToolKind.Axe : CombatPrototypeMapGatherToolKind.Pickaxe);
@@ -247,9 +256,9 @@ namespace Code_01.CombatPrototype.Map
             _feedbackUntil = Time.unscaledTimeAsDouble + _toolSettings.CraftFeedbackSeconds;
         }
 
-        internal bool ReadPanelInput(Keyboard keyboard, Mouse mouse, out bool craftAxe, out bool craftPickaxe,
+        internal bool ReadPanelInput(Keyboard keyboard, Mouse mouse, out bool craftAxe, out bool craftPickaxe, out bool repairAxe, out bool repairPickaxe,
             out CombatPrototypeMapInventoryDropRequest dropRequest) =>
-            _inventoryPanel.ReadInput(keyboard, mouse, out craftAxe, out craftPickaxe, out dropRequest);
+            _inventoryPanel.ReadInput(keyboard, mouse, out craftAxe, out craftPickaxe, out repairAxe, out repairPickaxe, out dropRequest);
 
         internal void Clear()
         {
@@ -267,6 +276,7 @@ namespace Code_01.CombatPrototype.Map
             _pickupHud.Reset();
             _highlight.Reset();
             _resourceStatus.Reset();
+            _repairFeedback.Reset();
             _labelStyle = null;
             _text = _toolText = _feedbackText = string.Empty;
             _mode = CombatPrototypeMapInteractionHudMode.Hidden;

@@ -48,6 +48,7 @@ namespace Code_01.CombatPrototype.Networking
                 AddBuffer<CombatPrototypeInventoryItem>(entity);
                 AddBuffer<CombatPrototypeMapGatherTool>(entity);
                 AddComponent<CombatPrototypeMapToolCraftFeedback>(entity);
+                AddComponent<CombatPrototypeMapToolRepairFeedback>(entity);
                 AddComponent<CombatPrototypeMapInventoryDropFeedback>(entity);
                 AddComponent(entity, new CombatPrototypePlayerResource
                 {

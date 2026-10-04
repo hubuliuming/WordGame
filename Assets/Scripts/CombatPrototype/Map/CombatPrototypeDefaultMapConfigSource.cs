@@ -17,7 +17,7 @@ namespace Code_01.CombatPrototype.Map
             {
                 map = new MapDefinitionConfig
                 {
-                    schemaVersion = 13, configRevision = 16,
+                    schemaVersion = 14, configRevision = 17,
                     mapDefinitionId = mapDefinitionId, defaultSeed = 12345,
                     geometry = new MapGeometryConfig
                     {
@@ -57,20 +57,22 @@ namespace Code_01.CombatPrototype.Map
                     },
                     gatherTools = new MapGatherToolsConfig
                     {
-                        enabled = true, craftFeedbackSeconds = 2f,
+                        enabled = true, craftFeedbackSeconds = 2f, repairEnabled = true, repairFeedbackSeconds = 2f,
                         tools = new[]
                         {
                             new MapGatherToolDefinitionConfig
                             {
                                 toolId = "stone_axe", displayName = "Axe", targetKind = "tree",
                                 maxDurability = 60, durabilityCostPerCompletion = 1, durationMultiplier = 0.75f,
-                                craftWoodQuantity = 3, craftStoneQuantity = 2
+                                craftWoodQuantity = 3, craftStoneQuantity = 2,
+                                repairDurability = 20, repairWoodQuantity = 1, repairStoneQuantity = 1
                             },
                             new MapGatherToolDefinitionConfig
                             {
                                 toolId = "stone_pickaxe", displayName = "Pickaxe", targetKind = "mine",
                                 maxDurability = 40, durabilityCostPerCompletion = 1, durationMultiplier = 0.75f,
-                                craftWoodQuantity = 2, craftStoneQuantity = 3
+                                craftWoodQuantity = 2, craftStoneQuantity = 3,
+                                repairDurability = 15, repairWoodQuantity = 1, repairStoneQuantity = 1
                             }
                         }
                     },
@@ -128,7 +130,8 @@ namespace Code_01.CombatPrototype.Map
                         brokenLabel = "Broken",
                         notOwnedLabel = "Not owned",
                         disabledLabel = "Disabled",
-                        readyLabel = "Ready"
+                        readyLabel = "Ready",
+                        repairLabel = "Repair", repairButtonLabel = "Repair", fullDurabilityLabel = "Full durability"
                     },
                     inventoryDrop = new MapInventoryDropConfig
                     {

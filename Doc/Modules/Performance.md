@@ -43,13 +43,17 @@
 
 | 核对对象 | 已核实状态 |
 |---|---|
-| 规模与引用 | 原 SubScene 的 Spawner 引用现有玩家/敌人 Prefab，EnemyCount=32、8 列、间距 3、原点 (0,1,2)；2 玩家仍是已确认采集目标，实际在线人数 UNKNOWN |
+| 规模与引用 | 原 SubScene 的 Spawner 引用现有玩家/敌人 Prefab，EnemyCount=32、8 列、间距 3；EnemyPosition=(0,1,2) 是兼容字段，实际位置由[地图](Map.md)配置提供；2 玩家仍是已确认采集目标，实际在线人数 UNKNOWN |
 | 第 6A 参数与门槛 | 玩家生命 100/100；敌人伤害 10、范围 1.75、前摇 0.5 秒、后摇 1 秒；死亡玩家排除追踪并停止移动/攻击，死亡敌人停止反击 |
 | 编译后的结算顺序 | PlayerMovement → EnemyMovement → EnemySpatial → ItemUse → MeleeServer → Damage → Reward/SavePrepared → EnemyAttack → PlayerDamage → PlayerRespawn；UpdateAfter/UpdateBefore 与源码一致 |
 | 存档入口与标记 | 服务端准入调用 Load；奖励/物品使用先准备候选、SavePrepared 再提交 ECS。两个标记仍为 Scripts/TimeNanoseconds，两种候选投影不在保存标记内 |
 | 当前观察状态 | Editor 未进入 PlayMode、未处于编译中，6 个 World 仅为 Editor/Loading；Profiler.enabled=false，采集会话未启动且无停止回调；未启用记录器或录制 |
 
 源码可见的成本入口包括：敌人移动按在线存活玩家逐个搜索最近目标；空间表复用 Persistent 容器并按更新清空重建存活敌人条目，容量仅在敌人数超过现值时扩充；近战只查询范围所覆盖的网格。移动、反击和奖励收集使用原生临时容器，这不能直接记作托管 GC。PrepareReward/PrepareItemConsumption 创建存档候选数组/字符串，SavePrepared 同步 JSON 序列化、UTF-8 字节分配、写盘和 Flush(true)；原每 2 秒状态/库存/逐敌人日志及战斗事件日志保留。上述调用的实际次数、耗时和分配量均未测量。
+
+## 【FACT】当前敌人动画表现成本边界
+
+当前网络敌人使用官方 GameObject 桥接与单层 Animator，每个腐化荒猪模型有 11 个 MeshRenderer；根占位 Renderer 关闭，不再以其 MaterialMeshInfo 显示。服务端只复制新增表现状态，客户端逐敌人读取同步阶段/剩余时间与生命并驱动姿态，资源与字段归[敌人美术](../EnemyArt.md)。32 敌人的实际可见数量、Animator/显示与网络字段成本均未采样，不能沿用旧占位显示的人工通过范围作为新表现的性能结论。
 
 ## 【CURRENT STRATEGY】已确认的采集口径
 

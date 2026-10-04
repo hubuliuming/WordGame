@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 13,
-  "configRevision": 16,
+  "schemaVersion": 14,
+  "configRevision": 17,
   "mapDefinitionId": "battle_forest_01",
   "defaultSeed": 12345,
   "geometry": {
@@ -59,6 +59,8 @@
   "gatherTools": {
     "enabled": true,
     "craftFeedbackSeconds": 2.0,
+    "repairEnabled": true,
+    "repairFeedbackSeconds": 2.0,
     "tools": [
       {
         "toolId": "stone_axe",
@@ -68,7 +70,10 @@
         "durabilityCostPerCompletion": 1,
         "durationMultiplier": 0.75,
         "craftWoodQuantity": 3,
-        "craftStoneQuantity": 2
+        "craftStoneQuantity": 2,
+        "repairDurability": 20,
+        "repairWoodQuantity": 1,
+        "repairStoneQuantity": 1
       },
       {
         "toolId": "stone_pickaxe",
@@ -78,7 +83,10 @@
         "durabilityCostPerCompletion": 1,
         "durationMultiplier": 0.75,
         "craftWoodQuantity": 2,
-        "craftStoneQuantity": 3
+        "craftStoneQuantity": 3,
+        "repairDurability": 15,
+        "repairWoodQuantity": 1,
+        "repairStoneQuantity": 1
       }
     ]
   },
@@ -158,7 +166,10 @@
     "brokenLabel": "Broken",
     "notOwnedLabel": "Not owned",
     "disabledLabel": "Disabled",
-    "readyLabel": "Ready"
+    "readyLabel": "Ready",
+    "repairLabel": "Repair",
+    "repairButtonLabel": "Repair",
+    "fullDurabilityLabel": "Full durability"
   },
   "inventoryDrop": {
     "enabled": true,

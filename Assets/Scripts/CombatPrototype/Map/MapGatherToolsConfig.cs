@@ -7,6 +7,8 @@ namespace Code_01.CombatPrototype.Map
     {
         public bool enabled;
         public float craftFeedbackSeconds;
+        public bool repairEnabled;
+        public float repairFeedbackSeconds;
         public MapGatherToolDefinitionConfig[] tools;
     }
 
@@ -21,5 +23,8 @@ namespace Code_01.CombatPrototype.Map
         public float durationMultiplier;
         public int craftWoodQuantity;
         public int craftStoneQuantity;
+        public int repairDurability;
+        public int repairWoodQuantity;
+        public int repairStoneQuantity;
     }
 }

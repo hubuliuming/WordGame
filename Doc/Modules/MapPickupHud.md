@@ -15,11 +15,11 @@
 | [原HUD宿主](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapInteractionHud.cs) / [绑定](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapInteractionHudBindingSystem.cs) | 原 Main Camera 组件委托独立 G 面板，沿原本地玩家/连接与生命周期绑定 |
 | [Map Baker](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapAuthoring.cs) / [Player Baker](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypePlayerNetCodeAuthoring.cs) | 地图 Settings 与玩家初始 Hidden 数据 |
 
-五个新脚本及 meta 已由正常 Unity 导入。新客户端类不是 MonoBehaviour，未新增组件挂载或 Scene/SubScene/Prefab/Animator 结构，也未修改旧 meta、资源绑定、网格/材质/字体/图片、包或构建配置。Baker 追加玩家 ECS 显示数据，烘焙后的 Ghost 布局变化；各端须同版代码、配置并重新烘焙。原输入仍为13字段，没有新增目标命令、RPC、版本协商或玩家存档字段。
+五个新脚本及 meta 已由正常 Unity 导入。新客户端类不是 MonoBehaviour，未新增组件挂载或 Scene/SubScene/Prefab/Animator 结构，也未修改旧 meta、资源绑定、网格/材质/字体/图片、包或构建配置。Baker 追加玩家 ECS 显示数据，烘焙后的 Ghost 布局变化；各端须同版代码、配置并重新烘焙。当前输入15字段的新增修理归[专题](MapToolRepair.md)，G没有新增目标命令、RPC、版本协商或玩家存档字段。
 
 ## 【FACT】当前 JSON 契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为 schemaVersion=13/configRevision=16，pickupHud段及全部九字段必填，[interactionHighlight](MapInteractionHighlight.md)亦为必填地图段。沿原严格 UTF-8/缺失/未知/重复字段/类型和语义校验；旧 v1～v12 明确失败，不迁移、补默认段或回退来源。正常导入/烘焙后生效，没有运行热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为 schemaVersion=14/configRevision=17，pickupHud段及全部九字段必填，[interactionHighlight](MapInteractionHighlight.md)亦为必填地图段。沿原严格 UTF-8/缺失/未知/重复字段/类型和语义校验；旧 v1～v13 明确失败，不迁移、补默认段或回退来源。正常导入/烘焙后生效，没有运行热重载。
 
 | 字段 | 当前默认值 | 契约 |
 |---|---|---|
@@ -76,4 +76,6 @@ v11/14拾取文字阶段正常Unity编译无C# Error，五脚本/meta、新Seria
 
 v12/15的[高亮](MapInteractionHighlight.md)按原DropId解析同一客户端Landed Ghost，不另选最近目标或改变按G时的服务端选择。已核对新增14配置值、原G/F初值与13输入；正常编译及14次隔离Editor烘焙静态通过。用户确认高亮人工通过限v12/15十项，未实际触发的独立排版/网络/生命周期与失败用例仍UNKNOWN；上述v11/14文字提示用户通过保持原范围。
 
-当前v13/16的[资源状态](MapResourceStatusHud.md)在G面板上方增加一行；G的开关、采样资格、四字段、DropId与拾取规则保持。资源状态不显示掉落期限，也不改变G蓝圈；仅状态开启仍保留整体绑定。新显示静态及用户人工通过，限v13/16十项，未触发用例UNKNOWN，旧G/高亮通过保持原版本/清单。
+v13/16的[资源状态](MapResourceStatusHud.md)在G面板上方增加一行；G的开关、采样资格、四字段、DropId与拾取规则保持。资源状态不显示掉落期限，也不改变G蓝圈；仅状态开启仍保留整体绑定。新显示静态及用户人工通过，限v13/16十项，未触发用例UNKNOWN，旧G/高亮通过保持原版本/清单。
+
+当前v14/17的[工具修理](MapToolRepair.md)新增两个输入和所属结果，遇同tick G请求时修理拒绝；G目标/资格/入包/保存/显示均保持原链，新增修理静态通过、人工UNKNOWN。

@@ -62,6 +62,7 @@ namespace Code_01.CombatPrototype.Networking
                 {
                     attack.ValueRW.Phase = CombatPrototypeEnemyAttackPhase.Ready;
                     attack.ValueRW.PhaseTimer = 0f;
+                    attack.ValueRW.SwingStarted = 0;
                     attack.ValueRW.TargetPlayer = Entity.Null;
                     attack.ValueRW.TargetNetworkId = 0;
                     continue;
@@ -77,6 +78,7 @@ namespace Code_01.CombatPrototype.Networking
                     attack.ValueRW.TargetPlayer = target.ValueRO.Player;
                     attack.ValueRW.TargetNetworkId = target.ValueRO.NetworkId;
                     attack.ValueRW.AttackSequence++;
+                    attack.ValueRW.SwingStarted = 0;
                     attack.ValueRW.Phase = CombatPrototypeEnemyAttackPhase.Startup;
                     attack.ValueRW.PhaseTimer = config.ValueRO.StartupSeconds;
                     Debug.Log($"[CombatPrototype.NetCode] Server enemy attack started; enemy={enemy}, NetworkId={attack.ValueRO.TargetNetworkId}, player={attack.ValueRO.TargetPlayer}, attack={attack.ValueRO.AttackSequence}, phase=Startup.");
@@ -92,6 +94,8 @@ namespace Code_01.CombatPrototype.Networking
                     // Advance before queuing: a hit, miss or failed event cannot replay this swing.
                     attack.ValueRW.Phase = CombatPrototypeEnemyAttackPhase.Recovery;
                     attack.ValueRW.PhaseTimer = config.ValueRO.RecoverySeconds;
+                    // A respawn-cancelled startup never reaches this actual swing marker.
+                    attack.ValueRW.SwingStarted = 1;
                     var playerIndex = FindPlayer(players, attack.ValueRO.TargetPlayer, attack.ValueRO.TargetNetworkId);
                     if (playerIndex < 0)
                     {

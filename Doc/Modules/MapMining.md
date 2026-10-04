@@ -25,7 +25,7 @@
 
 ## 【FACT】JSON 契约与默认值
 
-[battle_forest_01.json](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[battle_grassland_01.json](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 为 schemaVersion=13/configRevision=16。mining 及全部字段必填，interactionHud归[交互显示](MapInteractionHud.md)，gatherTools归[采集工具](MapGatherTools.md)；旧v1～v12、缺失/未知/重复字段、错误类型或无效引用明确失败，不补字段、不回退来源。配置只在烘焙时读取，无运行热重载或新联网配置校验协议。各端须使用相同代码、输入布局、Ghost、配置及资源。
+[battle_forest_01.json](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[battle_grassland_01.json](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 为 schemaVersion=14/configRevision=17。mining 及全部字段必填，interactionHud归[交互显示](MapInteractionHud.md)，gatherTools归[采集工具](MapGatherTools.md)；旧v1～v13、缺失/未知/重复字段、错误类型或无效引用明确失败，不补字段、不回退来源。配置只在烘焙时读取，无运行热重载或新联网配置校验协议。各端须使用相同代码、输入布局、Ghost、配置及资源。
 
 ```json
 "mining": {
@@ -128,10 +128,12 @@ Tools/CombatPrototype/地图/生成第九阶段采矿资源 要求空闲 EditMod
 
 v9/revision12阶段的[材料面板](MapInventoryPanel.md)只展示石材库存/镐子耐久和原配方，按钮沿原制作链；采矿/石材/阻挡/再生逻辑保持，用户确认面板人工通过限[运行入口](Runtime.md)v9/revision12十二项，未触发的独立显示/输入失败仍UNKNOWN。
 
-当前地图v13/16必填[背包丢弃](MapInventoryDrop.md)，复用原掉落资源及保存链；本专题原交互/工具/产出/再生行为保持。新增丢弃静态及用户人工通过限[运行入口](Runtime.md)v10/13十二项，未触发用例UNKNOWN；旧通过仍限原版本/清单。
+当前地图v14/17必填[背包丢弃](MapInventoryDrop.md)，复用原掉落资源及保存链；本专题原交互/工具/产出/再生行为保持。新增丢弃静态及用户人工通过限[运行入口](Runtime.md)v10/13十二项，未触发用例UNKNOWN；旧通过仍限原版本/清单。
 
 v11/14阶段的[G提示](MapPickupHud.md)只读共用掉落目标，与原F目标/工具进度独立；不修改本专题资源状态、产出、工具耐久、再生或保存。新显示编译/十次隔离烘焙静态通过；用户确认人工通过限v11/14十项，未触发用例UNKNOWN，旧用户通过保持各自版本/清单。
 
 v12/15的[高亮](MapInteractionHighlight.md)按原Kind/PlacementIndex解析矿点客户端Ghost，Ready黄圈、Working绿圈，默认半径0.9米；读取原Available/Mining/Depleted及CollectorNetworkId，不新增资源状态或倒计时。采矿/掉落/阻挡/再生及工具保存链保持，高亮静态及用户人工通过限v12/15十项，未触发独立用例UNKNOWN。
 
-当前v13/16的[资源状态](MapResourceStatusHud.md)只读Available/Mining/Depleted与原服务端RegrowAt；到期仍Depleted显示等待再生，实际恢复后才显示可用；mining关闭时不选择矿点。原采矿/掉落/占位/阻挡及保存行为保持。新显示静态及用户人工通过，限v13/16十项，未触发用例UNKNOWN，旧通过保持原范围。
+v13/16的[资源状态](MapResourceStatusHud.md)只读Available/Mining/Depleted与原服务端RegrowAt；到期仍Depleted显示等待再生，实际恢复后才显示可用；mining关闭时不选择矿点。原采矿/掉落/占位/阻挡及保存行为保持。新显示静态及用户人工通过，限v13/16十项，未触发用例UNKNOWN，旧通过保持原范围。
+
+当前v14/17的[工具修理](MapToolRepair.md)：Busy期间拒绝修理；原已锁定镐子、ActualDuration/FinishAt、成功扣耐久、地面stone×3、600秒再生/占位/阻挡与保存链保持。新链静态通过、人工UNKNOWN，旧矿点用户通过保持原版本/清单。

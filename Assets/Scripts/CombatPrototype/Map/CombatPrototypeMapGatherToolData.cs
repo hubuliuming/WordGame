@@ -30,6 +30,8 @@ namespace Code_01.CombatPrototype.Map
     {
         public byte Enabled;
         public float CraftFeedbackSeconds;
+        public byte RepairEnabled;
+        public float RepairFeedbackSeconds;
     }
 
     [InternalBufferCapacity(2)]
@@ -43,5 +45,8 @@ namespace Code_01.CombatPrototype.Map
         public float DurationMultiplier;
         public int CraftWoodQuantity;
         public int CraftStoneQuantity;
+        public int RepairDurability;
+        public int RepairWoodQuantity;
+        public int RepairStoneQuantity;
     }
 }

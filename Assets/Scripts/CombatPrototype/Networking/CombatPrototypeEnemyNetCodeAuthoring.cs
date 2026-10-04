@@ -55,6 +55,11 @@ namespace Code_01.CombatPrototype.Networking
                     RecoverySeconds = authoring.AttackRecoverySeconds
                 });
                 AddComponent<CombatPrototypeEnemyAttackState>(entity);
+                AddComponent(entity, new CombatPrototypeEnemyAnimationState
+                {
+                    StartupSeconds = authoring.AttackStartupSeconds,
+                    RecoverySeconds = authoring.AttackRecoverySeconds
+                });
                 AddBuffer<CombatPrototypeDamageEvent>(entity);
                 AddComponent(entity, new CombatPrototypeKillRewardConfig
                 {

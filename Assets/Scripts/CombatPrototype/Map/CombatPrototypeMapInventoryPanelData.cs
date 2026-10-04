@@ -30,5 +30,8 @@ namespace Code_01.CombatPrototype.Map
         public FixedString64Bytes NotOwnedLabel;
         public FixedString64Bytes DisabledLabel;
         public FixedString64Bytes ReadyLabel;
+        public FixedString64Bytes RepairLabel;
+        public FixedString64Bytes RepairButtonLabel;
+        public FixedString64Bytes FullDurabilityLabel;
     }
 }

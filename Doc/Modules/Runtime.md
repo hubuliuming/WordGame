@@ -100,7 +100,7 @@ Map 中存在 TestController 的脚本引用（GUID `42f2add30349522408099dbf10f
 
 运行调用链为：`SubScene 地图/Spawner 数据加载 → 客户端读取第 4D 固定 ID 并发送 GoInGame RPC → 服务端唯一握手入口验证身份与存档 → 生成玩家并恢复金币/经验/背包 → GhostOwner / AutoCommandTarget / CommandTarget 绑定 → 玩家加入连接 LinkedEntityGroup → NetworkStreamInGame`。重复或失效 RPC 不重复生成玩家；连接销毁时由 NetCode 的 LinkedEntityGroup 销毁对应玩家。服务端的 `CombatPrototypeEnemySpawnSystem` 从同一个 Spawner 批量生成 `32` 个现有敌人 Ghost，地图提供总量与首点，当前以 `(0, 1, 16)` 为首个网格位置，在 X/Z 平面按 `8` 列、`4` 行、间距 `3` 排列；玩家加入和复活共用地图位置计算，当前仍为 `(NetworkId * 2, 1, 0)`。批量生成只尝试一次，逐项记录和隔离实例化/初始化失败，清理当前项半成品，日志分别记录成功与失败数量。
 
-`Assets/Prefabs/CombatPrototype/` 中的玩家 Ghost 使用 `HasOwner`、`OwnerPredicted`、`SupportedGhostModes=All` 和自动输入目标；敌人 Ghost 使用 `Interpolated`。玩家通过官方 `GhostPresentationGameObjectAuthoring.ClientPrefab` 绑定原 Mono 表现 Prefab，并由官方桥接同步 Transform，服务端表现引用为空。敌人根节点已直接配置 MeshFilter/MeshRenderer，原 ClientPrefab 已清空；实体渲染与死亡隐藏见本页第 3B-2 节。
+`Assets/Prefabs/CombatPrototype/` 中的玩家 Ghost 使用 `HasOwner`、`OwnerPredicted`、`SupportedGhostModes=All` 和自动输入目标；敌人 Ghost 使用 `Interpolated`。两者通过官方 `GhostPresentationGameObjectAuthoring.ClientPrefab` 绑定对应 View，并由官方桥接同步 Transform，服务端表现引用为空。敌人根 MeshFilter/MeshRenderer 保留但 Renderer 关闭，EnemyView 绑定腐化荒猪模型；动画与死亡隐藏归[敌人美术](../EnemyArt.md)。
 
 ## 【CURRENT STRATEGY】第 3A 阶段观测入口
 
@@ -111,7 +111,7 @@ Map 中存在 TestController 的脚本引用（GUID `42f2add30349522408099dbf10f
 - 代码编译、Unity 资源绑定与 Editor 配置的 SubScene 烘焙产物已核对；用户已确认本阶段人工 GamePlayer 验收通过，主线程结合静态检查与用户反馈判定第 2B 阶段通过。
 - 验收范围仅当前独立网络原型：两个玩家加入/退出、跨客户端移动与朝向同步、本地输入预测、基础近战和单敌人生命/受击/死亡状态及 Mono 表现；不扩展为群体 ECS、正式 Map、平台构建、大规模性能或线上联调验收。
 - UI 保留 TODO；房间/匹配、Relay、寻路避障、正式 Map、正式属性奖励与正式存档保持原边界；独立网络奖励与开发固定 ID 存档的当前入口见本页第 4B/4C/4D 节，敌人反击与玩家受伤见第 6A 节。第 3A 已接入群体生成、最近在线玩家追踪及空间查询伤害链，验收边界见下节。
-- 当前渲染管线为 URP，玩家保留官方 Mono 表现桥接，敌人已接入 Entities Graphics；第 3B-2 已由用户确认人工 GamePlayer 验收通过，范围见本页对应验收节。Console 中的既有 No SRP、PEListener 序列化与 DOTween 弃用记录不能作为本阶段运行验收通过的依据，诊断记录见 ChangeLog。
+- 当前渲染管线为 URP，玩家与敌人使用官方 GameObject 表现桥接；第 3B-2 原占位显示已由用户确认人工 GamePlayer 验收通过，当前敌人美术/动画人工验收仍 UNKNOWN，范围见[敌人美术](../EnemyArt.md)。Console 中的既有 No SRP、PEListener 序列化与 DOTween 弃用记录不能作为本阶段运行验收通过的依据，诊断记录见 ChangeLog。
 - AI 未执行本阶段逻辑单元测试、PlayMode、命令行构建或平台发布；人工 GamePlayer 通过结论来自用户明确反馈。
 - `UNKNOWN`：第 3 阶段清单之外的面板交互与显示效果、生命周期调用组合，以及全部场景组件的完备性。第 4 阶段已完成两个面板和详情文本监听的静态生命周期接入，人工交互验收仍待主线程确认。
 - 第 2 阶段玩家状态与存储改动已有用户“实际行为和日志均已核对正确”的反馈，并由主线程结合代码、文档、资源静态检查判定该阶段通过；不扩展为全部场景或平台验收。
@@ -135,7 +135,7 @@ CombatPrototypeEnemySpawnSystem 在服务端网络接收之后、握手系统之
 
 `Packages` 中 URP、Universal Config、Shader Graph 与 Render Pipelines Core 均为 `17.5.0`；Searcher `4.9.4` 是 Shader Graph 的解析依赖。URP 全局设置为 `Assets/UniversalRenderPipelineGlobalSettings.asset`，其默认 Volume Profile 为 `Assets/DefaultVolumeProfile.asset`，当前 components 为空；包级配置还包括 `ProjectSettings/URPProjectSettings.asset` 与 `ShaderGraphSettings.asset`。
 
-玩家与敌人两份 View 的原根 MeshRenderer 仍引用 `Assets/Materials/CombatPrototype/CombatPrototypeNetworkView.mat`，Shader 为 `Universal Render Pipeline/Lit`，白色、不透明、Metallic=0、Smoothness=0.5、无贴图。PlayerView 原根 Renderer 当前关闭，实际角色由 VisualRoot 的灰衣修士模型和独立材质显示，资源与动画归[玩家美术](../PlayerArt.md)；玩家 Ghost 仍通过原 ClientPrefab 引用同一 PlayerView，服务端表现引用为空。敌人 Ghost 继续复用 EnemyView 的 Capsule 网格与原材质，其当前实体渲染绑定见第 3B-2 节；旧 EnemyView 资产保留。
+玩家与敌人两份 View 的原根 MeshRenderer 仍引用 `Assets/Materials/CombatPrototype/CombatPrototypeNetworkView.mat`，Shader 为 `Universal Render Pipeline/Lit`，白色、不透明、Metallic=0、Smoothness=0.5、无贴图；两者当前均关闭。实际角色由各自 VisualRoot 的独立模型和材质显示，分别归[玩家美术](../PlayerArt.md)与[敌人美术](../EnemyArt.md)。两份 Ghost 的 ClientPrefab 引用对应 View，ServerPrefab 均为空；敌人 Ghost 根的 Capsule 网格与原材质仍保留，但根 Renderer 关闭。
 
 管线 MSAA 为 `1`（关闭多重采样），Render Scale 为 `1`；URP 将当前 Ultra 的 `QualitySettings.antiAliasing` 同步为 `0`。`lightsUseLinearIntensity` 与 `lightsUseColorTemperature` 均为 true，由 URP 依据当前 Linear 配置设置。Graphics/Quality 文件使用当前 Unity 序列化版本及其默认字段。
 
@@ -149,17 +149,17 @@ URP 与 Linear 是全项目配置，影响所有场景；玩家保留原 Mono �
 
 ## 【FACT】第 3B-2 阶段敌人实体渲染
 
-`CombatPrototypeNetworkEnemy.prefab` 在既有根节点新增 MeshFilter 和 MeshRenderer，复用旧 EnemyView 的 Capsule 网格（单 submesh）、`CombatPrototypeNetworkView.mat` 的 URP/Lit 材质及 Renderer 配置。原 `GhostPresentationGameObjectAuthoring` 组件保留，ClientPrefab 与 ServerPrefab 均为空；根层级、Ghost 参数、生命与移动参数未变。旧 EnemyView Prefab 和脚本保留，玩家仍使用原 PlayerView 桥接。
+`CombatPrototypeNetworkEnemy.prefab` 保留既有根节点及 MeshFilter/MeshRenderer，原占位 Renderer 关闭。GhostPresentationGameObjectAuthoring 的 ClientPrefab 绑定既有 EnemyView，ServerPrefab 为空；根层级、Ghost 参数、生命与移动参数保持。EnemyView 的 VisualRoot 绑定腐化荒猪模型与 Animator，资源与当前显示策略归[敌人美术](../EnemyArt.md)。玩家仍使用原 PlayerView 桥接。
 
-现有 SubScene 的 Editor 配置已重新烘焙并读回：Spawner 仍为 1 个，敌人配置为 32 个、8 列、间距 3、首位置 `(0, 1, 2)`。敌人根实体同时具备 `CombatPrototypeEnemyState`、启用的 `MaterialMeshInfo`、`RenderMeshArray`、`RenderBounds`、`WorldRenderBounds` 与 `LocalToWorld`，LinkedEntityGroup 仅含根实体；网格与材质引用已核对，根实体不再含 `GhostPresentationGameObjectPrefabReference`。玩家仍有原 Mono 表现引用且没有 MaterialMeshInfo。
+当前 SubScene 隔离 Editor 烘焙已读回：Spawner 为 1 个，敌人配置为 32 个、8 列、间距 3；实际出生位置来自地图配置，见[战斗地图](Map.md)。敌人 Prefab 根含 Prefab、LocalTransform、原生命/攻击数据、新表现状态与 GhostPresentationGameObjectPrefabReference，LinkedEntityGroup 含根和表现资源引用两实体；根不含 MaterialMeshInfo，ClientPrefab 已核对为 EnemyView，ServerPrefab 为空。没有执行游戏 World 或 PlayMode。
 
 ## 【CURRENT STRATEGY】第 3B-2 阶段显示调用链
 
-`CombatPrototypeEnemyRenderSystem` 仅在 ClientSimulation World 的 PresentationSystemGroup 执行，并排在 EntitiesGraphicsSystem 之前。系统只读取 Ghost 同步的 IsDead，通过 `EnabledRefRW<MaterialMeshInfo>` 写启用状态：IsDead 为 0 时显示，否则隐藏。查询使用 `IgnoreComponentEnabledState`，已经隐藏的敌人仍参与显示状态更新；不写生命、位置、伤害或 Ghost 参数，不销毁死亡实体。
+`CombatPrototypeEnemyRenderSystem` 仅在 ClientSimulation World 的 PresentationSystemGroup、EntitiesGraphicsSystem 之前执行：无官方 GameObject 表现引用的敌人仍按 IsDead 控制 MaterialMeshInfo，带此引用的占位渲染保持关闭，两类查询都包含已禁用的渲染组件。当前敌人显示由官方 GameObject 桥接到 EnemyView，动画读取同步阶段、剩余时间与生命；侧倒后隐藏，晚加入对已死亡敌人直接隐藏。不写生命、世界根位置、伤害或奖励，不销毁死亡实体，完整规则归[敌人美术](../EnemyArt.md)。
 
 ## 【KNOWN ISSUES】第 3B-2 阶段验收边界
 
-新增系统已进入 Unity 加载程序集，Prefab 保存和实际烘焙产物已静态核对；用户已确认第 3B-2 人工 GamePlayer 验证通过，主线程结合既有静态检查与用户反馈判定第 3B-2 阶段通过。验收仅覆盖当前独立网络原型的双端敌人显示与移动、死亡隐藏无重复显示或残影、重新加入后的死亡状态，以及 HP/存活/死亡统计一致性。第 2B、第 3A 与第 3B-1 通过结论保持各自原验收范围；本阶段不包含规模性能、平台构建或线上联调结论。人工通过结论来自用户反馈，AI 未运行逻辑单元测试、PlayMode、命令行构建、平台发布或图片检查。
+原占位渲染系统、Prefab 与烘焙产物已静态核对；用户已确认第 3B-2 人工 GamePlayer 验证通过，主线程结合既有静态检查与用户反馈判定该阶段通过。验收仅覆盖当时独立网络原型的双端占位敌人显示与移动、死亡隐藏无重复显示或残影、重新加入后的死亡状态，以及 HP/存活/死亡统计一致性。第 2B、第 3A 与第 3B-1 通过结论保持各自原验收范围；不包含规模性能、平台构建或线上联调结论。该人工通过结论不覆盖当前腐化荒猪与 Animator 显示，当前资源静态落地已通过、人工 GamePlayer 仍 UNKNOWN，归[敌人美术](../EnemyArt.md)。原人工结论来自用户反馈，AI 未运行逻辑单元测试、PlayMode、命令行构建或平台发布。
 
 ## 【FACT】第 4A 阶段网络玩家资源与烘焙
 
@@ -685,3 +685,22 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 10. PlayMode前修改新面板尺寸/底距/字号/六文案并正常导入烘焙，合法值生效；旧v1～v12、缺失/未知/重复字段、错类型、非有限尺寸、非正字号、文字容纳或G间隔不足、空白/控制字符/超61 UTF-8字节标签明确失败，不补段/回退，disabled仍校验。回归原F/G/掉落/600秒再生、工具/制作/Drop/All及E/R/战斗/镜头/阻挡/保存；未触发的独立失败、字形与性能保持UNKNOWN。
 
 本清单限SourceMode=Json/Preset=Forest/schema13/revision16及本段11默认值；原空间/seed/32敌人/出生、F/G/工具/面板/丢弃/高亮/产出与存储接口保持。规则归[资源状态](MapResourceStatusHud.md)，原再生/采集/掉落结算仍归原专题。全部177项验收编号/内容及旧用户通过保持各自版本/清单。AI未运行GamePlayer/PlayMode、游戏模拟/显示系统/GUI回调、逻辑单元测试、命令行构建、发布、性能采样或图片检查；未实际触发的独立倒计时/等待/距离/身份/输入时序、配置/快照/绘制/保存失败、多玩家/生命周期、字形、性能/带宽/平台/线上及旧保存成功后意外ECS恢复仍UNKNOWN。
+
+## 【KNOWN ISSUES】采集工具修理与耐久恢复的人工验收
+
+入口CombatPrototypeNetCode，本段修理验收版本为schemaVersion=14/configRevision=17，默认SourceMode=Json/Preset=Forest。gatherTools.repairEnabled=true、repairFeedbackSeconds=2，斧头/镐子恢复20/15，每次木1石1；原最大耐久60/40、制作配方/单次成本/倍率保持，面板新增Repair/Repair/Full durability三文案。正常Unity编译、所属Serializer与18次隔离Editor烘焙静态通过；本阶段GamePlayer人工UNKNOWN，以下十二项尚待用户运行：
+
+1. 默认进入，用B查看制作区后的修理区：两工具名称/状态、当前→恢复后和实际增量、材料现有/需要、缺口与3/4按钮可滚动访问。未持有不显示负耐久，原380×640/字号18/行32及Drop/All/制作区保持。
+2. 制作斧头并用F消耗耐久，有材料时按3；当前40时恢复60并扣木1石1。工具/材料快照、B与F第二行反馈更新，不生成地面物或增加产出/交互距离；保存成功日志包含身份/工具/新耐久。
+3. 制作镐子并消耗耐久，有材料时按4；当前25时恢复40并扣木1石1。工具修理独立于植物、树木和矿点状态，不改变原资源/再生/掉落链。
+4. 斧头59→60或镐子39→40仍扣完整配方，不超过最大值。满耐久时按钮不可用、键盘请求明确拒绝且不扣料；按住3/4不连续修理，没有自动重试。
+5. 已持有耐久0的损坏工具允许修理，默认恢复20/15，之后F可沿原工具倍率使用；未持有时不创建新槽、不扣材料。可用工具修理与原1/2“仍可用拒绝、损坏可重新制作”分别核对；验收使用合法原Tools状态，不在运行中篡改ECS。
+6. 任一材料不足时不部分扣料或恢复耐久；刚好木1石1时两材料归零按原规则移除，其他库存/金币/经验及另一工具保持。接近满耐久也不得减免成本；客户端预览不预扣或写盘。
+7. 移动、攻击/非Ready近战、死亡和任意活动采集预约期间修理拒绝；存活静止且空闲时才允许。无所属连接/CommandTarget不符/Simulate失效不结算，非法归属不覆盖真正所属反馈；未实际触发的独立资格分支保持UNKNOWN。
+8. 同tick有F/G/E/R或1/2请求时修理拒绝，原业务继续按自身资格处理；3/4同时只处理斧头；修理与Drop同时则Drop拒绝，即使修理也被拒绝，不部分处理或转为丢弃。未触发的同tick/延迟/预测分支保持UNKNOWN。
+9. B按钮与3/4合并到原输入链，每次点击消费一次，只有当前有效绑定/可见面板内鼠标按下可提交。面板内不触发攻击或镜头滚轮缩放，外部鼠标行为保持；材料快照非法时禁用按钮，滞后预览由服务器重新判断。
+10. PlayMode前分别关闭repairEnabled、工具总开关、面板、F文字及全部显示并正常导入/烘焙：前两项拒绝修理且保留原耐久，关闭面板仍可3/4，关闭F文字但B开启仍有结果，全部显示关闭只关闭显示。反馈默认2秒，初次绑定/晚加入不重播旧结果；页脚未到期丢弃优先于修理、修理优先于制作。
+11. 可控保存失败时材料/耐久及原正式档保持，反馈失败，重新主动请求才重试。正常修理后同固定ID重连/重启恢复原v2材料和Tools，死亡/R不补满；两个Client只收到本人反馈、各自库存/工具独立。关闭面板、死亡/断线、源/玩家/World/Scene变化清未提交按钮/旧反馈。未实际触发的保存/提交、恢复、多人/晚加入和生命周期分支保持UNKNOWN。
+12. PlayMode前修改新恢复量、材料成本、反馈秒数及三文案并正常导入/烘焙，合法配置生效；恢复量须正整数且<=最大值，成本非负且总数>0，反馈有限正数，文案非空白/无控制字符/≤61 UTF-8字节。旧v1～v13、缺失/未知/重复字段、错类型及非法值明确失败，无补默认/回退，关闭仍校验；各端同版重新烘焙。回归原F/G、工具完成扣耐久、制作/Drop/All、600秒再生、高亮/资源状态、E/R/战斗/镜头/阻挡/保存；未触发的配置故障、字形/排版及性能保持UNKNOWN。
+
+本清单限本段v14/17与默认新字段，原空间/seed/32敌人/出生、工具槽、F/G与资源状态各四字段、原制作/丢弃反馈和写v2/读v1迁移保持；修理规则归[工具修理](MapToolRepair.md)。原177项验收编号/内容及旧用户通过保持原版本/清单，不扩展为修理通过。AI未运行GamePlayer/PlayMode、游戏模拟/显示系统/GUI回调、逻辑单元测试、命令行构建、发布、性能采样或图片检查，未创建子Agent或提交Git；人工、独立失败/时序/网络/生命周期、字形、性能/带宽/平台/线上及文件替换后意外ECS恢复仍UNKNOWN。

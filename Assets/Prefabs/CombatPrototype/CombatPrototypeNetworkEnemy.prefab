@@ -111,7 +111,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Unity.NetCode.Authoring.Hybrid::Unity.NetCode.Hybrid.GhostPresentationGameObjectAuthoring
   ServerPrefab: {fileID: 0}
-  ClientPrefab: {fileID: 0}
+  ClientPrefab: {fileID: 410010247496759649, guid: f75484c823032d2439f0b7593f030041, type: 3}
 --- !u!33 &7569844734739436092
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -127,7 +127,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3959261761280901052}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1

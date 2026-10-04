@@ -253,4 +253,6 @@ v11/14阶段的[G提示](MapPickupHud.md)由玩家Baker追加Hidden初值、Mode
 
 v12/15的[高亮](MapInteractionHighlight.md)沿原本地所属存活玩家/Connected/InGame绑定，仅读取F/G四字段及对应客户端目标位置；未改玩家Baker、13输入、Ghost字段、生命/体力/R/工具或存档。死亡/断线、玩家/地图源及World/Scene失效清圆环与缓存。高亮静态及用户人工通过限v12/15十项，未触发独立用例UNKNOWN，旧通过保持原范围。
 
-当前v13/16的[资源状态](MapResourceStatusHud.md)由Player Baker追加所属Mode/Kind/PlacementIndex/RemainingSeconds四字段，初始Hidden/0/-1/0；原13输入、F/G各四字段、生命/体力/工具/存档保持。仅Connected/InGame、所有权匹配、启用Simulate且存活者获得状态，死亡/断线与World/Scene变化清显示。新布局/编译/烘焙静态及用户人工通过，限v13/16十项，未触发用例UNKNOWN，旧通过保持原范围。
+v13/16的[资源状态](MapResourceStatusHud.md)由Player Baker追加所属Mode/Kind/PlacementIndex/RemainingSeconds四字段，初始Hidden/0/-1/0；原13输入、F/G各四字段、生命/体力/工具/存档保持。仅Connected/InGame、所有权匹配、启用Simulate且存活者获得状态，死亡/断线与World/Scene变化清显示。新布局/编译/烘焙静态及用户人工通过，限v13/16十项，未触发用例UNKNOWN，旧通过保持原范围。
+
+当前v14/17的[工具修理](MapToolRepair.md)：Player Baker追加零修理反馈Sequence/Kind/Result，仅SendToOwner；新增RepairAxe/RepairPickaxe输入，共15字段。复用原所属资格/唯一Tools与v2保存，生命/体力/R及资源显示快照保持；各端同版重新烘焙。新链静态通过、人工UNKNOWN，旧玩家用户通过保持原版本/清单。

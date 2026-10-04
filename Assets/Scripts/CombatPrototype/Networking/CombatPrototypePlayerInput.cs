@@ -17,6 +17,8 @@ namespace Code_01.CombatPrototype.Networking
         public InputEvent Pickup;
         public InputEvent CraftAxe;
         public InputEvent CraftPickaxe;
+        public InputEvent RepairAxe;
+        public InputEvent RepairPickaxe;
         public InputEvent DropInventory;
         public byte InventoryDropItem;
         public byte InventoryDropMode;
@@ -44,7 +46,8 @@ namespace Code_01.CombatPrototype.Networking
             var panelBinding = state.World.GetExistingSystemManaged<CombatPrototypeMapInteractionHudBindingSystem>();
             if (panelBinding == null)
                 throw new InvalidOperationException("Client input requires CombatPrototypeMapInteractionHudBindingSystem.");
-            var blocksMouse = panelBinding.ReadPanelInput(keyboard, mouse, out var panelCraftAxe, out var panelCraftPickaxe, out var panelDrop);
+            var blocksMouse = panelBinding.ReadPanelInput(keyboard, mouse, out var panelCraftAxe, out var panelCraftPickaxe,
+                out var panelRepairAxe, out var panelRepairPickaxe, out var panelDrop);
             var cameraBinding = state.World.GetExistingSystemManaged<CombatPrototypeCameraBindingSystem>();
             move = cameraBinding.ReadMove(move, keyboard, blocksMouse ? null : mouse);
             var attack = (keyboard != null && keyboard.spaceKey.wasPressedThisFrame) ||
@@ -55,6 +58,8 @@ namespace Code_01.CombatPrototype.Networking
             var pickup = keyboard != null && keyboard.gKey.wasPressedThisFrame;
             var craftAxe = panelCraftAxe || (keyboard != null && keyboard.digit1Key.wasPressedThisFrame);
             var craftPickaxe = panelCraftPickaxe || (keyboard != null && keyboard.digit2Key.wasPressedThisFrame);
+            var repairAxe = panelRepairAxe || (keyboard != null && keyboard.digit3Key.wasPressedThisFrame);
+            var repairPickaxe = panelRepairPickaxe || (keyboard != null && keyboard.digit4Key.wasPressedThisFrame);
 
             foreach (var input in SystemAPI.Query<RefRW<CombatPrototypePlayerInput>>().WithAll<GhostOwnerIsLocal>())
             {
@@ -71,6 +76,8 @@ namespace Code_01.CombatPrototype.Networking
                     input.ValueRW.Pickup.Set();
                 if (craftAxe) input.ValueRW.CraftAxe.Set();
                 if (craftPickaxe) input.ValueRW.CraftPickaxe.Set();
+                if (repairAxe) input.ValueRW.RepairAxe.Set();
+                if (repairPickaxe) input.ValueRW.RepairPickaxe.Set();
                 if (panelDrop.Mode != CombatPrototypeMapInventoryDropMode.None)
                 {
                     input.ValueRW.InventoryDropItem = (byte)panelDrop.Kind;

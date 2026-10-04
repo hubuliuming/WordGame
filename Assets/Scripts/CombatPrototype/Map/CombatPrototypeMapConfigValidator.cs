@@ -35,8 +35,8 @@ namespace Code_01.CombatPrototype.Map
             ValidateInventoryPanel(map.inventoryPanel);
             ValidateInventoryDrop(map.inventoryDrop);
             Id(map.mapDefinitionId, "mapDefinitionId");
-            if (map.schemaVersion != 13 || map.configRevision < 1 || map.defaultSeed < 1)
-                throw new InvalidOperationException("Map requires schemaVersion=13, positive revision and seed.");
+            if (map.schemaVersion != 14 || map.configRevision < 1 || map.defaultSeed < 1)
+                throw new InvalidOperationException("Map requires schemaVersion=14, positive revision and seed.");
             var drops = map.drops;
             Id(drops.itemId, "drops.itemId");
             Id(drops.visualResourceKey, "drops.visualResourceKey");
@@ -70,6 +70,7 @@ namespace Code_01.CombatPrototype.Map
             Id(mining.dropVisualResourceKey, "mining.dropVisualResourceKey");
             var gatheringTools = map.gatherTools;
             Positive(gatheringTools.craftFeedbackSeconds, "gatherTools.craftFeedbackSeconds");
+            Positive(gatheringTools.repairFeedbackSeconds, "gatherTools.repairFeedbackSeconds");
             if (gatheringTools.tools.Length != 2)
                 throw new InvalidOperationException("gatherTools requires exactly stone_axe and stone_pickaxe.");
             var toolIds = new HashSet<string>(StringComparer.Ordinal);
@@ -93,6 +94,10 @@ namespace Code_01.CombatPrototype.Map
                 if (tool.craftWoodQuantity < 0 || tool.craftStoneQuantity < 0 ||
                     (long)tool.craftWoodQuantity + tool.craftStoneQuantity == 0)
                     throw new InvalidOperationException("gatherTools recipe requires nonnegative material quantities and a nonzero cost for " + tool.toolId);
+                if (tool.repairDurability <= 0 || tool.repairDurability > tool.maxDurability ||
+                    tool.repairWoodQuantity < 0 || tool.repairStoneQuantity < 0 ||
+                    (long)tool.repairWoodQuantity + tool.repairStoneQuantity == 0)
+                    throw new InvalidOperationException("gatherTools repair requires recovery in (0,maximum], nonnegative materials and a nonzero cost for " + tool.toolId);
             }
             var geometry = map.geometry;
             Positive(geometry.cellSizeMeters, "cellSizeMeters");
@@ -357,6 +362,9 @@ namespace Code_01.CombatPrototype.Map
             HudLabel(panel.notOwnedLabel, "inventoryPanel.notOwnedLabel");
             HudLabel(panel.disabledLabel, "inventoryPanel.disabledLabel");
             HudLabel(panel.readyLabel, "inventoryPanel.readyLabel");
+            HudLabel(panel.repairLabel, "inventoryPanel.repairLabel");
+            HudLabel(panel.repairButtonLabel, "inventoryPanel.repairButtonLabel");
+            HudLabel(panel.fullDurabilityLabel, "inventoryPanel.fullDurabilityLabel");
         }
 
         private static void HudLabel(string value, string field)

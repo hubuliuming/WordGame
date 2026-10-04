@@ -21,7 +21,7 @@
 
 ## 【FACT】JSON契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=13/configRevision=16。inventoryDrop全部字段必填，沿原严格UTF-8/缺失/未知/重复字段及类型检查；旧v1～v12明确失败，不补段或回退来源。disabled仍校验全部字段与资源绑定；正常导入/烘焙后生效，没有运行热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=14/configRevision=17。inventoryDrop全部字段必填，沿原严格UTF-8/缺失/未知/重复字段及类型检查；旧v1～v13明确失败，不补段或回退来源。disabled仍校验全部字段与资源绑定；正常导入/烘焙后生效，没有运行热重载。
 
 | 字段 | 默认值 | 契约 |
 |---|---|---|
@@ -41,15 +41,15 @@ B沿原规则打开380×640面板；每个正数量材料行下面增加操作�
 
 客户端仅缓存一个未提交Kind/Mode请求，不扣库存或创建掉落。按钮沿原鼠标按下来源检查，面板内左键/滚轮仍隔离攻击/镜头；下一输入采样重新核对World、地图、当前所属存活玩家和Connected/InGame连接，再消费并清空请求。原IInputComponentData新增DropInventory InputEvent、InventoryDropItem byte、InventoryDropMode byte，稳定物品码None/Apple/Wood/Stone=0/1/2/3，模式None/Single/All=0/1/2；不传库存索引、数量、位置或客户端目标。没有新增RPC。
 
-新增玩家反馈Sequence/Kind/Quantity/Result四个GhostField，仅SendToOwner，初值全零；Result为None/Success/Rejected/Failed。服务端每次本人的有效处理结果更新序号，非法所有权请求不覆盖真正所属者反馈，未知物品码在拒绝反馈中归None。面板页脚优先显示未到期丢弃反馈，其后仍可显示原制作反馈；成功包含物品和实际数量，拒绝/失败使用配置文案。新绑定只观察现有Sequence，不重播旧结果；F提示/进度和工具制作反馈组件保持。
+新增玩家反馈Sequence/Kind/Quantity/Result四个GhostField，仅SendToOwner，初值全零；Result为None/Success/Rejected/Failed。服务端每次本人的有效处理结果更新序号，非法所有权请求不覆盖真正所属者反馈，未知物品码在拒绝反馈中归None。面板页脚依次显示未到期丢弃、修理、制作反馈；成功包含物品和实际数量，拒绝/失败使用配置文案。新绑定只观察现有Sequence，不重播旧结果；F提示/进度和工具制作反馈组件保持。
 
-关闭面板清掉未提交丢弃请求；死亡、断线、无本地Ghost、源/玩家变化及World/Scene停止或释放沿原Reset清掉请求、显示和序号观察。已消费进输入命令的请求由服务器最终资格决定，不通过关闭面板撤回。inventoryPanel、interactionHud和inventoryDrop开关独立；关闭面板不再提交按钮请求，原数字1/2和F/G/E/R仍沿原链。
+关闭面板清掉未提交丢弃请求；死亡、断线、无本地Ghost、源/玩家变化及World/Scene停止或释放沿原Reset清掉请求、显示和序号观察。已消费进输入命令的请求由服务器最终资格决定，不通过关闭面板撤回。inventoryPanel、interactionHud和inventoryDrop开关独立；关闭面板不再提交按钮请求，数字1/2/3/4和F/G/E/R仍沿原链。
 
 输入与玩家Ghost布局已变化，所有参与端必须使用同版代码/JSON及重新烘焙数据；未增加版本协商或配置一致性协议。
 
 ## 【CURRENT STRATEGY】服务端资格与事务
 
-InventoryDropSystem仅在ServerSimulation的PredictedSimulationSystemGroup执行，位于DropSpawn和工具制作之后、统一F及R复活之前，间接位于玩家伤害/掉落清理之后。从Connected/InGame且无断线请求的连接CommandTarget取启用Simulate的当前玩家；复用原交互服务核对GhostOwner、存活、有限零Move、没有Attack请求且近战Ready。任何植物/树木/矿点预约期间拒绝。同tick包含F/G/E、CraftAxe/CraftPickaxe或Respawn时保留原操作并拒绝丢弃，不部分扣料；不自动重试。
+InventoryDropSystem仅在ServerSimulation的PredictedSimulationSystemGroup执行，位于DropSpawn、制作和修理之后、统一F及R复活之前，间接位于玩家伤害/掉落清理之后。从Connected/InGame且无断线请求的连接CommandTarget取启用Simulate的当前玩家；复用原交互服务核对GhostOwner、存活、有限零Move、没有Attack请求且近战Ready。任何植物/树木/矿点预约期间拒绝。同tick包含F/G/E、制作、Respawn或RepairAxe/RepairPickaxe时保留原操作并拒绝丢弃，不部分扣料；不自动重试。
 
 服务端再校验启用开关、已配置物品、合法模式、All开关和实际库存。Single取当前配置数量；All取该项当前总量；缺项/非正或不足数量拒绝。同名重复条目、必需组件或服务缺失明确暴露错误，不创建兜底资源或修正库存。独立连接请求复制后逐项处理、记录阶段和原异常，一个失败不阻止其他请求。
 
@@ -66,7 +66,7 @@ DropPhase追加Prepared=3，原Airborne/Landed/Consumed值0/1/2保持。Prefab�
 
 ## 【KNOWN ISSUES】验证与人工边界
 
-正常Unity编译通过，新增输入共13字段及所属反馈Serializer已生成；当前配置、PrefabPrepared初值和玩家反馈零初值已静态核对。Forest/Grassland各八次隔离Editor烘焙，共16次：Json/BuiltIn默认、丢弃关闭、面板和F HUD均关闭、敌人掉落关闭、工具/砍树/采矿关闭、Single=2且All关闭、仅木材列表；两来源一致，设置/定义/原Prefab引用符合契约，默认地图布置保持，临时World/Scene释放且主场景干净。原SubScene正常重新导入已执行，未运行游戏模拟或GUI回调。
+v10/13丢弃阶段正常Unity编译通过，新增输入共13字段及所属反馈Serializer已生成；当前配置、PrefabPrepared初值和玩家反馈零初值已静态核对。Forest/Grassland各八次隔离Editor烘焙，共16次：Json/BuiltIn默认、丢弃关闭、面板和F HUD均关闭、敌人掉落关闭、工具/砍树/采矿关闭、Single=2且All关闭、仅木材列表；两来源一致，设置/定义/原Prefab引用符合契约，默认地图布置保持，临时World/Scene释放且主场景干净。原SubScene正常重新导入已执行，未运行游戏模拟或GUI回调。
 
 首次写入新JSON期间旧程序集导入产生两条inventoryDrop未知字段异常；完成编译后的严格读取和16次烘焙均成功，Console前后均[2 Error,2 Warning,0 Log]，无新增烘焙错误/警告。两条编译警告来自未修改的PEListener和DOTweenPreviewManager。保留原日志，没有清空Console。
 
@@ -76,4 +76,6 @@ v11/14阶段新增[G提示](MapPickupHud.md)，与实际拾取共用资格/最�
 
 v12/15的[资源高亮](MapInteractionHighlight.md)只读取原F/G目标快照和对应客户端资源/掉落位置，不改变Drop/All请求、反馈、保存/扣料或地面生命周期。原13输入与玩家Ghost字段保持；高亮静态及用户人工通过限v12/15十项，未触发独立用例UNKNOWN，旧丢弃/G文字通过仍限原版本/清单。
 
-当前v13/16的[资源状态](MapResourceStatusHud.md)新增玩家所属四字段，只读采集物/树/矿，不读取掉落到期或改Drop/All请求、反馈、保存/扣料。原13输入与F/G各四字段保持，玩家烘焙布局新增状态组件，各端须同版重新烘焙。新显示静态及用户人工通过，限v13/16十项，未触发用例UNKNOWN，旧通过保持原范围。
+v13/16的[资源状态](MapResourceStatusHud.md)新增玩家所属四字段，只读采集物/树/矿，不读取掉落到期或改Drop/All请求、反馈、保存/扣料。原13输入与F/G各四字段保持，玩家烘焙布局新增状态组件，各端须同版重新烘焙。新显示静态及用户人工通过，限v13/16十项，未触发用例UNKNOWN，旧通过保持原范围。
+
+当前v14/17的[修理](MapToolRepair.md)两个请求加入原HasPriorOperation：同tick有修理时Drop拒绝，即使修理被拒绝也不改为丢弃。RepairSystem位于Craft之后、Drop之前；原F/G/E/R/1/2互相规则、Drop/All事务、输入物品/模式及所属反馈保持，当前总输入15字段。新链静态通过、人工UNKNOWN。

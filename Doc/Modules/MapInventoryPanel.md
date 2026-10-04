@@ -19,7 +19,7 @@
 
 ## 【FACT】JSON 契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 当前一致为 schemaVersion=13/configRevision=16。必填 inventoryPanel 共25字段，沿原严格UTF-8、完整字段/类型及未知/重复键检查；即使关闭面板也校验全部字段。旧地图v1～v12明确失败，不补段/默认值或回退来源；正常导入/烘焙后生效，无运行热重载。原工具配方/耐久仍从 gatherTools 唯一读取，面板不复制配置真值。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 当前一致为 schemaVersion=14/configRevision=17。必填 inventoryPanel 共28字段，沿原严格UTF-8、完整字段/类型及未知/重复键检查；即使关闭面板也校验全部字段。旧地图v1～v13明确失败，不补段/默认值或回退来源；正常导入/烘焙后生效，无运行热重载。原工具配方/耐久仍从 gatherTools 唯一读取，面板不复制配置真值。
 
 | 字段 | 默认值 | 契约 |
 |---|---|---|
@@ -49,14 +49,17 @@
 | notOwnedLabel | Not owned |
 | disabledLabel | Disabled |
 | readyLabel | Ready |
+| repairLabel | Repair |
+| repairButtonLabel | Repair |
+| fullDurabilityLabel | Full durability |
 
-全部17文案须非空白、无控制字符且最多61个UTF-8字节，烘焙为FixedString64Bytes。内置GUI字体和白色纹理复用；当前英文文案，中文接口保留，字体/字形覆盖为UNKNOWN，没有读取图片或界面截图。
+全部20文案须非空白、无控制字符且最多61个UTF-8字节，烘焙为FixedString64Bytes。内置GUI字体和白色纹理复用；当前英文文案，中文接口保留，字体/字形覆盖为UNKNOWN，没有读取图片或界面截图。
 
 ## 【CURRENT STRATEGY】库存、工具与配方显示
 
 客户端仅枚举启用GhostOwnerIsLocal的一个玩家，并核对其GhostOwner对应Connected/InGame且无断线请求的连接；没有有效本地Ghost/连接时清空显示。展示原CombatPrototypeInventoryItem的正数量条目及原顺序，不设第二份可变库存，不按99拆格、不排序或扩充容量；零数量不列出。木材/石材/活力苹果/小块肉映射上述Wood/Stone/Apple/Meat文案，其余合法名称直接按原ItemName显示。ToolId/Durability仍来自原所属工具缓冲，工具独立于库存，两槽显示当前/最大耐久、未持有或损坏/功能关闭状态。
 
-新Snapshot只缓存显示文本/数量；条目名称空白/控制字符、负数量或重复名称按索引/地图/玩家记录错误并跳过该项，其余独立条目继续，当前快照有错误时禁用制作和丢弃按钮，不用展示数据修正库存。原工具网络数据仍由原HUD统一校验。必需地图配置、客户端绑定/宿主缺失明确暴露错误，不查找或创建组件兜底。
+新Snapshot只缓存显示文本/数量；条目名称空白/控制字符、负数量或重复名称按索引/地图/玩家记录错误并跳过该项，其余独立条目继续，当前快照有错误时禁用制作、修理和丢弃按钮，不用展示数据修正库存。原工具网络数据仍由原HUD统一校验。必需地图配置、客户端绑定/宿主缺失明确暴露错误，不查找或创建组件兜底。
 
 两条配方直接读取原definitions：斧头木3/石2、镐子木2/石3；分别列出现有/需要与max(需要-现有,0)缺少数量。只有工具开关启用、库存展示快照合法、材料充足且工具未持有或耐久小于单次成本时按钮可用。Ready仅是当前客户端材料/耐久预览，连接、生命、静止、无攻击、近战Ready、资源预约互斥及同tick优先仍由原服务端制作系统决定；网络快照滞后时服务器可拒绝，不按客户端预览扣料/发工具。工具功能关闭保留已有耐久并禁用按钮。
 
@@ -68,7 +71,7 @@ B单次按下在GhostInputSystemGroup内切换本地面板，同一渲染帧不�
 
 制作按钮只缓存本地Axe/Pickaxe布尔请求，要求鼠标按下来自本次有效绑定的可见面板；MouseUp结束后清理按下标记。输入系统下一次读取时重新核对地图、所属玩家、连接及生命，消费并清空按钮请求，再与数字1/2按下合并到原CraftAxe/CraftPickaxe InputEvent；原制作按钮不增加RPC、命令字段或保存入口；丢弃请求归[丢弃](MapInventoryDrop.md)。原服务端F优先、两类同时斧头优先、忙碌拒绝、仍可用拒绝及SavePrepared先于扣料/工具提交保持。一个按钮请求消费一次，没有自动重试；再次主动点击仍按当前服务器资格处理。
 
-制作成功/拒绝/失败共享原所属Sequence/Kind/Result，当前2秒展示期限由原宿主处理，只用于显示；新绑定只观察现有Sequence，不重播旧反馈。interactionHud.enabled只关闭F提示/进度，inventoryPanel.enabled独立；关闭F HUD仍可B打开本面板/查看制作反馈，关闭本面板仍可用原1/2。F/G文字、面板全关且没有启用高亮通道时宿主清空显示，工具玩法仍由原开关控制。
+制作成功/拒绝/失败共享原所属Sequence/Kind/Result，当前2秒展示期限由原宿主处理，只用于显示；新绑定只观察现有Sequence，不重播旧反馈。interactionHud.enabled只关闭F提示/进度，inventoryPanel.enabled独立；关闭F HUD仍可B打开本面板/查看制作反馈，关闭本面板仍可用原1/2。F/G文字、面板、高亮及资源状态全关时宿主清空显示，工具玩法由原开关控制。
 
 死亡、断线/无本地Ghost、玩家或地图源变化、关闭面板、World/Scene停止或释放清掉未提交按钮请求；绑定释放同时清库存投影、滚动位置、鼠标按下标记及旧反馈。重建有效绑定按initiallyOpen应用初始状态，默认保持关闭。已经消费进原输入命令的请求仍由原服务器链处理，不通过关闭面板撤销已提交制作。面板不保存/修改库存、耐久、世界资源、再生期限、金币/经验或玩家档案，沿原v2写入/v1读取迁移。
 
@@ -78,10 +81,12 @@ v9面板阶段正常Unity编译无C# Error，四个脚本导入、配置/烘焙�
 
 用户已确认本阶段人工GamePlayer验收通过，主线程结合既有静态核对与用户反馈判定通过，范围限CombatPrototypeNetCode、schemaVersion=9/configRevision=12及[运行入口](Runtime.md)材料面板十二项清单。人工结论来自用户反馈；未实际触发的精确排版/命中边界、事件顺序、同tick、延迟/预测回放、晚加入和独立配置/网络条目/创建/准备/保存/提交/清理失败仍为UNKNOWN。旧工具v8/revision11十二项用户通过、HUD v7/revision10八项及其他通过保持原版本/清单，不覆盖本阶段新显示/按钮行为。字体、运行性能/带宽、平台构建和线上联调未验证；保存成功后意外ECS故障恢复仍沿工具原未知边界。AI未执行GamePlayer/PlayMode、游戏模拟/GUI显示回调、逻辑单元测试、命令行构建、发布、性能采样或图片检查，未创建子Agent或提交Git。
 
-v10/13在材料行下接入[Drop/All](MapInventoryDrop.md)，页脚优先展示未到期丢弃结果，再显示原制作反馈。普通客户端帮助类缓存一个未提交请求；关闭和原绑定失效均清空。原面板尺寸/滚动/鼠标隔离、配方与F显示开关保持；本阶段编译/16次隔离烘焙静态通过，用户确认丢弃人工通过限[运行入口](Runtime.md)v10/13十二项，未触发的独立用例UNKNOWN；不扩展上述v9面板用户通过。
+v10/13在材料行下接入[Drop/All](MapInventoryDrop.md)，当时页脚先丢弃再制作反馈。普通客户端帮助类缓存一个未提交请求；关闭和原绑定失效均清空。原面板尺寸/滚动/鼠标隔离、配方与F显示开关保持；本阶段编译/16次隔离烘焙静态通过，用户确认丢弃人工通过限[运行入口](Runtime.md)v10/13十二项，未触发的独立用例UNKNOWN；不扩展上述v9面板用户通过。
 
 v11/14阶段的[G提示](MapPickupHud.md)与F HUD/本面板三开关独立，共用原宿主/连接及生命周期绑定；关闭本面板仍可显示G，v11时三者全关闭收起绑定。未修改B、列表/按钮、鼠标隔离或制作/丢弃事务，原13输入保持；新显示编译/十次隔离烘焙静态通过；用户确认人工通过限v11/14十项，未触发用例UNKNOWN。
 
 v12/15的[高亮](MapInteractionHighlight.md)复用同一宿主，圆环先于原面板绘制；文字/面板关闭而高亮开启仍绑定本地玩家。原B、鼠标隔离、按钮、输入与反馈保持，新增圆环不消费GUI事件。正常编译/14次隔离烘焙静态通过，用户确认高亮人工通过限v12/15十项，未触发独立用例UNKNOWN；旧面板/G提示用户通过仍限原版本/清单。
 
-当前v13/16的[资源状态](MapResourceStatusHud.md)与B面板独立，仍复用原宿主/绑定；状态开启时即使其余显示全关仍绑定。新状态不消费GUI事件或制作请求，B按钮与鼠标隔离保持。状态静态及用户人工通过，限v13/16十项，未触发用例UNKNOWN；旧面板/G/高亮用户通过保持原范围。
+v13/16的[资源状态](MapResourceStatusHud.md)与B面板独立，仍复用原宿主/绑定；状态开启时即使其余显示全关仍绑定。新状态不消费GUI事件或制作请求，B按钮与鼠标隔离保持。状态静态及用户人工通过，限v13/16十项，未触发用例UNKNOWN；旧面板/G/高亮用户通过保持原范围。
+
+当前v14/17的[工具修理](MapToolRepair.md)在制作区后追加11滚动行，预览封顶恢复值、材料现有/需要及缺口，3/4按钮沿原鼠标按下标记和输入绑定消费一次。关闭面板或生命周期失效清未提交修理，关闭面板仍可键盘3/4；库存展示错误禁用修理按钮。原380×640/字号18/行32、制作、Drop/All及鼠标隔离保持。配置28字段/20文案、工具根/定义和新反馈经编译/18次隔离烘焙静态通过，人工UNKNOWN。

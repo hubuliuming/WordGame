@@ -25,6 +25,7 @@ namespace Code_01.CombatPrototype.Networking
         public CombatPrototypeEnemyAttackPhase Phase;
         public float PhaseTimer;
         public uint AttackSequence;
+        public byte SwingStarted;
         public Entity TargetPlayer;
         public int TargetNetworkId;
     }

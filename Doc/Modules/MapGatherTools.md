@@ -11,8 +11,8 @@
 | [GatherToolUtility](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapGatherToolUtility.cs) | 两种稳定 ID、定义读取、开始时选择及成功扣耐久候选 |
 | [GatherToolCraftSystem](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapGatherToolCraftSystem.cs) | 服务端资格、材料/工具候选、保存与制作提交 |
 | [PlayerSaveTool](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypePlayerSaveTool.cs) | 存档 Tools 的 ToolId/Durability DTO |
-| [PlayerInput](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypePlayerInput.cs) | 本地数字 1/2 单次按下，CraftAxe/CraftPickaxe 两个 InputEvent |
-| [Player Baker](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypePlayerNetCodeAuthoring.cs) | 原玩家实体追加空工具缓冲与零制作反馈 |
+| [PlayerInput](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypePlayerInput.cs) | 1/2制作、3/4修理的单次InputEvent，修理归[专题](MapToolRepair.md) |
+| [Player Baker](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypePlayerNetCodeAuthoring.cs) | 原玩家实体的空工具缓冲、零制作/修理反馈 |
 | [Map Baker](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapAuthoring.cs) | 原地图根追加工具 Settings/Definitions |
 | [准入](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypeNetCodeLifecycle.cs) / [SaveStore](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypePlayerSaveStore.cs) | 全档校验后恢复工具，v1 读取迁移和 v2 保存候选 |
 | [F 入口](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapInteractionSystem.cs) / TreeHarvest / MineHarvest | 沿原最近目标预约，锁定工具与实际耗时，完成保存耐久 |
@@ -22,9 +22,9 @@
 
 ## 【FACT】当前 JSON 契约与数值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 BuiltIn 一致为 schemaVersion=13/configRevision=16，必填 gatherTools及[面板配置](MapInventoryPanel.md)。沿原严格 UTF-8、完整字段、类型、未知/重复键校验；旧地图 v1～v12 明确失败，不补默认段或回退来源。配置仅在正常导入/烘焙后生效，无运行热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 BuiltIn 一致为 schemaVersion=14/configRevision=17，必填 gatherTools及[面板配置](MapInventoryPanel.md)。沿原严格 UTF-8、完整字段、类型、未知/重复键校验；旧地图 v1～v13 明确失败，不补默认段或回退来源。配置仅在正常导入/烘焙后生效，无运行热重载。
 
-gatherTools 的 enabled=true、craftFeedbackSeconds=2.0、tools 为恰好两条不重复定义；enabled=false 仍校验所有字段，停止制作和工具加速，但保留已拥有工具/耐久，F 沿原徒手耗时。
+gatherTools 的 enabled=true、craftFeedbackSeconds=2.0、tools 为恰好两条不重复定义；enabled=false 仍校验所有字段，停止制作、修理和工具加速，但保留已拥有工具/耐久，F 沿原徒手耗时。
 
 | tools 字段 | 斧头 | 镐子 | 契约 |
 |---|---|---|---|
@@ -37,7 +37,7 @@ gatherTools 的 enabled=true、craftFeedbackSeconds=2.0、tools 为恰好两条�
 | craftWoodQuantity | 3 | 2 | 非负整数 |
 | craftStoneQuantity | 2 | 3 | 非负整数，两类材料总成本必须 > 0 |
 
-craftFeedbackSeconds 为有限正数。植物仍为徒手 1 秒；树木徒手 2 秒、有可用斧头 1.5 秒；矿点徒手 3 秒、有可用镐子 2.25 秒。工具不增加产出、范围或再生速度，普通攻击不消耗工具。每种工具一个逻辑槽，无手动装备切换、品质、维修、工具掉落、背包网格或工具使用动画。
+craftFeedbackSeconds 为有限正数。植物仍为徒手 1 秒；树木徒手 2 秒、有可用斧头 1.5 秒；矿点徒手 3 秒、有可用镐子 2.25 秒。工具不增加产出、范围或再生速度，普通攻击不消耗工具。每种工具一个逻辑槽，修理配置/结算归[工具修理](MapToolRepair.md)，无手动装备切换、品质、工具掉落、背包网格或工具使用动画。
 
 ## 【CURRENT STRATEGY】制作与材料事务
 
@@ -55,7 +55,7 @@ F 沿原三类最近目标、各自距离、同距 PlacementIndex、NetworkId �
 
 保存前生成、准备或保存失败，释放本次掉落，尝试恢复原障碍/历史长度并取消当前预约；不扣工具、不安排再生，错误保留阶段/地图/布置/玩家/DropId/资源与原异常，清理/回滚失败单独暴露，继续其他条目。SavePrepared 成功后的耐久成本已持久化，不用旧存档补偿，也不执行保存前的资源回滚；意外 ECS 提交异常明确暴露 durabilitySaved=true，跨文件系统与 ECS 的故障恢复保证仍为 UNKNOWN。
 
-最后一次可用耐久允许正常完成，默认 1→0；保留损坏工具记录，下一次 F 恢复徒手，重新制作成功后覆盖该槽并扣完整配方。死亡、R、重连或服务端重启不补满工具。
+最后一次可用耐久允许正常完成，默认 1→0；保留损坏工具记录，下一次 F 恢复徒手；3/4可按[修理配方](MapToolRepair.md)恢复，重新制作仍按原资格覆盖该槽并扣完整制作配方。死亡、R、重连或服务端重启不补满工具。
 
 ## 【FACT】工具同步与持久化
 
@@ -63,7 +63,7 @@ CombatPrototypeMapGatherTool 是唯一可变工具状态，内部容量 2，每�
 
 玩家保存版本为 2，同一固定 ID 路径、UTF-8 无 BOM 写入、临时文件 Flush/正式文件原子替换保持。Tools 必填数组，最多两条，条目恰含 ToolId/Durability；ID 已知且不重复，耐久整数 0～当前配置最大值，损坏 0 合法。未知 ID、缺失/额外/重复字段、错误类型、负值或越界拒绝整个档案，不修正或忽略坏项。
 
-旧 v1 仍严格读取原五字段；金币/经验/原库存保持，内存候选提升为 v2 且 Tools=[]，读取不写盘、不赠工具。下一次正常奖励、E 消耗、F 植物采集、G 拾取、制作或工具完成保存时写 v2；没有批量重写。全部旧保存候选均携带当前 Tools，避免其他业务覆盖工具数据。工具只记录 ToolId/Durability；资源状态、地面掉落、预约/再生期限、HUD 和生命/体力仍不入玩家档案。
+旧 v1 仍严格读取原五字段；金币/经验/原库存保持，内存候选提升为 v2 且 Tools=[]，读取不写盘、不赠工具。下一次正常奖励、E 消耗、F 植物采集、G 拾取、制作、修理或工具完成保存时写 v2；没有批量重写。全部旧保存候选均携带当前 Tools，避免其他业务覆盖工具数据。工具只记录 ToolId/Durability；资源状态、地面掉落、预约/再生期限、HUD 和生命/体力仍不入玩家档案。
 
 ## 【CURRENT STRATEGY】HUD 读取与反馈
 
@@ -79,10 +79,12 @@ CombatPrototypeMapGatherTool 是唯一可变工具状态，内部容量 2，每�
 
 v9/revision12阶段增加本地材料背包/配方与按钮，独立开关和人工边界归[制作面板](MapInventoryPanel.md)。工具资格/事务/反馈及v2保存链保持，旧工具十二项通过仍限v8/revision11。
 
-当前地图v13/16必填[背包丢弃](MapInventoryDrop.md)，复用原掉落资源及保存链；本专题原交互/工具/产出/再生行为保持。新增丢弃静态及用户人工通过限[运行入口](Runtime.md)v10/13十二项，未触发用例UNKNOWN；旧通过仍限原版本/清单。
+当前地图v14/17必填[背包丢弃](MapInventoryDrop.md)，复用原掉落资源及保存链；本专题原交互/工具/产出/再生行为保持。新增丢弃静态及用户人工通过限[运行入口](Runtime.md)v10/13十二项，未触发用例UNKNOWN；旧通过仍限原版本/清单。
 
 v11/14阶段的[G提示](MapPickupHud.md)只读共用掉落目标，与原F目标/工具进度独立；不修改本专题资源状态、产出、工具耐久、再生或保存。新显示编译/十次隔离烘焙静态通过；用户确认人工通过限v11/14十项，未触发用例UNKNOWN，旧用户通过保持各自版本/清单。
 
 v12/15的[资源高亮](MapInteractionHighlight.md)复用原F四字段，Working绿色圆环跟随已锁定目标；文字关闭而F高亮开启仍采样。工具锁定耗时、耐久、制作及保存链保持。新显示编译/14次隔离烘焙静态通过，用户确认人工通过限v12/15十项，未触发独立用例UNKNOWN；旧工具/F/G用户通过不扩展。
 
-当前v13/16的[资源状态](MapResourceStatusHud.md)显示资源阶段及服务端再生秒数；本人采集中优先原F锁定身份，不更改工具锁定耗时、耐久、制作或保存。移动/攻击时状态可显示，但F及制作资格保持。新显示静态及用户人工通过，限v13/16十项，未触发用例UNKNOWN，旧工具通过保持原范围。
+v13/16的[资源状态](MapResourceStatusHud.md)显示资源阶段及服务端再生秒数；本人采集中优先原F锁定身份，不更改工具锁定耗时、耐久、制作或保存。移动/攻击时状态可显示，但F及制作资格保持。新显示静态及用户人工通过，限v13/16十项，未触发用例UNKNOWN，旧工具通过保持原范围。
+
+当前v14/17的[工具修理](MapToolRepair.md)新增3/4和B按钮、所属三字段反馈；复用原唯一工具槽和候选保存，先保存再扣完整配方/提交封顶耐久，损坏0可修复。制作1/2资格与原F工具锁定/耗时/消耗保持。静态通过、人工UNKNOWN；旧工具及资源状态通过保持原版本/清单。

@@ -172,7 +172,10 @@ namespace Code_01.CombatPrototype.Map
                     BrokenLabel = new FixedString64Bytes(inventoryPanel.brokenLabel),
                     NotOwnedLabel = new FixedString64Bytes(inventoryPanel.notOwnedLabel),
                     DisabledLabel = new FixedString64Bytes(inventoryPanel.disabledLabel),
-                    ReadyLabel = new FixedString64Bytes(inventoryPanel.readyLabel)
+                    ReadyLabel = new FixedString64Bytes(inventoryPanel.readyLabel),
+                    RepairLabel = new FixedString64Bytes(inventoryPanel.repairLabel),
+                    RepairButtonLabel = new FixedString64Bytes(inventoryPanel.repairButtonLabel),
+                    FullDurabilityLabel = new FixedString64Bytes(inventoryPanel.fullDurabilityLabel)
                 });
                 var inventoryDrop = config.map.inventoryDrop;
                 AddComponent(entity, new CombatPrototypeMapInventoryDropSettings
@@ -204,7 +207,8 @@ namespace Code_01.CombatPrototype.Map
                 var gatheringTools = config.map.gatherTools;
                 AddComponent(entity, new CombatPrototypeMapGatherToolSettings
                 {
-                    Enabled = (byte)(gatheringTools.enabled ? 1 : 0), CraftFeedbackSeconds = gatheringTools.craftFeedbackSeconds
+                    Enabled = (byte)(gatheringTools.enabled ? 1 : 0), CraftFeedbackSeconds = gatheringTools.craftFeedbackSeconds,
+                    RepairEnabled = (byte)(gatheringTools.repairEnabled ? 1 : 0), RepairFeedbackSeconds = gatheringTools.repairFeedbackSeconds
                 });
                 var toolDefinitions = AddBuffer<CombatPrototypeMapGatherToolDefinition>(entity);
                 foreach (var tool in gatheringTools.tools)
@@ -213,7 +217,9 @@ namespace Code_01.CombatPrototype.Map
                         ToolId = new FixedString64Bytes(tool.toolId), DisplayName = new FixedString64Bytes(tool.displayName),
                         Kind = CombatPrototypeMapGatherToolUtility.ResolveKind(tool.toolId), MaxDurability = tool.maxDurability,
                         DurabilityCostPerCompletion = tool.durabilityCostPerCompletion, DurationMultiplier = tool.durationMultiplier,
-                        CraftWoodQuantity = tool.craftWoodQuantity, CraftStoneQuantity = tool.craftStoneQuantity
+                        CraftWoodQuantity = tool.craftWoodQuantity, CraftStoneQuantity = tool.craftStoneQuantity,
+                        RepairDurability = tool.repairDurability, RepairWoodQuantity = tool.repairWoodQuantity,
+                        RepairStoneQuantity = tool.repairStoneQuantity
                     });
                 var chunks = AddBuffer<CombatPrototypeMapChunk>(entity);
                 foreach (var chunk in layout.Chunks) chunks.Add(chunk);

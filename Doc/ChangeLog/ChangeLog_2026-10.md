@@ -667,3 +667,21 @@
 - 增量同步资源状态专题、运行入口及相关地图/显示/工具/树矿/掉落/玩家/战斗/资源与数据文档和项目外配置建议模板的验收状态；修正地图当前参数表残留的schema12/revision15为已确认13/16。全部177项人工验收编号/内容、配置默认值、原导航及旧阶段通过范围保持。
 - 未实际触发的独立倒计时/到期等待/再生关闭精确边界、距离/身份/输入时序、移动攻击显示、多玩家/晚加入/生命周期及配置/快照/绘制/保存失败仍UNKNOWN；字形、运行性能/带宽、平台/线上及旧保存成功后意外ECS恢复未验证。
 - 本次只同步文档，未修改脚本、JSON、Scene/SubScene、Prefab、Animator、meta/资源绑定、包或构建配置；AI未执行GamePlayer/PlayMode、游戏模拟/显示系统/GUI回调、逻辑单元测试、命令行构建、发布、性能采样或图片检查，未创建子Agent或提交Git。
+
+## 2026-10-05 采集工具修理与耐久恢复接入
+
+- 用户明确确认修理方案，主线程在CombatPrototypeNetCode新增四个职责脚本及正常Unity生成meta；原工具配置/烘焙数据接入repairEnabled=true/repairFeedbackSeconds=2及斧头恢复20、镐子15、每次木1石1；inventoryPanel新增Repair/Repair/Full durability三文案，共28字段。Json/BuiltIn/两模板统一schema14/revision17，旧v1～v13严格拒绝，关闭仍校验，无补默认/来源回退或热重载。
+- 新服务端RepairSystem位于Craft后、Drop/F/Respawn前，沿原所属/存活/静止/无攻击/非预约资格；F/G/E/R/1/2请求优先于修理，3/4同时斧头优先，Drop将两修理请求加入原优先拒绝判断。只修理已持有未满工具，0可修复、封顶恢复且近满仍扣完整材料；复用原PrepareToolCraft候选与SavePrepared，先保存再提交材料/耐久，失败不自动重试、保存前不改原状态。
+- 原PlayerInput新增RepairAxe/RepairPickaxe，共15实例字段；原Player Baker追加零Sequence/Kind/Result修理反馈，仅SendToOwner。新增普通反馈/面板类委托原Main Camera宿主与滚动面板，3/4与B按钮消费一次，预览材料缺口与封顶恢复；结果默认2秒，页脚丢弃/修理/制作优先，原F第一行/进度保持，生命周期清缓存/未提交请求。
+- 正常Unity编译无C# Error，所属Serializer及三反馈/15输入/F/G/资源状态各4/工具定义11/Settings4/面板28字段静态核对通过；Forest/Grassland各9种隔离Editor烘焙共18次，新Settings/定义/全28面板值/玩家零反馈和原Prefab/初值/完整布局一致，Console前后[0 Error,8 Warning,47 Log]相同、原主场景干净、临时World/Scene/TextAsset释放。主线程静态验收通过，新GamePlayer人工UNKNOWN。
+- 增量同步修理专题、相关模块/导航、项目外配置模板及Runtime新增十二项；原177项人工编号/内容、旧通过版本/清单和UNKNOWN边界保持。原SaveStore/存档格式、制作结算、F资源/工具完成、G/掉落生成/生命周期、Scene/SubScene/Prefab/Animator结构、旧meta/资源引用、包/构建配置均不在本阶段修改；执行期间敌人动画脚本/Prefab等并行差异保留且不计入本次验收。AI未执行PlayMode、游戏模拟/显示系统/GUI回调、逻辑单元测试、命令行构建、发布、性能采样或图片检查，未创建子Agent或提交Git。
+
+## 2026-10-05 网络敌人腐化荒猪美术与战斗动画实装
+
+- 按用户已确认方案与一次性资源权限，由主线程为 CombatPrototypeNetCode 现有敌人生成腐化荒猪设定图，并制作独立低面数关节模型。设定图于 2026-10-04 使用内置 image_gen 生成，1536x1024、非透明、无参考图片；运行模型位于 Assets/Art/Enemy/CombatPrototype/，含 11 份网格、8 份 URP/Lit 材质、11 个 MeshRenderer、3286 个三角形。
+- 新增单层 EnemyCombat.controller 与七个 60 fps/84 曲线 Clip：待机 1.6、移动 0.7、蓄力 0.5、顶击 0.12、收势 0.88、受击 0.16、侧倒 0.75 秒。无 Animation Event、自动过渡或 Root Motion；新增新资源采样预览 2080x720，设定图/预览 NPOT=None，预览 Max Size=4096。
+- 两份既有敌人 Prefab 保留根与原组件，Ghost ClientPrefab 绑定 EnemyView，新增 VisualRoot 嵌套模型于 (0,-1,0)，关闭原占位 Renderer 并序列化绑定 Animator/动画组件。既有 GUID、Scene/SubScene 结构、Bundle、包和构建设置未改。
+- 新增表现状态、服务端状态复制系统与客户端动画组件，修改既有 Enemy Authoring/View/Render/Attack 脚本。权威攻击配置/状态继续仅服务端保留；正常前摇结束设置 SwingStarted，原复活取消前摇不设置该标记。复制系统在 PlayerRespawn 后同步阶段、序号、标记与剩余时间，客户端正常后摇前 12% 播放顶击，取消时只退回蓄力姿态；原前摇结束伤害、追踪、体力、奖励和存档链保持。
+- 客户端受击由原 HitSequence 驱动，死亡播放侧倒后隐藏，晚加入直接隐藏已死敌人；保留原死亡实体与统计。表现只读取 Ghost 状态并写模型关节/可见性，完成官方 Transform 桥接依赖后再读取根位置；没有新增敌人复活或客户端伤害事件。
+- Unity 编译、生成的表现 Ghost Serializer、七状态、全部曲线目标、缺失脚本为 0、无事件与静态接地采样已核对。现有 SubScene 的隔离 Editor 烘焙确认 32/8列/间距3、实际 EnemyPrefab 标签/LocalTransform/两实体 LinkedEntityGroup、新表现初态及 ClientPrefab，原 HP100、伤害10、范围1.75、前摇0.5/后摇1保持；主场景仍干净，临时 World/Scene 已释放。主线程判定代码和资源静态落地通过。
+- 增量同步 EnemyArt、战斗、运行入口、资源与数据、性能边界、总导航与本月 ChangeLog，仅检查本次新设定图与新 Clip 预览。工作区工具修理任务的并行改动保留，不计入本次修改与验收。人工 GamePlayer 的双端动画/光照/脚步、攻击取消、死亡隐藏、晚加入/重连及原战斗回归仍 UNKNOWN；未执行逻辑单元测试、PlayMode、命令行构建、发布或性能采样，未创建子Agent或提交 Git。

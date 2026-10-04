@@ -30,5 +30,8 @@ namespace Code_01.CombatPrototype.Map
         public string notOwnedLabel;
         public string disabledLabel;
         public string readyLabel;
+        public string repairLabel;
+        public string repairButtonLabel;
+        public string fullDurabilityLabel;
     }
 }

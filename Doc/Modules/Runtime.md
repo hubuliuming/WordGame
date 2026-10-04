@@ -637,7 +637,7 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 
 ## 【KNOWN ISSUES】掉落物拾取提示与目标显示的人工验收
 
-入口CombatPrototypeNetCode，当前Forest/Grassland的Json/BuiltIn为schemaVersion=11/configRevision=14，pickupHud=true/400×52/底168/字号20，四文案Pick up、Vitality Apple、Wood、Stone。原F HUD和背包面板默认开启，G距离仍为drops的2米。正常Unity编译、新所属四字段Serializer/SendToOwner/原13输入、十次隔离Editor烘焙静态通过；原地图布置/资源引用及F初值保持。主线程静态验收通过，本阶段GamePlayer人工结果UNKNOWN，以下十项尚未执行：
+入口CombatPrototypeNetCode，G提示验收时Forest/Grassland的Json/BuiltIn为schemaVersion=11/configRevision=14，pickupHud=true/400×52/底168/字号20，四文案Pick up、Vitality Apple、Wood、Stone。原F HUD和背包面板默认开启，G距离仍为drops的2米。正常Unity编译、新所属四字段Serializer/SendToOwner/原13输入、十次隔离Editor烘焙静态通过；原地图布置/资源引用及F初值保持。用户已确认本阶段人工GamePlayer验收通过，主线程结合既有静态核对与用户反馈判定通过，范围限本入口、schemaVersion=11/configRevision=14及以下十项清单；未实际触发的独立用例仍UNKNOWN：
 
 1. 按原敌人掉落、砍树、采矿与背包丢弃分别取得苹果/木材/石材，落地且具备资格时显示G、正确物品文案及目标实际数量；All生成的一份Ghost显示其实际总量，不显示固定1。默认G面板在F面板上方16像素，两者无覆盖；无目标时G隐藏。
 2. 多份已落地物同时进入2米范围，仅显示X/Z最近一个；改变站位并停下后按最近目标切换，新G沿实际处理tick选择。精确同距取较小DropId、恰好边界距离及不可精确构造用例保持UNKNOWN，不凭目测推定通过。
@@ -650,4 +650,21 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 9. PlayMode前调整尺寸/底距/字号和四文案、正常导入/烘焙后核对等比显示。旧v10/缺段/缺字段/未知或重复字段/错类型、非有限或非法几何、字号非正、F间隔不足16、空白/控制字符/超61UTF-8字节标签明确失败，不补默认或回退。关闭显示仍校验全部字段；中文/乘号字形与未触发的独立异常保持UNKNOWN。
 10. 停止/释放和再次进入后不显示上一局目标，原宿主/绑定保留、没有新场景UI或世界标记。回归原G保存/数量/飞行/到期/释放，F采集/砍树/采矿及600秒再生、工具耐久/制作、背包Drop/All、战斗奖励/E/R/镜头/阻挡；原地面物本局不存档、重启清空且已保存扣减不返还边界保持。
 
-完成人工核对后恢复SourceMode=Json/Preset=Forest/schema11/revision14、pickupHud=true/400×52/底168/字号20及四个默认文案，原F HUD/面板/工具/丢弃/drops/空间/资源/600秒再生值保持。规则归[拾取提示](MapPickupHud.md)，实际结算归[掉落](MapDrops.md)。原147项验收编号/内容和各旧版本用户通过保持，本阶段不扩展旧通过。AI未执行GamePlayer/PlayMode、游戏模拟/显示系统/GUI回调、逻辑单元测试、命令行构建、发布、性能采样或图片检查；新显示人工及未触发的独立配置/网络/保存分支、字体/布局/预测/性能/带宽/平台/线上仍UNKNOWN。
+本清单对应SourceMode=Json/Preset=Forest/schema11/revision14、pickupHud=true/400×52/底168/字号20及四个默认文案，原F HUD/面板/工具/丢弃/drops/空间/资源/600秒再生值保持。规则归[拾取提示](MapPickupHud.md)，实际结算归[掉落](MapDrops.md)。原147项验收编号/内容和各旧版本用户通过保持，本阶段不扩展旧通过。AI未执行GamePlayer/PlayMode、游戏模拟/显示系统/GUI回调、逻辑单元测试、命令行构建、发布、性能采样或图片检查；本阶段人工通过来自用户反馈，限上述版本与清单；未实际触发的独立配置/网络/保存/预测/字形与布局用例，以及性能/带宽/平台/线上仍UNKNOWN。
+
+## 【KNOWN ISSUES】资源交互目标高亮的人工验收
+
+入口CombatPrototypeNetCode，当前Forest/Grassland的Json/BuiltIn为schemaVersion=12/configRevision=15，interactionHighlight主/F/G开启、采集/树/矿/掉落半径0.65/0.9/0.9/0.45米、线宽3/48段、Ready黄#FFD166/Working绿#6ED88A/G蓝#6EC6FF、opacity=0.9、heightOffset=0.03。原F/G文字与背包面板默认开启。正常Unity编译及14次隔离Editor烘焙静态通过，14个新值/RGB、原输入13/F四/G四、F/G初值、原Prefab及全部布局保持；主线程静态验收通过。本阶段GamePlayer人工为UNKNOWN，以下十项尚待用户运行：
+
+1. 默认Forest进入，静止接近可采集植物/树木/矿点：F文字和黄色圆环对应同一最近权威目标，三类半径分别0.65/0.9/0.9米，远端玩家目标不显示；无目标或资格不符时隐藏。
+2. 开始F采集/砍树/采矿：Working圆环变绿色并跟随原锁定目标，附近更近物体不使其切换；原百分比、1/2/3秒徒手和1.5/2.25秒工具耗时保持，没有客户端提前完成。
+3. 移动/攻击/受击/死亡/超距取消，以及正常完成/耗尽：收到当前权威状态后绿色圈清除，可恢复新有效黄圈或隐藏；资源和所属快照未对齐时允许暂不画，不残留旧圈。
+4. 接近Landed苹果/木材/石材：G文字和蓝色圆环对应同一DropId，半径0.45米、实际数量仍正确；Prepared/Airborne/Consumed不画圈，拾取/到期或目标被他人拿走后随权威状态隐藏/切换。
+5. F/G目标同时有效时最多各一圈，蓝圈先画、黄/绿圈后画；B面板、G/F文字盖在圆环之后。按F/G仍按原处理tick选择，不新增目标锁定、预约或自动拾取。
+6. 旋转/缩放原Main Camera并改变Game视口尺寸：圆环跟随对应资源客户端位置，半径仍为世界米，线宽按1920×1080比例缩放，画面外和近/远裁剪边界无异常；接受圆环作为无真实深度遮挡的屏幕叠加。
+7. PlayMode前分别修改三色、透明度、偏移、四半径、线宽和段数并正常导入/烘焙：值按合法配置生效，不能改变资源占地、阻挡、交互距离或工作耗时；结束恢复本段默认值。
+8. PlayMode前分别关闭高亮主开关/F通道/G通道、关闭对应文字但保留高亮、三文字全关而高亮开启、所有显示全关并重新导入/烘焙：文字与圈独立，关闭文字仍有对应圈，全部显示关闭仅收起显示，原F/G及工具玩法保持。
+9. 两个Client仅显示本人圈；死亡/R、断线/重连、退出/重进、玩家或地图源变化后不残留上一局实体/位置/圈。Ghost晚到或快照分批到达先隐藏再按同身份恢复；不能触发的多玩家/时序分支保持UNKNOWN。
+10. 正常F采集入包、砍树/采矿掉落与600秒再生、G保存入包、工具制作/耗耐久、B/Drop/All以及原E/R/攻击继续；非法/缺失/未知/重复字段、旧v1～v11、非法颜色和边界数值在配置阶段明确失败且不补段/回退。不能触发的保存/解析/绘制独立失败保持UNKNOWN。
+
+本清单默认SourceMode=Json/Preset=Forest/schema12/revision15，interactionHighlight14值与本段一致；原seed/空间/出生/32敌人、F/G HUD、面板/工具/丢弃/drops/树矿/600秒再生保持。规则归[目标高亮](MapInteractionHighlight.md)，实际F/G行为归原资源/掉落模块。原157项验收编号/内容和各旧版本用户通过保持，新高亮不扩展旧通过。AI未运行GamePlayer/PlayMode、游戏模拟/显示系统/GUI回调、逻辑单元测试、命令行构建、发布、性能采样或图片检查。运行效果、网络/生命周期、独立故障、性能/带宽/平台/线上仍UNKNOWN。

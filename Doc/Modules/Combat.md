@@ -222,4 +222,6 @@ MineHarvest 使用独立 Available/Mining/Depleted 状态与服务端计时，�
 
 v10/13接入的[背包丢弃](MapInventoryDrop.md)已接入。丢弃入口位于原工具制作之后、统一F/R之前，复用所属/存活/静止/无Attack且近战Ready资格；资源预约或同tick F/G/E/制作/R拒绝丢弃，原战斗/奖励/伤害链保持。编译/16次隔离烘焙静态通过，用户确认丢弃人工通过限[运行入口](Runtime.md)v10/13十二项，未触发独立用例UNKNOWN；原用户通过限各自版本/清单。
 
-当前v11/14的[G提示](MapPickupHud.md)共用原G资格，移动、Attack请求或近战非Ready时隐藏；只读掉落显示数据，不改变伤害、奖励、F/G同tick或保存入包次序。编译/十次隔离烘焙静态通过，新显示人工UNKNOWN，旧用户通过保持原版本/清单。
+v11/14阶段的[G提示](MapPickupHud.md)共用原G资格，移动、Attack请求或近战非Ready时隐藏；只读掉落显示数据，不改变伤害、奖励、F/G同tick或保存入包次序。编译/十次隔离烘焙静态通过，用户确认新显示人工通过，限v11/14十项，未触发用例UNKNOWN，旧用户通过保持原版本/清单。
+
+当前v12/15的[高亮](MapInteractionHighlight.md)与原F/G文字共用资格快照；Working跟随原锁定资源，圆环不消费输入、预约资源或发奖。原伤害/奖励、F/G同tick及保存次序保持，新显示静态通过、人工UNKNOWN，旧通过仍限各自版本/清单。

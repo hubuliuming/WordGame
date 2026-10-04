@@ -118,6 +118,20 @@ namespace Code_01.CombatPrototype.Map
                     WoodLabel = new FixedString64Bytes(pickupHud.woodLabel),
                     StoneLabel = new FixedString64Bytes(pickupHud.stoneLabel)
                 });
+                var highlight = config.map.interactionHighlight;
+                AddComponent(entity, new CombatPrototypeMapInteractionHighlightSettings
+                {
+                    Enabled = (byte)(highlight.enabled ? 1 : 0),
+                    FTargetsEnabled = (byte)(highlight.fTargetsEnabled ? 1 : 0),
+                    GTargetsEnabled = (byte)(highlight.gTargetsEnabled ? 1 : 0),
+                    GatherRadius = highlight.gatherRadiusMeters, TreeRadius = highlight.treeRadiusMeters,
+                    MineRadius = highlight.mineRadiusMeters, DropRadius = highlight.dropRadiusMeters,
+                    LineWidthPixels = highlight.lineWidthPixels, SegmentCount = highlight.segmentCount,
+                    ReadyColor = CombatPrototypeMapInteractionHighlightSettings.ColorFromHex(highlight.readyColorHex),
+                    WorkingColor = CombatPrototypeMapInteractionHighlightSettings.ColorFromHex(highlight.workingColorHex),
+                    PickupColor = CombatPrototypeMapInteractionHighlightSettings.ColorFromHex(highlight.pickupColorHex),
+                    Opacity = highlight.opacity, HeightOffset = highlight.heightOffsetMeters
+                });
                 var inventoryPanel = config.map.inventoryPanel;
                 AddComponent(entity, new CombatPrototypeMapInventoryPanelSettings
                 {

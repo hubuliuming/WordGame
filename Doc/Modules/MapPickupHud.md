@@ -19,11 +19,11 @@
 
 ## 【FACT】当前 JSON 契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为 schemaVersion=11/configRevision=14，pickupHud 段及全部九字段必填。沿原严格 UTF-8/缺失/未知/重复字段/类型和语义校验；旧 v1～v10 明确失败，不迁移、补默认段或回退来源。正常导入/烘焙后生效，没有运行热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为 schemaVersion=12/configRevision=15，pickupHud段及全部九字段必填，[interactionHighlight](MapInteractionHighlight.md)亦为必填地图段。沿原严格 UTF-8/缺失/未知/重复字段/类型和语义校验；旧 v1～v11 明确失败，不迁移、补默认段或回退来源。正常导入/烘焙后生效，没有运行热重载。
 
 | 字段 | 当前默认值 | 契约 |
 |---|---|---|
-| enabled | true | 仅控制 G 提示；关闭后服务端快照 Hidden，原 G 结算继续 |
+| enabled | true | 仅控制 G 文字；G 文字与 G 高亮均关闭时快照 Hidden，原 G 结算继续 |
 | panelWidthPixels | 400 | 有限，32 < 宽度 <= 1920 |
 | panelHeightPixels | 52 | 有限正数，至少 fontSize+32 |
 | bottomMarginPixels | 168 | 有限非负；高度+底距<=1080，且至少为 F 面板底距+高度+16 |
@@ -41,7 +41,7 @@
 
 DropTargetSelector 沿原算法遍历 Landed 且未到期掉落，按本人 X/Z 中心距离筛选，距离<=原 PickupDistance，取最近一个；精确同距选较小 DropId。Prepared、Airborne、Consumed、到期和超范围物体排除，lifetime=0 的原永不到期规则保持。按 G 仍由实际处理 tick 重新选择，不上传客户端目标，也不锁定/预约正在显示的物体；多人请求仍按 NetworkId 升序，保存成功才库存提交/Consumed。
 
-PickupHudStateSystem 在服务端 PredictedSimulation、PlayerRespawn 后执行，读取本 tick 原掉落运动/拾取/到期处理后的状态及服务端模拟时间。每 tick 重建所属玩家显示帧，只有字段变化才写入；无目标、资格拒绝、显示关闭、连接失效、未采样和系统停止时清为 Hidden。单个玩家采样异常记录地图、NetworkId、玩家、DropId、阶段和原异常，继续其他玩家，未形成有效帧者清空。必需组件/配置缺失明确暴露，不创建默认数据或替代服务。
+PickupHudStateSystem 在服务端 PredictedSimulation、PlayerRespawn 后执行，读取本 tick 原掉落运动/拾取/到期处理后的状态及服务端模拟时间。每 tick 重建所属玩家显示帧，只有字段变化才写入；无目标、资格拒绝、G文字与G高亮均关闭、连接失效、未采样和系统停止时清为Hidden；采样条件为pickupHud.enabled或interactionHighlight.enabled且gTargetsEnabled。单个玩家采样异常记录地图、NetworkId、玩家、DropId、阶段和原异常，继续其他玩家，未形成有效帧者清空。必需组件/配置缺失明确暴露，不创建默认数据或替代服务。
 
 提示只写 PickupHudState；不修改 DropPhase/Quantity/进度、库存、Tools、奖励、资源预约、输入或存档，不控制运动、到期和释放。保存失败后的未到期目标仍可显示；提示不是保存成功标志，也没有新增拾取成功/失败反馈、动画或自动拾取。
 
@@ -60,16 +60,18 @@ CombatPrototypeMapPickupHudState 使用 OwnerSendType=SendToOwner，四个 Ghost
 
 ## 【CURRENT STRATEGY】显示、开关与释放
 
-沿原绑定枚举启用 GhostOwnerIsLocal 并核对所属 Connected/InGame 连接，只取本地存活玩家快照；不在含可启用组件的查询上调用单例 API。新帮助类仅读取烘焙 Settings 和显示快照，不读 PlayerView/世界坐标，不修改玩家或服务端数据。Main Camera 原宿主先委托 G 绘制，再走原 F 面板路径，原 B 面板/输入和制作/丢弃反馈保持。
+沿原绑定枚举启用 GhostOwnerIsLocal 并核对所属 Connected/InGame 连接，只取本地存活玩家快照；不在含可启用组件的查询上调用单例 API。PickupHudClient只读取烘焙Settings和显示快照，不读PlayerView/世界坐标，不修改玩家或服务端数据。原绑定另委托[高亮解析](MapInteractionHighlight.md)读取对应客户端掉落位置；Main Camera原宿主先画G/F圆环，再走原B、G、F面板路径，原输入和制作/丢弃反馈保持。
 
 Ready 显示“G  Pick up  物品文案 ×实际数量”，Hidden 收起；DropId 保留在快照中供目标身份记录，屏幕不显示数值 ID。1920×1080 参考像素按 min(屏幕宽/1920,屏幕高/1080) 等比缩放，底部居中。默认400×52、底距168、字号20，与原320×104、底距48的 F 面板间隔16像素；两种提示可同时显示。黑色背景alpha=0.7、白色文字，复用内置GUI字体及Texture2D.whiteTexture，richText=false；仅Repaint绘制，缓存稳定文案/样式，恢复GUI.matrix/color，不接管鼠标或键盘事件。
 
-pickupHud.enabled、interactionHud.enabled、inventoryPanel.enabled 三者独立。关闭 G 提示不关闭实际拾取；关闭 F HUD 和背包面板仍可只显示 G；三者都关闭时原绑定收起，键盘原玩法继续。死亡/断线、无本地玩家或地图、玩家/地图源变化、World/Scene停止及释放沿原Clear/Reset清掉可见状态和缓存，不保留上一局目标。非法网络快照明确报错并保持 G 隐藏，不以默认标签伪装有效目标。
+pickupHud.enabled、interactionHud.enabled、inventoryPanel.enabled与interactionHighlight的主开关/F/G通道独立。关闭G文字仍可显示G高亮和实际拾取；关闭F HUD和背包面板仍可只显示G。三文字全关闭且没有启用的高亮通道时原绑定收起，键盘原玩法继续。死亡/断线、无本地玩家或地图、玩家/地图源变化、World/Scene停止及释放沿原Clear/Reset清掉可见状态和缓存，不保留上一局目标。非法网络快照明确报错并保持 G 隐藏，不以默认标签伪装有效目标。
 
 ## 【KNOWN ISSUES】静态证据与人工边界
 
-正常 Unity 编译无 C# Error，五脚本/meta、新 Serializer/Snapshot 四字段与 SendToOwner、原13输入字段及系统入口已静态核对。Forest/Grassland 各覆盖 Json 默认、BuiltIn 默认、Json 关闭 G 提示、Json 关闭 F HUD和背包但保留G、Json 三种显示全关闭，共十次隔离 Editor 烘焙。schema11/revision14、全部新 Settings、玩家 Hidden/DropId0/空ItemId/Quantity0、原 F 初值/丢弃反馈、原掉落 Prefab/Prepared 和原布局一致。森林/草原树木89/53、采集点36/38、矿点20/18、阻挡109/71保持，布置位置/朝向逐项一致。
+v11/14拾取文字阶段正常Unity编译无C# Error，五脚本/meta、新Serializer/Snapshot 四字段与 SendToOwner、原13输入字段及系统入口已静态核对。Forest/Grassland 各覆盖 Json 默认、BuiltIn 默认、Json 关闭 G 提示、Json 关闭 F HUD和背包但保留G、Json 三种显示全关闭，共十次隔离 Editor 烘焙。schema11/revision14、全部新 Settings、玩家 Hidden/DropId0/空ItemId/Quantity0、原 F 初值/丢弃反馈、原掉落 Prefab/Prepared 和原布局一致。森林/草原树木89/53、采集点36/38、矿点20/18、阻挡109/71保持，布置位置/朝向逐项一致。
 
 编译前 Console [0 Error,5 Warning,48 Log]；编译新增两条来自未修改 PEListener/DOTweenPreviewManager 的既有代码警告，没有新增 C# Error。隔离烘焙前后均[0 Error,7 Warning,48 Log]，无新增烘焙错误/警告；原五条运行 Tick Batching 警告保留，没有清空Console。原主场景干净，临时 World/Scene 与临时 TextAsset 已释放。
 
-主线程静态验收通过；本阶段 GamePlayer 人工结果为 UNKNOWN，见[运行入口](Runtime.md)十项清单。实际排版/字形/缩放、临界距离/同距、同tick、延迟/预测回放、多玩家/晚加入、断线/重连和独立配置/快照/保存失败未运行验证。原丢弃v10/13、面板v9/12、工具v8/11、F HUD v7/10等用户通过保持各自版本/清单，不覆盖本次新显示。字体、运行性能/带宽、平台/线上及原保存成功后意外ECS恢复仍UNKNOWN。AI未运行GamePlayer/PlayMode、游戏模拟/显示系统/GUI回调、逻辑单元测试、命令行构建、发布、性能采样或图片检查，未创建子Agent或提交Git。
+用户已确认本阶段人工GamePlayer验收通过，主线程结合既有静态核对与用户反馈判定通过，范围限CombatPrototypeNetCode、schemaVersion=11/configRevision=14及[运行入口](Runtime.md)十项清单。人工结论来自用户反馈；未实际触发的独立排版/字形/缩放、临界距离/同距、同tick、延迟/预测回放、多玩家/晚加入、断线/重连及配置/快照/保存失败仍为UNKNOWN。原丢弃v10/13、面板v9/12、工具v8/11、F HUD v7/10等用户通过保持各自版本/清单，不覆盖本次新显示。未验证的字体覆盖、运行性能/带宽、平台/线上及原保存成功后意外ECS恢复仍UNKNOWN。AI未运行GamePlayer/PlayMode、游戏模拟/显示系统/GUI回调、逻辑单元测试、命令行构建、发布、性能采样或图片检查，未创建子Agent或提交Git。
+
+当前v12/15的[高亮](MapInteractionHighlight.md)按原DropId解析同一客户端Landed Ghost，不另选最近目标或改变按G时的服务端选择。已核对新增14配置值、原G/F初值与13输入；正常编译及14次隔离Editor烘焙静态通过。新圆环的GamePlayer效果、网络/生命周期与独立失败用例仍UNKNOWN；上述v11/14文字提示用户通过保持原范围。

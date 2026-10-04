@@ -10,7 +10,7 @@ namespace Code_01.CombatPrototype.Map
             if (config == null || config.map == null || config.map.geometry == null ||
                 config.map.layout == null || config.map.movement == null || config.map.drops == null || config.map.treeHarvest == null ||
                 config.map.mining == null || config.map.gatherTools == null || config.map.gatherTools.tools == null ||
-                config.map.interactionHud == null || config.map.pickupHud == null || config.map.inventoryPanel == null || config.map.inventoryDrop == null || config.map.inventoryDrop.items == null ||
+                config.map.interactionHud == null || config.map.pickupHud == null || config.map.interactionHighlight == null || config.map.inventoryPanel == null || config.map.inventoryDrop == null || config.map.inventoryDrop.items == null ||
                 config.map.population == null || config.map.spawn == null ||
                 config.biomes == null || config.grounds == null || config.objects == null ||
                 config.map.biomeIds == null || config.map.biomeRegions == null)
@@ -30,11 +30,12 @@ namespace Code_01.CombatPrototype.Map
             HudLabel(hud.treeLabel, "interactionHud.treeLabel");
             HudLabel(hud.mineLabel, "interactionHud.mineLabel");
             ValidatePickupHud(map.pickupHud, hud);
+            ValidateInteractionHighlight(map.interactionHighlight);
             ValidateInventoryPanel(map.inventoryPanel);
             ValidateInventoryDrop(map.inventoryDrop);
             Id(map.mapDefinitionId, "mapDefinitionId");
-            if (map.schemaVersion != 11 || map.configRevision < 1 || map.defaultSeed < 1)
-                throw new InvalidOperationException("Map requires schemaVersion=11, positive revision and seed.");
+            if (map.schemaVersion != 12 || map.configRevision < 1 || map.defaultSeed < 1)
+                throw new InvalidOperationException("Map requires schemaVersion=12, positive revision and seed.");
             var drops = map.drops;
             Id(drops.itemId, "drops.itemId");
             Id(drops.visualResourceKey, "drops.visualResourceKey");
@@ -224,6 +225,44 @@ namespace Code_01.CombatPrototype.Map
                 if (region.minX < 0f || region.minZ < 0f || region.maxX > 1f || region.maxZ > 1f ||
                     region.minX >= region.maxX || region.minZ >= region.maxZ)
                     throw new InvalidOperationException("Biome region must be a nonempty normalized rectangle.");
+            }
+        }
+
+        private static void ValidateInteractionHighlight(MapInteractionHighlightConfig highlight)
+        {
+            HighlightRadius(highlight.gatherRadiusMeters, "interactionHighlight.gatherRadiusMeters");
+            HighlightRadius(highlight.treeRadiusMeters, "interactionHighlight.treeRadiusMeters");
+            HighlightRadius(highlight.mineRadiusMeters, "interactionHighlight.mineRadiusMeters");
+            HighlightRadius(highlight.dropRadiusMeters, "interactionHighlight.dropRadiusMeters");
+            Finite(highlight.lineWidthPixels, "interactionHighlight.lineWidthPixels");
+            Finite(highlight.opacity, "interactionHighlight.opacity");
+            Finite(highlight.heightOffsetMeters, "interactionHighlight.heightOffsetMeters");
+            if (highlight.lineWidthPixels < 1f || highlight.lineWidthPixels > 8f ||
+                highlight.segmentCount < 32 || highlight.segmentCount > 96 ||
+                highlight.opacity <= 0f || highlight.opacity > 1f ||
+                highlight.heightOffsetMeters < 0f || highlight.heightOffsetMeters > 1f)
+                throw new InvalidOperationException("interactionHighlight requires line width in [1,8], " +
+                    "integer segments in [32,96], opacity in (0,1], and height offset in [0,1].");
+            HighlightColor(highlight.readyColorHex, "interactionHighlight.readyColorHex");
+            HighlightColor(highlight.workingColorHex, "interactionHighlight.workingColorHex");
+            HighlightColor(highlight.pickupColorHex, "interactionHighlight.pickupColorHex");
+        }
+
+        private static void HighlightRadius(float value, string field)
+        {
+            Positive(value, field);
+            if (value > 5f) throw new InvalidOperationException(field + " must be in (0,5].");
+        }
+
+        private static void HighlightColor(string value, string field)
+        {
+            if (value == null || value.Length != 7 || value[0] != '#')
+                throw new InvalidOperationException(field + " requires #RRGGBB.");
+            for (var i = 1; i < value.Length; i++)
+            {
+                var c = value[i];
+                if (!(c >= '0' && c <= '9') && !(c >= 'a' && c <= 'f') && !(c >= 'A' && c <= 'F'))
+                    throw new InvalidOperationException(field + " requires #RRGGBB.");
             }
         }
 

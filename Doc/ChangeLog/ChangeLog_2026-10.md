@@ -630,3 +630,18 @@
 - 原G资格及最近Landed/未到期/XZ距离/同距DropId选择抽为共用只读入口，结算、请求排序/次序及SavePrepared先于库存/Consumed保持；服务端在PlayerRespawn后采样，仅写Mode/DropId/ItemId/Quantity所属快照。原13输入、F四字段、丢弃反馈与v2/v1存储保持；三显示开关独立，生命周期失效清缓存，新提示不控制输入、产出、运动/到期或保存。
 - 正常Unity编译无C# Error，新Serializer/SendToOwner与类型、十次隔离Editor烘焙静态通过；两模板/两来源、G关闭、F/面板关闭但保留G、三者全关的设置/玩家初值/原Prefab及布置一致。编译前Console[0 Error,5 Warning,48 Log]，新增两条未修改第三方/工具代码警告；烘焙前后[0 Error,7 Warning,48 Log]，无新增烘焙错误/警告，旧运行警告保留且未清Console，主场景干净、临时World/Scene/TextAsset释放。
 - 增量同步新专题、相关模块、导航、项目外配置模板与Runtime十项人工清单，原147项人工编号/内容及旧版本用户通过范围保持。主线程静态验收通过，新显示GamePlayer人工UNKNOWN；未修改旧meta/资源绑定/图片/字体/网格/材质、包/构建设置或存储类。AI未运行GamePlayer/PlayMode、游戏模拟/显示系统/GUI回调、逻辑单元测试、命令行构建、发布、性能采样或图片检查，未创建子Agent或提交Git。
+
+## 2026-10-04 用户确认掉落物拾取提示与目标显示人工验收通过
+
+- 用户明确反馈“我已验收通过，接下来下一阶段”。主线程结合此前代码/编译/十次隔离Editor烘焙静态核对与本次反馈判定阶段通过，范围限CombatPrototypeNetCode、schemaVersion=11/configRevision=14及运行入口拾取提示十项清单；人工结论来自用户反馈。
+- 增量同步拾取提示专题、运行入口、地图、背包、掉落、丢弃、材料面板、工具、F交互HUD、树木、采矿、玩家、战斗、资源与数据及项目外配置建议模板的验收状态。参数、全部人工验收编号/内容与旧阶段通过范围保持；未实际触发的独立配置/快照/保存/网络/同tick/预测/字形与布局用例仍UNKNOWN。
+- 本次只同步文档，未修改脚本、JSON、Scene、Prefab、Animator、meta/资源绑定、导航、包或构建配置。字体覆盖、运行性能/带宽、平台/线上及原保存成功后意外ECS恢复未验证；地面物本局不存档、重启消失且不返还已保存扣减边界保持。
+- AI未执行GamePlayer/PlayMode、游戏模拟/显示系统/GUI回调、逻辑单元测试、命令行构建、发布、性能采样或图片检查，未创建子Agent或提交Git。
+
+## 2026-10-04 资源交互目标高亮落地
+
+- 按用户确认范围在CombatPrototypeNetCode复用原F/G所属四字段目标接入Ready黄圈、Working锁定绿圈和G蓝圈，最多各一圈；读取对应客户端LocalToWorld，经原Main Camera投影到屏幕，G先F后、原面板随后，无真实深度遮挡。
+- Forest/Grassland Json与BuiltIn升级schemaVersion=12/configRevision=15，必填interactionHighlight14字段；默认主/F/G开启、半径0.65/0.9/0.9/0.45米、线宽3/48段、#FFD166/#6ED88A/#6EC6FF、透明度0.9/偏移0.03米。沿原严格字段/类型与有限数值/范围/#RRGGBB校验，关闭仍验证，旧v1～v11拒绝，不补段或回退。
+- 五新职责脚本及Unity正常生成meta，原Map Baker追加固定Settings；原HUD/绑定委托普通解析/投影/客户端帮助类，Awake读取同对象Camera。只调整原F/G显示采样开关，文字关闭而对应高亮开启仍采样；三文字全关且高亮无启用通道才收起绑定，沿原所属连接/玩家及生命周期清缓存。
+- 正常Unity编译无C# Error，五类型/14配置字段、原13输入与F/G各四字段静态核对；两模板/两来源及主/F/G开关、三文字关/高亮开、全部显示关共14次隔离Editor烘焙通过。新Settings/RGB、原初值/反馈/掉落Prefab/Prepared及全部布置位置/朝向一致，Console前后[0 Error,6 Warning,47 Log]无新增错误/警告，保留原日志，主场景干净、临时World/Scene/TextAsset释放。
+- 增量同步新专题、相关模块、导航、项目外配置建议模板与Runtime十项人工清单；保留全部原157项编号/内容及旧版本用户通过范围。主线程静态验收通过，新高亮GamePlayer人工UNKNOWN；未改Player Baker、输入/Ghost/RPC、玩法选择/结算/存储、Scene/SubScene/Prefab/Animator结构、旧meta/资源绑定/网格/材质/图片/字体、包或构建配置。AI未执行PlayMode、游戏模拟/显示系统/GUI回调、逻辑单元测试、命令行构建、发布、性能采样或图片检查，未创建子Agent或提交Git。

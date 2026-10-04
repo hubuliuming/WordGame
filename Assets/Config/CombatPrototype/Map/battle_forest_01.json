@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 11,
-  "configRevision": 14,
+  "schemaVersion": 12,
+  "configRevision": 15,
   "mapDefinitionId": "battle_forest_01",
   "defaultSeed": 12345,
   "geometry": {
@@ -103,6 +103,22 @@
     "appleLabel": "Vitality Apple",
     "woodLabel": "Wood",
     "stoneLabel": "Stone"
+  },
+  "interactionHighlight": {
+    "enabled": true,
+    "fTargetsEnabled": true,
+    "gTargetsEnabled": true,
+    "gatherRadiusMeters": 0.65,
+    "treeRadiusMeters": 0.9,
+    "mineRadiusMeters": 0.9,
+    "dropRadiusMeters": 0.45,
+    "lineWidthPixels": 3.0,
+    "segmentCount": 48,
+    "readyColorHex": "#FFD166",
+    "workingColorHex": "#6ED88A",
+    "pickupColorHex": "#6EC6FF",
+    "opacity": 0.9,
+    "heightOffsetMeters": 0.03
   },
   "inventoryPanel": {
     "enabled": true,

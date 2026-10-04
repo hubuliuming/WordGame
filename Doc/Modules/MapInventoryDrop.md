@@ -21,7 +21,7 @@
 
 ## 【FACT】JSON契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=11/configRevision=14。inventoryDrop全部字段必填，沿原严格UTF-8/缺失/未知/重复字段及类型检查；旧v1～v10明确失败，不补段或回退来源。disabled仍校验全部字段与资源绑定；正常导入/烘焙后生效，没有运行热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=12/configRevision=15。inventoryDrop全部字段必填，沿原严格UTF-8/缺失/未知/重复字段及类型检查；旧v1～v11明确失败，不补段或回退来源。disabled仍校验全部字段与资源绑定；正常导入/烘焙后生效，没有运行热重载。
 
 | 字段 | 默认值 | 契约 |
 |---|---|---|
@@ -72,4 +72,6 @@ DropPhase追加Prepared=3，原Airborne/Landed/Consumed值0/1/2保持。Prefab�
 
 用户已确认本阶段人工GamePlayer验收通过，主线程结合既有静态核对与用户反馈判定通过，范围限CombatPrototypeNetCode、schemaVersion=10/configRevision=13及[运行入口](Runtime.md)丢弃十二项清单。人工结论来自用户反馈；未实际触发的按钮布局/命中、事件顺序、同tick、延迟/预测回放、多玩家/晚加入、独立保存/准备创建/提交/清理及文件替换后意外ECS恢复仍为UNKNOWN。用户此前面板v9/12、工具v8/11、HUD v7/10等人工通过仍限各自原版本/清单，不覆盖新增丢弃。字体、运行性能/带宽、平台/线上未验收；AI未执行PlayMode、逻辑单元测试、命令行构建、发布、性能采样或图片检查，未创建子Agent或提交Git。
 
-当前v11/14新增[G提示](MapPickupHud.md)，与实际拾取共用资格/最近目标并显示实际数量；inventoryDrop列表不控制提示标签。未改变丢弃事务、请求/反馈、原13输入字段或v2存档；G新显示静态通过、人工UNKNOWN，丢弃用户通过仍限v10/13十二项。
+v11/14阶段新增[G提示](MapPickupHud.md)，与实际拾取共用资格/最近目标并显示实际数量；inventoryDrop列表不控制提示标签。未改变丢弃事务、请求/反馈、原13输入字段或v2存档；G新显示静态及用户人工通过，限v11/14十项，未触发用例UNKNOWN，丢弃用户通过仍限v10/13十二项。
+
+当前v12/15的[资源高亮](MapInteractionHighlight.md)只读取原F/G目标快照和对应客户端资源/掉落位置，不改变Drop/All请求、反馈、保存/扣料或地面生命周期。原13输入与玩家Ghost字段保持；新高亮静态通过、人工UNKNOWN，旧丢弃/G文字通过仍限原版本/清单。

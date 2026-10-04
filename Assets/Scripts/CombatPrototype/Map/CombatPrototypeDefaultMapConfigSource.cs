@@ -17,7 +17,7 @@ namespace Code_01.CombatPrototype.Map
             {
                 map = new MapDefinitionConfig
                 {
-                    schemaVersion = 11, configRevision = 14,
+                    schemaVersion = 12, configRevision = 15,
                     mapDefinitionId = mapDefinitionId, defaultSeed = 12345,
                     geometry = new MapGeometryConfig
                     {
@@ -85,6 +85,15 @@ namespace Code_01.CombatPrototype.Map
                         enabled = true, panelWidthPixels = 400f, panelHeightPixels = 52f,
                         bottomMarginPixels = 168f, fontSize = 20, pickupLabel = "Pick up",
                         appleLabel = "Vitality Apple", woodLabel = "Wood", stoneLabel = "Stone"
+                    },
+                    interactionHighlight = new MapInteractionHighlightConfig
+                    {
+                        enabled = true, fTargetsEnabled = true, gTargetsEnabled = true,
+                        gatherRadiusMeters = 0.65f, treeRadiusMeters = 0.9f,
+                        mineRadiusMeters = 0.9f, dropRadiusMeters = 0.45f,
+                        lineWidthPixels = 3f, segmentCount = 48,
+                        readyColorHex = "#FFD166", workingColorHex = "#6ED88A", pickupColorHex = "#6EC6FF",
+                        opacity = 0.9f, heightOffsetMeters = 0.03f
                     },
                     inventoryPanel = new MapInventoryPanelConfig
                     {

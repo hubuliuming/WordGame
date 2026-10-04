@@ -14,12 +14,18 @@ namespace Code_01.CombatPrototype.Map
         private CombatPrototypeMapInteractionHud _hud;
         private Entity _source;
         private Entity _player;
+        private CombatPrototypeMapInteractionHighlightTargetResolver _highlightTargets;
 
         protected override void OnCreate()
         {
             RequireForUpdate<CombatPrototypeMapData>();
             RequireForUpdate<CombatPrototypePlayerSpawner>();
             _map = GetEntityQuery(ComponentType.ReadOnly<CombatPrototypeMapData>());
+            _highlightTargets = new CombatPrototypeMapInteractionHighlightTargetResolver(
+                GetEntityQuery(ComponentType.ReadOnly<CombatPrototypeMapGatherState>()),
+                GetEntityQuery(ComponentType.ReadOnly<CombatPrototypeMapTreeState>()),
+                GetEntityQuery(ComponentType.ReadOnly<CombatPrototypeMapMineState>()),
+                GetEntityQuery(ComponentType.ReadOnly<CombatPrototypeMapDropState>()));
         }
 
         public void RegisterHud(CombatPrototypeMapInteractionHud hud)
@@ -27,6 +33,7 @@ namespace Code_01.CombatPrototype.Map
             if (_hud != null && _hud != hud)
                 throw new InvalidOperationException("[CombatPrototype.Map] World=" + World.Name + " already has a registered HUD.");
             _hud = hud;
+            _highlightTargets.Reset();
             _source = Entity.Null;
             _player = Entity.Null;
             _hud.Reset();
@@ -36,6 +43,7 @@ namespace Code_01.CombatPrototype.Map
         {
             if (_hud != hud) return;
             _hud.Reset();
+            _highlightTargets.Reset();
             _hud = null;
             _source = Entity.Null;
             _player = Entity.Null;
@@ -46,10 +54,14 @@ namespace Code_01.CombatPrototype.Map
             Dependency.Complete();
             if (_hud != null) _hud.Clear();
             var source = _map.GetSingletonEntity();
+            var map = EntityManager.GetComponentData<CombatPrototypeMapData>(source);
             var settings = EntityManager.GetComponentData<CombatPrototypeMapInteractionHudSettings>(source);
             var inventorySettings = EntityManager.GetComponentData<CombatPrototypeMapInventoryPanelSettings>(source);
             var pickupSettings = EntityManager.GetComponentData<CombatPrototypeMapPickupHudSettings>(source);
-            if (settings.Enabled == 0 && inventorySettings.Enabled == 0 && pickupSettings.Enabled == 0)
+            var highlightSettings = EntityManager.GetComponentData<CombatPrototypeMapInteractionHighlightSettings>(source);
+            var hasHighlight = highlightSettings.Enabled != 0 &&
+                (highlightSettings.FTargetsEnabled != 0 || highlightSettings.GTargetsEnabled != 0);
+            if (settings.Enabled == 0 && inventorySettings.Enabled == 0 && pickupSettings.Enabled == 0 && !hasHighlight)
             {
                 ResetBinding();
                 return;
@@ -62,22 +74,29 @@ namespace Code_01.CombatPrototype.Map
             if (EntityManager.GetComponentData<CombatPrototypePlayerHealth>(player).IsDead != 0) { ResetBinding(); return; }
             if (source != _source || player != _player)
             {
+                _highlightTargets.Reset();
                 var toolSettings = EntityManager.GetComponentData<CombatPrototypeMapGatherToolSettings>(source);
                 var definitions = EntityManager.GetBuffer<CombatPrototypeMapGatherToolDefinition>(source, true);
                 _hud.Configure(settings, inventorySettings, toolSettings,
                     CombatPrototypeMapGatherToolUtility.RequireDefinition(definitions, CombatPrototypeMapGatherToolKind.Axe),
                     CombatPrototypeMapGatherToolUtility.RequireDefinition(definitions, CombatPrototypeMapGatherToolKind.Pickaxe),
                     EntityManager.GetComponentData<CombatPrototypeMapInventoryDropSettings>(source),
-                    EntityManager.GetBuffer<CombatPrototypeMapInventoryDropDefinition>(source, true), pickupSettings);
+                    EntityManager.GetBuffer<CombatPrototypeMapInventoryDropDefinition>(source, true), pickupSettings,
+                    highlightSettings, map.MapDefinitionId.ToString());
                 _source = source;
                 _player = player;
             }
-            _hud.Show(EntityManager.GetComponentData<CombatPrototypeMapInteractionHudState>(player),
+            var interaction = EntityManager.GetComponentData<CombatPrototypeMapInteractionHudState>(player);
+            var pickup = EntityManager.GetComponentData<CombatPrototypeMapPickupHudState>(player);
+            _hud.Show(interaction,
                 EntityManager.GetBuffer<CombatPrototypeMapGatherTool>(player, true),
                 EntityManager.GetComponentData<CombatPrototypeMapToolCraftFeedback>(player),
                 EntityManager.GetComponentData<CombatPrototypeMapInventoryDropFeedback>(player),
                 EntityManager.GetBuffer<CombatPrototypeInventoryItem>(player, true), source, player,
-                EntityManager.GetComponentData<CombatPrototypeMapPickupHudState>(player));
+                pickup);
+            _highlightTargets.Resolve(EntityManager, World.Name, map, highlightSettings,
+                EntityManager.GetComponentData<GhostOwner>(player).NetworkId, interaction, pickup, out var f, out var g);
+            _hud.ShowHighlight(f, g);
         }
 
         internal bool ReadPanelInput(Keyboard keyboard, Mouse mouse, out bool craftAxe, out bool craftPickaxe,
@@ -127,6 +146,7 @@ namespace Code_01.CombatPrototype.Map
 
         private void ResetBinding()
         {
+            _highlightTargets.Reset();
             if (_hud != null) _hud.Reset();
             _source = Entity.Null;
             _player = Entity.Null;

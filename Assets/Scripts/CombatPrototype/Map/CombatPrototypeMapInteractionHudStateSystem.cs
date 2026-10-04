@@ -49,7 +49,8 @@ namespace Code_01.CombatPrototype.Map
             var source = SystemAPI.GetSingletonEntity<CombatPrototypeMapData>();
             var map = EntityManager.GetComponentData<CombatPrototypeMapData>(source);
             var settings = EntityManager.GetComponentData<CombatPrototypeMapInteractionHudSettings>(source);
-            if (settings.Enabled == 0)
+            var highlight = EntityManager.GetComponentData<CombatPrototypeMapInteractionHighlightSettings>(source);
+            if (settings.Enabled == 0 && (highlight.Enabled == 0 || highlight.FTargetsEnabled == 0))
             {
                 CommitFrames();
                 return;

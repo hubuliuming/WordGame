@@ -40,6 +40,15 @@ namespace Code_01.CombatPrototype.Map
         private bool _visible;
         private readonly CombatPrototypeMapInventoryPanel _inventoryPanel = new CombatPrototypeMapInventoryPanel();
         private readonly CombatPrototypeMapPickupHudClient _pickupHud = new CombatPrototypeMapPickupHudClient();
+        private readonly CombatPrototypeMapInteractionHighlightClient _highlight = new CombatPrototypeMapInteractionHighlightClient();
+        private Camera _highlightCamera;
+
+        private void Awake()
+        {
+            _highlightCamera = GetComponent<Camera>();
+            if (_highlightCamera == null)
+                throw new InvalidOperationException("[CombatPrototype.Map] The Main Camera HUD requires its existing Camera component.");
+        }
 
         private void OnEnable()
         {
@@ -84,7 +93,8 @@ namespace Code_01.CombatPrototype.Map
         internal void Configure(CombatPrototypeMapInteractionHudSettings settings,
             CombatPrototypeMapInventoryPanelSettings inventorySettings, CombatPrototypeMapGatherToolSettings toolSettings, CombatPrototypeMapGatherToolDefinition axe,
             CombatPrototypeMapGatherToolDefinition pickaxe, CombatPrototypeMapInventoryDropSettings dropSettings,
-            DynamicBuffer<CombatPrototypeMapInventoryDropDefinition> dropDefinitions, CombatPrototypeMapPickupHudSettings pickupSettings)
+            DynamicBuffer<CombatPrototypeMapInventoryDropDefinition> dropDefinitions, CombatPrototypeMapPickupHudSettings pickupSettings,
+            CombatPrototypeMapInteractionHighlightSettings highlightSettings, string mapId)
         {
             Reset();
             _settings = settings;
@@ -98,6 +108,7 @@ namespace Code_01.CombatPrototype.Map
             _mineLabel = settings.MineLabel.ToString();
             _inventoryPanel.Configure(inventorySettings, toolSettings, axe, pickaxe, dropSettings, dropDefinitions);
             _pickupHud.Configure(pickupSettings);
+            _highlight.Configure(highlightSettings, mapId, _highlightCamera);
         }
 
         internal void Show(CombatPrototypeMapInteractionHudState state, DynamicBuffer<CombatPrototypeMapGatherTool> tools,
@@ -144,6 +155,11 @@ namespace Code_01.CombatPrototype.Map
                 ToolStatus(state.Kind == (byte)CombatPrototypeMapInteractionKind.Tree ?
                     CombatPrototypeMapGatherToolKind.Axe : CombatPrototypeMapGatherToolKind.Pickaxe);
             _visible = true;
+        }
+
+        internal void ShowHighlight(CombatPrototypeMapInteractionHighlightFrame f, CombatPrototypeMapInteractionHighlightFrame g)
+        {
+            _highlight.Show(f, g);
         }
 
         private void RefreshToolStatus(DynamicBuffer<CombatPrototypeMapGatherTool> tools)
@@ -235,6 +251,7 @@ namespace Code_01.CombatPrototype.Map
             _visible = false;
             _inventoryPanel.Clear();
             _pickupHud.Clear();
+            _highlight.Clear();
         }
 
         internal void Reset()
@@ -242,6 +259,7 @@ namespace Code_01.CombatPrototype.Map
             Clear();
             _inventoryPanel.Reset();
             _pickupHud.Reset();
+            _highlight.Reset();
             _labelStyle = null;
             _text = _toolText = _feedbackText = string.Empty;
             _mode = CombatPrototypeMapInteractionHudMode.Hidden;
@@ -258,6 +276,7 @@ namespace Code_01.CombatPrototype.Map
 
         private void OnGUI()
         {
+            _highlight.Draw();
             _inventoryPanel.Draw();
             _pickupHud.Draw();
             if (!_visible || Event.current.type != EventType.Repaint || Screen.width <= 0 || Screen.height <= 0) return;

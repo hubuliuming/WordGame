@@ -21,7 +21,7 @@
 
 ## 【FACT】JSON 契约与当前默认值
 
-[battle_forest_01.json](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[battle_grassland_01.json](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn 来源](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 均为 schemaVersion=6、默认 configRevision=8，必填 drops 对象。原空间、移动、出生及 drops/grounds 数值保持；mining 与生态矿点字段归采矿专题，tree_normal/gather_apple 仍启用 600 秒再生。配置在烘焙时读取，不支持运行热重载；不同端须使用相同版本、输入布局和资源，未新增配置一致性协议。
+[battle_forest_01.json](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[battle_grassland_01.json](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn 来源](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 均为 schemaVersion=6、默认 configRevision=9，必填 drops 对象。原空间、移动、出生及 drops/grounds 数值保持；mining 与生态矿点字段归采矿专题，tree_normal/gather_apple/mine_rock 均默认 600 秒再生。配置在烘焙时读取，不支持运行热重载；不同端须使用相同版本、输入布局和资源，未新增配置一致性协议。
 
 | 字段 | 默认值 | 校验/行为 |
 |---|---|---|
@@ -91,6 +91,8 @@ DropSpawnSystem.SpawnOwnedDrop 接收明确来源、Prefab、资源键、ItemId/
 
 ## 【FACT】采矿石材的共用掉落接入
 
-MineHarvest 调用原 SpawnOwnedDrop 生成 DroppedStone，stone 显式映射 Msg.ItemName.石材。石材、木材、敌人苹果共享同局 DropId、运动/落地、G 实际 ItemId 解析、SavePrepared 先于库存/Consumed 提交、到期和实例释放；drops.enabled 只控制敌人额外掉落，采矿由 mining.enabled 控制。矿点提交失败只释放当前石材并尝试恢复原阻挡/Available，原异常及清理/回滚错误保留，需新 F；完整事务边界归[采矿](MapMining.md)。第九阶段资源/烘焙已静态核对，采矿/G/保存失败及跨端的人工 GamePlayer 为 UNKNOWN，归[运行入口](Runtime.md)；第六至第八阶段通过仍限各自旧版本和清单。
+MineHarvest 调用原 SpawnOwnedDrop 生成 DroppedStone，stone 显式映射 Msg.ItemName.石材。石材、木材、敌人苹果共享同局 DropId、运动/落地、G 实际 ItemId 解析、SavePrepared 先于库存/Consumed 提交、到期和实例释放；drops.enabled 只控制敌人额外掉落，采矿由 mining.enabled 控制。矿点提交失败只释放当前石材并尝试恢复原阻挡/历史长度/Available 并清空再生期限，原异常及清理/回滚错误保留，需新 F；完整事务边界归[采矿](MapMining.md)。第九阶段资源/烘焙已静态核对，采矿/G/保存失败及跨端的人工 GamePlayer 为 UNKNOWN，归[运行入口](Runtime.md)；第六至第八阶段通过仍限各自旧版本和清单。
+
+矿点默认成功耗尽后 600 秒原点空闲才恢复，再生本身不创建石材、不修改库存或保存；恢复后新 F 完成再次走原 SpawnOwnedDrop 与同局共享 DropId、G/保存/到期/释放链。规则归[采矿](MapMining.md)，再生阶段的人工回归仍为 UNKNOWN，归[运行入口](Runtime.md)。
 
 砍树/采矿现由统一 F 选目标并启动，产出的木材/石材仍走原地面掉落和 G 保存链；跨类型交互及产出回归已获用户人工通过反馈，结论限[运行入口](Runtime.md)统一 F 八项清单，未实际触发的独立用例仍为 UNKNOWN。旧阶段人工通过范围保持。

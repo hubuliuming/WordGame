@@ -547,3 +547,13 @@
 - 用户明确反馈“我已验收通过，接下来下一个阶段”；主线程结合统一 F 阶段已有静态核对与用户反馈判定该阶段通过，范围限 Runtime 统一 F 八项人工清单及 v6/revision=8。
 - 人工结论来自用户反馈；未实际触发的临界距离、精确同距、同 tick、创建/清理/回滚或保存等独立失败、延迟/预测回放时序仍为 UNKNOWN。第九阶段原 J 清单及第二阶段独立 JSON 人工结果仍为 UNKNOWN，既有通过仍限各自原版本和清单；性能、平台构建与线上联调未验收。
 - 增量同步地图、树木、采矿、掉落、背包、玩家、战斗、资源与 Runtime 的验收状态，以及项目外策划模板；导航和全部代码、JSON、资源及 Scene/Prefab/Animator 保持。本次仅记录已收到的人工反馈，未运行 Unity 编译、GamePlayer/PlayMode、游戏系统、逻辑单元测试、命令行构建、发布、性能采样或图片检查，未创建子Agent、未提交 Git。
+
+## 2026-10-04 矿点原点再生
+
+- 用户选择矿点原点再生并确认完整执行方案；主线程按范围落地，未创建子Agent。沿原 objects.mine_rock 再生字段接通 true/600 秒，Json 与 BuiltIn 同步为 schemaVersion=6/configRevision=9；矿点/生态/空间/种子、2 米/3 秒/stone ×3 和原其他配置保持，关闭再生仍耗尽。
+- MineSettings/Progress 增加仅服务端再生配置/期限，成功石材创建与耗尽提交才保留 RegrowAt；取消或提交失败清空期限并回滚历史长度/障碍，既往轮次历史保留。矿点 Baker/Spawn 初始化空阻挡历史，新增 MineBlockingEvent 的 TransitionTick/Disabled Ghost 缓冲、内部容量 4；MineObstacle 按预测 tick 严格之前最近转换重建阻挡，耗尽/恢复从下一 tick 生效，本局全部历史不截断。
+- 新增独立 MineRegrowSystem，服务端在 MineHarvest 后/R 复活前按模拟时间处理到期矿点，检查全部存活玩家/敌人（含未启用 Simulate 的存活玩家），默认占位阈值 1.16/1.21 米且包含边界，死亡实体不占位。占位保持耗尽/原期限等待；空闲恢复同一矿点/Ghost/布置/位置/朝向、Available/显示/阻挡，失败尝试还原原状态/期限/历史/障碍并逐项隔离。再生不生成石材、改库存或写盘，须新 F 再次采矿，G 保存与本局生命周期沿原链。
+- 正常 Unity 编译无 C# Error，新系统/仅服务端字段/顺序及 MineState、MineBlockingEvent Ghost Serializer 已加载核对。Forest/Grassland 的 Json/BuiltIn 各一次、另各一次 Json mining=false 和 regrowEnabled=false（600 秒），共八次隔离 Editor 烘焙通过；全部初始布置位置/朝向一致，森林/草原仍为矿点 20/18、阻挡 109/71、树木 89/53、采集点 36/38，关闭采矿为 0 矿点和 89/53 阻挡。空间违规为 0，Prefab 空历史/零期限、配置/资源键一致；烘焙 Console 前后均 [0 Error,3 Warning,7 Log]，无新增烘焙警告，原场景干净、未播放，无临时 World 遗留。
+- 增量同步 MapMining 当前规则、地图/树木/掉落/背包/玩家/战斗/资源文档、导航及策划模板；Runtime 新增矿点再生八项人工清单，统一 F 的原 v6/revision=8 已通过清单保留原口径，第九阶段原 J 与第二阶段独立 JSON 人工 UNKNOWN 保持。当前矿点再生主线程代码/烘焙静态验收通过，人工 GamePlayer、未触发独立时序/失败、历史内存/网络开销、规模性能、平台构建与线上联调为 UNKNOWN。
+- 只修改方案内矿点链/配置和受影响文档；新系统 meta 由 Unity 导入生成，GUID=9da8de47253e52f4ba3b80983082bcc3。Scene/Prefab/Animator 层级、旧 meta/资源、统一 F/G/E/R 输入链、树木/采集物系统、存储类、包与构建设置保持。AI 未新增/运行逻辑单元测试、GamePlayer/PlayMode、游戏模拟/显示系统、命令行构建、发布、性能采样或图片检查，未提交 Git。
+- 最终范围核对：相对本阶段开始快照，22 个既有文件变化（8 脚本、3 JSON、11 文档），新增 1 脚本及 Unity 生成的 meta，另同步策划模板，无删除/越界。旧 Scene/Prefab/Animator/资源/meta 及原 F/G 输入与树木/采集系统散列保持；MineHarvest 的 TryBegin/CancelBegin/RejectPlayer/FindCollector/Cancel 原方法及统一 F 原八项人工清单逐字保持。25 份任务文本 UTF-8、496 个本地链接、JSON/策划示例一致性、GUID 唯一性及受影响文件 git diff --check 通过；导航 8192 字节、地图 24500 字节，矿点专题在 24 KiB 内。加载元数据确认状态 Snapshot 四字段及历史 Snapshot 两字段，临时烘焙 World 已释放；矿点再生人工 GamePlayer 仍为 UNKNOWN。

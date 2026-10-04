@@ -137,9 +137,9 @@ namespace Code_01.CombatPrototype.Map
             Reference(objectIds, mining.mineObjectId, "mining.mineObjectId");
             var mineDefinition = Array.Find(config.objects, item => item.objectId == mining.mineObjectId);
             if (mineDefinition.gatherable || !mineDefinition.blocksMovement || mineDefinition.interactionDistanceMeters <= 0f ||
-                mineDefinition.regrowEnabled || mineDefinition.regrowSeconds != 0f || mining.mineObjectId == treeHarvest.treeObjectId ||
+                mining.mineObjectId == treeHarvest.treeObjectId ||
                 !Array.Exists(config.biomes, biome => biome != null && biome.mineObjectId == mining.mineObjectId))
-                throw new InvalidOperationException("mining.mineObjectId requires a distinct blocking, nongatherable biome mine with positive interaction distance and no regrowth.");
+                throw new InvalidOperationException("mining.mineObjectId requires a distinct blocking, nongatherable biome mine with positive interaction distance.");
             var biomeIds = new HashSet<string>(StringComparer.Ordinal);
             foreach (var biome in config.biomes)
             {

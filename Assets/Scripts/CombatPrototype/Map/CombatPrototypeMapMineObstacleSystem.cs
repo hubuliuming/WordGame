@@ -35,7 +35,7 @@ namespace Code_01.CombatPrototype.Map
                     if (objects[obstacles[i].ObjectIndex].Mineable != 0)
                         _indices.Add(obstacles[i].PlacementIndex, i);
             }
-            // Reconstruct the obstacle for each prediction tick, including rollback before depletion.
+            // Restore the baked state before applying this prediction tick, including rollback.
             foreach (var index in _indices.Values)
             {
                 var obstacle = obstacles[index];
@@ -44,7 +44,7 @@ namespace Code_01.CombatPrototype.Map
             }
             var tick = SystemAPI.GetSingleton<NetworkTime>().ServerTick;
             if (!tick.IsValid) return;
-            foreach (var mine in SystemAPI.Query<RefRO<CombatPrototypeMapMineState>>())
+            foreach (var (mine, mineEntity) in SystemAPI.Query<RefRO<CombatPrototypeMapMineState>>().WithEntityAccess())
             {
                 var value = mine.ValueRO;
                 if (!_indices.TryGetValue(value.PlacementIndex, out var index))
@@ -53,19 +53,30 @@ namespace Code_01.CombatPrototype.Map
                         value.PlacementIndex + ", mapSource=" + source + ".");
                     continue;
                 }
-                if (value.Phase != CombatPrototypeMapMinePhase.Depleted) continue;
-                var minedTick = new NetworkTick { SerializedData = value.MinedTick };
-                if (!minedTick.IsValid)
+                if (!EntityManager.HasBuffer<CombatPrototypeMapMineBlockingEvent>(mineEntity))
                 {
-                    Debug.LogError("[CombatPrototype.Map] Mine obstacle update failed; stage=ReadMinedTick, placement=" +
-                        value.PlacementIndex + ", mapSource=" + source + ".");
+                    Debug.LogError("[CombatPrototype.Map] Mine obstacle update failed; stage=ReadHistory, placement=" +
+                        value.PlacementIndex + ", mapSource=" + source + ", reason=MissingBlockingEvents.");
                     continue;
                 }
-                // Depletion commits after movement and applies from the following simulated tick.
-                if (!tick.IsNewerThan(minedTick)) continue;
-                var obstacle = obstacles[index];
-                obstacle.Disabled = 1;
-                obstacles[index] = obstacle;
+                var history = EntityManager.GetBuffer<CombatPrototypeMapMineBlockingEvent>(mineEntity, true);
+                // Both transitions commit after movement, taking effect from the following simulated tick.
+                for (var eventIndex = history.Length - 1; eventIndex >= 0; eventIndex--)
+                {
+                    var transition = history[eventIndex];
+                    var transitionTick = new NetworkTick { SerializedData = transition.TransitionTick };
+                    if (!transitionTick.IsValid || transition.Disabled > 1)
+                    {
+                        Debug.LogError("[CombatPrototype.Map] Mine obstacle update failed; stage=ReadTransition, placement=" +
+                            value.PlacementIndex + ", mapSource=" + source + ", eventIndex=" + eventIndex + ".");
+                        break;
+                    }
+                    if (!tick.IsNewerThan(transitionTick)) continue;
+                    var obstacle = obstacles[index];
+                    obstacle.Disabled = transition.Disabled;
+                    obstacles[index] = obstacle;
+                    break;
+                }
             }
         }
 

@@ -123,7 +123,7 @@ KnapsackControl.OnStart 缓存当前 PlayerModel 与 FactoryUISystem，记录 Co
 
 ## 【CURRENT STRATEGY】采集物原点再生
 
-默认 gather_apple 启用 regrowEnabled=true、regrowSeconds=600；再生字段形状保持；当前地图契约为 schemaVersion=6、默认 configRevision=8，包含 drops/treeHarvest/mining 段。Map Baker → GatherSpawnSystem 将开关和间隔送入仅服务端的 GatherConfig；仅在采集保存成功后，GatherProgress.RegrowAt 写为该次 Server World 模拟时间加间隔，Collector/StartHitSequence/FinishAt 清空。取消或准备/保存失败清空进度、释放预约，不发物品、不安排再生，也不自动重试。
+默认 gather_apple 启用 regrowEnabled=true、regrowSeconds=600；再生字段形状保持；当前地图契约为 schemaVersion=6、默认 configRevision=9，包含 drops/treeHarvest/mining 段。Map Baker → GatherSpawnSystem 将开关和间隔送入仅服务端的 GatherConfig；仅在采集保存成功后，GatherProgress.RegrowAt 写为该次 Server World 模拟时间加间隔，Collector/StartHitSequence/FinishAt 清空。取消或准备/保存失败清空进度、释放预约，不发物品、不安排再生，也不自动重试。
 
 [GatherRegrowSystem](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapGatherRegrowSystem.cs) 在 PredictedSimulationSystemGroup 的 GatherSystem 之后、PlayerRespawnSystem 之前恢复到期 Depleted 点为 Available，并清空期限及采集者。原实体、位置和 PlacementIndex 保持，客户端复用原 Ghost 状态和显示系统恢复显示；再生不入包、不保存库存，也不自动开始下一次采集。玩家须重新按 F，完整资格/预约/保存规则继续生效；regrowEnabled=false 时点保持本局耗尽。计时与耗尽仅保留当前 Server World，停止重进生成新的 Available 点，已保存库存仍沿原 v1 固定 ID 恢复。
 
@@ -148,5 +148,7 @@ F 统一选中树木后由 TreeHarvest 预约/计时，默认 2 米/2 秒后生�
 ## 【FACT】采矿石材与库存提交
 
 统一 F 选中矿点后，服务端默认 2 米/3 秒完成只生成 stone ×3 地面掉落，完成时不直接入包。stone 显式映射新增 Msg.ItemName.石材；G 继续按实际 ItemId 调用原 PrepareReward → SavePrepared，再提交同名库存及 Consumed，原金币/经验、v1 格式和存储类保持。保存失败不改库存或未到期掉落，恢复后须新 G；已入包石材随固定 ID 库存恢复，矿点/未拾取石材只保留本局。石材没有新增使用效果或 UI，E 仍只用小块肉。规则归[采矿](MapMining.md)/[掉落](MapDrops.md)，第九阶段人工库存/保存/恢复验收为 UNKNOWN，归[运行入口](Runtime.md)。
+
+矿点默认耗尽提交后 600 秒原点再生，占位等待；再生不发石材、不提交库存或存档，再次产出须新 F 完成后 G 保存入包。矿点期限/历史只属于当前 Server World，已入包石材仍沿原 v1 固定 ID 恢复。规则归[采矿](MapMining.md)，新阶段人工库存回归为 UNKNOWN，归[运行入口](Runtime.md)。
 
 当前采集、砍树、采矿共用 F，统一规则归[战斗地图](Map.md)。原第四至第八阶段人工通过保留其旧版本/清单，新增跨类型交互及保存/产出回归已获用户人工通过反馈，结论限[运行入口](Runtime.md)统一 F 八项清单，未触发的独立失败用例仍为 UNKNOWN。

@@ -17,7 +17,7 @@ namespace Code_01.CombatPrototype.Map
             {
                 map = new MapDefinitionConfig
                 {
-                    schemaVersion = 6, configRevision = 8,
+                    schemaVersion = 6, configRevision = 9,
                     mapDefinitionId = mapDefinitionId, defaultSeed = 12345,
                     geometry = new MapGeometryConfig
                     {
@@ -118,7 +118,8 @@ namespace Code_01.CombatPrototype.Map
                     {
                         objectId = "mine_rock", visualResourceKey = "mine_rock",
                         footprintRadiusMeters = 0.75f, minimumSameTypeSpacingMeters = 2.5f,
-                        blocksMovement = true, interactionDistanceMeters = 2f
+                        blocksMovement = true, interactionDistanceMeters = 2f,
+                        regrowEnabled = true, regrowSeconds = 600f
                     }
                 }
             };

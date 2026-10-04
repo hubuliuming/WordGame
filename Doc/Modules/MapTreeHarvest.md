@@ -23,7 +23,7 @@
 
 ## 【FACT】JSON 契约与当前默认值
 
-当前两份地图定义与 BuiltIn 均为 schemaVersion=6、configRevision=8，treeHarvest 段及全部字段必填。树木配置仍为 2 米/2 秒/wood ×3，再生复用 objects.tree_normal 的 true/600 秒；原空间、种子、树木/采集物密度、出生及 movement/drops/grounds 数值保持。新增 mining 段与生态矿点字段归[采矿](MapMining.md)，树木规则独立。配置在 SubScene 烘焙时读取，Json 失败不回退 BuiltIn，不支持热重载或新的联网配置校验协议。
+当前两份地图定义与 BuiltIn 均为 schemaVersion=6、configRevision=9，treeHarvest 段及全部字段必填。树木配置仍为 2 米/2 秒/wood ×3，再生复用 objects.tree_normal 的 true/600 秒；原空间、种子、树木/采集物密度、出生及 movement/drops/grounds 数值保持。新增 mining 段与生态矿点字段归[采矿](MapMining.md)，树木规则独立。配置在 SubScene 烘焙时读取，Json 失败不回退 BuiltIn，不支持热重载或新的联网配置校验协议。
 
 | 字段 | 当前默认值 | 校验与作用 |
 |---|---|---|

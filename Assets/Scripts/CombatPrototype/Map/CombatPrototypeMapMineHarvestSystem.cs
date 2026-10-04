@@ -209,12 +209,19 @@ namespace Code_01.CombatPrototype.Map
             var position = EntityManager.GetComponentData<LocalTransform>(mine).Position;
             var drop = Entity.Null;
             var dropId = 0;
+            var historyLength = EntityManager.GetBuffer<CombatPrototypeMapMineBlockingEvent>(mine).Length;
             try
             {
                 drop = dropOwner.SpawnOwnedDrop(source, settings.DropPrefab, settings.DropResourceKey,
                     settings.DropItemId, settings.DropQuantity, position, out dropId);
-                // SpawnOwnedDrop initializes and registers the drop before the nonstructural mine commit.
-                EntityManager.SetComponentData(mine, default(CombatPrototypeMapMineProgress));
+                // Instantiate invalidated handles; prepare history capacity before the nonstructural commit.
+                var history = EntityManager.GetBuffer<CombatPrototypeMapMineBlockingEvent>(mine);
+                history.EnsureCapacity(checked(historyLength + 1));
+                EntityManager.SetComponentData(mine, new CombatPrototypeMapMineProgress
+                {
+                    RegrowAt = settings.RegrowEnabled != 0 ? SystemAPI.Time.ElapsedTime + settings.RegrowSeconds : 0d
+                });
+                history.Add(new CombatPrototypeMapMineBlockingEvent { TransitionTick = tick.SerializedData, Disabled = 1 });
                 var obstacle = oldObstacle;
                 obstacle.Disabled = 1;
                 var obstacles = EntityManager.GetBuffer<CombatPrototypeMapObstacle>(source);
@@ -243,6 +250,7 @@ namespace Code_01.CombatPrototype.Map
                 {
                     var obstacles = EntityManager.GetBuffer<CombatPrototypeMapObstacle>(source);
                     obstacles[index] = oldObstacle;
+                    EntityManager.GetBuffer<CombatPrototypeMapMineBlockingEvent>(mine).ResizeUninitialized(historyLength);
                     Cancel(mine, state, map.MapDefinitionId, "DropOrCommitFailed");
                 }
                 catch (Exception rollback)

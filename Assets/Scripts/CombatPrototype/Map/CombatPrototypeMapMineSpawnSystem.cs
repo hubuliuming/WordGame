@@ -48,7 +48,8 @@ namespace Code_01.CombatPrototype.Map
                 valid[i] = EntityManager.HasComponent<Prefab>(prefab) && EntityManager.HasComponent<GhostType>(prefab) &&
                     EntityManager.HasComponent<LocalTransform>(prefab) &&
                     EntityManager.HasComponent<CombatPrototypeMapMineState>(prefab) &&
-                    EntityManager.HasComponent<CombatPrototypeMapMineProgress>(prefab);
+                    EntityManager.HasComponent<CombatPrototypeMapMineProgress>(prefab) &&
+                    EntityManager.HasBuffer<CombatPrototypeMapMineBlockingEvent>(prefab);
                 if (!valid[i])
                     Debug.LogError("[CombatPrototype.Map] Mine spawn prerequisites failed; stage=ValidatePrefab, map=" +
                         map.MapDefinitionId + ", objectId=" + objects[i].ObjectId + ", resource=" +
@@ -76,6 +77,7 @@ namespace Code_01.CombatPrototype.Map
                         PlacementIndex = i, Phase = CombatPrototypeMapMinePhase.Available
                     });
                     EntityManager.SetComponentData(entity, default(CombatPrototypeMapMineProgress));
+                    EntityManager.GetBuffer<CombatPrototypeMapMineBlockingEvent>(entity).Clear();
                     _owned.Add(entity);
                     succeeded++;
                 }

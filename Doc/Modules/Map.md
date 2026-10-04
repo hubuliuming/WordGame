@@ -15,11 +15,11 @@
 
 ## 【FACT】当前默认配置
 
-当前 JSON 与 [内置来源](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 一致，为 v6/revision=8。原空间、种子、生态及出生值保持，新增 mine_rock；SubScene 为 Json，BuiltIn 须显式选择。采集物/树木启用原点再生，矿点不再生。G 归[掉落](MapDrops.md)，F 统一选择采集点/树木/矿点；树木/再生归[树木](MapTreeHarvest.md)，矿点/石材归[采矿](MapMining.md)。
+当前 JSON 与 [内置来源](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 一致，为 v6/revision=9；SubScene 为 Json，BuiltIn 须显式选择。采集物/树木/矿点默认 600 秒原点再生。G 归[掉落](MapDrops.md)，F 统一选择三类资源；树木归[树木](MapTreeHarvest.md)，矿点/石材/再生归[采矿](MapMining.md)。
 
 | 配置字段 | 当前值与用途 |
 |---|---|
-| schemaVersion / configRevision | 6 / 8 |
+| schemaVersion / configRevision | 6 / 9 |
 | defaultSeed | 12345，用于确定性布置 |
 | geometry.cellSizeMeters | 2 米 |
 | geometry.cellsPerChunk | 每块单边 16 格，即 32×32 米 |
@@ -45,7 +45,7 @@ Spawner 的 EnemyColumns、EnemySpacing 保留现有序列化值并参与敌人�
 | forest | forest_floor | 8 | 1.5 | 0.5 | 0.2 | 0.2 |
 | rocky | rock | 3 | 0.1 | 0.2 | 1 | 1 |
 
-当前 objects 包含 decor_grass、decor_pebble、tree_normal、gather_apple、mine_rock。草丛占地 0、同类间距 0.5 米；装饰碎石占地 0.3、间距 2.5 米，均不阻挡。mine_rock 独立阻挡，占地 0.75、间距 2.5、交互 2 米，F 采矿 3 秒产出 stone ×3，本局耗尽不再生。
+当前 objects 包含 decor_grass、decor_pebble、tree_normal、gather_apple、mine_rock。草丛占地 0、同类间距 0.5 米；装饰碎石占地 0.3、间距 2.5 米，均不阻挡。mine_rock 独立阻挡，占地 0.75、间距 2.5、交互 2 米，F 采矿 3 秒产出 stone ×3，默认 600 秒原点再生，占位等待。
 
 普通树木的 footprintRadiusMeters=0.5、minimumSameTypeSpacingMeters=3、blocksMovement=true，三种生态通过 treeObjectId=tree_normal 引用。F 使用 interactionDistanceMeters=2，按 treeHarvest 的 2 秒/wood ×3 砍伐；regrowEnabled=true、regrowSeconds=600。普通攻击不破坏树木；gatherDurationSeconds=1 未用于砍伐，gatherable=false、yieldItemId=null、yieldQuantity=0。地表 walkable=true、movementMultiplier=1，尚未接入地表通行或速度计算。
 
@@ -53,7 +53,7 @@ gather_apple 的 footprintRadiusMeters=0.3、minimumSameTypeSpacingMeters=1.5、
 
 ## 【FACT】JSON 文件与配置入口
 
-Assets/Config/CombatPrototype/Map/ 有五份 UTF-8 无 BOM JSON。当前地图 v6/revision=8，movement/drops/treeHarvest/mining 必填；生态含 treeObjectId/gatherObjectId/mineObjectId、mineDensityPer100m2，物体新增 mine_rock。原地表、空间、种子和出生值保持。
+Assets/Config/CombatPrototype/Map/ 有五份 UTF-8 无 BOM JSON。当前地图 v6/revision=9，movement/drops/treeHarvest/mining 必填；生态含 treeObjectId/gatherObjectId/mineObjectId、mineDensityPer100m2，物体新增 mine_rock。原地表、空间、种子和出生值保持。
 
 | MapAuthoring 字段 | 显式绑定文件 | JSON 根类型 |
 |---|---|---|
@@ -108,7 +108,7 @@ Map Baker 将再生开关/间隔写入物体定义，GatherSpawnSystem 复制到
 
 玩家须在线、归属匹配、启用 Simulate、存活、有限零 Move、无攻击且近战 Ready。按各类型配置距离筛选 Available 采集点、Standing 树和 Available 矿点，关闭功能/占用/耗尽目标排除；比较 X/Z 中心距离平方，精确同距取小 PlacementIndex，无类型优先。请求按 NetworkId 升序，立即预约后再处理下一玩家。
 
-记录本 tick 已交互玩家，重复 F 不重置/切换，完成/取消本 tick 不再启动，须新 F，按住不连续。原系统计时/中断/产出；启动失败仅清理当前预约，记录地图/类型/布置/玩家/阶段与原异常，不转选，其他请求继续。v6/revision=8 保持；用户人工通过，范围见[运行入口](Runtime.md)，未触发用例 UNKNOWN。
+记录本 tick 已交互玩家，重复 F 不重置/切换，完成/取消本 tick 不再启动，须新 F，按住不连续。原系统计时/中断/产出；启动失败仅清理当前预约，记录地图/类型/布置/玩家/阶段与原异常，不转选，其他请求继续。统一 F 用户人工通过，范围见[运行入口](Runtime.md)，未触发用例 UNKNOWN。
 
 ## 【CURRENT STRATEGY】静态物体移动阻挡
 
@@ -116,7 +116,7 @@ Map Baker 将再生开关/间隔写入物体定义，GatherSpawnSystem 复制到
 
 [玩家移动](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypePlayerMovementSystem.cs) 在 Client/Server 的原预测模拟组中共用该工具，只处理 Simulate 且存活的玩家，保留非有限输入拒绝、长度限制、速度及朝向规则。[敌人移动](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypeEnemyMovementSystem.cs) 只在服务端调用，最近在线存活目标、前后摇停动及距离 1.5 停止规则保持；碰到障碍可滑动或停止，没有全局路径规划。
 
-两个移动系统都等待地图单例，直接读取现有地图根实体上的只读阻挡缓冲，不实例化 Collider；该移动阻挡链不增加玩家/敌人组件或输入/Ghost 字段。角色 Y 保持；树木阻挡历史及矿点 MinedTick 按权威 tick 重建 Disabled，移动工具只处理启用记录。地表 walkable、movementMultiplier 与地图边界尚不参与移动阻挡。不同端仍须使用相同地图配置，未新增联网配置校验协议。
+两个移动系统都等待地图单例，直接读取现有地图根实体上的只读阻挡缓冲，不实例化 Collider；该移动阻挡链不增加玩家/敌人组件或输入/Ghost 字段。角色 Y 保持；树木/矿点阻挡历史按权威 tick 重建 Disabled，移动工具只处理启用记录。地表 walkable、movementMultiplier 与地图边界尚不参与移动阻挡。不同端仍须使用相同地图配置，未新增联网配置校验协议。
 
 ## 【FACT】资源绑定与 Editor 入口
 
@@ -157,4 +157,4 @@ Map Baker 将再生开关/间隔写入物体定义，GatherSpawnSystem 复制到
 
 树木成功砍倒后默认 600 秒原点再生，占位则等待，原 Ghost 恢复 Standing/显示/阻挡，新 F 才再次产出。第八阶段 v5/revision=7 编译/历史序列化/烘焙已核对且布局保持；用户通过限八项原清单，未触发用例 UNKNOWN；旧 H 通过不覆盖统一 F。
 
-森林/草原：20/18 矿点、109/71 阻挡，关闭后原布局保持；采矿编译/六次隔离烘焙已核对，人工 UNKNOWN，见[运行入口](Runtime.md)/[采矿](MapMining.md)。
+森林/草原：20/18 矿点、109/71 阻挡，关闭采矿后原布局保持；矿点再生编译/八次隔离烘焙已核对，人工 UNKNOWN，见[运行入口](Runtime.md)/[采矿](MapMining.md)。

@@ -152,7 +152,8 @@ namespace Code_01.CombatPrototype.Map
                     HarvestDuration = mining.harvestDurationSeconds,
                     DropPrefab = GetEntity(stonePrefab, TransformUsageFlags.Dynamic),
                     DropResourceKey = mining.dropVisualResourceKey,
-                    DropItemId = mining.dropItemId, DropQuantity = mining.dropQuantity
+                    DropItemId = mining.dropItemId, DropQuantity = mining.dropQuantity,
+                    RegrowEnabled = (byte)(mineDefinition.regrowEnabled ? 1 : 0), RegrowSeconds = mineDefinition.regrowSeconds
                 });
                 var objects = AddBuffer<CombatPrototypeMapObject>(entity);
                 foreach (var item in config.objects)

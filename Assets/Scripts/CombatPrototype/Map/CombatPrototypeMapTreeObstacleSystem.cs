@@ -45,27 +45,38 @@ namespace Code_01.CombatPrototype.Map
             }
             var tick = SystemAPI.GetSingleton<NetworkTime>().ServerTick;
             if (!tick.IsValid) return;
-            foreach (var tree in SystemAPI.Query<RefRO<CombatPrototypeMapTreeState>>())
+            foreach (var (tree, treeEntity) in SystemAPI.Query<RefRO<CombatPrototypeMapTreeState>>().WithEntityAccess())
             {
-                if (tree.ValueRO.Phase != CombatPrototypeMapTreePhase.Felled) continue;
                 if (!_indices.TryGetValue(tree.ValueRO.PlacementIndex, out var index))
                 {
                     Debug.LogError("[CombatPrototype.Map] Tree obstacle update failed; stage=FindObstacle, placement=" +
                         tree.ValueRO.PlacementIndex + ", mapSource=" + source + ".");
                     continue;
                 }
-                var felledTick = new NetworkTick { SerializedData = tree.ValueRO.FelledTick };
-                if (!felledTick.IsValid)
+                if (!EntityManager.HasBuffer<CombatPrototypeMapTreeBlockingEvent>(treeEntity))
                 {
-                    Debug.LogError("[CombatPrototype.Map] Tree obstacle update failed; stage=ReadFelledTick, placement=" +
-                        tree.ValueRO.PlacementIndex + ", mapSource=" + source + ".");
+                    Debug.LogError("[CombatPrototype.Map] Tree obstacle update failed; stage=ReadHistory, placement=" +
+                        tree.ValueRO.PlacementIndex + ", mapSource=" + source + ", reason=MissingBlockingEvents.");
                     continue;
                 }
-                // The cut commits after movement; remove blocking from the following simulated tick.
-                if (!tick.IsNewerThan(felledTick)) continue;
-                var obstacle = obstacles[index];
-                obstacle.Disabled = 1;
-                obstacles[index] = obstacle;
+                var history = EntityManager.GetBuffer<CombatPrototypeMapTreeBlockingEvent>(treeEntity, true);
+                // Both transitions commit after movement, taking effect from the following simulated tick.
+                for (var eventIndex = history.Length - 1; eventIndex >= 0; eventIndex--)
+                {
+                    var transition = history[eventIndex];
+                    var transitionTick = new NetworkTick { SerializedData = transition.TransitionTick };
+                    if (!transitionTick.IsValid || transition.Disabled > 1)
+                    {
+                        Debug.LogError("[CombatPrototype.Map] Tree obstacle update failed; stage=ReadTransition, placement=" +
+                            tree.ValueRO.PlacementIndex + ", mapSource=" + source + ", eventIndex=" + eventIndex + ".");
+                        break;
+                    }
+                    if (!tick.IsNewerThan(transitionTick)) continue;
+                    var obstacle = obstacles[index];
+                    obstacle.Disabled = transition.Disabled;
+                    obstacles[index] = obstacle;
+                    break;
+                }
             }
         }
 

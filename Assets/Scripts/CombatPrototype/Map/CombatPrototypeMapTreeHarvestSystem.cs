@@ -21,13 +21,11 @@ namespace Code_01.CombatPrototype.Map
         {
             public Entity Entity;
             public int NetworkId;
-            public bool WasChopping;
         }
 
         private EntityQuery _trees;
         private Entity _source;
         private readonly Dictionary<int, int> _obstacles = new Dictionary<int, int>();
-        private readonly HashSet<Entity> _gatherCollectors = new HashSet<Entity>();
 
         protected override void OnCreate()
         {
@@ -65,11 +63,6 @@ namespace Code_01.CombatPrototype.Map
                     if (objects[obstacles[i].ObjectIndex].Harvestable != 0)
                         _obstacles.Add(obstacles[i].PlacementIndex, i);
             }
-            _gatherCollectors.Clear();
-            foreach (var (gather, progress) in SystemAPI.Query<RefRO<CombatPrototypeMapGatherState>,
-                         RefRO<CombatPrototypeMapGatherProgress>>())
-                if (gather.ValueRO.Phase == CombatPrototypeMapGatherPhase.Collecting)
-                    _gatherCollectors.Add(progress.ValueRO.Collector);
 
             var time = SystemAPI.Time.ElapsedTime;
             using var trees = _trees.ToEntityArray(Allocator.Temp);
@@ -110,8 +103,6 @@ namespace Code_01.CombatPrototype.Map
                             continue;
                         }
                         var player = players[index];
-                        player.WasChopping = true;
-                        players[index] = player;
                         var reason = RejectPlayer(player, out _, out var health);
                         if (reason == null && health.HitSequence != progress.StartHitSequence) reason = "PlayerHit";
                         if (reason == null && math.distancesq(
@@ -137,66 +128,35 @@ namespace Code_01.CombatPrototype.Map
                     }
                 }
 
-                for (var i = 0; i < players.Length; i++)
-                {
-                    var player = players[i];
-                    var stage = "ReadInput";
-                    try
-                    {
-                        if (!EntityManager.GetComponentData<CombatPrototypePlayerInput>(player.Entity).HarvestTree.IsSet) continue;
-                        stage = "ValidatePlayer";
-                        var reason = player.WasChopping ? "AlreadyChopping" : RejectPlayer(player, out _, out _);
-                        if (reason != null)
-                        {
-                            Reject(map.MapDefinitionId, player, reason);
-                            continue;
-                        }
-                        stage = "SelectTree";
-                        var target = Entity.Null;
-                        var bestDistance = float.PositiveInfinity;
-                        var bestPlacement = int.MaxValue;
-                        var position = EntityManager.GetComponentData<LocalTransform>(player.Entity).Position.xz;
-                        foreach (var tree in trees)
-                        {
-                            var value = EntityManager.GetComponentData<CombatPrototypeMapTreeState>(tree);
-                            if (value.Phase != CombatPrototypeMapTreePhase.Standing) continue;
-                            var distance = math.distancesq(position,
-                                EntityManager.GetComponentData<LocalTransform>(tree).Position.xz);
-                            if (distance > settings.InteractionDistance * settings.InteractionDistance || distance > bestDistance ||
-                                (distance == bestDistance && value.PlacementIndex >= bestPlacement)) continue;
-                            target = tree;
-                            bestDistance = distance;
-                            bestPlacement = value.PlacementIndex;
-                        }
-                        if (target == Entity.Null)
-                        {
-                            Reject(map.MapDefinitionId, player, "NoStandingTarget");
-                            continue;
-                        }
-                        stage = "ReserveTree";
-                        var state = EntityManager.GetComponentData<CombatPrototypeMapTreeState>(target);
-                        var health = EntityManager.GetComponentData<CombatPrototypePlayerHealth>(player.Entity);
-                        EntityManager.SetComponentData(target, new CombatPrototypeMapTreeProgress
-                        {
-                            Collector = player.Entity, StartHitSequence = health.HitSequence,
-                            FinishAt = time + settings.HarvestDuration
-                        });
-                        state.Phase = CombatPrototypeMapTreePhase.Chopping;
-                        state.CollectorNetworkId = player.NetworkId;
-                        EntityManager.SetComponentData(target, state);
-                        Debug.Log("[CombatPrototype.Map] Tree harvest started; map=" + map.MapDefinitionId +
-                            ", placement=" + state.PlacementIndex + ", NetworkId=" + player.NetworkId +
-                            ", duration=" + settings.HarvestDuration + ".");
-                    }
-                    catch (Exception exception)
-                    {
-                        Debug.LogError("[CombatPrototype.Map] Tree request failed; stage=" + stage + ", map=" +
-                            map.MapDefinitionId + ", NetworkId=" + player.NetworkId + ", player=" + player.Entity +
-                            ", resource=" + settings.ResourceKey + ". " + exception);
-                    }
-                }
             }
             finally { players.Dispose(); }
+        }
+
+        internal bool TryBegin(Entity tree, Entity player, int networkId, uint hitSequence,
+            double time, FixedString64Bytes mapId, CombatPrototypeMapTreeSettings settings)
+        {
+            var state = EntityManager.GetComponentData<CombatPrototypeMapTreeState>(tree);
+            if (state.Phase != CombatPrototypeMapTreePhase.Standing) return false;
+            var progress = EntityManager.GetComponentData<CombatPrototypeMapTreeProgress>(tree);
+            progress = new CombatPrototypeMapTreeProgress
+            {
+                Collector = player, StartHitSequence = hitSequence, FinishAt = time + settings.HarvestDuration
+            };
+            state.Phase = CombatPrototypeMapTreePhase.Chopping;
+            state.CollectorNetworkId = networkId;
+            EntityManager.SetComponentData(tree, progress);
+            EntityManager.SetComponentData(tree, state);
+            Debug.Log("[CombatPrototype.Map] Tree harvest started; map=" + mapId + ", placement=" +
+                state.PlacementIndex + ", NetworkId=" + networkId + ", duration=" + settings.HarvestDuration + ".");
+            return true;
+        }
+
+        internal void CancelBegin(Entity tree, Entity player, FixedString64Bytes mapId)
+        {
+            var progress = EntityManager.GetComponentData<CombatPrototypeMapTreeProgress>(tree);
+            if (progress.Collector == player)
+                Cancel(tree, EntityManager.GetComponentData<CombatPrototypeMapTreeState>(tree),
+                    mapId, "ReservationFailed");
         }
 
         private string RejectPlayer(OnlinePlayer player, out CombatPrototypePlayerInput input,
@@ -210,7 +170,6 @@ namespace Code_01.CombatPrototype.Map
                 CombatPrototypeAttackPhase.Ready) return "AttackInProgress";
             if (!math.all(math.isfinite(input.Move))) return "InvalidMoveInput";
             if (math.lengthsq(input.Move) != 0f) return "PlayerMoving";
-            if (input.Gather.IsSet || _gatherCollectors.Contains(player.Entity)) return "GatherPriority";
             return null;
         }
 
@@ -242,12 +201,19 @@ namespace Code_01.CombatPrototype.Map
             var position = EntityManager.GetComponentData<LocalTransform>(tree).Position;
             var drop = Entity.Null;
             var dropId = 0;
+            var historyLength = EntityManager.GetBuffer<CombatPrototypeMapTreeBlockingEvent>(tree).Length;
             try
             {
                 drop = dropOwner.SpawnOwnedDrop(source, settings.DropPrefab, settings.DropResourceKey,
                     settings.DropItemId, settings.DropQuantity, position, out dropId);
-                // Instantiate invalidated handles; reacquire them before the nonstructural tree commit.
-                EntityManager.SetComponentData(tree, default(CombatPrototypeMapTreeProgress));
+                // Instantiate invalidated handles; prepare history capacity before the nonstructural commit.
+                var history = EntityManager.GetBuffer<CombatPrototypeMapTreeBlockingEvent>(tree);
+                history.EnsureCapacity(checked(historyLength + 1));
+                EntityManager.SetComponentData(tree, new CombatPrototypeMapTreeProgress
+                {
+                    RegrowAt = settings.RegrowEnabled != 0 ? SystemAPI.Time.ElapsedTime + settings.RegrowSeconds : 0d
+                });
+                history.Add(new CombatPrototypeMapTreeBlockingEvent { TransitionTick = tick.SerializedData, Disabled = 1 });
                 var obstacle = oldObstacle;
                 obstacle.Disabled = 1;
                 var obstacles = EntityManager.GetBuffer<CombatPrototypeMapObstacle>(source);
@@ -268,6 +234,7 @@ namespace Code_01.CombatPrototype.Map
                 {
                     var obstacles = EntityManager.GetBuffer<CombatPrototypeMapObstacle>(source);
                     obstacles[index] = oldObstacle;
+                    EntityManager.GetBuffer<CombatPrototypeMapTreeBlockingEvent>(tree).ResizeUninitialized(historyLength);
                     Cancel(tree, state, map.MapDefinitionId, "DropOrCommitFailed");
                 }
                 catch (Exception rollback)
@@ -282,10 +249,5 @@ namespace Code_01.CombatPrototype.Map
             }
         }
 
-        private static void Reject(FixedString64Bytes mapId, OnlinePlayer player, string reason)
-        {
-            Debug.Log("[CombatPrototype.Map] Tree harvest rejected; map=" + mapId + ", NetworkId=" +
-                player.NetworkId + ", player=" + player.Entity + ", reason=" + reason + ".");
-        }
     }
 }

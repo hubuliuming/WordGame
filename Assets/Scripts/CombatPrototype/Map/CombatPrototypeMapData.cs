@@ -76,6 +76,7 @@ namespace Code_01.CombatPrototype.Map
         public FixedString64Bytes BiomeId;
         public float TreeDensityPer100m2;
         public float GatherableDensityPer100m2;
+        public float MineDensityPer100m2;
     }
 
     [InternalBufferCapacity(0)]
@@ -86,6 +87,7 @@ namespace Code_01.CombatPrototype.Map
         public Entity Prefab;
         public byte Gatherable;
         public byte Harvestable;
+        public byte Mineable;
         public float InteractionDistance;
         public float GatherDuration;
         public FixedString64Bytes YieldItemName;

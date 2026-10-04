@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 5,
-  "configRevision": 6,
+  "schemaVersion": 6,
+  "configRevision": 8,
   "mapDefinitionId": "battle_forest_01",
   "defaultSeed": 12345,
   "geometry": {
@@ -46,6 +46,15 @@
     "dropItemId": "wood",
     "dropQuantity": 3,
     "dropVisualResourceKey": "drop_wood"
+  },
+  "mining": {
+    "enabled": true,
+    "mineObjectId": "mine_rock",
+    "visualResourceKey": "mine_rock",
+    "harvestDurationSeconds": 3.0,
+    "dropItemId": "stone",
+    "dropQuantity": 3,
+    "dropVisualResourceKey": "drop_stone"
   },
   "population": {
     "initialEnemyCount": 32

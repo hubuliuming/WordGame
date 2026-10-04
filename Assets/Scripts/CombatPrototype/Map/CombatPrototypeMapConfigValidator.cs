@@ -9,14 +9,14 @@ namespace Code_01.CombatPrototype.Map
         {
             if (config == null || config.map == null || config.map.geometry == null ||
                 config.map.layout == null || config.map.movement == null || config.map.drops == null || config.map.treeHarvest == null ||
-                config.map.population == null || config.map.spawn == null ||
+                config.map.mining == null || config.map.population == null || config.map.spawn == null ||
                 config.biomes == null || config.grounds == null || config.objects == null ||
                 config.map.biomeIds == null || config.map.biomeRegions == null)
                 throw new InvalidOperationException("Map configuration is missing required sections.");
             var map = config.map;
             Id(map.mapDefinitionId, "mapDefinitionId");
-            if (map.schemaVersion != 5 || map.configRevision < 1 || map.defaultSeed < 1)
-                throw new InvalidOperationException("Map requires schemaVersion=5, positive revision and seed.");
+            if (map.schemaVersion != 6 || map.configRevision < 1 || map.defaultSeed < 1)
+                throw new InvalidOperationException("Map requires schemaVersion=6, positive revision and seed.");
             var drops = map.drops;
             Id(drops.itemId, "drops.itemId");
             Id(drops.visualResourceKey, "drops.visualResourceKey");
@@ -39,6 +39,15 @@ namespace Code_01.CombatPrototype.Map
             if (treeHarvest.dropQuantity <= 0)
                 throw new InvalidOperationException("treeHarvest.dropQuantity must be a positive integer.");
             Id(treeHarvest.dropVisualResourceKey, "treeHarvest.dropVisualResourceKey");
+            var mining = map.mining;
+            Id(mining.mineObjectId, "mining.mineObjectId");
+            Id(mining.visualResourceKey, "mining.visualResourceKey");
+            Positive(mining.harvestDurationSeconds, "mining.harvestDurationSeconds");
+            Id(mining.dropItemId, "mining.dropItemId");
+            CombatPrototypeMapYieldItemResolver.Resolve(mining.dropItemId);
+            if (mining.dropQuantity <= 0)
+                throw new InvalidOperationException("mining.dropQuantity must be a positive integer.");
+            Id(mining.dropVisualResourceKey, "mining.dropVisualResourceKey");
             var geometry = map.geometry;
             Positive(geometry.cellSizeMeters, "cellSizeMeters");
             Finite(geometry.baseHeightMeters, "baseHeightMeters");
@@ -125,6 +134,12 @@ namespace Code_01.CombatPrototype.Map
             if (treeDefinition.gatherable || !treeDefinition.blocksMovement || treeDefinition.interactionDistanceMeters <= 0f ||
                 !Array.Exists(config.biomes, biome => biome != null && biome.treeObjectId == treeHarvest.treeObjectId))
                 throw new InvalidOperationException("treeHarvest.treeObjectId must reference a blocking, nongatherable biome tree with positive interaction distance.");
+            Reference(objectIds, mining.mineObjectId, "mining.mineObjectId");
+            var mineDefinition = Array.Find(config.objects, item => item.objectId == mining.mineObjectId);
+            if (mineDefinition.gatherable || !mineDefinition.blocksMovement || mineDefinition.interactionDistanceMeters <= 0f ||
+                mineDefinition.regrowEnabled || mineDefinition.regrowSeconds != 0f || mining.mineObjectId == treeHarvest.treeObjectId ||
+                !Array.Exists(config.biomes, biome => biome != null && biome.mineObjectId == mining.mineObjectId))
+                throw new InvalidOperationException("mining.mineObjectId requires a distinct blocking, nongatherable biome mine with positive interaction distance and no regrowth.");
             var biomeIds = new HashSet<string>(StringComparer.Ordinal);
             foreach (var biome in config.biomes)
             {
@@ -135,6 +150,11 @@ namespace Code_01.CombatPrototype.Map
                 Reference(objectIds, biome.rockObjectId, "biome.rockObjectId");
                 Reference(objectIds, biome.treeObjectId, "biome.treeObjectId");
                 Reference(objectIds, biome.gatherObjectId, "biome.gatherObjectId");
+                Reference(objectIds, biome.mineObjectId, "biome.mineObjectId");
+                if (biome.mineObjectId != mining.mineObjectId || biome.mineObjectId == biome.treeObjectId ||
+                    biome.mineObjectId == biome.gatherObjectId || biome.mineObjectId == biome.decorationObjectId ||
+                    biome.mineObjectId == biome.rockObjectId)
+                    throw new InvalidOperationException("biome.mineObjectId must use the configured mine separately from existing content; biomeId=" + biome.biomeId);
                 var gatherDefinition = Array.Find(config.objects, item => item.objectId == biome.gatherObjectId);
                 if (!gatherDefinition.gatherable)
                     throw new InvalidOperationException("biome.gatherObjectId must reference a gatherable; biomeId=" + biome.biomeId);
@@ -142,6 +162,7 @@ namespace Code_01.CombatPrototype.Map
                 Nonnegative(biome.treeDensityPer100m2, "treeDensityPer100m2");
                 Nonnegative(biome.gatherableDensityPer100m2, "gatherableDensityPer100m2");
                 Nonnegative(biome.rockDensityPer100m2, "rockDensityPer100m2");
+                Nonnegative(biome.mineDensityPer100m2, "mineDensityPer100m2");
             }
             var enabledBiomes = new HashSet<string>(StringComparer.Ordinal);
             foreach (var id in map.biomeIds)

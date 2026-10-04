@@ -11,9 +11,10 @@ namespace Code_01.CombatPrototype.Networking
         public InputEvent Attack;
         public InputEvent Respawn;
         public InputEvent UseItem;
-        public InputEvent Gather;
+        public InputEvent Gather; // Unified F resource interaction; retain the existing input layout.
         public InputEvent Pickup;
-        public InputEvent HarvestTree;
+        public InputEvent HarvestTree; // Reserved; keyboard H is no longer submitted or consumed.
+        public InputEvent Mine; // Reserved; keyboard J is no longer submitted or consumed.
     }
 
     [WorldSystemFilter(WorldSystemFilterFlags.ClientSimulation)]
@@ -41,7 +42,6 @@ namespace Code_01.CombatPrototype.Networking
             var useItem = keyboard != null && keyboard.eKey.wasPressedThisFrame;
             var gather = keyboard != null && keyboard.fKey.wasPressedThisFrame;
             var pickup = keyboard != null && keyboard.gKey.wasPressedThisFrame;
-            var harvestTree = keyboard != null && keyboard.hKey.wasPressedThisFrame;
 
             foreach (var input in SystemAPI.Query<RefRW<CombatPrototypePlayerInput>>().WithAll<GhostOwnerIsLocal>())
             {
@@ -56,8 +56,6 @@ namespace Code_01.CombatPrototype.Networking
                     input.ValueRW.Gather.Set();
                 if (pickup)
                     input.ValueRW.Pickup.Set();
-                if (harvestTree)
-                    input.ValueRW.HarvestTree.Set();
             }
         }
     }

@@ -77,11 +77,11 @@ ChangeAll 先得到本次最终上限，再据其约束本次有非零增量的�
 
 `CombatPrototypePlayerNetCodeAuthoring` 为玩家 Ghost 烘焙速度 `5`、`CombatPrototypePlayerInput` 和近战数据；NetCode 为 `IInputComponentData` 生成输入缓冲。服务端握手后设置 `GhostOwner.NetworkId`、启用 `AutoCommandTarget`，并把连接 `CommandTarget` 指向玩家；玩家加入连接 `LinkedEntityGroup`，跟随断线销毁。
 
-玩家 Ghost 使用 `OwnerPredicted`：本地拥有者预测，其他客户端插值。`CombatPrototypePlayerInputSystem` 只给 `GhostOwnerIsLocal` 写入由当前本地镜头水平角转换的世界 X/Z Move，以及空格/鼠标左键 `InputEvent` 攻击事件；第 6B 增加 R 键 `Respawn`，第 7A 增加 E 键 `UseItem`，地图第四阶段增加 F 键 `Gather`，第六阶段增加 G 键 `Pickup`，地图第七阶段增加 H 键 `HarvestTree` 输入事件。`CombatPrototypePlayerMovementSystem` 等待地图数据，在 Client/Server 预测组中只处理带 `Simulate` 且存活的实体；移动输入拒绝非有限值并限制长度，位移通过共享的 CombatPrototypeMapMovementUtility 对当前启用阻挡圆进行扫掠及滑动，再更新 LocalTransform。角色 Y、速度和按输入设置朝向的规则保持；地图占地、留缝及烘焙阻挡数据归[战斗地图](Map.md)。网络玩家仍不接第 1 阶段 CharacterController 脚本的移动、重力或碰撞链；网络镜头与输入转换采用本页“本地跟随镜头”定义的独立入口。
+玩家 Ghost 使用 `OwnerPredicted`：本地拥有者预测，其他客户端插值。`CombatPrototypePlayerInputSystem` 只给 `GhostOwnerIsLocal` 写入由当前本地镜头水平角转换的世界 X/Z Move，以及空格/鼠标左键 `InputEvent` 攻击事件；第 6B 增加 R 键 `Respawn`，第 7A 增加 E 键 `UseItem`，F 键 `Gather` 现承载采集/砍树/采矿统一请求，第六阶段增加 G 键 `Pickup`，`HarvestTree`/`Mine` 字段保留，H/J 停止触发与消费。`CombatPrototypePlayerMovementSystem` 等待地图数据，在 Client/Server 预测组中只处理带 `Simulate` 且存活的实体；移动输入拒绝非有限值并限制长度，位移通过共享的 CombatPrototypeMapMovementUtility 对当前启用阻挡圆进行扫掠及滑动，再更新 LocalTransform。角色 Y、速度和按输入设置朝向的规则保持；地图占地、留缝及烘焙阻挡数据归[战斗地图](Map.md)。网络玩家仍不接第 1 阶段 CharacterController 脚本的移动、重力或碰撞链；网络镜头与输入转换采用本页“本地跟随镜头”定义的独立入口。
 
 ## 【FACT】地图采集与玩家状态
 
-F 采集由服务端确认本人资格、最近可用点并计时；移动/攻击/受击/死亡/超距/断线会释放预约，完成后保存并入包活力苹果，E 仍仅使用小块肉。第五阶段保存成功后按默认 600 秒服务端期限恢复原采集点，玩家须新 F 请求；再生不恢复玩家生命/体力、不发物品，输入字段及原资格/中断规则保持。目标、计时和提交规则归 [背包与道具](Inventory.md)。没有新增玩家组件或修改玩家 Prefab；用户已确认地图第四阶段人工 GamePlayer 通过，主线程结合既有静态核对判定该阶段通过；玩家范围限采集输入/中断、死亡/R 复活、多人同步/重连及原玩家回归；用户已确认第五阶段人工 GamePlayer 通过，主线程结合既有静态核对判定该阶段通过，玩家范围限新 F 循环再采集、多人同步/晚加入、重连/重启及原玩家回归，完整边界归 [运行入口](Runtime.md)。
+F 由服务端跨采集点/树木/矿点确认最近有效目标，采集点由原系统计时；移动/攻击/受击/死亡/超距/断线会释放预约，完成后保存并入包活力苹果，E 仍仅使用小块肉。第五阶段保存成功后按默认 600 秒服务端期限恢复原采集点，玩家须新 F 请求；再生不恢复玩家生命/体力、不发物品，输入字段及原资格/中断规则保持。目标、计时和提交规则归 [背包与道具](Inventory.md)。没有新增玩家组件或修改玩家 Prefab；用户已确认地图第四阶段人工 GamePlayer 通过，主线程结合既有静态核对判定该阶段通过；玩家范围限采集输入/中断、死亡/R 复活、多人同步/重连及原玩家回归；用户已确认第五阶段人工 GamePlayer 通过，主线程结合既有静态核对判定该阶段通过，玩家范围限新 F 循环再采集、多人同步/晚加入、重连/重启及原玩家回归，完整边界归 [运行入口](Runtime.md)。
 
 ## 【KNOWN ISSUES】地图移动阻挡验收
 
@@ -223,4 +223,12 @@ PlayerView 的现有网络 Owner 连接客户端表现脚本，后者只读取�
 
 ## 【FACT】地图树木砍伐输入与动态阻挡
 
-原 PlayerInput 增加 H 单次 InputEvent HarvestTree，仅由本地 GhostOwnerIsLocal 写入，所有端须使用同一输入布局。服务端在伤害/F 采集后、R 复活前验证资格、预约并计时；移动/攻击/受击/死亡/超距/断线取消，F 请求/既有采集优先。砍倒后由独立阻挡系统在玩家/敌人移动前按权威 tick 更新启用记录，原移动组件、玩家 Prefab 与扫掠/滑动算法保持。G、E 和 R 沿原规则独立请求；同次死亡后的 H 不补发。完整行为与预测边界归[树木砍伐](MapTreeHarvest.md)。第七阶段人工 GamePlayer 为 UNKNOWN，清单归[运行入口](Runtime.md)，原阶段通过不扩展到新 H/动态阻挡。
+当前 F 统一选中树木后调用 TreeHarvest.TryBegin，原 HarvestTree 字段保留但 H 不再触发/消费。TreeHarvest 继续计时/中断/产出，移除 F 采集优先；动态阻挡、原玩家 Prefab/移动/镜头/动画及 G/E/R 保持。规则归[树木](MapTreeHarvest.md)/[统一交互](Map.md)。用户已确认第七阶段人工通过，仍限原 v5/revision=6 的 H 资格/请求、中断/F 优先、争抢、阻挡/同步及[运行入口](Runtime.md)十项清单；该反馈不覆盖统一 F，未触发独立用例仍为 UNKNOWN。
+
+## 【FACT】树木再生的玩家占位与移动
+
+树木再生在服务端砍伐之后、R 复活之前检查，全部存活网络玩家的位置参与原点占位，包含当前未启用 Simulate 的玩家；死亡玩家不占位。默认中心距离不超过 0.5+0.4+0.01=0.91 米时等待，移出后原树恢复 Standing/显示；不会推开或传送玩家。玩家原预测移动按 Ghost 的砍倒/再生阻挡历史读取当前 tick 的 Disabled，取消预约及新 F 保留既往历史；输入、玩家资源、镜头、姿态和移动算法保持。细节归[树木砍伐](MapTreeHarvest.md)，用户已确认第八阶段人工 GamePlayer 通过，主线程结合既有静态核对与用户反馈判定该阶段通过；玩家范围限占位等待、再生阻挡、多轮 H/跨端移动与原玩法回归，完整边界归[运行入口](Runtime.md)第八阶段八项清单。人工结论来自用户反馈，精确边界、同 tick、延迟/回放和未触发失败用例仍为 UNKNOWN。
+
+## 【FACT】地图采矿输入与动态阻挡
+
+当前 F 由服务端统一选择最近有效资源目标，选中矿点时调用 MineHarvest.TryBegin；Mine 字段保留，J 不再触发/消费。有效在线 CommandTarget/归属、启用 Simulate、存活、零 Move、无攻击且近战 Ready 才合格。玩家只持有一个资源预约，重复 F 不重置或切换，完成/取消本 tick 不再启动；旧 F/H 优先判断移除。原中断、MinedTick 阻挡重建、玩家 Prefab/镜头/移动/动画及 G/E/R 保持。规则归[采矿](MapMining.md)/[统一交互](Map.md)，第九阶段原 J 人工仍为 UNKNOWN；统一 F 已获用户人工通过反馈，范围与未触发用例归[运行入口](Runtime.md)八项清单。

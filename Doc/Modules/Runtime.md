@@ -363,7 +363,7 @@ Clip 图片由隔离 Editor 预览场景采样生成，仅用于本次获授权�
 
 ## 【FACT】战斗地图入口
 
-当前网络 SubScene 选择 SourceMode=Json、Preset=Forest，五份 JSON 已显式绑定；可在 PlayMode 前保存 Preset 切换到 Grassland，或显式选择 BuiltIn。配置经校验与 LayoutBuilder 烘焙地图单例及缓冲，修改 JSON 须完成正常导入/烘焙后再进入。当前配置契约为 schemaVersion=4、configRevision=5，树木和 gather_apple 按生态密度依次布置。客户端在 Presentation 阶段、Entities Graphics 前创建分块地表和草丛/碎石/树木；采集物由服务端在准入前生成插值 Ghost，客户端按同步耗尽状态控制显示。默认 gather_apple 保存成功后耗尽，服务端模拟计时 600 秒后在原点恢复 Available，客户端恢复显示；再生不发物品，再次采集须新 F 请求。玩家 Client/Server 预测移动及服务端敌人移动读取烘焙阻挡缓冲，经过共享扫掠/滑动工具；服务端沿原 Spawner 生成敌人，GoInGame 和复活使用共用出生位置函数。服务端独立生成敌人首次死亡的额外苹果，驱动飞行/落地、G 拾取保存及到期清理，客户端接收插值 Ghost；地面掉落不写盘。配置文件、参数、所有权与清理职责由[战斗地图](Map.md)及[掉落与拾取](MapDrops.md)维护。
+当前网络 SubScene 选择 SourceMode=Json、Preset=Forest，五份 JSON 已显式绑定；可在 PlayMode 前保存 Preset 切换到 Grassland，或显式选择 BuiltIn。配置经校验与 LayoutBuilder 烘焙地图单例及缓冲，修改 JSON 须完成正常导入/烘焙后再进入。当前配置契约为 schemaVersion=5、configRevision=7，树木和 gather_apple 按生态密度依次布置。客户端在 Presentation 阶段、Entities Graphics 前创建分块地表和草丛/碎石；砍伐开启时树木和采集物由服务端在准入前生成插值 Ghost，关闭砍伐时保留原静态树。客户端按同步状态控制树木/采集物显示。H 成功砍倒生成 wood ×3，默认 600 秒后在原点空闲时恢复 Standing/显示，阻挡按砍倒/再生历史重建，再次砍伐须新 H。默认 gather_apple 保存成功后耗尽，服务端模拟计时 600 秒后在原点恢复 Available，客户端恢复显示；再生不发物品，再次采集须新 F 请求。玩家 Client/Server 预测移动及服务端敌人移动读取烘焙阻挡缓冲，经过共享扫掠/滑动工具；服务端沿原 Spawner 生成敌人，GoInGame 和复活使用共用出生位置函数。服务端独立生成敌人首次死亡的额外苹果，驱动飞行/落地、G 拾取保存及到期清理，客户端接收插值 Ghost；地面掉落不写盘。配置文件、参数、所有权与清理职责由[战斗地图](Map.md)及[掉落与拾取](MapDrops.md)维护。
 
 ## 【KNOWN ISSUES】战斗地图第一阶段验收
 
@@ -378,7 +378,7 @@ Clip 图片由隔离 Editor 预览场景采样生成，仅用于本次获授权�
 
 ## 【KNOWN ISSUES】战斗地图第二阶段 JSON 验收
 
-JSON 读取、五份 TextAsset 引用及两种模板的隔离 Editor 烘焙已静态核对，主线程代码、资源与文档静态验收通过；第二阶段人工 GamePlayer 的配置修改生效、异常配置反馈、来源/模板切换与原玩法回归仍为 UNKNOWN。当前清单使用第六阶段 schemaVersion=4、configRevision=5 的配置，JSON 与当前内置值一致；第一、第三阶段人工通过不替代本节独立的 JSON 验收清单。
+JSON 读取、五份 TextAsset 引用及两种模板的隔离 Editor 烘焙已静态核对，主线程代码、资源与文档静态验收通过；第二阶段人工 GamePlayer 的配置修改生效、异常配置反馈、来源/模板切换与原玩法回归仍为 UNKNOWN。以下清单保留第六阶段 schemaVersion=4、configRevision=5 的参数示例；当前入口与验收恢复值以第八阶段 v5/revision=7 清单为准；第一、第三阶段人工通过不替代本节独立的 JSON 验收清单。
 
 人工验收范围：
 
@@ -459,9 +459,11 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 
 ## 【KNOWN ISSUES】战斗地图第七阶段树木砍伐与资源掉落验收
 
-正常 Unity 编译、H 的 HarvestTree 输入/生成命令类型、TreeState 四项 Ghost 字段/Serializer、系统顺序及仅服务端 Progress 已静态核对。Forest/Grassland 的隔离 Editor 烘焙均与 BuiltIn 完整值一致，为 schemaVersion=5/configRevision=6；默认砍伐 2 米/2 秒/wood ×3 和新树木/木材 Ghost 有效，四类地图 GhostType 互不重复。原布局、89/53 初始树木阻挡、36/38 采集点、96×96 米、32 敌人/8 列/间距 3/首点 (0,1,16) 保持，空间违规为 0。木材占位网格 18 顶点/32 三角形、非退化且朝外，旧资源散列保持。主线程静态验收通过，第七阶段人工 GamePlayer 为 UNKNOWN。
+本节保留第七阶段 v5/revision=6、原 H 操作的验收口径；当前操作和跨类型选择见本页“地图资源统一 F 的人工验收”。
 
-人工入口为 CombatPrototypeNetCode，按既有启动配置进入 SinglePlayer 或 Online。所有端须使用同一代码、输入布局、Ghost 和 v5 配置；下列结果由用户人工记录，静态烘焙不替代运行验收：
+正常 Unity 编译、H 的 HarvestTree 输入/生成命令类型、TreeState 四项 Ghost 字段/Serializer、系统顺序及仅服务端 Progress 已静态核对。Forest/Grassland 的隔离 Editor 烘焙均与 BuiltIn 完整值一致，为 schemaVersion=5/configRevision=6；默认砍伐 2 米/2 秒/wood ×3 和新树木/木材 Ghost 有效，四类地图 GhostType 互不重复。原布局、89/53 初始树木阻挡、36/38 采集点、96×96 米、32 敌人/8 列/间距 3/首点 (0,1,16) 保持，空间违规为 0。木材占位网格 18 顶点/32 三角形、非退化且朝外，旧资源散列保持。主线程静态验收通过；用户明确反馈“我已验收通过，接下来下一阶段”，主线程结合既有静态核对与用户反馈判定第七阶段通过，范围限本节十项人工清单及 schemaVersion=5/configRevision=6 版本。人工结论来自用户反馈；未实际触发的临界距离、精确同距、同 tick、延迟/预测回放及创建/清理/回滚失败分支仍为 UNKNOWN。
+
+人工入口为 CombatPrototypeNetCode，按既有启动配置进入 SinglePlayer 或 Online。所有端须使用同一代码、输入布局、Ghost 和 v5 配置；以下为该阶段人工验收范围，结论来自用户反馈，静态烘焙不替代运行验收：
 
 1. 分别在 Forest/Grassland 核对树木位置/数量及初始阻挡；本人 X/Z 2 米内单次 H 预约最近 Standing 树，2 秒后仅生成一份木材堆 ×3，树木隐藏并解除阻挡。木材经过原 0.4 秒飞行/落地，空中 G 拒绝，落地 G 才入包；砍伐完成时库存、金币/经验不直接变化。
 2. 核对范围外、死亡、非零移动输入、攻击请求或近战非 Ready 时 H 拒绝；树挡住移动仍按输入取消。预约中移动/攻击/受击/死亡/超距/断线均取消，不产木材、不解除阻挡；恢复后新 H 可重新开始。重复 H 不重置期限，持续按住 H 不自动连续砍树，完成/取消当次不自动预约下一棵，R 不补发死亡时请求。
@@ -476,4 +478,66 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 
 验收结束恢复 SourceMode=Json、Preset=Forest、两份地图 schemaVersion=5/configRevision=6、seed=12345、32 敌人及原空间/movement/生态/出生配置；treeHarvest 恢复 enabled=true、treeObjectId=tree_normal、visualResourceKey=tree_harvest、harvestDurationSeconds=2、dropItemId=wood、dropQuantity=3、dropVisualResourceKey=drop_wood，树木交互距离恢复 2。drops 恢复第六阶段的 enabled=true、vitality_apple ×1、drop_apple、距离 2、飞行 0.4、散落/弧高 0.6、贴地 0.05、缩放 0.5、寿命 600；gather_apple 原 2 米/1 秒/苹果 ×1/关闭阻挡/启用再生 600 秒保持。
 
-详细规则归[树木砍伐](MapTreeHarvest.md)与[掉落与拾取](MapDrops.md)。原第一/第三/第四/第五/第六阶段通过范围保持，第二阶段独立 JSON 人工清单仍为 UNKNOWN；第七阶段人工、性能、平台构建与线上联调未验收。AI 未运行 GamePlayer/PlayMode、游戏模拟/显示系统、逻辑单元测试、命令行构建、发布、性能采样或图片检查。
+详细规则归[树木砍伐](MapTreeHarvest.md)与[掉落与拾取](MapDrops.md)。原第一/第三/第四/第五/第六阶段通过范围保持，第二阶段独立 JSON 人工清单仍为 UNKNOWN；第七阶段人工通过仅限本节清单，未实际触发的独立用例和规模性能、平台构建与线上联调仍为 UNKNOWN。AI 未运行 GamePlayer/PlayMode、游戏模拟/显示系统、逻辑单元测试、命令行构建、发布、性能采样或图片检查。
+
+## 【KNOWN ISSUES】战斗地图第八阶段树木原点再生验收
+
+本节保留第八阶段 v5/revision=7、原 H 操作的验收口径；当前操作和跨类型选择见本页“地图资源统一 F 的人工验收”。
+
+正常 Unity 编译当前无 C# Error，TreeBlockingEvent 的 TransitionTick/Disabled 两项 Ghost 字段与 Serializer/Snapshot 已生成，TreeProgress.RegrowAt 仅服务端，TreeRegrow 在 TreeHarvest 之后、PlayerRespawn 之前已静态核对。Forest/Grassland 隔离 Editor 烘焙均与 BuiltIn 完整值一致，为 schemaVersion=5/configRevision=7；tree_normal 的 regrowEnabled=true/regrowSeconds=600 已进入物体定义及 TreeSettings，原树 Prefab 烘焙历史为空、RegrowAt=0。原 2 米/2 秒/wood ×3、89/53 初始树木及启用阻挡、36/38 采集点、9 块/2304 格/96×96 米、32 敌人/8 列/间距 3/首点 (0,1,16)、NetworkId=1 玩家点 (2,1,0) 保持，空间违规为 0。烘焙前后 Console 均为 [0 Error,8 Warning,106 Log]，未清空日志，未新增烘焙错误/警告；原主场景干净、未进入 PlayMode，无临时烘焙 World 遗留。原 Scene/Prefab/Animator/资源/旧 meta 保持。
+
+主线程静态验收通过；用户明确反馈“我已验收通过，接下来下个阶段”，主线程结合既有静态核对与用户反馈判定第八阶段通过，范围限本节八项人工清单及 schemaVersion=5/configRevision=7。人工结论来自用户反馈，未实际触发的精确边界、同 tick、延迟/预测回放与创建/清理/回滚失败仍为 UNKNOWN。入口为 CombatPrototypeNetCode，沿原启动配置使用 SinglePlayer 或 Online，所有端须使用同一代码、Ghost、输入布局及配置。以下八项为已获用户确认的本阶段人工范围，静态烘焙不替代运行验收：
+
+1. PlayMode 前临时将 objects 中 tree_normal.regrowSeconds 改为 5，regrowEnabled=true，等待正常导入/烘焙。分别在 Forest/Grassland 成功 H 后检查从砍倒提交起模拟计时，原点空闲时原实体/位置/Yaw/PlacementIndex 恢复 Standing/显示及阻挡，至少完成两轮 H → Felled → Standing。再生本身库存/地面木材/金币/经验不增加，新 H 完成才再次产出一份 wood ×3；持续按住 H、重复 H、已砍树不自动连砍。
+2. 预约期间移动/攻击/受击/死亡/超距/断线或 F 优先取消时无木材和再生期限，原树保持 Standing/阻挡；恢复后须新 H。成功砍倒后 G 是否拾取、木材是否到期均不改变树木期限。可控条件下核对木材创建/提交失败无有效半成品、不安排再生，记录原异常；不能触发的创建/清理/回滚失败仍为 UNKNOWN。
+3. 分别让存活玩家/敌人在砍倒的原阻挡圆内等待到期，核对树不恢复、不推开角色；原期限保留，移出后才恢复，默认中心距离阈值为玩家 0.91/敌人 0.96 米（含边界）。存活网络玩家不以 Simulate 为占位条件，死亡角色不占位。恢复后玩家/敌人按原扫掠/滑动被树阻挡，相邻树保持独立；精确边界、恢复失败及回滚日志未触发时保持 UNKNOWN。
+4. 双客户端至少两轮核对砍倒/再生显示与阻挡一致，分别在 Felled 和再次 Standing 时晚加入、固定 ID 重连。检查跨端历史能覆盖先砍倒/再生/再砍倒，预测回放到转换之前及两次转换之间重建对应阻挡；转换在该 tick 移动后提交，从下一模拟 tick 生效。记录实际覆盖的延迟/纠正/回放条件，未触发的时序用例保持 UNKNOWN，不用显示一致替代阻挡验证。
+5. PlayMode 前设 tree_normal.regrowEnabled=false，成功砍倒后本局保持 Felled、不自动产出；恢复 true 后以新局复测。treeHarvest.enabled=false 时使用原静态树/阻挡，不产生树木 Ghost/砍伐木材；drops.enabled=false 只禁敌人额外掉落，H 及木材的 G/到期链保持。原 gather_apple 再生开关与期限独立。
+6. 临时调整树木 regrowSeconds、开关及 configRevision，核对重新导入/烘焙后生效，JSON 来源失败不回退 BuiltIn。非有限/负间隔、启用时为 0、缺失或错误类型字段须明确报错，关闭时 0 仍合法；schemaVersion 保持 5，无新增字段或旧配置自动补齐，旧 v4 仍拒绝。修复后重新成功烘焙；不同端使用相同配置，本阶段不提供联网配置校验协议。
+7. 在等待再生、被占位、多轮恢复后分别停止重进；切换 Forest/Grassland、Json/BuiltIn，释放 SubScene/World，核对树木及历史随原实例释放、无重复树/掉落或清理错误。新 Server World 从原布局 Standing/空历史/零期限开始；已入包木材按原 v1 恢复，树木期限/历史和未拾取掉落不写盘。共享资源保持。
+8. 回归 H/F 中断与争抢、G 苹果/木材分别入包和保存失败保留、新 G 重试/固定 ID 恢复、drops 到期及清理；F 采集物至少两轮原点再生（可沿第五阶段方法临时 5 秒）。回归地表/装饰、镜头、出生/复活点、玩家/敌人移动、近战/反击/受击/死亡/R、E 小块肉及原奖励保存。未实际触发的同 tick、保存失败和运行失败分支仍为 UNKNOWN。
+
+验收结束恢复 SourceMode=Json、Preset=Forest、两份地图 schemaVersion=5/configRevision=7、seed=12345、32 敌人及原空间/movement/生态/出生参数；tree_normal 恢复 interactionDistanceMeters=2、footprintRadiusMeters=0.5、minimumSameTypeSpacingMeters=3、blocksMovement=true、regrowEnabled=true、regrowSeconds=600。treeHarvest 恢复 enabled=true、treeObjectId=tree_normal、visualResourceKey=tree_harvest、harvestDurationSeconds=2、dropItemId=wood、dropQuantity=3、dropVisualResourceKey=drop_wood；drops 恢复 enabled=true、vitality_apple ×1、drop_apple、距离 2、飞行 0.4、散落/弧高 0.6、贴地 0.05、缩放 0.5、寿命 600；gather_apple 恢复原 2 米/1 秒/苹果 ×1/关闭阻挡/启用再生 600 秒。
+
+实现边界归[树木砍伐](MapTreeHarvest.md)，木材运动/拾取与库存归[掉落与拾取](MapDrops.md)/[背包与道具](Inventory.md)。第七阶段用户通过仍限 v5/revision=6 及原十项清单，其他历史通过与第二阶段独立 JSON UNKNOWN 保持。AI 未运行 GamePlayer/PlayMode、游戏模拟/显示系统、逻辑单元测试、命令行构建、发布、性能采样或图片检查；第八阶段人工通过仅限本节八项清单及原版本；未实际触发的独立用例、历史内存与网络开销、规模性能、平台构建和线上联调仍为 UNKNOWN。
+
+
+## 【KNOWN ISSUES】战斗地图第九阶段矿点采集与资源掉落验收
+
+本节保留第九阶段 v6/revision=8、原 J 操作的验收口径；当前操作和跨类型选择见本页“地图资源统一 F 的人工验收”。
+
+正常 Unity 编译当前无 C# Error，J 的 Mine 输入/命令类型、MineState 四字段 Serializer/Snapshot、服务端配置/进度标注及系统顺序已静态核对。Forest/Grassland 的 Json/BuiltIn 四次隔离 Editor 烘焙均与内置完整值一致，为 schemaVersion=6/configRevision=8；另两次 Json 关闭采矿时矿点为 0、原四类布局保持。默认森林/草原矿点 20/18、启用阻挡 109/71，树木 89/53、采集点 36/38 的位置与朝向保持，空间违规为 0；9 块/2304 格/96×96 米、32 敌人/8 列/间距 3/首点 (0,1,16)、NetworkId=1 玩家点 (2,1,0) 保持。六类地图交互/掉落 GhostType 互不重复，新网格 38 顶点/72 三角形、1.2 米高/0.75 米最大半径，非退化且朝外。烘焙前后 Console 均为 [0 Error,2 Warning,7 Log]，未清空日志、未新增烘焙错误/警告；主场景干净、无临时 World 遗留。旧资源/旧 meta 与主 Scene 保持，SubScene 仅追加 mine_rock/drop_stone 两个引用。
+
+主线程代码/资源静态验收通过；第九阶段人工 GamePlayer 为 UNKNOWN，不能以编译/隔离烘焙替代。人工入口为 CombatPrototypeNetCode，沿既有启动配置进入 SinglePlayer 或 Online；所有端须同步代码、输入布局、Ghost、配置与资源。以下为本阶段人工清单，未能实际触发的独立用例保留 UNKNOWN：
+
+1. 分别在 Forest/Grassland 核对新增 mine_rock 及初始阻挡、树木/采集点保持；本人 X/Z 2 米内单次 J 预约最近 Available 矿点，3 秒后仅生成一堆 stone ×3，矿点隐藏/解除对应阻挡。完成时库存、金币/经验不直接增加；石材沿原 0.4 秒飞行，空中 G 拒绝，落地 G 后按日志进入“石材”库存。
+2. 核对范围外、死亡、非零 Move（含被障碍挡住）、Attack 请求、近战非 Ready 或无有效在线/归属/Simulate 时拒绝。预约中移动/攻击/受击/死亡/超距/断线均取消，不产石材、不耗尽/解除阻挡；恢复后须新 J。重复 J 不重置期限，持续按住不自动连续采矿，完成/取消当 tick 不再预约下一点，R 不补发死亡时 J。
+3. 核对最近目标、精确同距取小 PlacementIndex；两玩家同 tick 争抢按 NetworkId 升序，仅一人预约同点，另一人可取其他合格点，已预约目标不被覆盖。不能触发的精确同距、临界 2 米和同 tick 竞争保持 UNKNOWN。
+4. 分别覆盖 F/J、H/J 同帧请求、F/H 已在交互中按 J、J 预约中开始 F/H；核对 F/H 请求或活跃状态优先，J 被拒绝/取消，原 F/H 链保持。G/E/R 仍按原规则独立处理；同步按键不产生重复石材或双重预约。
+5. 耗尽后本人/远端玩家和服务端敌人可通过该矿点原阻挡圆，相邻矿点/树木保持独立；双端隐藏/状态一致。晚加入、固定 ID 重连保留本局 Depleted；按原预测环境观察回放到 MinedTick 之前的阻挡恢复、从下一模拟 tick 解除，记录延迟/纠正条件。未覆盖的预测/时序分支仍为 UNKNOWN。
+6. 已耗尽矿点的新 J 或攻击不重复产出，不自动再生；多点各完成一堆 ×3。并存敌人苹果、树木木材和石材时核对共享 DropId 唯一/不复用、G 最近规则及三个实际 ItemId 分别入包，同名累计，无采矿者专属；多人争抢同堆只提交一次，原金币/经验/小块肉归属保持。
+7. 按既有方法制造玩家保存失败，核对 stone/DropId/阶段及原异常、石材库存不增、未到期掉落保持 Landed、旧正式档保留；恢复后须新 G，无自动补发，其他玩家/掉落/F/奖励继续。成功 G 后固定 ID 重连/服务端重启恢复已入包石材；未拾取掉落清空，矿点按原布局 Available 重建。
+8. 可控条件下覆盖石材创建、矿点提交、清理/回滚失败，记录 Mine completion failed 及具体地图/布置/玩家/DropId/物品/资源/原异常；成功回滚时无有效半成品、矿点可重新预约且原阻挡保持，需新 J，其他点/玩家继续。清理/回滚错误必须单独可见；不能触发的运行失败保持 UNKNOWN，不用配置错误替代。
+9. PlayMode 前修改 objects.mine_rock.interactionDistanceMeters、mining 时长/数量、生态 mineDensityPer100m2 与 map revision，等待正常导入/烘焙后核对。mining.enabled=false 时无矿点/采矿掉落、原四类布局恢复；drops.enabled=false 只禁敌人额外掉落，H/J 和已有掉落 G/到期仍沿原链；treeHarvest 开关与采矿独立。
+10. 核对旧 v5、缺 mining/生态矿点字段、未知物品/资源/对象、非正时长/数量/交互/占地、负数或非有限密度、错误类型及矿点再生字段非 false/0 的明确错误，不补字段、不回退 BuiltIn；修复后重新成功烘焙。各端配置一致，本阶段没有新增联网一致性协议。
+11. 沿原方法临时设 drops.lifetimeSeconds=3 或 0，核对石材生成起模拟计时到期/不自动到期，不自动入包。预约中、飞行中、落地等待、耗尽/取消后分别停止重进、切换 Forest/Grassland 与 Json/BuiltIn、释放 SubScene/World，核对矿点/石材无重复或销毁错误，共享资源保持。
+12. 回归地表/草丛/碎石、镜头、出生/R 复活、玩家/敌人移动、近战/反击/受击/死亡、E 小块肉、原奖励/库存保存恢复、敌人苹果/G、H 木材及至少两轮树木/采集物再生（沿原方法临时 5 秒，结束恢复 600 秒）。J 没有工具要求、动画、石材使用效果或新 UI。
+
+验收结束恢复 SourceMode=Json、Preset=Forest、两份地图 schemaVersion=6/configRevision=8、seed=12345、32 敌人及原空间/movement/出生；mining 恢复 enabled=true、mineObjectId/visualResourceKey=mine_rock、harvestDurationSeconds=3、dropItemId=stone、dropQuantity=3、dropVisualResourceKey=drop_stone，grassland/forest/rocky 的矿点密度恢复 0.1/0.2/1。mine_rock 恢复占地 0.75、同类间距 2.5、交互 2 米、只阻挡移动、非 gatherable、regrowEnabled=false/regrowSeconds=0。tree_normal/gather_apple 再生恢复 true/600 秒；treeHarvest 恢复 2 米/2 秒/wood ×3、drop_wood，drops 恢复 enabled=true、苹果 ×1、drop_apple、距离 2、飞行 0.4、散落/弧高 0.6、贴地 0.05、缩放 0.5、寿命 600，其余原值保持。
+
+完整规则归[采矿](MapMining.md)，掉落/库存归[掉落](MapDrops.md)/[背包](Inventory.md)。第八阶段通过仍限 v5/revision=7 八项清单，第七阶段仍限 v5/revision=6 十项清单；其余既有通过及第二阶段独立 JSON UNKNOWN 保持。第九阶段人工 GamePlayer、同步写盘耗时、规模性能、平台构建与线上联调为 UNKNOWN。AI 未运行 GamePlayer/PlayMode、游戏模拟/显示系统、逻辑单元测试、命令行构建、发布、性能采样或图片检查。
+
+## 【KNOWN ISSUES】地图资源统一 F 的人工验收
+
+当前入口为 CombatPrototypeNetCode，JSON 仍为 v6/revision=8。客户端 F 单次按下提交已有 Gather，H/J 不再触发或消费，G/E/R 保持；所有端须同步当前代码、输入布局、配置及资源。正常 Unity 编译及两个新脚本、三类 TryBegin/CancelBegin、保留输入字段和顺序特性已静态核对，未运行游戏系统或 PlayMode。用户已确认统一 F 人工 GamePlayer 验收通过，主线程结合既有静态核对与用户反馈判定该阶段通过，范围限下列八项清单。人工结论来自用户反馈，未实际触发的临界距离、精确同距、同 tick、独立失败及延迟/预测回放时序仍为 UNKNOWN：
+
+1. 分别在采集点、树木、矿点旁单次 F：默认 2 米内开始，分别 1/2/3 秒完成；苹果 ×1 保存成功直接入包，木材/石材各 ×3 生成地面掉落并沿原 G 保存入包。H/J 单独按下无对应资源请求，原 G/E/R 和攻击保持。
+2. 交互范围相交时跨三类选择 X/Z 最近有效目标，无类型优先；用 Interaction selected 的 type/placement/distance 核对。最近目标已占用/耗尽或功能关闭时排除，可选择另一有效目标；不同类型配置距离分别生效，范围外拒绝。精确同距取小 PlacementIndex，未触发边界用例保持 UNKNOWN。
+3. 一名玩家只持有一种资源预约。操作期间重复 F 不重置、不预约第二个目标，其他更近资源变为可用也不切换；按住不自动连续。完成/取消当 tick 不启动另一交互，之后须重新按 F；无目标或启动失败不自动补发/转选。
+4. 三类分别覆盖非零 Move（含被阻挡）、攻击、受击、死亡、超距、断线/归属失效的拒绝与中断：不提前产出或耗尽，树木/矿点阻挡保持；R 不补发死亡时 F。旧 F/H 类型优先不再参与，同一 F 不被树木/采矿系统误取消。
+5. 两玩家同 tick 争抢同目标，按 NetworkId 升序立即预约，只有一个持有者，另一人可取其他有效目标；覆盖不同类型目标并存、已经预约玩家再次 F。未触发精确同 tick 竞争保持 UNKNOWN。
+6. 回归采集 SavePrepared 失败不入包/耗尽、释放预约并须新 F；木材/石材创建或提交失败只清理当前项/回滚，记录原异常及清理失败，其他玩家继续；地上掉落的 G 保存失败保持未到期掉落及旧库存/正式档。未触发独立失败用例保持 UNKNOWN。
+7. 回归采集物和树木至少两轮原点再生、占位等待及新 F 再次产出，取消/失败不安排再生；矿点仍不再生。核对跨端显示、下一 tick 阻挡、预测/晚加入/重连及重启后资源重建和固定 ID 库存恢复，未覆盖时序保持 UNKNOWN。
+8. 回归 Forest/Grassland、Json/BuiltIn、treeHarvest/mining 独立开关、drops.enabled 仅控制敌人掉落，以及原镜头/出生/移动/近战/反击/奖励/库存/清理。修改距离/耗时/数量须在 PlayMode 前完成并各端一致，沿原严格 JSON 校验及烘焙生效；结束恢复默认 2 米、1/2/3 秒、苹果 ×1/木材 ×3/石材 ×3、再生 true/600 秒、矿点 false/0 和其余原配置。
+
+统一 F 通过依据为本阶段用户反馈；旧阶段人工通过仍限各自原版本/清单，第九阶段原 J 人工结果仍为 UNKNOWN，未触发用例不由其他阶段替代。完整规则归[地图](Map.md)，计时/结算归[背包](Inventory.md)、[树木](MapTreeHarvest.md)、[采矿](MapMining.md)。AI 未新增/运行逻辑单元测试、GamePlayer/PlayMode、游戏模拟/显示系统、命令行构建、发布、性能采样或图片检查；运行性能、平台及线上结果仍为 UNKNOWN。

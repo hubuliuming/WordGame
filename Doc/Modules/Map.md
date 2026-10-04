@@ -15,11 +15,11 @@
 
 ## 【FACT】当前默认配置
 
-当前 JSON 与 [CombatPrototypeDefaultMapConfigSource.cs](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 的内置值一致。地图尺寸、种子、生态密度与出生参数沿用第一阶段；当前契约为 v5，启用普通树木、静态移动阻挡及种植采集物 gather_apple。SubScene 使用 Json 来源，BuiltIn 仅在显式选择时使用；采集物已接入原点再生，攻击遮挡和树木再生未接入。动态掉落/G 归[掉落与拾取](MapDrops.md)，H 砍伐及解除阻挡归[树木砍伐](MapTreeHarvest.md)。
+当前 JSON 与 [内置来源](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 一致，为 v6/revision=8。原空间、种子、生态及出生值保持，新增 mine_rock；SubScene 为 Json，BuiltIn 须显式选择。采集物/树木启用原点再生，矿点不再生。G 归[掉落](MapDrops.md)，F 统一选择采集点/树木/矿点；树木/再生归[树木](MapTreeHarvest.md)，矿点/石材归[采矿](MapMining.md)。
 
 | 配置字段 | 当前值与用途 |
 |---|---|
-| schemaVersion / configRevision | 5 / 6 |
+| schemaVersion / configRevision | 6 / 8 |
 | defaultSeed | 12345，用于确定性布置 |
 | geometry.cellSizeMeters | 2 米 |
 | geometry.cellsPerChunk | 每块单边 16 格，即 32×32 米 |
@@ -39,21 +39,21 @@
 
 Spawner 的 EnemyColumns、EnemySpacing 保留现有序列化值并参与敌人网格校验。原 EnemyPosition、EnemyCount 字段名和序列化值兼容保留，当前 Baker 使用地图配置生成 ECS 中的 EnemyPosition、EnemyCount；这两个旧 Inspector 字段不再控制当前敌人原点与总量。首个敌人位置为 (0,1,16)，最后一个为 (21,1,25)。
 
-| 生态 | 地表 | 草丛组 /100㎡ | 树木 /100㎡ | 采集物 /100㎡ | 静态碎石 /100㎡ |
-|---|---|---:|---:|---:|---:|
-| grassland | grass | 12 | 0.4 | 0.6 | 0.2 |
-| forest | forest_floor | 8 | 1.5 | 0.5 | 0.2 |
-| rocky | rock | 3 | 0.1 | 0.2 | 1 |
+| 生态 | 地表 | 草丛组 /100㎡ | 树木 /100㎡ | 采集物 /100㎡ | 静态碎石 /100㎡ | 矿点 /100㎡ |
+|---|---|---:|---:|---:|---:|---:|
+| grassland | grass | 12 | 0.4 | 0.6 | 0.2 | 0.1 |
+| forest | forest_floor | 8 | 1.5 | 0.5 | 0.2 | 0.2 |
+| rocky | rock | 3 | 0.1 | 0.2 | 1 | 1 |
 
-当前 objects 包含 decor_grass、decor_pebble、tree_normal 和 gather_apple。草丛占地半径为 0、同类最小间距 0.5 米；碎石占地半径为 0.3 米、同类最小间距 2.5 米。碎石是静态装饰，不是建议模板中的占地 0.75 米可采矿点。草丛与碎石均不阻挡。
+当前 objects 包含 decor_grass、decor_pebble、tree_normal、gather_apple、mine_rock。草丛占地 0、同类间距 0.5 米；装饰碎石占地 0.3、间距 2.5 米，均不阻挡。mine_rock 独立阻挡，占地 0.75、间距 2.5、交互 2 米，F 采矿 3 秒产出 stone ×3，本局耗尽不再生。
 
-普通树木的 footprintRadiusMeters=0.5、minimumSameTypeSpacingMeters=3、blocksMovement=true，三种生态通过 treeObjectId=tree_normal 引用。树木不产出、不受攻击破坏、不再生；interactionDistanceMeters=2、gatherDurationSeconds=1 仅保留配置值，gatherable=false、yieldItemId=null、yieldQuantity=0。地表 walkable=true、movementMultiplier=1，尚未接入地表通行或速度计算。
+普通树木的 footprintRadiusMeters=0.5、minimumSameTypeSpacingMeters=3、blocksMovement=true，三种生态通过 treeObjectId=tree_normal 引用。F 使用 interactionDistanceMeters=2，按 treeHarvest 的 2 秒/wood ×3 砍伐；regrowEnabled=true、regrowSeconds=600。普通攻击不破坏树木；gatherDurationSeconds=1 未用于砍伐，gatherable=false、yieldItemId=null、yieldQuantity=0。地表 walkable=true、movementMultiplier=1，尚未接入地表通行或速度计算。
 
-gather_apple 的 footprintRadiusMeters=0.3、minimumSameTypeSpacingMeters=1.5、interactionDistanceMeters=2、gatherDurationSeconds=1、yieldItemId=vitality_apple、yieldQuantity=1，gatherable=true。三种生态通过 gatherObjectId=gather_apple 引用；移动/近战/投射物阻挡关闭，regrowEnabled=true、regrowSeconds=600。产出 ID 只允许 vitality_apple，显式映射既有 Msg.ItemName.活力苹果；当前苹果只入包和保存，E 键仍仅使用小块肉。
+gather_apple 的 footprintRadiusMeters=0.3、minimumSameTypeSpacingMeters=1.5、interactionDistanceMeters=2、gatherDurationSeconds=1、yieldItemId=vitality_apple、yieldQuantity=1，gatherable=true。三种生态通过 gatherObjectId=gather_apple 引用；移动/近战/投射物阻挡关闭，regrowEnabled=true、regrowSeconds=600。当前采集产出 vitality_apple，显式映射既有 Msg.ItemName.活力苹果；当前苹果只入包和保存，E 键仍仅使用小块肉。
 
 ## 【FACT】JSON 文件与配置入口
 
-配置目录为 Assets/Config/CombatPrototype/Map/，包含五份 UTF-8 无 BOM JSON。两份地图定义为 schemaVersion=5、configRevision=6，包含 movement/drops/treeHarvest 段；生态数组包含必填 treeObjectId、gatherObjectId，物体数组包含普通树木和采集物。grounds.json 的结构与数值保持。地图尺寸、种子、生态密度及出生参数保持原值。
+Assets/Config/CombatPrototype/Map/ 有五份 UTF-8 无 BOM JSON。当前地图 v6/revision=8，movement/drops/treeHarvest/mining 必填；生态含 treeObjectId/gatherObjectId/mineObjectId、mineDensityPer100m2，物体新增 mine_rock。原地表、空间、种子和出生值保持。
 
 | MapAuthoring 字段 | 显式绑定文件 | JSON 根类型 |
 |---|---|---|
@@ -63,7 +63,7 @@ gather_apple 的 footprintRadiusMeters=0.3、minimumSameTypeSpacingMeters=1.5、
 | GroundsJson | [grounds.json](../../Assets/Config/CombatPrototype/Map/grounds.json) | GroundDefinitionConfig 数组 |
 | ObjectsJson | [objects.json](../../Assets/Config/CombatPrototype/Map/objects.json) | MapObjectDefinitionConfig 数组 |
 
-SourceMode=BuiltIn 时明确使用内置来源，SourceMode=Json 时使用选中地图 JSON 和三份共享 JSON；Json 来源失败不自动回退 BuiltIn。Preset=Grassland 要求地图 ID 为 battle_grassland_01，Preset=Forest 要求 battle_forest_01。schemaVersion=5 管理当前整组配置契约，configRevision 为正整数修订号；不会自动递增。旧 v1/v2/v3/v4 或缺少 movement/drops/treeHarvest/treeObjectId/gatherObjectId 的文件明确失败，不补默认字段或回退来源。
+SourceMode=BuiltIn 时明确使用内置来源，SourceMode=Json 时使用选中地图 JSON 和三份共享 JSON；Json 来源失败不自动回退 BuiltIn。Preset=Grassland 要求地图 ID 为 battle_grassland_01，Preset=Forest 要求 battle_forest_01。schemaVersion=6 管理当前整组配置契约，configRevision 为正整数修订号；不会自动递增。旧 v1～v5 或缺少 movement/drops/treeHarvest/mining/treeObjectId/gatherObjectId/mineObjectId/mineDensityPer100m2 的文件明确失败，不补默认字段或回退来源。
 
 [MapMovementConfig.cs](../../Assets/Scripts/CombatPrototype/Map/MapMovementConfig.cs) 是地图定义的必填 movement 段：
 
@@ -92,15 +92,23 @@ MapAuthoring.LoadMapConfig 是当前配置来源接入点，按 SourceMode 和 P
 
 烘焙得到 [CombatPrototypeMapData.cs](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapData.cs) 中的地图单例和区块、格子、静态物体布置、阻挡、生态、地表材质、Prefab 缓冲。CombatPrototypeMapData 保存两类角色半径、碰撞留缝与滑动次数；CombatPrototypeMapObstacle 保存布置索引、物体索引、X/Z 位置、占地半径和 Disabled 开关。地图不是 Ghost；各 World 使用同一 SubScene 烘焙配置。原准入客户端/服务端、敌人生成与复活系统等待地图数据就绪。
 
-[LayoutBuilder](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapLayoutBuilder.cs) 先生成全图生态、道路及禁止布置格，再跨所有区块依次完成树木、采集物布置，最后补草丛和碎石。每块各生态按可布置格面积计算期望数量，进行确定性整数取样、候选格洗牌和格内抖动。候选点避开道路、安全区、战斗区、边缘及整个敌人初始网格的矩形；矩形在网格外留半个敌人间距。阻挡物的避让半径额外计入最大角色半径和碰撞留缝。共享空间桶检查同类间距与所有非零占地物体之间的重叠；零占地草丛不参与占地互斥。实际数量可少于期望值，每次类别布置每格最多一个候选。相同空间配置与种子决定同一布局；树木布置保持，新增采集物优先于草丛/碎石，后两类的旧位置与数量不作为当前固定结果。
+[LayoutBuilder](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapLayoutBuilder.cs) 先生成全图生态、道路及禁止布置格，再跨所有区块依次完成树木、采集物、启用的矿点布置，最后补草丛和碎石。每块各生态按可布置格面积计算期望数量，进行确定性整数取样、候选格洗牌和格内抖动。候选点避开道路、安全区、战斗区、边缘及整个敌人初始网格的矩形；矩形在网格外留半个敌人间距。阻挡物的避让半径额外计入最大角色半径和碰撞留缝。共享空间桶检查同类间距与所有非零占地物体之间的重叠；零占地草丛不参与占地互斥。实际数量可少于期望值，每次类别布置每格最多一个候选。相同配置/种子决定布局；树木/采集物的位置与朝向保持，矿点优先于草丛/碎石，后两类可变化。
 
-[ChunkMeshBuilder](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapChunkMeshBuilder.cs) 每块生成一个网格，地表类型对应子网格。[MapPresentationSystem](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapPresentationSystem.cs) 仅在客户端 PresentationSystemGroup、EntitiesGraphicsSystem 前创建地表和静态装饰，跳过 Gatherable/Harvestable。砍伐开启时树木由服务端 TreeSpawn 生成插值 Ghost，关闭时仍显示原静态树；草丛/碎石保持静态。采集物由 [GatherSpawnSystem](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapGatherSpawnSystem.cs) 在服务端地图就绪后、准入前实例化为插值 Ghost，根实体更换/失效或系统停止时清理其拥有的实体。服务端原敌人生成链保持。
+[ChunkMeshBuilder](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapChunkMeshBuilder.cs) 每块生成一个网格，地表类型对应子网格。[MapPresentationSystem](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapPresentationSystem.cs) 仅在客户端 PresentationSystemGroup、EntitiesGraphicsSystem 前创建地表和静态装饰，跳过 Gatherable/Harvestable/Mineable。砍伐开启时树木由服务端 TreeSpawn 生成插值 Ghost，关闭时仍显示原静态树；草丛/碎石保持静态。采集物由 [GatherSpawnSystem](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapGatherSpawnSystem.cs) 在服务端地图就绪后、准入前实例化为插值 Ghost，根实体更换/失效或系统停止时清理其拥有的实体。服务端原敌人生成链保持。
 
 显示系统在首次取得地图根实体时生成一次；结构变更前复制缓冲，装饰同时初始化 LocalTransform 与当前帧 LocalToWorld。区块、装饰逐项隔离生成失败并清理当前项，缺失整批必要依赖明确终止，日志包含阶段、条目标识和资源键。根实体失效/替换、系统停止及 World 销毁时释放本系统拥有的实体与生成网格；共享材质和 Prefab 不由该系统销毁。第一阶段清理相关人工验收已获用户确认通过，范围见 [运行入口](Runtime.md)。
 
-[采集状态](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapGatherData.cs) 同步 PlacementIndex、Available/Collecting/Depleted 和 CollectorNetworkId，配置与计时组件仅服务端保留。[GatherRenderSystem](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapGatherRenderSystem.cs) 按耗尽状态禁用客户端 MaterialMeshInfo，回到 Available 时恢复；Ghost 保留至本局地图释放，供晚加入接收。F 单次请求、服务端预约/中断及保存后入包规则归 [背包与道具](Inventory.md)，人工范围归 [运行入口](Runtime.md)。
+[采集状态](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapGatherData.cs) 同步 PlacementIndex、Available/Collecting/Depleted 和 CollectorNetworkId，配置与计时组件仅服务端保留。[GatherRenderSystem](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapGatherRenderSystem.cs) 按耗尽状态禁用客户端 MaterialMeshInfo，回到 Available 时恢复；Ghost 保留至本局地图释放，供晚加入接收。采集计时/中断及保存后入包归[背包](Inventory.md)，F 统一选目标见下节，人工范围归[运行入口](Runtime.md)。
 
 Map Baker 将再生开关/间隔写入物体定义，GatherSpawnSystem 复制到服务端采集配置。采集仅在 SavePrepared 成功、提交库存并耗尽时写入 RegrowAt=当次服务端模拟时间+间隔；取消/保存失败清空进度且不安排再生。独立 [GatherRegrowSystem](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapGatherRegrowSystem.cs) 在服务端预测组的采集之后、复活之前检查 Depleted、启用再生且期限已到的点，清空进度/采集者并恢复 Available。位置、布置索引及原 Ghost 保持，不实例化新点、不发物品或写盘；再次采集须有新 F 请求。关闭再生时点保持本局耗尽。期限仅属于当前 Server World，不使用客户端或系统墙钟。
+
+## 【CURRENT STRATEGY】统一 F 资源交互
+
+[统一入口](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapInteractionSystem.cs)在服务端预测组的伤害/G 清理后、Gather 前执行；[选择器](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapInteractionTargetSelector.cs)跨三类比较。F 单次按下只写已有 Gather；HarvestTree/Mine 保留，H/J 停用，输入布局与 G/E/R 保持。
+
+玩家须在线、归属匹配、启用 Simulate、存活、有限零 Move、无攻击且近战 Ready。按各类型配置距离筛选 Available 采集点、Standing 树和 Available 矿点，关闭功能/占用/耗尽目标排除；比较 X/Z 中心距离平方，精确同距取小 PlacementIndex，无类型优先。请求按 NetworkId 升序，立即预约后再处理下一玩家。
+
+记录本 tick 已交互玩家，重复 F 不重置/切换，完成/取消本 tick 不再启动，须新 F，按住不连续。原系统计时/中断/产出；启动失败仅清理当前预约，记录地图/类型/布置/玩家/阶段与原异常，不转选，其他请求继续。v6/revision=8 保持；用户人工通过，范围见[运行入口](Runtime.md)，未触发用例 UNKNOWN。
 
 ## 【CURRENT STRATEGY】静态物体移动阻挡
 
@@ -108,7 +116,7 @@ Map Baker 将再生开关/间隔写入物体定义，GatherSpawnSystem 复制到
 
 [玩家移动](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypePlayerMovementSystem.cs) 在 Client/Server 的原预测模拟组中共用该工具，只处理 Simulate 且存活的玩家，保留非有限输入拒绝、长度限制、速度及朝向规则。[敌人移动](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypeEnemyMovementSystem.cs) 只在服务端调用，最近在线存活目标、前后摇停动及距离 1.5 停止规则保持；碰到障碍可滑动或停止，没有全局路径规划。
 
-两个移动系统都等待地图单例，直接读取现有地图根实体上的只读阻挡缓冲，不实例化 Collider；该移动阻挡链不增加玩家/敌人组件或输入/Ghost 字段。角色 Y 保持；砍伐按权威时刻更新 Disabled，移动工具只处理启用记录。地表 walkable、movementMultiplier 与地图边界尚不参与移动阻挡。不同端仍须使用相同地图配置，未新增联网配置校验协议。
+两个移动系统都等待地图单例，直接读取现有地图根实体上的只读阻挡缓冲，不实例化 Collider；该移动阻挡链不增加玩家/敌人组件或输入/Ghost 字段。角色 Y 保持；树木阻挡历史及矿点 MinedTick 按权威 tick 重建 Disabled，移动工具只处理启用记录。地表 walkable、movementMultiplier 与地图边界尚不参与移动阻挡。不同端仍须使用相同地图配置，未新增联网配置校验协议。
 
 ## 【FACT】资源绑定与 Editor 入口
 
@@ -139,10 +147,14 @@ Map Baker 将再生开关/间隔写入物体定义，GatherSpawnSystem 复制到
 
 ## 【KNOWN ISSUES】当前验收边界
 
-脚本编译、两种模板的隔离 Editor 烘焙、地表网格数据和显式资源引用已静态核对；用户已确认第一、第三、第四、第五、第六阶段人工 GamePlayer 验收通过。主线程结合既有静态核对与用户反馈判定这五个阶段通过，范围分别限 [运行入口](Runtime.md) 对应阶段的清单；性能、平台构建和线上联调仍为 UNKNOWN。核对与验收记录归 [本月 ChangeLog](../ChangeLog/ChangeLog_2026-10.md)。
+脚本、模板隔离烘焙、网格及绑定已有静态核对。用户已确认第一/第三/第四/第五/第六/第七/第八阶段人工通过，仍限[运行入口](Runtime.md)各自原版本/清单；不覆盖统一 F，性能/平台/线上为 UNKNOWN。记录归[本月 ChangeLog](../ChangeLog/ChangeLog_2026-10.md)。
 
-当前没有地图边界碰撞、地形高度、路径规划、攻击遮挡、超出当前掉落范围的动态物体生命周期或树木再生。角色仍可离开地表范围；旧 NetworkId 连续排列没有新增人数上限或回绕，较大 ID 的出生点可能越界。道路与安全区仅限制初始物体布置，敌人仍可追踪进入，不提供持续安全区行为。敌人可能在树木前停止，当前滑动不保证绕过成片障碍或全图可达。普通树木的显示、阻挡和滑动已获第三阶段人工通过反馈，结论限第三阶段版本与对应清单。
+当前没有地图边界碰撞、地形高度、路径规划、攻击遮挡、超出当前掉落范围的动态物体生命周期。角色仍可离开地表范围；旧 NetworkId 连续排列没有新增人数上限或回绕，较大 ID 的出生点可能越界。道路与安全区仅限制初始物体布置，敌人仍可追踪进入，不提供持续安全区行为。敌人可能在树木前停止，当前滑动不保证绕过成片障碍或全图可达。普通树木的显示、阻挡和滑动已获第三阶段人工通过反馈，结论限第三阶段版本与对应清单。
 
 配置/种子没有新增联网校验或同步协议；不同端配置不一致的处理未接入。地图切换只支持 PlayMode 前保存 Preset，运行中切换未接入。AI 未运行逻辑单元测试、GamePlayer/PlayMode、命令行构建、发布、性能采样或图片检查。
 
-第一/第三/第四/第五/第六阶段用户人工通过分别限[运行入口](Runtime.md)对应版本与清单；第二阶段独立 JSON 人工清单仍为 UNKNOWN。第七阶段正常编译、Ghost 类型/资源和两种模板隔离烘焙已核对，主线程静态验收通过，砍伐/动态阻挡/木材多物品拾取的人工 GamePlayer 为 UNKNOWN，完整规则归[树木砍伐](MapTreeHarvest.md)。静态烘焙不替代人工运行验收。
+第二阶段独立 JSON 人工仍为 UNKNOWN。第七阶段编译/Ghost/资源/隔离烘焙已核对，用户人工通过限 v5/revision=6 十项清单；未触发用例 UNKNOWN，规则归[树木](MapTreeHarvest.md)。
+
+树木成功砍倒后默认 600 秒原点再生，占位则等待，原 Ghost 恢复 Standing/显示/阻挡，新 F 才再次产出。第八阶段 v5/revision=7 编译/历史序列化/烘焙已核对且布局保持；用户通过限八项原清单，未触发用例 UNKNOWN；旧 H 通过不覆盖统一 F。
+
+森林/草原：20/18 矿点、109/71 阻挡，关闭后原布局保持；采矿编译/六次隔离烘焙已核对，人工 UNKNOWN，见[运行入口](Runtime.md)/[采矿](MapMining.md)。

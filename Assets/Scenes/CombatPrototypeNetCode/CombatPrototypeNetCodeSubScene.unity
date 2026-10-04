@@ -211,6 +211,10 @@ MonoBehaviour:
     Prefab: {fileID: 2904090953180580515, guid: 3207c51e470cd2244b3b934436fd83ec, type: 3}
   - ResourceKey: drop_wood
     Prefab: {fileID: 3069278388377741593, guid: 4d858381c32935942851ccbba8a14fe4, type: 3}
+  - ResourceKey: mine_rock
+    Prefab: {fileID: 42716172904812669, guid: 6a4118ae4b4c6334983e718cf8c791e5, type: 3}
+  - ResourceKey: drop_stone
+    Prefab: {fileID: 7486287523747639946, guid: 5c046f7757439c444b83563690bb15b4, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

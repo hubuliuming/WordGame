@@ -48,7 +48,8 @@ namespace Code_01.CombatPrototype.Map
                 valid[i] = EntityManager.HasComponent<Prefab>(prefab) && EntityManager.HasComponent<GhostType>(prefab) &&
                     EntityManager.HasComponent<LocalTransform>(prefab) &&
                     EntityManager.HasComponent<CombatPrototypeMapTreeState>(prefab) &&
-                    EntityManager.HasComponent<CombatPrototypeMapTreeProgress>(prefab);
+                    EntityManager.HasComponent<CombatPrototypeMapTreeProgress>(prefab) &&
+                    EntityManager.HasBuffer<CombatPrototypeMapTreeBlockingEvent>(prefab);
                 if (!valid[i])
                     Debug.LogError("[CombatPrototype.Map] Tree spawn prerequisites failed; stage=ValidatePrefab, map=" +
                         map.MapDefinitionId + ", objectId=" + objects[i].ObjectId + ", resource=" +
@@ -76,6 +77,7 @@ namespace Code_01.CombatPrototype.Map
                         PlacementIndex = i, Phase = CombatPrototypeMapTreePhase.Standing
                     });
                     EntityManager.SetComponentData(entity, default(CombatPrototypeMapTreeProgress));
+                    EntityManager.GetBuffer<CombatPrototypeMapTreeBlockingEvent>(entity).Clear();
                     _owned.Add(entity);
                     succeeded++;
                 }

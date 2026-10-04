@@ -487,3 +487,63 @@
 - 新增 MapTreeHarvest 专题，局部同步 Map、MapDrops、Inventory、Player、Combat、DataResources、Runtime、AI_Understanding、本月 ChangeLog 与项目外建议模板；配置示例同步真实森林 JSON，Runtime 增加十项第七阶段人工清单。第一/第三/第四/第五/第六阶段通过仅限原版本/原清单，第二阶段独立 JSON 人工仍为 UNKNOWN。
 - 最终范围核对以本阶段开始前 3200 份文件散列为基线：25 份既有文件受影响（含项目外模板），29 份新增文件（含 14 份 Unity 生成 meta）；未删除文件，旧资源仅 SubScene 两处引用改变。Unity 保存引入的原组件空名称尾空格已恢复原序列化格式。54 份文本严格 UTF-8/新增行空白检查、14 个新 GUID 唯一性与旧 GUID 无冲突、5 份 JSON、模板示例一致性、388 个文档本地链接和 git diff --check 均通过；导航 8191 字节、地图主文档 23331 字节、新砍伐专题 12387 字节均在约定上限内。
 - 主线程代码/资源静态验收通过；第七阶段人工 GamePlayer 为 UNKNOWN，取消/争抢、动态阻挡/预测回放、失败回滚、木材拾取保存/恢复与原玩法回归需人工确认。未接斧头、动画/树桩、树木再生、物理、世界存档、新 UI 或使用效果。AI 未运行游戏模拟/显示系统、GamePlayer/PlayMode、逻辑单元测试、命令行构建、发布、性能采样或图片检查，未提交 Git；性能、平台与线上联调仍为 UNKNOWN。
+
+## 2026-10-03：战斗地图第七阶段人工验收通过
+
+- 用户明确反馈“我已验收通过，接下来下一阶段”，主线程结合第七阶段既有静态核对与用户反馈判定该阶段通过；范围限 Runtime 第七阶段十项清单及 schemaVersion=5/configRevision=6 版本。
+- 人工通过覆盖范围按原清单记录：H 最近树木/计时/木材产出、中断/F 优先/争抢、隐藏及动态阻挡/跨端/晚加入、苹果与木材分别拾取/保存/恢复、配置/开关/到期/清理和原玩法回归。未实际触发的临界距离、精确同距、同 tick、延迟/预测回放与创建/清理/回滚失败分支仍为 UNKNOWN，不扩展为规模性能、平台构建或线上联调通过；第二阶段独立 JSON UNKNOWN 与此前阶段边界保持。
+- 局部同步 Map、MapTreeHarvest、MapDrops、Inventory、Player、Combat、DataResources、Runtime、本月 ChangeLog 及项目外建议模板，共十份既有文档；AI_Understanding 当前路由和 v5/revision=6 默认配置保持。用户已选择第八阶段方向“树木原点再生”；本轮只同步第七阶段验收状态，未执行第八阶段开发。
+- 代码、JSON、Scene、Prefab、Animator、meta、包与构建设置未修改，未创建子Agent。人工结论来自用户反馈；AI 未运行游戏模拟/显示系统、GamePlayer/PlayMode、逻辑单元测试、命令行构建、发布、性能采样或图片检查，未提交 Git。
+
+## 2026-10-04：战斗地图第八阶段树木原点再生
+
+- 用户确认第八阶段完整方案，由主线程执行，未创建子Agent。入口为 CombatPrototypeNetCode，成功砍倒后按原对象字段计时并在原树 Ghost 恢复 Standing/显示/阻挡，再次产出须新 H。
+- 两份地图 JSON 与 BuiltIn 的 configRevision 从 6 改为 7，schemaVersion=5 保持；objects.tree_normal 的 regrowEnabled=true、regrowSeconds=600。没有新增 JSON 字段或修改原 DTO/校验器；原空间、种子、生态、出生、砍伐/drops/gather_apple 数值和 biomes/grounds 保持。
+- 修改七份既有脚本：DefaultMapConfigSource、MapAuthoring、TreeData、TreeAuthoring、TreeSpawnSystem、TreeHarvestSystem、TreeObstacleSystem。Map Baker 复制所选树木再生配置，TreeProgress 增加仅服务端 RegrowAt；TreeAuthoring 烘焙空阻挡历史，TreeSpawn 初始化时清空。
+- 新增 TreeRegrowSystem，仅服务端预测组、TreeHarvest 之后及 PlayerRespawn 之前执行。计时只从完整木材生成/登记及砍倒提交成功起安排；取消/失败不安排。到期原点无占位时先预留缓冲容量，再追加启用历史、清空进度并恢复原实体/阻挡；单树失败回滚状态、进度、历史长度及阻挡，原异常可定位，其他条目继续，原期限保留供后续检查。
+- 占位采用原阻挡位置/半径，加对应角色半径及留缝；全部存活服务端网络玩家参与（包含未启用 Simulate 的玩家），存活敌人参与，死亡角色跳过，默认阈值分别为 0.91/0.96 米（含边界）。占位时等待、清空后恢复，不推开角色/换树位/重置期限；非有限角色位置明确终止本批恢复。
+- TreeState 保持四个 Ghost 字段，新增 CombatPrototypeMapTreeBlockingEvent 动态缓冲，两字段 TransitionTick/Disabled 同步，内部容量 4，每完整轮次增加两条。砍倒/再生均在移动之后记录权威 tick，下一模拟 tick 起转换；TreeObstacle 对所有树木阶段逆向查找历史重建当前预测阻挡，取消/新 H 保留既往轮次，不只依赖最新 FelledTick。历史保留当前 World 全部轮次并随原树实体释放，不写世界存档。
+- 再生不创建新树/掉落、不发物品、不写盘；重复砍伐继续共用原 DropId/有效所有权/木材 G 保存与到期清理。原输入、玩家/敌人、F 再生、战斗/奖励、存储类与架构保持。原 Scene/SubScene、Prefab、Animator、网格/材质/资源/旧 meta、包与构建配置未修改；仅新增系统脚本的 meta 由 Unity 导入生成。
+- 首轮正常编译发现新增系统两处动态缓冲临时返回值写入的 CS1612，改为局部缓冲变量后正常 Unity 编译无 C# 错误；静态复核移除占位查询对 Simulate 的限制，覆盖全部存活网络玩家，随后正常编译当前 0 Error。两项阻挡历史 Ghost Serializer/Snapshot 已生成，RegrowAt 的服务端标记和系统顺序已核对；未调用游戏系统。
+- 原 SubScene 根克隆到临时 Editor 场景，Forest/Grassland 隔离烘焙均与 BuiltIn 完整值一致，为 v5/revision=7；物体定义/TreeSettings 均为 true/600 秒，树 Prefab 历史为空且 RegrowAt=0。仍为 1 地图/9 块/2304 格/452 禁布格、96×96 米；森林/草地树木及初始阻挡 89/53、采集点 36/38、草丛 598/746、碎石 17/22，占地/间距/保护区与出生重叠违规为 0。四类 GhostType 互异，原 32 敌人/8 列/间距 3/首点 (0,1,16) 和 NetworkId=1 玩家点 (2,1,0) 保持。
+- 烘焙前后 Console 均为 [0 Error,8 Warning,106 Log]，未清空日志、未新增烘焙警告；原主场景干净/未进入 PlayMode，临时烘焙 World 已释放，保留原六个 Editor/Loading World。代码/资源静态验收通过；多轮再生/占位/预测回放与第八阶段人工 GamePlayer 为 UNKNOWN。
+- 局部同步 Map、MapTreeHarvest、MapDrops、Inventory、Player、Combat、DataResources、Runtime、本月 ChangeLog 与项目外建议模板，共十份文档；Runtime 增加八项人工清单，模板示例同步当前森林 JSON。修正地图/模板中仍称树木无产出或无再生及旧当前配置版本的受影响描述；AI_Understanding 已有专题路由保持。第七阶段用户通过仍限 v5/revision=6 原十项清单，其他既有通过与第二阶段独立 JSON UNKNOWN 保持。
+- AI 未运行 GamePlayer/PlayMode、游戏模拟/显示系统、逻辑单元测试、命令行构建、发布、性能采样或图片检查，未提交 Git。阻挡历史的内存/网络开销、规模性能、平台构建与线上联调未验收。
+- 最终范围核对以本阶段开始前 3290 份既有非视觉文件散列为基线：仅 20 份授权既有文件变化（七份脚本、三份 JSON、十份文档），新增系统脚本及其 meta 两份，无删除；原 SubScene/Scene/Prefab/Animator/资源/旧 meta 字节保持。22 份任务文本严格 UTF-8/新增行空白、5 份 JSON、策划森林示例一致性、496 个文档本地链接及 git diff --check 均通过。新 meta GUID fcaaed41f0c51154a9700bef2f28f400 唯一且与旧 GUID 无冲突；导航 8191 字节、地图主文档 23981 字节、树木专题 16699 字节在上限内。最终 Editor 为 idle、未播放/未编译，Console 当前 0 Error；人工 GamePlayer 与性能覆盖仍为 UNKNOWN。
+
+## 2026-10-04：战斗地图第八阶段人工验收通过
+
+- 用户明确反馈“我已验收通过，接下来下个阶段”。主线程结合第八阶段既有代码/资源/文档静态核对与用户人工反馈判定该阶段通过；范围限 Runtime 第八阶段八项清单及 schemaVersion=5/configRevision=7，结论来自用户反馈。
+- 人工通过按原清单限定：至少两轮原树再生/新 H 产出、取消/失败不安排、存活角色占位等待/阻挡恢复、双端/晚加入、开关/配置、重启/释放及原库存/战斗回归。未实际触发的精确边界、同 tick、延迟/预测回放、创建/清理/回滚或保存失败用例仍为 UNKNOWN；历史内存/网络开销、规模性能、平台构建与线上联调未验收，不扩大此前阶段通过范围，第二阶段独立 JSON UNKNOWN 保持。
+- 局部同步 Map、MapTreeHarvest、MapDrops、Inventory、Player、Combat、DataResources、Runtime、本月 ChangeLog 与项目外配置建议模板，共十份既有文档。当前两份地图 v5/revision=7、tree_normal/gather_apple 均启用再生/600 秒、SourceMode=Json/Preset=Forest 保持，AI_Understanding 原导航保持。
+- 用户已选择第九阶段方向“石头／矿点采集与资源掉落”；本轮同步第八阶段验收状态并只读准备后续方案，未执行第九阶段开发。代码、JSON、Scene/Prefab/Animator/资源/meta、包与构建配置未修改，未创建子Agent、未提交 Git。
+- AI 未运行 GamePlayer/PlayMode、游戏模拟/显示系统、逻辑单元测试、命令行构建、发布、性能采样或图片检查。第八阶段人工结论完全来自用户反馈。
+- 最终核对：3292 份既有非视觉文件基线中仅上述十份文档变化，无新增/删除，代码/JSON/原资源与结构字节保持。十份文档严格 UTF-8、407 个局部文档本地链接及 git diff --check 通过，原第八阶段八项清单正文保持。导航为 8191 字节、地图入口 24133 字节、树木专题 16975 字节，均在本次约定上限内；未运行编译、逻辑单元测试或人工 GamePlayer。
+
+
+## 2026-10-04：战斗地图第九阶段矿点采集与石材掉落
+
+- 用户选择“石头／矿点采集与资源掉落”，并在完整第九阶段执行方案和一次性资源/Scene 权限说明后明确“确认并授权”；主线程按方案执行，未创建子Agent。
+- 两份地图与 BuiltIn 更新为 schemaVersion=6/configRevision=8，新增必填 mining，默认启用 mine_rock、3 秒、stone ×3、drop_stone。biomes 新增 mineObjectId/mineDensityPer100m2，grassland/forest/rocky 为 0.1/0.2/1；objects 在原四项后追加矿点，占地 0.75、间距 2.5、交互 2 米、只阻挡移动、非 gatherable、无再生。grounds 及原空间/种子/出生/movement/drops/treeHarvest 数值保持，旧 v5 明确拒绝。
+- 原 PlayerInput 增加本地 J/Mine 单次事件；新增独立 Mine 数据、Authoring、生成/采矿/预测阻挡/显示系统。服务端在 F/H 与伤害后、R 前处理资格/最近预约，F/H 请求或活跃状态优先，移动/攻击/受击/死亡/超距/在线或归属失效取消；重复/长按不重置或连续，完成/取消本 tick 不再预约。石材完全初始化并登记后才耗尽矿点/解除阻挡，失败仅清理当前掉落并尝试回滚，原异常及清理错误保留。本局 Depleted 不再生，MinedTick 四字段 Ghost 同步供预测 tick 重建阻挡。
+- stone 显式映射新增 Msg.ItemName.石材。石材沿原共享 DropId、飞行/落地/G/SavePrepared/到期/清理链，保存成功后才提交库存/Consumed；原 v1 存储类及格式保持，矿点/未拾取掉落不保存。drops.enabled 只控制敌人额外掉落，mining 开关独立。
+- 新增 MineableRock.asset/.mat、MineableRock.prefab、DroppedStone.prefab 四个授权资源及 Unity 生成 meta，两个 Prefab 为单根插值动态 Ghost、带 LinkedEntityGroupAuthoring，共用新灰色占位网格/材质，无 Owner/AutoCommandTarget/Collider/Animator。新 Editor 创建/绑定入口只处理明确路径、拒绝覆盖/重复绑定；原网络 SubScene 仅追加 mine_rock/drop_stone 两个引用。旧 Scene 根/挂载关系、主 Scene、玩家/敌人 Prefab、Animator、旧资源/旧 meta、包与构建设置保持。
+- 正常 Unity 编译当前 0 C# Error；MineState 四字段 Serializer/Snapshot、J 命令类型、Server 标注及系统顺序通过。Forest/Grassland 的 Json/BuiltIn 各一次隔离烘焙，另各一次 Json mining=false，共六次；森林/草原默认矿点 20/18、阻挡 109/71，树木 89/53、采集点 36/38 的位置与朝向保持，空间违规为 0。默认装饰草丛/碎石变为 601/19 与 744/19；关闭采矿后旧四类 [598,17,89,36]/[746,22,53,38] 与第八阶段一致。新网格 38 顶点/72 三角形、高 1.2 米/最大半径 0.75 米，非退化且朝外。烘焙前后 Console 均 [0 Error,2 Warning,7 Log]，未清空或新增烘焙警告，原主场景干净，无临时 World 遗留。
+- 局部同步 Map/树木/掉落/背包/玩家/战斗/资源/Runtime、AI_Understanding、项目外建议模板及本月 ChangeLog；新增 MapMining 规则专题，Runtime 新增十二项人工清单，策划森林示例同步真实 JSON。第九阶段代码/资源静态验收通过，人工 GamePlayer 为 UNKNOWN；第八阶段仍限用户通过的 v5/revision=7 八项清单，第七阶段仍限 v5/revision=6 十项清单，其余通过与第二阶段独立 JSON UNKNOWN 保持。
+- AI 未运行 GamePlayer/PlayMode、游戏模拟/显示系统、逻辑单元测试、命令行构建、发布、性能采样或图片检查，未提交 Git；同步写盘耗时、规模性能、平台构建与线上联调未验收。
+- 最终第九阶段范围核对：以开始前 3292 份既有非视觉文件散列为基线，仅 27 份授权既有文件变化（11 脚本、4 JSON、1 SubScene、11 文档），新增 27 份（9 脚本及 9 meta、4 资源及 4 meta、1 采矿专题），无删除/越界。54 份任务文本严格 UTF-8、新增行空白、五份 JSON/策划示例一致性、12 份文档的 460 个本地链接及 git diff --check 通过；13 个新 meta GUID 唯一且与旧 GUID 无冲突。SubScene 差异严格限两项绑定，旧主场景/资源/meta 散列保持。导航 8188 字节、地图入口 24193 字节、树木专题 17247 字节、采矿专题 14253 字节均在各自上限内。最终 Editor 空闲、未播放/未编译，Console 当前 0 Error；第九阶段人工 GamePlayer 为 UNKNOWN。
+
+## 2026-10-04 地图资源交互统一 F
+
+- 用户确认统一 F 调整方案后，由主线程执行。新增 CombatPrototypeMapInteractionSystem 与 CombatPrototypeMapInteractionTargetSelector，按 NetworkId 升序跨三类筛选最近有效目标，精确同距取小 PlacementIndex，选中后立即预约；本 tick 已交互玩家不能再启动。
+- PlayerInput 保留 Gather/HarvestTree/Mine 等原字段布局，F 复用 Gather，停止 H/J 触发与消费。Gather/TreeHarvest/MineHarvest 提供指定目标 TryBegin 与部分预约 CancelBegin，移除独立按键选择及旧 F/H 优先；原计时/中断、采集保存、木材/石材完成事务、再生/阻挡保持。
+- 两个新脚本 meta 由 Unity 正常导入生成。正常 Unity 编译无 C# Error，已反射核对两个脚本、三类启动/清理入口、顺序特性及八个输入字段；未执行游戏回调或进入 PlayMode。
+- 增量同步地图/树木/采矿/掉落/库存/玩家/战斗/资源文档、导航和项目外策划模板；运行入口新增八项统一 F 人工清单，旧 H/J 阶段清单注明原版本范围，人工 GamePlayer 保持 UNKNOWN。
+- 本轮未修改地图 JSON、Scene/Prefab/Animator、既有 meta、包/构建设置或存储类；未新增/运行逻辑单元测试、GamePlayer/PlayMode、游戏系统、命令行构建、发布、性能采样或图片检查，未创建子Agent、未提交 Git。
+- 相对本轮开始快照，15 个既有文本文件修改、4 个新脚本/meta 及策划模板变化均在范围内，无其他资源变化。三类 Complete/Cancel/FindCollector 方法逐字保持，RejectPlayer 仅删除旧类型优先，八个输入字段/顺序保持；UTF-8、相对文件链接、GUID 唯一性及受影响文件 git diff --check 通过。导航 8190 字节，Map 24574 字节；新交互人工仍为 UNKNOWN。
+
+## 2026-10-04 地图资源统一 F 人工验收反馈
+
+- 用户明确反馈“我已验收通过，接下来下一个阶段”；主线程结合统一 F 阶段已有静态核对与用户反馈判定该阶段通过，范围限 Runtime 统一 F 八项人工清单及 v6/revision=8。
+- 人工结论来自用户反馈；未实际触发的临界距离、精确同距、同 tick、创建/清理/回滚或保存等独立失败、延迟/预测回放时序仍为 UNKNOWN。第九阶段原 J 清单及第二阶段独立 JSON 人工结果仍为 UNKNOWN，既有通过仍限各自原版本和清单；性能、平台构建与线上联调未验收。
+- 增量同步地图、树木、采矿、掉落、背包、玩家、战斗、资源与 Runtime 的验收状态，以及项目外策划模板；导航和全部代码、JSON、资源及 Scene/Prefab/Animator 保持。本次仅记录已收到的人工反馈，未运行 Unity 编译、GamePlayer/PlayMode、游戏系统、逻辑单元测试、命令行构建、发布、性能采样或图片检查，未创建子Agent、未提交 Git。

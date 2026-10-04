@@ -12,7 +12,7 @@
 
 | 任务、问题或搜索词 | 先读 | 需要时再读 |
 |---|---|---|
-| 地图块/砍树/采集/掉落 | [地图](Modules/Map.md) | — |
+| 地图/F/采矿/采集/掉落 | [地图](Modules/Map.md) | — |
 | 从哪里启动、Map、按键、场景按钮、OnStart | [运行入口](Modules/Runtime.md) | [资源与数据](Modules/DataResources.md) |
 | 属性、生命、体力、等级、金币、刷新 | [玩家](Modules/Player.md) | [数据文件](Modules/DataResources.md) |
 | 野猪、BtnAttack、伤害、掉落、战斗奖励 | [战斗](Modules/Combat.md) | [玩家](Modules/Player.md) |

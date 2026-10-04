@@ -59,7 +59,7 @@ namespace Code_01.CombatPrototype.Map
             var validObjects = new bool[objects.Length];
             for (var i = 0; i < objects.Length; i++)
             {
-                if (objects[i].Gatherable != 0 || objects[i].Harvestable != 0) continue;
+                if (objects[i].Gatherable != 0 || objects[i].Harvestable != 0 || objects[i].Mineable != 0) continue;
                 var prefab = objects[i].Prefab;
                 validObjects[i] = EntityManager.HasComponent<Prefab>(prefab) && EntityManager.HasComponent<LocalTransform>(prefab) &&
                     EntityManager.HasComponent<LocalToWorld>(prefab) && EntityManager.HasComponent<MaterialMeshInfo>(prefab);
@@ -71,7 +71,7 @@ namespace Code_01.CombatPrototype.Map
             for (var i = 0; i < decorations.Length; i++)
             {
                 var decoration = decorations[i];
-                if (objects[decoration.ObjectIndex].Gatherable != 0 || objects[decoration.ObjectIndex].Harvestable != 0) continue;
+                if (objects[decoration.ObjectIndex].Gatherable != 0 || objects[decoration.ObjectIndex].Harvestable != 0 || objects[decoration.ObjectIndex].Mineable != 0) continue;
                 if (!validObjects[decoration.ObjectIndex]) continue;
                 var item = objects[decoration.ObjectIndex];
                 var entity = Entity.Null;

@@ -156,7 +156,7 @@ Ghost 字段、Baker 和资源引用已形成实际烘焙数据；用户已确�
 
 ## 【CURRENT STRATEGY】网络原型战斗顺序与反击
 
-服务端预测模拟组当前顺序：`PlayerMovement → EnemyMovement → EnemySpatial → ItemUse → MeleeServer → Damage → Reward/SavePrepared → MapDropSpawn → EnemyAttack → PlayerDamage → MapDropMotion → MapDropPickup/SavePrepared → MapDropCleanup → MapGather/SavePrepared → MapGatherRegrow → PlayerRespawn`。第 7A [物品使用](Inventory.md) 在近战前恢复体力，地图采集在当次伤害后检查生命/HitSequence 并取消失效预约，随后才结算仍有效的采集；独立 MapGatherRegrow 随后只恢复到期采集点，第 6B 复活在再生之后。采集不修改近战、反击、原奖励规则，完整规则归 [背包与道具](Inventory.md)。
+服务端预测模拟组先由 MapMineObstacle → MapTreeObstacle 重建阻挡，再沿原 PlayerMovement → EnemyMovement → EnemySpatial → ItemUse → MeleeServer → Damage → Reward/SavePrepared → MapDropSpawn → EnemyAttack → PlayerDamage → MapDropMotion → MapDropPickup/SavePrepared → MapDropCleanup → MapGather/SavePrepared。随后 GatherRegrow 在 Gather 后，TreeHarvest 在 Gather/DropSpawn 后，TreeRegrow 与 MineHarvest 分别在 TreeHarvest 后；这些交互/再生系统均在 PlayerRespawn 前。第 7A [物品使用](Inventory.md) 在近战前恢复体力；采集、砍伐及采矿在当次伤害后检查生命/HitSequence 并取消失效预约，再处理有效进度。矿点规则归[采矿](MapMining.md)，原战斗规则保持。
 
 - [敌人攻击系统](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypeEnemyAttackSystem.cs) 复用当前最近在线存活目标。Ready 仅在 X/Z 距离不超过 1.75 时锁定该实体及 NetworkId，递增一次攻击序号并进入 0.5 秒前摇；前摇与后摇中敌人停止移动和旋转。
 - 前摇结束先进入 1 秒后摇，再对锁定目标重新确认 Connected、NetworkStreamInGame、CommandTarget、玩家生命与 X/Z 距离。目标离线、死亡或出范围则空击，同次挥击不换目标；命中只添加一条伤害 10 的玩家事件，后摇不再产生命中。后摇结束清空锁定目标并回 Ready。
@@ -194,4 +194,14 @@ Ghost 字段、Baker 和资源引用已形成实际烘焙数据；用户已确�
 
 ## 【FACT】树木产出与战斗边界
 
-H 砍伐使用独立树木状态/计时，不调用近战伤害或原击杀奖励链。攻击/受击/死亡会取消砍伐；完成后只生成木材掉落并解除对应阻挡，敌人沿原移动工具通过该位置。木材没有 EnemyState 或伤害缓冲，原金币/经验/小块肉奖励和敌人首次死亡额外苹果保持。完整链归[树木砍伐](MapTreeHarvest.md)与[掉落与拾取](MapDrops.md)；第七阶段原战斗/奖励回归人工结果为 UNKNOWN，清单归[运行入口](Runtime.md)。
+F 选中树木后使用独立树木状态/计时，不调用近战伤害或原击杀奖励链。攻击/受击/死亡会取消砍伐；完成后只生成木材掉落并解除对应阻挡，敌人沿原移动工具通过该位置。木材没有 EnemyState 或伤害缓冲，原金币/经验/小块肉奖励和敌人首次死亡额外苹果保持。完整链归[树木砍伐](MapTreeHarvest.md)与[掉落与拾取](MapDrops.md)；用户已确认第七阶段人工 GamePlayer 通过，主线程结合静态核对判定该阶段通过；战斗范围限攻击/受击/死亡中断砍伐、砍倒后的移动阻挡和原战斗/奖励回归，完整边界归[运行入口](Runtime.md)第七阶段十项清单。人工结论来自用户反馈，未实际触发的独立用例仍为 UNKNOWN。
+
+## 【FACT】树木再生的敌人占位
+
+服务端在原点恢复树木前检查存活 EnemyState 的 X/Z 位置，当前阈值为树木占地 0.5+敌人半径 0.45+留缝 0.01=0.96 米，距离小于等于阈值时延迟；死亡敌人不占位。空闲后原树恢复显示和阻挡，敌人继续沿既有移动工具读取当前 tick 的阻挡，不推开敌人、不更换树位。原敌人移动/攻击、近战伤害、死亡奖励和额外苹果链保持；实现归[树木砍伐](MapTreeHarvest.md)。用户已确认第八阶段人工 GamePlayer 通过，主线程结合既有静态核对与用户反馈判定该阶段通过；战斗范围限敌人占位、再生阻挡及原战斗回归，完整边界归[运行入口](Runtime.md)第八阶段八项清单。人工结论来自用户反馈，未触发的精确边界与独立失败用例仍为 UNKNOWN，既有阶段通过范围保持。
+
+## 【FACT】采矿产出与战斗边界
+
+MineHarvest 使用独立 Available/Mining/Depleted 状态与服务端计时，不接近战伤害或击杀奖励；攻击/受击/死亡取消预约。石材完整初始化并登记后才提交耗尽/解除矿点阻挡，敌人继续沿原移动工具处理；矿点及石材没有 EnemyState/伤害缓冲，不参加敌人索引、近战或反击。默认矿点阻挡圆 0.75 米，无攻击遮挡或自动再生。原金币/经验/小块肉奖励、敌人额外苹果、木材/树木再生与采集结算保持；资源请求共用 F。完整规则归[采矿](MapMining.md)，第九阶段人工中断/阻挡及战斗回归为 UNKNOWN，归[运行入口](Runtime.md)。
+
+统一 F 在玩家伤害之后选目标并预约；新请求仍受存活/攻击/近战资格约束，三类已有预约沿原受击/死亡中断。统一入口与选择规则归[地图](Map.md)；用户确认人工战斗回归通过，结论限[运行入口](Runtime.md)统一 F 八项清单，未触发的独立用例仍为 UNKNOWN。

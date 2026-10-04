@@ -1,0 +1,110 @@
+# 战斗地图矿点采集与石材掉落
+
+返回[战斗地图](Map.md)。本专题负责 CombatPrototypeNetCode 的 F 采矿、矿点状态与阻挡；石材飞行、G 拾取、保存和到期由[掉落与拾取](MapDrops.md)维护。人工清单归[运行入口](Runtime.md)，库存归[背包](Inventory.md)。
+
+## 【FACT】入口与职责
+
+| 文件 | 职责 |
+|---|---|
+| [MapMiningConfig](../../Assets/Scripts/CombatPrototype/Map/MapMiningConfig.cs) | 必填 mining DTO |
+| [BiomeDefinitionConfig](../../Assets/Scripts/CombatPrototype/Map/BiomeDefinitionConfig.cs) | mineObjectId/mineDensityPer100m2 |
+| [MapConfigValidator](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapConfigValidator.cs) | 字段、数值、引用、独立矿点和无再生约束 |
+| [MapLayoutBuilder](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapLayoutBuilder.cs) | 原树木/采集物后、草丛/碎石前布置矿点 |
+| [MapAuthoring](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapAuthoring.cs) | 原地图根写入 MineSettings/Mineable 与显式 Ghost 引用 |
+| [PlayerInput](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypePlayerInput.cs) | F 单次 Gather 事件，仅写本地玩家；Mine 字段保留 |
+| [MineData](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapMineData.cs) | 状态、服务端配置与进度 |
+| [MineAuthoring](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapMineAuthoring.cs) | 矿点 Ghost 初态/进度烘焙 |
+| [MineSpawn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapMineSpawnSystem.cs) | 服务端实例生成与所有权清理 |
+| [MineHarvest](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapMineHarvestSystem.cs) | 接收统一 F 指定目标、预约、中断和完成/回滚 |
+| [MineObstacle](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapMineObstacleSystem.cs) | Client/Server 每个预测 tick 重建矿点阻挡 |
+| [MineRender](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapMineRenderSystem.cs) | 客户端耗尽状态隐藏 |
+| [YieldItemResolver](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapYieldItemResolver.cs) / [Msg](../../Assets/Scripts/Msg/Msg.cs) | stone → Msg.ItemName.石材 |
+| [MineAssetBuilder](../../Assets/Scripts/Editor/CombatPrototypeMapMineAssetBuilder.cs) | 四个明确新资源路径的创建 |
+| [MineBinding](../../Assets/Scripts/Editor/CombatPrototypeMapMineBinding.cs) | 原 SubScene 仅追加两个 Prefab 引用 |
+
+## 【FACT】JSON 契约与默认值
+
+[battle_forest_01.json](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[battle_grassland_01.json](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 为 schemaVersion=6/configRevision=8。mining 及全部字段必填；旧 v1～v5、缺失/未知/重复字段、错误类型或无效引用明确失败，不补字段、不回退来源。配置只在烘焙时读取，无运行热重载或新联网配置校验协议。各端须使用相同代码、输入布局、Ghost、配置及资源。
+
+```json
+"mining": {
+  "enabled": true,
+  "mineObjectId": "mine_rock",
+  "visualResourceKey": "mine_rock",
+  "harvestDurationSeconds": 3.0,
+  "dropItemId": "stone",
+  "dropQuantity": 3,
+  "dropVisualResourceKey": "drop_stone"
+}
+```
+
+| 字段 | 默认值 | 约束/用途 |
+|---|---|---|
+| enabled | true | false 时不布置/实例化矿点，不产采矿掉落；配置与绑定仍必填 |
+| mineObjectId | mine_rock | 所有生态引用同一配置矿点，与树木/采集/装饰角色分开 |
+| visualResourceKey | mine_rock | 显式单根插值 Mine Ghost |
+| harvestDurationSeconds | 3 | 有限正数；服务端模拟计时 |
+| dropItemId | stone | 现有白名单 vitality_apple/wood/stone，分别映射活力苹果/木材/石材 |
+| dropQuantity | 3 | 正整数；一次完成生成一堆 |
+| dropVisualResourceKey | drop_stone | 显式 Drop Ghost |
+
+[biomes.json](../../Assets/Config/CombatPrototype/Map/biomes.json) 新增必填 mineObjectId、mineDensityPer100m2，密度须有限非负。grassland/forest/rocky 分别为 0.1/0.2/1 个每 100㎡可布置面积，均引用 mine_rock；rockObjectId/rockDensityPer100m2 继续控制不阻挡的装饰碎石。
+
+[objects.json](../../Assets/Config/CombatPrototype/Map/objects.json) 在原四项后追加 mine_rock，旧索引保持：visualResourceKey=mine_rock、footprintRadiusMeters=0.75、minimumSameTypeSpacingMeters=2.5、interactionDistanceMeters=2、blocksMovement=true、blocksMelee/blocksProjectile=false、gatherable=false、gatherDurationSeconds=0、yieldItemId=null、yieldQuantity=0、regrowEnabled=false、regrowSeconds=0。矿点必须为正占地/交互距离的移动阻挡物、非 gatherable，当前拒绝矿点再生开关或非零再生间隔；采矿时长/产出由 mining 控制。普通攻击不破坏矿点，保留能力字段不驱动攻击遮挡。
+
+LayoutBuilder 使用原 seed/随机流，先跨全图完成树木，再采集植物，再启用的矿点，最后草丛/碎石；原树木/采集点位置及朝向保持。矿点沿原占地互斥、同类间距、道路/安全区/战斗区/边缘/敌人初始矩形避让；阻挡物额外计入最大角色半径及留缝。实际数量可少于目标，矿点会改变后续装饰的位置/数量。关闭 mining 后跳过这一随机/占地步骤，原四类布局保持。
+
+## 【CURRENT STRATEGY】生成、状态与显示
+
+MineSpawn 在服务端 Simulation、NetworkReceive 后、GoInGameServer 前取得原地图单例；只生成 Mineable 定义的已布置矿点，settings.Enabled=0 时直接结束。Instantiate 前复制对象/布置缓冲；保留原 Position/Yaw/PlacementIndex，写入 Available、CollectorNetworkId=0、MinedTick=0 和空进度后才登记有效所有权。逐项生成失败记录地图/布置/对象/资源/阶段及原异常，清理当前半成品，继续其他条目，不自动重放整批。
+
+MineState 同步 PlacementIndex、Phase、CollectorNetworkId、MinedTick 四字段，阶段为 Available → Mining → Depleted；MineSettings/Progress 标注 Server，配置及 Collector/StartHitSequence/FinishAt 由服务端消费。耗尽矿点保留当前世界实体，供晚加入接收；没有自动再生、历史循环缓冲或本局补生成。新 Server World 从原布局 Available 重新开始。
+
+MapPresentation 在校验和实例化两处均跳过 Mineable，不创建静态矿点副本；标记按矿点对象角色写入，关闭时因无布置记录也不会显示矿点。MineRender 在客户端 Presentation、EntitiesGraphics 前按 Depleted 禁用 MaterialMeshInfo，Available/Mining 显示；不提交玩法或存档状态。
+
+## 【CURRENT STRATEGY】F 采矿预约与取消
+
+客户端 F 单次按下只给 GhostOwnerIsLocal 写入已有 Gather；Mine 字段保留，J 停止触发与消费，不提交客户端目标。[统一交互](Map.md)在伤害/G 清理后跨三类选目标，立即调用 MineHarvest.TryBegin。MineHarvest 在 TreeHarvest 后、PlayerRespawn 前维护计时/取消/完成。
+
+- 从 Connected、NetworkStreamInGame、没有 RequestDisconnect 的连接读取 CommandTarget/NetworkId，要求网络玩家、启用 Simulate 及 GhostOwner 归属匹配。
+- 玩家存活、Move 有限且为零、无 Attack 请求且近战 Ready 才合格；即使位移被障碍挡住，非零 Move 仍拒绝/取消。
+- 玩家同时只持有一种资源预约，已有交互期间 F 不重置、不切换；旧 F/H 优先判断移除。G/E/R 仍独立，R 不补发死亡时的 F。
+- 统一入口按各类型配置的 X/Z 交互距离筛选三类最近可用目标，矿点须 Available；精确同距取小 PlacementIndex，请求按 NetworkId 升序且立即预约，已占用点不覆盖，下一玩家可取其他有效目标。当前矿点距离 2 米。
+- 预约保存 Collector、当前 HitSequence 与 FinishAt=服务端模拟时间+3 秒，状态 Mining、CollectorNetworkId=该玩家。重复 F 不重置期限；持续按住不自动连续采矿。
+- 每次更新核对在线/归属、生命、Move/攻击、HitSequence 和距离。移动/攻击/受击/死亡/超距/在线或归属失效均取消，清空进度、恢复 Available/CollectorNetworkId=0/MinedTick=0，不创建石材、不解除阻挡。
+- 统一入口在资源系统更新前记录已有交互，完成/取消玩家本 tick 不再预约，后续须新 F。启动失败只清理该玩家部分预约，不自动转选另一目标；日志保留阶段/地图/类型/布置/玩家及原异常，清理错误单独记录，继续其他请求。
+
+## 【CURRENT STRATEGY】完成、掉落与回滚
+
+到期仍合格时，MineHarvest 保存原障碍值，调用原 DropSpawnSystem.SpawnOwnedDrop，传入明确 map source、石材 Prefab/资源键、stone/3 与矿点起点。DropSpawnUtility 完整初始化 Transform/DropState/DropProgress，并登记共享掉落所有权后才返回；沿原统一 DropId 递增、不复用，可有失败空号。Instantiate 后重新获取所需组件/缓冲，清空 MineProgress、写入 Depleted/CollectorNetworkId=0/MinedTick=当前权威 tick、设置对应障碍 Disabled=1。采矿完成不直接改库存/金币/经验，不调用存档。
+
+生成或提交失败只释放本次石材，尝试恢复原障碍并取消到 Available；记录原异常、当前 DropId/物品/资源及独立清理/回滚错误。若回滚本身失败，日志暴露实际错误，不宣称恢复成功；其他矿点/玩家继续，不自动补发或重试。无法实际触发的运行失败分支为 UNKNOWN。
+
+石材复用 drops 的 0.4 秒飞行、0.6 米散落/弧高、0.05 米贴地、0.5 缩放、600 秒寿命和 2 米 G 拾取距离。drops.enabled 只关闭敌人额外掉落，mining.enabled 独立；没有落点物理碰撞或避障。DropPickup 按实际 ItemId 解析石材并合并同名库存，PrepareReward → SavePrepared 成功才提交库存及 Consumed；失败保留旧正式档、库存数量和未到期掉落，恢复后须新 G。原 v1 存储类/格式保持，已入包石材随固定 ID 恢复，矿点耗尽/进度及地面掉落只保留本局。
+
+## 【CURRENT STRATEGY】预测阻挡与清理
+
+MineObstacle 在 Client/Server 的 PredictedSimulation、TreeObstacle 之前执行，后者再先于玩家/敌人移动。按地图源建立 Mineable 的 PlacementIndex→障碍索引；每个预测 tick 先恢复这些记录的初始 Disabled=0。只有矿点为 Depleted 且当前 ServerTick 严格晚于有效 MinedTick 时禁用对应障碍；耗尽在移动后提交，从下一模拟 tick 生效。回放到耗尽之前恢复阻挡，不处理其他树木/障碍记录。缺索引或无效耗尽 tick 记录具体错误；系统停止恢复本系统索引的初始阻挡。
+
+矿点由 MineSpawn 在地图根更换/失效、停止及 World 销毁时清理本系统拥有的实体；石材由原 DropSpawn/DropCleanup 清理。共享网格/材质/Prefab 不随实例销毁。没有世界存档、运行中地图切换、工具装备/耐久、采矿动画、物理碰撞、新 UI 或石材使用效果；E 仍只使用小块肉。
+
+## 【FACT】资源与 Editor 边界
+
+| 键/类型 | 路径 | Unity GUID |
+|---|---|---|
+| 网格 | [MineableRock.asset](../../Assets/Art/Map/CombatPrototype/Meshes/MineableRock.asset) | 5f86aae15e7fddf4c958787664bfb898 |
+| 灰色材质 | [MineableRock.mat](../../Assets/Art/Map/CombatPrototype/Materials/MineableRock.mat) | 9414f076780a3f549ab7ce373530381c |
+| mine_rock | [MineableRock.prefab](../../Assets/Prefabs/CombatPrototype/Map/MineableRock.prefab) | 6a4118ae4b4c6334983e718cf8c791e5 |
+| drop_stone | [DroppedStone.prefab](../../Assets/Prefabs/CombatPrototype/Map/DroppedStone.prefab) | 5c046f7757439c444b83563690bb15b4 |
+
+程序占位网格高 1.2 米、底部 Y=0、最大半径 0.75 米，38 顶点/72 三角形，数据检查非退化且朝外。两个 Prefab 共用新网格/材质，均为单根 Transform/MeshFilter/MeshRenderer/LinkedEntityGroupAuthoring/GhostAuthoringComponent/对应 Authoring，无子节点、Owner、AutoCommandTarget、Collider 或 Animator，Ghost 仅插值、Dynamic。
+
+Tools/CombatPrototype/地图/生成第九阶段采矿资源 要求空闲 EditMode、干净场景、原目录及 GroundRock 材质的 Shader，只创建四个明确新路径，已有资源或 meta 时拒绝覆盖。逐项记录创建/清理失败；使用临时场景并恢复原活动场景。绑定第九阶段采矿资源要求干净的原[网络 SubScene](../../Assets/Scenes/CombatPrototypeNetCode/CombatPrototypeNetCodeSubScene.unity)、唯一 CombatPrototypeNetworkRoot、原 MapAuthoring/Spawner；检查两种模板和完整资源键后仅追加 mine_rock/drop_stone 两项，拒绝重复绑定。全部新 meta 由 Unity 导入生成；旧资源/旧 meta、主 Scene、根/挂载关系、玩家/敌人 Prefab、Animator、包与构建设置保持。
+
+## 【KNOWN ISSUES】验收边界
+
+第九阶段静态核对时正常 Unity 编译无 C# Error，MineState Serializer/Snapshot、原 J 命令类型和系统顺序已核对。Forest/Grassland 的 Json/BuiltIn 各完成一次隔离 Editor 烘焙，另各完成 mining.enabled=false 的 Json 烘焙，共六次；原树木/采集点位置与朝向、保护区域、占地/间距和显式资源引用通过。默认森林/草原为树木 89/53、采集点 36/38、矿点 20/18、阻挡 109/71；关闭采矿后旧四类数量分别为 [598,17,89,36] / [746,22,53,38]，与第八阶段一致。默认启用时草丛/碎石分别为 601/19 与 744/19，空间违规为 0。烘焙前后 Console 均为 [0 Error,2 Warning,7 Log]，未清空日志、未新增烘焙警告；未进入 PlayMode，主场景干净，无临时 World 遗留。
+
+主线程代码/资源静态验收通过；第九阶段 J 实际计时/取消/F-H 优先/争抢、跨端显示与阻挡预测/晚加入、石材 G/保存失败/恢复、运行创建/清理/回滚及开关回归的人工 GamePlayer 为 UNKNOWN，完整清单归[运行入口](Runtime.md)。第八阶段用户通过仍限 v5/revision=7 八项清单，第七阶段仍限 v5/revision=6 十项清单，其余既有通过与第二阶段独立 JSON UNKNOWN 保持。同步写盘耗时、规模性能、平台构建与线上联调未验收；AI 未运行 GamePlayer/PlayMode、游戏模拟/显示系统、逻辑单元测试、命令行构建、发布、性能采样或图片检查。
+
+统一 F 的正常 Unity 编译/启动入口已核对；用户已确认人工 GamePlayer 通过，结论限[运行入口](Runtime.md)八项清单，未实际触发的边界/同 tick/失败/预测用例仍为 UNKNOWN。旧 J 清单保留第九阶段原口径，不作为当前按键说明；配置、状态/阻挡及完成事务保持。

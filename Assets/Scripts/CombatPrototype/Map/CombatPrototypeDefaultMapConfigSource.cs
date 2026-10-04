@@ -17,7 +17,7 @@ namespace Code_01.CombatPrototype.Map
             {
                 map = new MapDefinitionConfig
                 {
-                    schemaVersion = 5, configRevision = 6,
+                    schemaVersion = 6, configRevision = 8,
                     mapDefinitionId = mapDefinitionId, defaultSeed = 12345,
                     geometry = new MapGeometryConfig
                     {
@@ -49,6 +49,12 @@ namespace Code_01.CombatPrototype.Map
                         harvestDurationSeconds = 2f, dropItemId = CombatPrototypeMapYieldItemResolver.WoodId,
                         dropQuantity = 3, dropVisualResourceKey = "drop_wood"
                     },
+                    mining = new MapMiningConfig
+                    {
+                        enabled = true, mineObjectId = "mine_rock", visualResourceKey = "mine_rock",
+                        harvestDurationSeconds = 3f, dropItemId = CombatPrototypeMapYieldItemResolver.StoneId,
+                        dropQuantity = 3, dropVisualResourceKey = "drop_stone"
+                    },
                     spawn = new MapSpawnConfig
                     {
                         playerOriginX = 0f, playerOriginZ = 0f, playerSpacingMeters = 2f,
@@ -71,9 +77,9 @@ namespace Code_01.CombatPrototype.Map
                 },
                 biomes = new[]
                 {
-                    Biome("grassland", "grass", 12f, 0.4f, 0.6f, 0.2f),
-                    Biome("forest", "forest_floor", 8f, 1.5f, 0.5f, 0.2f),
-                    Biome("rocky", "rock", 3f, 0.1f, 0.2f, 1f)
+                    Biome("grassland", "grass", 12f, 0.4f, 0.6f, 0.2f, 0.1f),
+                    Biome("forest", "forest_floor", 8f, 1.5f, 0.5f, 0.2f, 0.2f),
+                    Biome("rocky", "rock", 3f, 0.1f, 0.2f, 1f, 1f)
                 },
                 grounds = new[]
                 {
@@ -97,7 +103,8 @@ namespace Code_01.CombatPrototype.Map
                     {
                         objectId = "tree_normal", visualResourceKey = "tree_normal",
                         footprintRadiusMeters = 0.5f, minimumSameTypeSpacingMeters = 3f,
-                        blocksMovement = true, interactionDistanceMeters = 2f, gatherDurationSeconds = 1f
+                        blocksMovement = true, interactionDistanceMeters = 2f, gatherDurationSeconds = 1f,
+                        regrowEnabled = true, regrowSeconds = 600f
                     },
                     new MapObjectDefinitionConfig
                     {
@@ -106,6 +113,12 @@ namespace Code_01.CombatPrototype.Map
                         interactionDistanceMeters = 2f, gatherable = true, gatherDurationSeconds = 1f,
                         yieldItemId = CombatPrototypeMapYieldItemResolver.VitalityAppleId, yieldQuantity = 1,
                         regrowEnabled = true, regrowSeconds = 600f
+                    },
+                    new MapObjectDefinitionConfig
+                    {
+                        objectId = "mine_rock", visualResourceKey = "mine_rock",
+                        footprintRadiusMeters = 0.75f, minimumSameTypeSpacingMeters = 2.5f,
+                        blocksMovement = true, interactionDistanceMeters = 2f
                     }
                 }
             };
@@ -118,13 +131,13 @@ namespace Code_01.CombatPrototype.Map
             { groundId = id, visualResourceKey = key, walkable = true, movementMultiplier = 1f };
 
         private static BiomeDefinitionConfig Biome(string id, string ground, float grass,
-            float tree, float gatherable, float rock) => new BiomeDefinitionConfig
+            float tree, float gatherable, float rock, float mine) => new BiomeDefinitionConfig
         {
             biomeId = id, groundId = ground, decorationObjectId = "decor_grass",
             rockObjectId = "decor_pebble", treeObjectId = "tree_normal", gatherObjectId = "gather_apple",
-            decorationDensityPer100m2 = grass,
+            mineObjectId = "mine_rock", decorationDensityPer100m2 = grass,
             treeDensityPer100m2 = tree, gatherableDensityPer100m2 = gatherable,
-            rockDensityPer100m2 = rock
+            rockDensityPer100m2 = rock, mineDensityPer100m2 = mine
         };
 
         private static MapBiomeRegionConfig Region(string id, float x0, float z0, float x1, float z1) =>

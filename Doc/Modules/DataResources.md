@@ -204,9 +204,9 @@ EditorTest 声明以下菜单；三个重写菜单直接写入上表对应 JSON�
 
 ## 【FACT】网络战斗地图配置与资源
 
-Assets/Scripts/CombatPrototype/Map/ 包含四类配置、地图子段 MapMovementConfig/MapDropConfig/MapTreeHarvestConfig、配置集合、来源接口、内置/JSON 来源、JSON 读取及边界校验、Authoring/Baker、地图数据/显示脚本及共享移动阻挡工具。当前 SubScene 的 SourceMode=Json，显式绑定 Assets/Config/CombatPrototype/Map/ 下的两份地图对象 JSON 与三份共享数组 JSON；原材质和装饰仍通过 GroundMaterials、DecorationPrefabs 按稳定键绑定。文件/字段契约、来源切换和错误处理统一归[战斗地图](Map.md)。当前整组配置契约为 schemaVersion=5、默认 configRevision=6，两份地图包含必填 movement/drops/treeHarvest 段，生态包含 treeObjectId/gatherObjectId，物体包含 tree_normal/gather_apple；JSON 在烘焙时读取为固定 ECS 配置/布置数据及带 Disabled 开关的阻挡缓冲，两个相关 Baker 均登记使用文件的内容依赖。移动参数通过地图数据接入，不增加玩家/敌人 Prefab 字段；没有运行时外部配置加载、热重载或地图状态写盘。
+Assets/Scripts/CombatPrototype/Map/ 包含四类配置、地图子段 MapMovementConfig/MapDropConfig/MapTreeHarvestConfig/MapMiningConfig、配置集合、来源接口、内置/JSON 来源、JSON 读取及边界校验、Authoring/Baker、地图数据/显示脚本及共享移动阻挡工具。当前 SubScene 的 SourceMode=Json，显式绑定 Assets/Config/CombatPrototype/Map/ 下的两份地图对象 JSON 与三份共享数组 JSON；原材质和装饰仍通过 GroundMaterials、DecorationPrefabs 按稳定键绑定。文件/字段契约、来源切换和错误处理统一归[战斗地图](Map.md)。当前整组配置契约为 schemaVersion=6、默认 configRevision=8，两份地图包含必填 movement/drops/treeHarvest/mining 段，生态包含 treeObjectId/gatherObjectId/mineObjectId/mineDensityPer100m2，物体包含 tree_normal/gather_apple/mine_rock；JSON 在烘焙时读取为固定 ECS 配置/布置数据及带 Disabled 开关的阻挡缓冲，两个相关 Baker 均登记使用文件的内容依赖。移动参数通过地图数据接入，不增加玩家/敌人 Prefab 字段；没有运行时外部配置加载、热重载或地图状态写盘。
 
-新资源位于 Assets/Art/Map/CombatPrototype/ 与 Assets/Prefabs/CombatPrototype/Map/，包括 7 个材质、5 个网格和 7 个物体 Prefab；草丛/碎石仍为静态，树木在砍伐关闭时使用原静态资源，GatherApple.mat、GatherApple.asset、GatherApple.prefab 为新单根插值 Ghost 采集资源。新增资源和脚本 meta 由 Unity 导入生成；既有玩家/敌人资源、旧 meta、Bundle、包与构建设置保持。地表运行网格及静态装饰由客户端地图显示系统拥有和清理，开启砍伐时树木 Ghost 由服务端 TreeSpawn 拥有和清理，共享资源不随地图根实体释放而销毁。砍伐开启时树木为 Ghost，阻挡数据仍随地图根存在；玩家预测与敌人移动读取同一结构，按权威砍倒时刻更新 Disabled。服务端采集复用 PrepareReward → SavePrepared 后再提交库存及耗尽，按烘焙的 regrowEnabled/regrowSeconds 记录仅服务端 RegrowAt；到期只复用原 Ghost 恢复 Available，不发物品或写盘。默认 gather_apple 启用 600 秒再生，vitality_apple 显式映射活力苹果，不新增存档字段或修改旧存储类。玩家金币/经验/完整库存仍为 v1 格式；地图对象耗尽/再生期限不保存，重启服务端从 Available 重新生成资源。产出/失败规则归 [背包与道具](Inventory.md)，用户已确认第四阶段人工 GamePlayer 通过，主线程结合既有静态核对判定该阶段通过；数据范围限采集保存失败不入包/不耗尽、旧正式档保留、恢复存储后重新采集、原固定 ID 库存恢复与服务端重启资源重建，完整边界归 [运行入口](Runtime.md)。第五阶段只新增独立再生系统脚本及 Unity 生成的 meta，沿用原资源与显式绑定；再生配置烘焙已静态核对；用户已确认第五阶段人工 GamePlayer 通过，主线程结合既有静态核对判定该阶段通过，范围限再生不重复入包/写盘、关闭与失败/取消分支、同局期限及服务端重启按既有规则重建，完整边界归运行入口。存档耗时、平台和线上验证仍为 UNKNOWN。
+新资源位于 Assets/Art/Map/CombatPrototype/ 与 Assets/Prefabs/CombatPrototype/Map/，包括 8 个材质、6 个网格和 9 个物体 Prefab；草丛/碎石仍为静态，树木在砍伐关闭时使用原静态资源，GatherApple.mat、GatherApple.asset、GatherApple.prefab 为新单根插值 Ghost 采集资源。新增资源和脚本 meta 由 Unity 导入生成；既有玩家/敌人资源、旧 meta、Bundle、包与构建设置保持。地表运行网格及静态装饰由客户端地图显示系统拥有和清理，开启砍伐/采矿时树木/矿点 Ghost 分别由服务端 TreeSpawn/MineSpawn 拥有和清理，共享资源不随地图根实体释放而销毁。砍伐开启时树木为 Ghost，阻挡数据仍随地图根存在；玩家预测与敌人移动读取同一结构，按权威砍倒时刻更新 Disabled。服务端采集复用 PrepareReward → SavePrepared 后再提交库存及耗尽，按烘焙的 regrowEnabled/regrowSeconds 记录仅服务端 RegrowAt；到期只复用原 Ghost 恢复 Available，不发物品或写盘。默认 gather_apple 启用 600 秒再生，vitality_apple 显式映射活力苹果，不新增存档字段或修改旧存储类。玩家金币/经验/完整库存仍为 v1 格式；地图对象耗尽/再生期限不保存，重启服务端从 Available 重新生成资源。产出/失败规则归 [背包与道具](Inventory.md)，用户已确认第四阶段人工 GamePlayer 通过，主线程结合既有静态核对判定该阶段通过；数据范围限采集保存失败不入包/不耗尽、旧正式档保留、恢复存储后重新采集、原固定 ID 库存恢复与服务端重启资源重建，完整边界归 [运行入口](Runtime.md)。第五阶段只新增独立再生系统脚本及 Unity 生成的 meta，沿用原资源与显式绑定；再生配置烘焙已静态核对；用户已确认第五阶段人工 GamePlayer 通过，主线程结合既有静态核对判定该阶段通过，范围限再生不重复入包/写盘、关闭与失败/取消分支、同局期限及服务端重启按既有规则重建，完整边界归运行入口。存档耗时、平台和线上验证仍为 UNKNOWN。
 
 ## 【FACT】地图掉落配置、资源与存档边界
 
@@ -218,4 +218,18 @@ Assets/Scripts/CombatPrototype/Map/ 包含四类配置、地图子段 MapMovemen
 
 新增 HarvestableTree.prefab 复用 TreeNormal 网格/材质；新增 DroppedWood.prefab 与程序生成的 DroppedWood.asset/.mat，原 DecorationPrefabs 仅追加 tree_harvest/drop_wood 两个引用。新资源/脚本 meta 由 Unity 导入生成，旧资源与旧 meta 保持。资源路径、Ghost 字段、Editor 创建/绑定及生命周期归[树木砍伐](MapTreeHarvest.md)。
 
-TreeState 的砍倒时刻用于客户端预测阻挡，不写世界存档；树木/地面木材随本局释放，重启恢复原布局与 Standing。wood 显式映射“木材”，成功 G 后沿现有 v1 库存保存/恢复；原 PlayerSaveStore 与正式档替换规则未修改。静态引用/烘焙已核对，第七阶段运行保存失败、双端/晚加入与重启恢复人工结果为 UNKNOWN，清单归[运行入口](Runtime.md)。
+TreeState 保留四个 Ghost 字段，另以阻挡转换历史同步各次砍倒/再生的权威 tick 和 Disabled，供客户端预测重建；不写世界存档；树木/地面木材随本局释放，重启恢复原布局与 Standing。wood 显式映射“木材”，成功 G 后沿现有 v1 库存保存/恢复；原 PlayerSaveStore 与正式档替换规则未修改。静态引用/烘焙已核对；用户已确认第七阶段人工 GamePlayer 通过，主线程结合静态核对判定该阶段通过，数据范围限木材保存/失败保留、双端/晚加入、固定 ID 重连及重启恢复，完整边界归[运行入口](Runtime.md)第七阶段十项清单。人工结论来自用户反馈，未实际触发的独立用例与存档耗时、性能、平台和线上验证仍为 UNKNOWN。
+
+## 【FACT】树木再生配置与历史缓冲
+
+objects.tree_normal 与 BuiltIn 复用 regrowEnabled=true/regrowSeconds=600；树木再生复用原字段，第八阶段版本为 v5/revision=7，当前整组契约见地图配置节。Map Baker 复制到 TreeSettings，TreeProgress 增加仅服务端 RegrowAt；原 TreeAuthoring 烘焙空 CombatPrototypeMapTreeBlockingEvent 缓冲，每条 TransitionTick/Disabled 两字段通过 Ghost 同步，内部容量 4，同局历史随轮次增长并随树木实例释放。新 TreeRegrowSystem 在服务端处理到期、占位和恢复；原资源/Prefab/Scene/Animator/旧 meta 与存储类保持，只新增系统脚本及 Unity 生成的 meta。重启按原布局生成 Standing、空历史及零期限；已入包木材沿原 v1 恢复。编译、历史 Serializer/Snapshot 和两种模板隔离烘焙已静态核对，用户已确认第八阶段人工 GamePlayer 通过，主线程结合既有静态核对与用户反馈判定该阶段通过，数据范围限配置/开关、多轮同步、晚加入/重启与释放，完整边界归[运行入口](Runtime.md)第八阶段八项清单及 v5/revision=7。人工结论来自用户反馈；未触发的独立时序/失败用例及历史内存/网络性能仍为 UNKNOWN。
+
+## 【FACT】采矿配置、资源与存档边界
+
+MapMiningConfig 为必填 mining 段，默认 enabled=true、mine_rock、3 秒、stone ×3、drop_stone；生态 mineDensityPer100m2 为 grassland/forest/rocky 的 0.1/0.2/1，矿点占地 0.75、间距 2.5、交互 2 米、只阻挡移动、不再生。新增 MineableRock.asset/.mat、MineableRock.prefab、DroppedStone.prefab；两个单根插值动态 Ghost 共用新灰色材质/网格，带 LinkedEntityGroupAuthoring，无 Owner/AutoCommandTarget/Collider/Animator。只在原 DecorationPrefabs 追加 mine_rock/drop_stone，旧资源、旧 meta、Scene 根/组件关系保持。
+
+MineState 同步 PlacementIndex/Phase/CollectorNetworkId/MinedTick 四字段，MineSettings/Progress 仅服务端；有效矿点在初始化完成后才登记 MineSpawn 所有权，石材由原 DropSpawn 拥有和清理，共享资源不随实例销毁。stone 映射“石材”，原存储类/v1 格式不变，成功 G 后保存/恢复库存；矿点耗尽、进度与地面石材不写盘，新 Server World 按原布局恢复 Available。资源/配置/生命周期归[采矿](MapMining.md)，第九阶段人工跨端/保存失败/重启/清理为 UNKNOWN，归[运行入口](Runtime.md)。
+
+## 【FACT】统一 F 资源交互的配置边界
+
+F 复用原 Gather 输入，HarvestTree/Mine 字段保留但 H/J 停止触发/消费。服务端统一入口跨三类选目标，继续使用各类型既有距离、耗时与产出 JSON 字段；schemaVersion=6/configRevision=8、来源/烘焙、资源绑定、Ghost 状态及 v1 玩家库存契约保持。只新增两个交互脚本及 Unity 生成的 meta；原配置、Scene/Prefab/Animator、旧 meta 与存储类未修改。规则归[地图](Map.md)；人工交互/保存回归已获用户通过反馈，结论限[运行入口](Runtime.md)统一 F 八项清单，未触发的独立用例仍为 UNKNOWN。

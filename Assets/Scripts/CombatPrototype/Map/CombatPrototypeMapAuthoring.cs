@@ -123,7 +123,7 @@ namespace Code_01.CombatPrototype.Map
                     biomes.Add(new CombatPrototypeMapBiome
                     {
                         BiomeId = biome.biomeId, TreeDensityPer100m2 = biome.treeDensityPer100m2,
-                        GatherableDensityPer100m2 = biome.gatherableDensityPer100m2
+                        GatherableDensityPer100m2 = biome.gatherableDensityPer100m2, MineDensityPer100m2 = biome.mineDensityPer100m2
                     });
                 var treeHarvest = config.map.treeHarvest;
                 var treePrefab = ReadGhostPrefab(prefabs, treeHarvest.visualResourceKey, typeof(CombatPrototypeMapTreeAuthoring));
@@ -137,7 +137,22 @@ namespace Code_01.CombatPrototype.Map
                     HarvestDuration = treeHarvest.harvestDurationSeconds,
                     DropPrefab = GetEntity(woodPrefab, TransformUsageFlags.Dynamic),
                     DropResourceKey = treeHarvest.dropVisualResourceKey,
-                    DropItemId = treeHarvest.dropItemId, DropQuantity = treeHarvest.dropQuantity
+                    DropItemId = treeHarvest.dropItemId, DropQuantity = treeHarvest.dropQuantity,
+                    RegrowEnabled = (byte)(treeDefinition.regrowEnabled ? 1 : 0), RegrowSeconds = treeDefinition.regrowSeconds
+                });
+                var mining = config.map.mining;
+                var minePrefab = ReadGhostPrefab(prefabs, mining.visualResourceKey, typeof(CombatPrototypeMapMineAuthoring));
+                var stonePrefab = ReadGhostPrefab(prefabs, mining.dropVisualResourceKey, typeof(CombatPrototypeMapDropAuthoring));
+                var mineDefinition = Array.Find(config.objects, item => item.objectId == mining.mineObjectId);
+                AddComponent(entity, new CombatPrototypeMapMineSettings
+                {
+                    Enabled = (byte)(mining.enabled ? 1 : 0),
+                    ObjectId = mining.mineObjectId, ResourceKey = mining.visualResourceKey,
+                    InteractionDistance = mineDefinition.interactionDistanceMeters,
+                    HarvestDuration = mining.harvestDurationSeconds,
+                    DropPrefab = GetEntity(stonePrefab, TransformUsageFlags.Dynamic),
+                    DropResourceKey = mining.dropVisualResourceKey,
+                    DropItemId = mining.dropItemId, DropQuantity = mining.dropQuantity
                 });
                 var objects = AddBuffer<CombatPrototypeMapObject>(entity);
                 foreach (var item in config.objects)
@@ -147,6 +162,7 @@ namespace Code_01.CombatPrototype.Map
                             "; config=" + (authoring.SourceMode == CombatPrototypeMapConfigSourceMode.Json
                                 ? CombatPrototypeMapJsonReader.ResourcePath(authoring.ObjectsJson) : "BuiltIn") +
                             "; objectId=" + item.objectId + "; field=visualResourceKey.");
+                    var mineable = item.objectId == mining.mineObjectId;
                     var ghost = prefab.GetComponent<GhostAuthoringComponent>();
                     var gather = prefab.GetComponent<CombatPrototypeMapGatherAuthoring>();
                     if (item.gatherable)
@@ -157,15 +173,16 @@ namespace Code_01.CombatPrototype.Map
                             throw new InvalidOperationException("Gatherable requires one root and interpolated gather Ghost prefab; objectId=" +
                                 item.objectId + "; visualResourceKey=" + item.visualResourceKey);
                     }
-                    else if (ghost != null || gather != null)
+                    else if (!mineable && (ghost != null || gather != null))
                         throw new InvalidOperationException("Static map object cannot use a gather Ghost prefab; objectId=" + item.objectId);
                     var harvestable = treeHarvest.enabled && item.objectId == treeHarvest.treeObjectId;
                     if (harvestable) prefab = treePrefab;
+                    if (mineable) prefab = minePrefab;
                     objects.Add(new CombatPrototypeMapObject
                     {
-                        ObjectId = item.objectId, ResourceKey = harvestable ? treeHarvest.visualResourceKey : item.visualResourceKey,
+                        ObjectId = item.objectId, ResourceKey = mineable ? mining.visualResourceKey : harvestable ? treeHarvest.visualResourceKey : item.visualResourceKey,
                         Prefab = GetEntity(prefab, TransformUsageFlags.Dynamic),
-                        Gatherable = (byte)(item.gatherable ? 1 : 0), Harvestable = (byte)(harvestable ? 1 : 0),
+                        Gatherable = (byte)(item.gatherable ? 1 : 0), Harvestable = (byte)(harvestable ? 1 : 0), Mineable = (byte)(mineable ? 1 : 0),
                         InteractionDistance = item.interactionDistanceMeters, GatherDuration = item.gatherDurationSeconds,
                         YieldItemName = item.gatherable ? CombatPrototypeMapYieldItemResolver.Resolve(item.yieldItemId) : default,
                         YieldQuantity = item.yieldQuantity,
@@ -199,12 +216,12 @@ namespace Code_01.CombatPrototype.Map
             private static GameObject ReadGhostPrefab(Dictionary<string, GameObject> prefabs, string key, Type component)
             {
                 if (!prefabs.TryGetValue(key, out var prefab))
-                    throw new InvalidOperationException("Missing treeHarvest prefab; resource=" + key + ", requiredComponent=" + component.Name);
+                    throw new InvalidOperationException("Missing map interaction prefab; resource=" + key + ", requiredComponent=" + component.Name);
                 var ghost = prefab.GetComponent<GhostAuthoringComponent>();
                 if (prefab.GetComponent(component) == null || ghost == null || prefab.transform.childCount != 0 ||
                     ghost.HasOwner || ghost.SupportAutoCommandTarget || ghost.DefaultGhostMode != GhostMode.Interpolated ||
                     ghost.SupportedGhostModes != GhostModeMask.Interpolated)
-                    throw new InvalidOperationException("treeHarvest requires a single-root interpolated Ghost; resource=" + key +
+                    throw new InvalidOperationException("Map interaction requires a single-root interpolated Ghost; resource=" + key +
                         ", requiredComponent=" + component.Name);
                 return prefab;
             }

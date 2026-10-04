@@ -6,10 +6,12 @@
     "rockObjectId": "decor_pebble",
     "treeObjectId": "tree_normal",
     "gatherObjectId": "gather_apple",
+    "mineObjectId": "mine_rock",
     "decorationDensityPer100m2": 12.0,
     "treeDensityPer100m2": 0.4,
     "gatherableDensityPer100m2": 0.6,
-    "rockDensityPer100m2": 0.2
+    "rockDensityPer100m2": 0.2,
+    "mineDensityPer100m2": 0.1
   },
   {
     "biomeId": "forest",
@@ -18,10 +20,12 @@
     "rockObjectId": "decor_pebble",
     "treeObjectId": "tree_normal",
     "gatherObjectId": "gather_apple",
+    "mineObjectId": "mine_rock",
     "decorationDensityPer100m2": 8.0,
     "treeDensityPer100m2": 1.5,
     "gatherableDensityPer100m2": 0.5,
-    "rockDensityPer100m2": 0.2
+    "rockDensityPer100m2": 0.2,
+    "mineDensityPer100m2": 0.2
   },
   {
     "biomeId": "rocky",
@@ -30,9 +34,11 @@
     "rockObjectId": "decor_pebble",
     "treeObjectId": "tree_normal",
     "gatherObjectId": "gather_apple",
+    "mineObjectId": "mine_rock",
     "decorationDensityPer100m2": 3.0,
     "treeDensityPer100m2": 0.1,
     "gatherableDensityPer100m2": 0.2,
-    "rockDensityPer100m2": 1.0
+    "rockDensityPer100m2": 1.0,
+    "mineDensityPer100m2": 1.0
   }
 ]

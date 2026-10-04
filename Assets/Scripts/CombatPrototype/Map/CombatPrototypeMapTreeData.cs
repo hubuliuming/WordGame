@@ -14,6 +14,13 @@ namespace Code_01.CombatPrototype.Map
         [GhostField] public uint FelledTick;
     }
 
+    [InternalBufferCapacity(4)]
+    public struct CombatPrototypeMapTreeBlockingEvent : IBufferElementData
+    {
+        [GhostField] public uint TransitionTick;
+        [GhostField] public byte Disabled;
+    }
+
     [GhostComponent(PrefabType = GhostPrefabType.Server)]
     public struct CombatPrototypeMapTreeSettings : IComponentData
     {
@@ -26,6 +33,8 @@ namespace Code_01.CombatPrototype.Map
         public FixedString64Bytes DropResourceKey;
         public FixedString64Bytes DropItemId;
         public int DropQuantity;
+        public byte RegrowEnabled;
+        public float RegrowSeconds;
     }
 
     [GhostComponent(PrefabType = GhostPrefabType.Server)]
@@ -34,5 +43,6 @@ namespace Code_01.CombatPrototype.Map
         public Entity Collector;
         public uint StartHitSequence;
         public double FinishAt;
+        public double RegrowAt;
     }
 }

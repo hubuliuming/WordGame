@@ -44,8 +44,8 @@
     "gatherDurationSeconds": 1.0,
     "yieldItemId": null,
     "yieldQuantity": 0,
-    "regrowEnabled": false,
-    "regrowSeconds": 0.0
+    "regrowEnabled": true,
+    "regrowSeconds": 600.0
   },
   {
     "objectId": "gather_apple",
@@ -62,5 +62,21 @@
     "yieldQuantity": 1,
     "regrowEnabled": true,
     "regrowSeconds": 600.0
+  },
+  {
+    "objectId": "mine_rock",
+    "visualResourceKey": "mine_rock",
+    "footprintRadiusMeters": 0.75,
+    "minimumSameTypeSpacingMeters": 2.5,
+    "interactionDistanceMeters": 2.0,
+    "blocksMovement": true,
+    "blocksMelee": false,
+    "blocksProjectile": false,
+    "gatherable": false,
+    "gatherDurationSeconds": 0.0,
+    "yieldItemId": null,
+    "yieldQuantity": 0,
+    "regrowEnabled": false,
+    "regrowSeconds": 0.0
   }
 ]

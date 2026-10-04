@@ -12,6 +12,7 @@ namespace Code_01.CombatPrototype.Map
                 var entity = GetEntity(TransformUsageFlags.Dynamic);
                 AddComponent(entity, new CombatPrototypeMapTreeState { PlacementIndex = -1 });
                 AddComponent<CombatPrototypeMapTreeProgress>(entity);
+                AddBuffer<CombatPrototypeMapTreeBlockingEvent>(entity);
             }
         }
     }

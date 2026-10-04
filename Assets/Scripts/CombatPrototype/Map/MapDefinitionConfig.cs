@@ -14,6 +14,7 @@ namespace Code_01.CombatPrototype.Map
         public MapMovementConfig movement;
         public MapDropConfig drops;
         public MapTreeHarvestConfig treeHarvest;
+        public MapMiningConfig mining;
         public MapPopulationConfig population;
         public MapSpawnConfig spawn;
         public string[] biomeIds;

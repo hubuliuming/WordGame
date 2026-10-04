@@ -85,7 +85,7 @@ namespace Code_01.CombatPrototype.Map
                     });
                 }
             }
-            // Trees reserve first, then gatherables, then the remaining decorations.
+            // Trees and gatherables keep their original placements; mines reserve before decorations.
             foreach (var chunk in result.Chunks)
             for (var biome = 0; biome < config.biomes.Length; biome++)
             {
@@ -102,6 +102,15 @@ namespace Code_01.CombatPrototype.Map
                 Place(configBiome.gatherableDensityPer100m2, objectIndices[configBiome.gatherObjectId],
                     candidates, config, result, spacing, occupancy, definition.layout, enemyColumns, enemySpacing, ref random);
             }
+            if (definition.mining.enabled)
+                foreach (var chunk in result.Chunks)
+                for (var biome = 0; biome < config.biomes.Length; biome++)
+                {
+                    ReadCandidates(result, chunk, biome, candidates);
+                    var configBiome = config.biomes[biome];
+                    Place(configBiome.mineDensityPer100m2, objectIndices[configBiome.mineObjectId],
+                        candidates, config, result, spacing, occupancy, definition.layout, enemyColumns, enemySpacing, ref random);
+                }
             foreach (var chunk in result.Chunks)
             for (var biome = 0; biome < config.biomes.Length; biome++)
             {

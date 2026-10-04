@@ -12,6 +12,7 @@ namespace Code_01.CombatPrototype.Map
     [WorldSystemFilter(WorldSystemFilterFlags.ServerSimulation)]
     [UpdateInGroup(typeof(PredictedSimulationSystemGroup))]
     [UpdateAfter(typeof(CombatPrototypePlayerDamageSystem))]
+    [UpdateAfter(typeof(CombatPrototypeMapInteractionSystem))]
     [UpdateBefore(typeof(CombatPrototypePlayerRespawnSystem))]
     public partial class CombatPrototypeMapGatherSystem : SystemBase
     {
@@ -19,7 +20,6 @@ namespace Code_01.CombatPrototype.Map
         {
             public Entity Entity;
             public int NetworkId;
-            public bool WasGathering;
         }
 
         private struct PlayerLookups
@@ -106,8 +106,6 @@ namespace Code_01.CombatPrototype.Map
                             continue;
                         }
                         var player = players[playerIndex];
-                        player.WasGathering = true;
-                        players[playerIndex] = player;
                         var reason = RejectPlayer(player, access);
                         if (reason == null && access.Healths[player.Entity].HitSequence != progress.ValueRO.StartHitSequence)
                             reason = "PlayerHit";
@@ -132,67 +130,43 @@ namespace Code_01.CombatPrototype.Map
                     }
                 }
 
-                for (var i = 0; i < players.Length; i++)
-                {
-                    var player = players[i];
-                    var stage = "ReadInput";
-                    try
-                    {
-                        if (!access.Inputs[player.Entity].Gather.IsSet) continue;
-                        stage = "ValidatePlayer";
-                        var reason = player.WasGathering ? "AlreadyGathering" : RejectPlayer(player, access);
-                        if (reason != null)
-                        {
-                            Reject(map.MapDefinitionId, player, reason);
-                            continue;
-                        }
-                        var position = access.Transforms[player.Entity].Position.xz;
-                        var target = Entity.Null;
-                        var bestDistance = float.PositiveInfinity;
-                        var bestPlacement = int.MaxValue;
-                        foreach (var point in points)
-                        {
-                            var gather = states[point];
-                            if (gather.Phase != CombatPrototypeMapGatherPhase.Available) continue;
-                            var range = configs[point].InteractionDistance;
-                            var distance = math.distancesq(position, access.Transforms[point].Position.xz);
-                            if (distance > range * range || distance > bestDistance ||
-                                (distance == bestDistance && gather.PlacementIndex >= bestPlacement)) continue;
-                            target = point;
-                            bestDistance = distance;
-                            bestPlacement = gather.PlacementIndex;
-                        }
-                        if (target == Entity.Null)
-                        {
-                            Reject(map.MapDefinitionId, player, "NoAvailableTarget");
-                            continue;
-                        }
-                        stage = "StartGather";
-                        var state = states.GetRefRW(target);
-                        var progress = progresses.GetRefRW(target);
-                        var config = configs[target];
-                        // Obtain both references before committing the temporary reservation.
-                        progress.ValueRW = new CombatPrototypeMapGatherProgress
-                        {
-                            Collector = player.Entity, StartHitSequence = access.Healths[player.Entity].HitSequence,
-                            FinishAt = time + config.GatherDuration
-                        };
-                        state.ValueRW.CollectorNetworkId = player.NetworkId;
-                        state.ValueRW.Phase = CombatPrototypeMapGatherPhase.Collecting;
-                        Debug.Log("[CombatPrototype.Map] Gather started; map=" + map.MapDefinitionId +
-                            ", placement=" + state.ValueRO.PlacementIndex + ", objectId=" + config.ObjectId +
-                            ", NetworkId=" + player.NetworkId + ", player=" + player.Entity +
-                            ", duration=" + config.GatherDuration + ".");
-                    }
-                    catch (Exception exception)
-                    {
-                        Debug.LogError("[CombatPrototype.Map] Gather request failed; map=" + map.MapDefinitionId +
-                            ", NetworkId=" + player.NetworkId + ", player=" + player.Entity +
-                            ", stage=" + stage + ". " + exception);
-                    }
-                }
             }
             finally { players.Dispose(); }
+        }
+
+        internal bool TryBegin(Entity point, Entity player, int networkId, uint hitSequence,
+            double time, FixedString64Bytes mapId)
+        {
+            var state = EntityManager.GetComponentData<CombatPrototypeMapGatherState>(point);
+            if (state.Phase != CombatPrototypeMapGatherPhase.Available) return false;
+            var progress = EntityManager.GetComponentData<CombatPrototypeMapGatherProgress>(point);
+            var config = EntityManager.GetComponentData<CombatPrototypeMapGatherConfig>(point);
+            progress = new CombatPrototypeMapGatherProgress
+            {
+                Collector = player, StartHitSequence = hitSequence, FinishAt = time + config.GatherDuration
+            };
+            state.CollectorNetworkId = networkId;
+            state.Phase = CombatPrototypeMapGatherPhase.Collecting;
+            EntityManager.SetComponentData(point, progress);
+            EntityManager.SetComponentData(point, state);
+            Debug.Log("[CombatPrototype.Map] Gather started; map=" + mapId + ", placement=" +
+                state.PlacementIndex + ", objectId=" + config.ObjectId + ", NetworkId=" + networkId +
+                ", player=" + player + ", duration=" + config.GatherDuration + ".");
+            return true;
+        }
+
+        internal void CancelBegin(Entity point, Entity player, FixedString64Bytes mapId)
+        {
+            var progress = EntityManager.GetComponentData<CombatPrototypeMapGatherProgress>(point);
+            if (progress.Collector != player) return;
+            var state = EntityManager.GetComponentData<CombatPrototypeMapGatherState>(point);
+            progress = default;
+            state.CollectorNetworkId = 0;
+            state.Phase = CombatPrototypeMapGatherPhase.Available;
+            EntityManager.SetComponentData(point, progress);
+            EntityManager.SetComponentData(point, state);
+            Debug.Log("[CombatPrototype.Map] Gather reservation cancelled; map=" + mapId +
+                ", placement=" + state.PlacementIndex + ", point=" + point + ", reason=ReservationFailed.");
         }
 
         private static int FindCollector(NativeList<OnlinePlayer> players, Entity entity, int networkId)
@@ -212,12 +186,6 @@ namespace Code_01.CombatPrototype.Map
             if (!math.all(math.isfinite(input.Move))) return "InvalidMoveInput";
             if (math.lengthsq(input.Move) != 0f) return "PlayerMoving";
             return null;
-        }
-
-        private static void Reject(FixedString64Bytes mapId, OnlinePlayer player, string reason)
-        {
-            Debug.Log("[CombatPrototype.Map] Gather rejected; map=" + mapId + ", NetworkId=" +
-                player.NetworkId + ", player=" + player.Entity + ", reason=" + reason + ".");
         }
 
         private static void Cancel(RefRW<CombatPrototypeMapGatherState> state,

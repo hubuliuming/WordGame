@@ -599,7 +599,7 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 
 ## 【KNOWN ISSUES】材料背包与制作面板的人工验收
 
-入口CombatPrototypeNetCode，Forest/Grassland的Json/BuiltIn当前schemaVersion=9/configRevision=12。inventoryPanel=true/initiallyOpen=false、380×640/右24/上64/字号18/行32；原HUD仍true/320×104，工具参数及玩家v2保存/v1读取迁移保持。正常编译/类型导入/十四次隔离Editor烘焙已静态核对，主线程静态验收通过；以下人工GamePlayer均为UNKNOWN：
+入口CombatPrototypeNetCode，面板验收时Forest/Grassland的Json/BuiltIn为schemaVersion=9/configRevision=12。inventoryPanel=true/initiallyOpen=false、380×640/右24/上64/字号18/行32；原HUD仍true/320×104，工具参数及玩家v2保存/v1读取迁移保持。正常编译/类型导入/十四次隔离Editor烘焙已静态核对，主线程静态验收通过；用户已确认本阶段人工GamePlayer通过，主线程结合既有静态核对与用户反馈判定通过，范围限本入口、v9/revision12及以下十二项清单，未实际触发的独立用例仍为UNKNOWN：
 
 1. 默认准入后面板关闭，B单次打开/再按关闭，按住不反复；底部关闭按钮有效。没有本地Ghost/未准入/死亡时不显示，打开不暂停世界、攻击/敌人/再生计时，WASD、空格、F/G/E/R及Z/X保持。
 2. 新固定ID空库存显示Empty，两工具Not owned；通过植物F、木材/石材G和敌人奖励看到Apple/Wood/Stone/Meat及实际数量，保持原条目顺序，同名累加、归零移除，数量超过99不拆格。原1/2在面板关闭时也可制作。
@@ -614,4 +614,23 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 11. 合法修改initiallyOpen、尺寸/边距/字号/行高/文案后正常导入/烘焙生效；可控条件下旧v8、缺段/字段、未知/重复字段、错类型、非有限/非法几何、空白/控制字符/超61UTF-8字节文案明确失败、不补默认或回退来源。确认字体之外的显示及滚动；中文字体/字形仍UNKNOWN。未触发配置/异常网络条目保持UNKNOWN。
 12. 回归原采集/砍伐/采矿计时与取消、工具损坏/重制、掉落飞行/G/到期、原点再生/占位等待、移动阻挡/战斗/E/R/镜头，以及停止重进的实例释放；原产出、存档v2/v1边界和地图布局保持，世界资源/期限仍不保存，面板没有库存容量/99拆格或额外物品使用效果。
 
-验收结束恢复SourceMode=Json/Preset=Forest/schema9/revision12、inventoryPanel=true/initiallyOpen=false及本节默认尺寸/英文文案；原seed12345、32敌人、HUD、工具、资源产出和600秒再生保持。新面板规则归[材料背包与制作面板](MapInventoryPanel.md)，原制作/耐久归[采集工具](MapGatherTools.md)。本阶段人工结果为UNKNOWN；工具v8/revision11、HUD v7/revision10及其他用户通过仍限旧版本/清单。字体、运行性能/带宽、平台与线上未验证，AI未执行PlayMode、游戏模拟/GUI回调、逻辑单元测试、命令行构建、发布、性能采样或图片检查。
+验收结束恢复SourceMode=Json/Preset=Forest/schema9/revision12、inventoryPanel=true/initiallyOpen=false及本节默认尺寸/英文文案；原seed12345、32敌人、HUD、工具、资源产出和600秒再生保持。新面板规则归[材料背包与制作面板](MapInventoryPanel.md)，原制作/耐久归[采集工具](MapGatherTools.md)。本阶段人工通过来自用户反馈；未实际触发的精确排版/命中、事件顺序、同tick、延迟/预测回放、晚加入及独立配置/网络条目/创建/准备/保存/提交/清理失败仍为UNKNOWN。工具v8/revision11、HUD v7/revision10及其他用户通过仍限旧版本/清单。字体、运行性能/带宽、平台与线上未验证，AI未执行PlayMode、游戏模拟/GUI回调、逻辑单元测试、命令行构建、发布、性能采样或图片检查。
+
+## 【KNOWN ISSUES】背包物品丢弃与地面掉落的人工验收
+
+入口CombatPrototypeNetCode，当前Forest/Grassland的Json/BuiltIn为schemaVersion=10/configRevision=13，inventoryDrop=true、singleDropQuantity=1、allowDropAll=true、feedbackSeconds=2；苹果/木材/石材各用原资源键。正常Unity编译、新输入/所属反馈序列化及16次隔离Editor烘焙静态通过，未改原地图布置/结构/资源绑定。主线程静态验收通过；本阶段GamePlayer人工结果UNKNOWN，以下清单尚未执行：
+
+1. B打开面板，苹果/木材/石材正数量行显示Drop x1和All，小块肉及未配置库存显示Unavailable；工具两槽无丢弃按钮。默认空库存和材料不足单次数量时无非法操作，丢弃开关关闭保留原列表/制作/玩法。
+2. 静止存活且近战Ready，分别单次丢弃三种物品：原库存各扣1，其余条目顺序/金币/经验/Tools保持，一份对应Ghost从玩家位置飞行、落地；客户端不提前扣包。库存归零移除条目，面板随后显示服务器结果。
+3. All使用服务端执行时的实际总量；可控准备超过99数量，单份Ghost承载全部数量、不拆99、不地面合并；G拾取全量后按原同名checked累加。快照滞后和连续主动点击仍以服务器当前量/资格判定，不产生负数或补发。
+4. Prepared不可见、不运动、不可G；激活后飞行期不可领，落地才可在原2米内G，保存成功才入包/Consumed。其他合格玩家也可拾取，两玩家争抢沿原一次提交/同距DropId规则；跨端/晚加入及预测回放未触发保持UNKNOWN。
+5. 移动、Attack请求/近战非Ready、死亡、无所属Connected/InGame连接或任意植物/树木/矿点预约期间丢弃拒绝，不扣库存或留下可拾取物。本人收到Drop rejected，非法归属不覆盖真实玩家反馈；不能触发的分支保持UNKNOWN。
+6. 同输入tick丢弃与F/G/E、制作或R均保留原操作，丢弃拒绝；不干扰原F最近目标、制作F优先/斧头优先、E小块肉及G/R资格。无自动重试，重新主动点击仍重新核定；精确同tick/事件顺序未触发保持UNKNOWN。
+7. 可控准备/Prefab创建/保存失败时旧库存与正式档保持，只有本次Prepared释放；清理失败须保留日志且残留不可见/不可领。恢复后重新点击，其他玩家请求继续；独立失败无法触发保持UNKNOWN，不宣称保存成功后意外ECS故障可完整回滚。
+8. 成功显示Dropped及对应物品/实际量，拒绝/失败分别显示配置文案，默认2秒，面板页脚优先于原制作提示，F进度和工具反馈不改。仅本人显示丢弃反馈，新绑定不重播旧Sequence；双客户端独立反馈/晚加入未触发保持UNKNOWN。
+9. 面板内丢弃按钮/空白/滚轮不触发鼠标Attack或缩放镜头，面板外原鼠标规则保持；关闭、死亡、断线、源/玩家变化及World/Scene释放清掉未提交请求。已交给输入的请求仍由服务器核定，不由下一玩家或World继承待提交状态；缩放/精确命中未触发保持UNKNOWN。
+10. PlayMode前正常导入/烘焙核对两模板/Json与BuiltIn，分别关闭inventoryDrop、All、面板、F HUD、敌人掉落、工具/砍树/采矿；各开关独立，已有地面物仍可原G。Single改2、合法物品列表缩减/文案/反馈秒数变化生效；关闭面板不再提交按钮，原1/2保持。
+11. 可控旧v9、缺inventoryDrop/字段、未知/重复字段、错误类型、非正单次数量/非有限反馈、空/超3条/未知或重复itemId、非法或未绑定资源键、空白/控制字符/超61字节文案均明确失败，不补默认或回退来源。配置关闭仍校验全部字段；未触发独立异常保持UNKNOWN。
+12. 丢弃后重连恢复已扣库存，未拾取地面物仍只属于本局；服务器重启清掉未拾取物，已保存扣减保持，G成功后物品随拾取者库存恢复。回归原三类F/工具耐久/制作、飞行/G/到期、再生/占位、战斗奖励/E/R/镜头/阻挡及停止释放；原空间/资源/产出/600秒再生保持。
+
+验收后恢复SourceMode=Json/Preset=Forest/schema10/revision13、inventoryDrop=true/Single1/Alltrue/反馈2秒、三种默认映射和六个英文文案，原面板/工具/HUD/drops/空间/种子/出生及600秒再生默认保持。规则归[背包丢弃](MapInventoryDrop.md)，运动/拾取归[掉落](MapDrops.md)。地面物重启消失且不返还已保存库存，这是当前边界；未触发的独立保存/创建/提交/清理、预测/网络/反馈/命中仍UNKNOWN。原面板v9/12十二项、工具v8/11十二项、HUD v7/10八项及其他用户通过保持各自原版本/清单，不覆盖新增丢弃。AI未执行GamePlayer/PlayMode、游戏模拟/GUI回调、逻辑单元测试、命令行构建、发布、性能采样或图片检查；字体、运行性能/带宽、平台/线上及文件替换后意外ECS恢复未验证。

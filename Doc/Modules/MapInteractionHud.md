@@ -20,7 +20,7 @@
 
 ## 【FACT】当前 JSON 契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 为 schemaVersion=9/configRevision=12，interactionHud、[工具配置](MapGatherTools.md)与[面板配置](MapInventoryPanel.md)均必填；全部九个字段必填，沿原严格 UTF-8/字段/类型/重复键检查。旧 v1～v8 明确失败，不补默认段或回退来源；JSON 只在正常导入和烘焙后生效，无运行热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 为 schemaVersion=10/configRevision=13，interactionHud、[工具配置](MapGatherTools.md)与[面板配置](MapInventoryPanel.md)均必填；全部九个字段必填，沿原严格 UTF-8/字段/类型/重复键检查。旧 v1～v9 明确失败，不补默认段或回退来源；JSON 只在正常导入和烘焙后生效，无运行热重载。
 
 | 字段 | 默认值 | 契约 |
 |---|---|---|
@@ -69,4 +69,6 @@ Ready 显示“F  文案”；Working 显示“文案  百分比%”和按千分
 
 工具v8/revision=11接入第二行和制作反馈，实际锁定耗时用于服务器进度；正常编译和十次工具隔离烘焙已核对，用户确认工具显示人工通过限v8/revision=11十二项清单，未实际触发的独立用例仍为UNKNOWN，完整静态与人工边界见[采集工具](MapGatherTools.md)/[运行入口](Runtime.md)。原HUD八项用户通过不覆盖本次新行为。
 
-当前v9/revision12复用原Main Camera宿主接入[材料背包与制作面板](MapInventoryPanel.md)，两个显示开关独立。关闭F HUD仍保留本地面板/制作反馈，关闭面板仍保留F HUD；绑定先核对所属Connected/InGame连接，两者关闭或生命周期失效时清空。原服务端四字段不变，本次编译/十四次隔离烘焙静态通过，人工结果UNKNOWN。
+v9/revision12阶段复用原Main Camera宿主接入[材料背包与制作面板](MapInventoryPanel.md)，两个显示开关独立。关闭F HUD仍保留本地面板/制作反馈，关闭面板仍保留F HUD；绑定先核对所属Connected/InGame连接，两者关闭或生命周期失效时清空。原服务端四字段不变，本次编译/十四次隔离烘焙静态通过；用户确认面板人工通过限v9/revision12及[运行入口](Runtime.md)十二项，未触发的独立失败/时序用例仍UNKNOWN。
+
+当前地图v10/13必填[背包丢弃](MapInventoryDrop.md)，复用原掉落资源及保存链；本专题原交互/工具/产出/再生行为保持。新增丢弃静态通过、人工UNKNOWN，旧通过仍限原版本/清单。

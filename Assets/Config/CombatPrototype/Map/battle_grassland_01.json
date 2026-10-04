@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 9,
-  "configRevision": 12,
+  "schemaVersion": 10,
+  "configRevision": 13,
   "mapDefinitionId": "battle_grassland_01",
   "defaultSeed": 12345,
   "geometry": {
@@ -119,6 +119,32 @@
     "notOwnedLabel": "Not owned",
     "disabledLabel": "Disabled",
     "readyLabel": "Ready"
+  },
+  "inventoryDrop": {
+    "enabled": true,
+    "singleDropQuantity": 1,
+    "allowDropAll": true,
+    "feedbackSeconds": 2.0,
+    "dropLabel": "Drop",
+    "dropAllLabel": "All",
+    "unavailableLabel": "Unavailable",
+    "successLabel": "Dropped",
+    "rejectedLabel": "Drop rejected",
+    "failureLabel": "Drop failed",
+    "items": [
+      {
+        "itemId": "vitality_apple",
+        "visualResourceKey": "drop_apple"
+      },
+      {
+        "itemId": "wood",
+        "visualResourceKey": "drop_wood"
+      },
+      {
+        "itemId": "stone",
+        "visualResourceKey": "drop_stone"
+      }
+    ]
   },
   "population": {
     "initialEnemyCount": 32

@@ -22,7 +22,7 @@
 
 ## 【FACT】当前 JSON 契约与数值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 BuiltIn 一致为 schemaVersion=9/configRevision=12，必填 gatherTools及[面板配置](MapInventoryPanel.md)。沿原严格 UTF-8、完整字段、类型、未知/重复键校验；旧地图 v1～v8 明确失败，不补默认段或回退来源。配置仅在正常导入/烘焙后生效，无运行热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 BuiltIn 一致为 schemaVersion=10/configRevision=13，必填 gatherTools及[面板配置](MapInventoryPanel.md)。沿原严格 UTF-8、完整字段、类型、未知/重复键校验；旧地图 v1～v9 明确失败，不补默认段或回退来源。配置仅在正常导入/烘焙后生效，无运行热重载。
 
 gatherTools 的 enabled=true、craftFeedbackSeconds=2.0、tools 为恰好两条不重复定义；enabled=false 仍校验所有字段，停止制作和工具加速，但保留已拥有工具/耐久，F 沿原徒手耗时。
 
@@ -77,4 +77,6 @@ CombatPrototypeMapGatherTool 是唯一可变工具状态，内部容量 2，每�
 
 用户已确认本阶段人工 GamePlayer 验收通过，主线程结合既有静态核对与用户反馈判定通过，范围限 CombatPrototypeNetCode、v8/revision=11 和[运行入口](Runtime.md)工具十二项清单。人工结论来自用户反馈；未实际触发的精确边界、同 tick、延迟/预测回放、晚加入及独立配置/创建/准备/保存/提交/清理/回滚失败仍为 UNKNOWN。既有 HUD、矿点再生和其他用户通过仅限各自原版本/清单。同步保存新增频率与耗时、带宽/性能、中文字体/字形、平台构建和线上联调未验证；文件替换成功后的意外 ECS 故障不宣称可完全回滚。AI 未运行 GamePlayer/PlayMode、游戏模拟/显示系统、逻辑单元测试、命令行构建、发布、性能采样或图片检查，未创建子Agent、未提交 Git。
 
-当前v9/revision12增加本地材料背包/配方与按钮，独立开关和人工边界归[制作面板](MapInventoryPanel.md)。工具资格/事务/反馈及v2保存链保持，旧工具十二项通过仍限v8/revision11。
+v9/revision12阶段增加本地材料背包/配方与按钮，独立开关和人工边界归[制作面板](MapInventoryPanel.md)。工具资格/事务/反馈及v2保存链保持，旧工具十二项通过仍限v8/revision11。
+
+当前地图v10/13必填[背包丢弃](MapInventoryDrop.md)，复用原掉落资源及保存链；本专题原交互/工具/产出/再生行为保持。新增丢弃静态通过、人工UNKNOWN，旧通过仍限原版本/清单。

@@ -17,7 +17,7 @@ namespace Code_01.CombatPrototype.Map
             {
                 map = new MapDefinitionConfig
                 {
-                    schemaVersion = 9, configRevision = 12,
+                    schemaVersion = 10, configRevision = 13,
                     mapDefinitionId = mapDefinitionId, defaultSeed = 12345,
                     geometry = new MapGeometryConfig
                     {
@@ -107,6 +107,18 @@ namespace Code_01.CombatPrototype.Map
                         notOwnedLabel = "Not owned",
                         disabledLabel = "Disabled",
                         readyLabel = "Ready"
+                    },
+                    inventoryDrop = new MapInventoryDropConfig
+                    {
+                        enabled = true, singleDropQuantity = 1, allowDropAll = true, feedbackSeconds = 2f,
+                        dropLabel = "Drop", dropAllLabel = "All", unavailableLabel = "Unavailable",
+                        successLabel = "Dropped", rejectedLabel = "Drop rejected", failureLabel = "Drop failed",
+                        items = new[]
+                        {
+                            new MapInventoryDropItemConfig { itemId = CombatPrototypeMapYieldItemResolver.VitalityAppleId, visualResourceKey = "drop_apple" },
+                            new MapInventoryDropItemConfig { itemId = CombatPrototypeMapYieldItemResolver.WoodId, visualResourceKey = "drop_wood" },
+                            new MapInventoryDropItemConfig { itemId = CombatPrototypeMapYieldItemResolver.StoneId, visualResourceKey = "drop_stone" }
+                        }
                     },
                     spawn = new MapSpawnConfig
                     {

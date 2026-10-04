@@ -13,7 +13,8 @@ namespace Code_01.CombatPrototype.Map
             foreach (var (drop, visibility) in SystemAPI.Query<
                          RefRO<CombatPrototypeMapDropState>, EnabledRefRW<MaterialMeshInfo>>()
                          .WithOptions(EntityQueryOptions.IgnoreComponentEnabledState))
-                visibility.ValueRW = drop.ValueRO.Phase != CombatPrototypeMapDropPhase.Consumed;
+                visibility.ValueRW = drop.ValueRO.Phase != CombatPrototypeMapDropPhase.Consumed &&
+                    drop.ValueRO.Phase != CombatPrototypeMapDropPhase.Prepared;
         }
     }
 }

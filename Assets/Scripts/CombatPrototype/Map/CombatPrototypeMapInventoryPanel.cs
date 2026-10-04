@@ -9,6 +9,7 @@ namespace Code_01.CombatPrototype.Map
     internal sealed class CombatPrototypeMapInventoryPanel
     {
         private readonly CombatPrototypeMapInventoryPanelSnapshot _snapshot = new CombatPrototypeMapInventoryPanelSnapshot();
+        private readonly CombatPrototypeMapInventoryDropClient _drop = new CombatPrototypeMapInventoryDropClient();
         private CombatPrototypeMapInventoryPanelSettings _settings;
         private CombatPrototypeMapGatherToolSettings _toolSettings;
         private CombatPrototypeMapGatherToolDefinition _axe;
@@ -26,7 +27,8 @@ namespace Code_01.CombatPrototype.Map
         private bool _canCraftAxe, _canCraftPickaxe, _lastInventoryValid;
 
         public void Configure(CombatPrototypeMapInventoryPanelSettings settings, CombatPrototypeMapGatherToolSettings toolSettings,
-            CombatPrototypeMapGatherToolDefinition axe, CombatPrototypeMapGatherToolDefinition pickaxe)
+            CombatPrototypeMapGatherToolDefinition axe, CombatPrototypeMapGatherToolDefinition pickaxe,
+            CombatPrototypeMapInventoryDropSettings dropSettings, DynamicBuffer<CombatPrototypeMapInventoryDropDefinition> dropDefinitions)
         {
             Reset();
             _settings = settings;
@@ -53,12 +55,13 @@ namespace Code_01.CombatPrototype.Map
             _axeButton = "1: " + _craftButton + " " + _axeName;
             _pickaxeButton = "2: " + _craftButton + " " + _pickaxeName;
             _snapshot.Configure(settings);
+            _drop.Configure(dropSettings, dropDefinitions, settings);
             _configured = true;
             _open = settings.Enabled != 0 && settings.InitiallyOpen != 0;
         }
 
         public void Show(DynamicBuffer<CombatPrototypeInventoryItem> inventory, int axeDurability, int pickaxeDurability,
-            string feedback, Entity source, Entity player)
+            string feedback, CombatPrototypeMapInventoryDropFeedback dropFeedback, Entity source, Entity player)
         {
             if (_settings.Enabled == 0) return;
             _snapshot.Capture(inventory, axeDurability, pickaxeDurability, source, player);
@@ -82,7 +85,8 @@ namespace Code_01.CombatPrototype.Map
                 _axeCraftTitle = _axeName + "  " + Availability(_axe, axeDurability);
                 _pickaxeCraftTitle = _pickaxeName + "  " + Availability(_pickaxe, pickaxeDurability);
             }
-            _feedback = feedback;
+            _drop.Observe(dropFeedback);
+            _feedback = string.IsNullOrEmpty(_drop.Feedback) ? feedback : _drop.Feedback;
             _ready = true;
         }
 
@@ -114,12 +118,15 @@ namespace Code_01.CombatPrototype.Map
         }
 
         // Called once the binding has rechecked the current World/map/local living player.
-        public bool ReadInput(Keyboard keyboard, Mouse mouse, out bool craftAxe, out bool craftPickaxe)
+        public bool ReadInput(Keyboard keyboard, Mouse mouse, out bool craftAxe, out bool craftPickaxe,
+            out CombatPrototypeMapInventoryDropRequest dropRequest)
         {
             craftAxe = craftPickaxe = false;
+            dropRequest = default;
             if (!_configured || !_ready || _settings.Enabled == 0)
             {
                 _craftAxe = _craftPickaxe = _mousePressAccepted = false;
+                _drop.ClearPending();
                 return false;
             }
             var wasInside = ContainsMouse(mouse);
@@ -139,6 +146,7 @@ namespace Code_01.CombatPrototype.Map
             {
                 craftAxe = _craftAxe;
                 craftPickaxe = _craftPickaxe;
+                dropRequest = _drop.ReadRequest();
             }
             _craftAxe = _craftPickaxe = false;
             // Closing by B must also consume the mouse press that began over this panel.
@@ -182,7 +190,7 @@ namespace Code_01.CombatPrototype.Map
                 GUI.Label(new Rect(panel.x + 12f, panel.y + 12f, panel.width - 24f, _settings.RowHeightPixels), _title, _labelStyle);
                 var viewport = new Rect(panel.x + 12f, panel.y + 12f + _settings.RowHeightPixels,
                     panel.width - 24f, panel.height - 3f * _settings.RowHeightPixels - 24f);
-                var rows = Mathf.Max(_snapshot.Items.Count, 1) + 13;
+                var rows = Mathf.Max(_snapshot.Items.Count * 2, 1) + 13;
                 var content = new Rect(0f, 0f, viewport.width - 18f, rows * _settings.RowHeightPixels);
                 _scroll = GUI.BeginScrollView(viewport, _scroll, content);
                 try { DrawBody(content.width); }
@@ -206,7 +214,13 @@ namespace Code_01.CombatPrototype.Map
             var y = 0f;
             Label(width, ref y, _materials);
             if (_snapshot.Items.Count == 0) Label(width, ref y, _empty);
-            foreach (var item in _snapshot.Items) Label(width, ref y, item.Text);
+            foreach (var item in _snapshot.Items)
+            {
+                Label(width, ref y, item.Text);
+                _drop.DrawRow(width, y, _settings.RowHeightPixels, _labelStyle, _buttonStyle, item,
+                    _snapshot.InventoryValid, _mousePressAccepted);
+                y += _settings.RowHeightPixels;
+            }
             Label(width, ref y, _tools);
             Label(width, ref y, _axeStatus);
             Label(width, ref y, _pickaxeStatus);
@@ -245,6 +259,7 @@ namespace Code_01.CombatPrototype.Map
         private void Close()
         {
             _open = _craftAxe = _craftPickaxe = _mousePressAccepted = false;
+            _drop.ClearPending();
             _scroll = Vector2.zero;
         }
 
@@ -255,6 +270,7 @@ namespace Code_01.CombatPrototype.Map
             Close();
             _configured = _ready = false;
             _snapshot.Reset();
+            _drop.Reset();
             _labelStyle = _buttonStyle = null;
             _feedback = string.Empty;
             _woodQuantity = _stoneQuantity = -1;

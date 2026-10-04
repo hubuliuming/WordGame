@@ -80,7 +80,8 @@ namespace Code_01.CombatPrototype.Map
         }
 
         public Entity SpawnOwnedDrop(Entity source, Entity prefab, FixedString64Bytes resource,
-            FixedString64Bytes itemId, int quantity, Unity.Mathematics.float3 start, out int dropId)
+            FixedString64Bytes itemId, int quantity, Unity.Mathematics.float3 start, out int dropId,
+            CombatPrototypeMapDropPhase phase = CombatPrototypeMapDropPhase.Airborne)
         {
             dropId = 0;
             if (source != _source)
@@ -90,7 +91,7 @@ namespace Code_01.CombatPrototype.Map
             dropId = checked(_nextId + 1);
             _nextId = dropId;
             var entity = CombatPrototypeMapDropSpawnUtility.Instantiate(EntityManager, map, settings,
-                prefab, resource, itemId, quantity, dropId, start, World.Time.ElapsedTime);
+                prefab, resource, itemId, quantity, dropId, start, World.Time.ElapsedTime, phase);
             try { _owned.Add(entity); }
             catch
             {
@@ -100,9 +101,9 @@ namespace Code_01.CombatPrototype.Map
             return entity;
         }
 
-        public void ReleaseDrop(Entity entity)
+        public void ReleaseDrop(Entity entity, string stage = "TreeRollback")
         {
-            if (DestroyOwned(entity, "TreeRollback")) _owned.Remove(entity);
+            if (DestroyOwned(entity, stage)) _owned.Remove(entity);
         }
 
         private bool DestroyOwned(Entity entity, string stage)

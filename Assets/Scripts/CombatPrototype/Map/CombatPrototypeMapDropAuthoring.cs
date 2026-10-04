@@ -10,7 +10,7 @@ namespace Code_01.CombatPrototype.Map
             public override void Bake(CombatPrototypeMapDropAuthoring authoring)
             {
                 var entity = GetEntity(TransformUsageFlags.Dynamic);
-                AddComponent<CombatPrototypeMapDropState>(entity);
+                AddComponent(entity, new CombatPrototypeMapDropState { Phase = CombatPrototypeMapDropPhase.Prepared });
                 AddComponent<CombatPrototypeMapDropProgress>(entity);
             }
         }

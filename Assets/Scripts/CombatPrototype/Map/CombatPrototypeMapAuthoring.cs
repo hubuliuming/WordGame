@@ -136,6 +136,33 @@ namespace Code_01.CombatPrototype.Map
                     DisabledLabel = new FixedString64Bytes(inventoryPanel.disabledLabel),
                     ReadyLabel = new FixedString64Bytes(inventoryPanel.readyLabel)
                 });
+                var inventoryDrop = config.map.inventoryDrop;
+                AddComponent(entity, new CombatPrototypeMapInventoryDropSettings
+                {
+                    Enabled = (byte)(inventoryDrop.enabled ? 1 : 0),
+                    SingleDropQuantity = inventoryDrop.singleDropQuantity,
+                    AllowDropAll = (byte)(inventoryDrop.allowDropAll ? 1 : 0),
+                    FeedbackSeconds = inventoryDrop.feedbackSeconds,
+                    DropLabel = new FixedString64Bytes(inventoryDrop.dropLabel),
+                    DropAllLabel = new FixedString64Bytes(inventoryDrop.dropAllLabel),
+                    UnavailableLabel = new FixedString64Bytes(inventoryDrop.unavailableLabel),
+                    SuccessLabel = new FixedString64Bytes(inventoryDrop.successLabel),
+                    RejectedLabel = new FixedString64Bytes(inventoryDrop.rejectedLabel),
+                    FailureLabel = new FixedString64Bytes(inventoryDrop.failureLabel)
+                });
+                var inventoryDropDefinitions = AddBuffer<CombatPrototypeMapInventoryDropDefinition>(entity);
+                foreach (var item in inventoryDrop.items)
+                {
+                    var prefab = ReadGhostPrefab(prefabs, item.visualResourceKey, typeof(CombatPrototypeMapDropAuthoring));
+                    inventoryDropDefinitions.Add(new CombatPrototypeMapInventoryDropDefinition
+                    {
+                        Kind = CombatPrototypeMapInventoryDropUtility.ResolveKind(item.itemId),
+                        ItemId = new FixedString64Bytes(item.itemId),
+                        ItemName = CombatPrototypeMapYieldItemResolver.Resolve(item.itemId),
+                        ResourceKey = new FixedString64Bytes(item.visualResourceKey),
+                        Prefab = GetEntity(prefab, TransformUsageFlags.Dynamic)
+                    });
+                }
                 var gatheringTools = config.map.gatherTools;
                 AddComponent(entity, new CombatPrototypeMapGatherToolSettings
                 {

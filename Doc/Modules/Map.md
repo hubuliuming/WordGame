@@ -15,11 +15,11 @@
 
 ## 【FACT】当前默认配置
 
-Json/BuiltIn 为 v9/revision=12；三类资源600秒再生。F/HUD、[工具](MapGatherTools.md)、[树木](MapTreeHarvest.md)、[采矿](MapMining.md)、G[掉落](MapDrops.md)各按专题。
+Json/BuiltIn 为 v10/revision=13；三类资源600秒再生。F/HUD、[工具](MapGatherTools.md)、[树木](MapTreeHarvest.md)、[采矿](MapMining.md)、G[掉落](MapDrops.md)各按专题。
 
 | 配置字段 | 当前值与用途 |
 |---|---|
-| schemaVersion / configRevision | 8 / 11 |
+| schemaVersion / configRevision | 10 / 13 |
 | defaultSeed | 12345，用于确定性布置 |
 | geometry.cellSizeMeters | 2 米 |
 | geometry.cellsPerChunk | 每块单边 16 格，即 32×32 米 |
@@ -53,7 +53,7 @@ gather_apple 的 footprintRadiusMeters=0.3、minimumSameTypeSpacingMeters=1.5、
 
 ## 【FACT】JSON 文件与配置入口
 
-Assets/Config/CombatPrototype/Map/ 有五份 UTF-8 无 BOM JSON。当前地图v9/revision=12，movement/drops/treeHarvest/mining/gatherTools/interactionHud/inventoryPanel必填；生态含 treeObjectId/gatherObjectId/mineObjectId、mineDensityPer100m2，物体新增 mine_rock。原地表、空间、种子和出生值保持。
+Assets/Config/CombatPrototype/Map/ 有五份 UTF-8 无 BOM JSON。当前地图v10/revision=13，movement/drops/treeHarvest/mining/gatherTools/interactionHud/inventoryPanel/inventoryDrop必填；生态含 treeObjectId/gatherObjectId/mineObjectId、mineDensityPer100m2，物体新增 mine_rock。原地表、空间、种子和出生值保持。
 
 | MapAuthoring 字段 | 显式绑定文件 | JSON 根类型 |
 |---|---|---|
@@ -63,7 +63,7 @@ Assets/Config/CombatPrototype/Map/ 有五份 UTF-8 无 BOM JSON。当前地图v9
 | GroundsJson | [grounds.json](../../Assets/Config/CombatPrototype/Map/grounds.json) | GroundDefinitionConfig 数组 |
 | ObjectsJson | [objects.json](../../Assets/Config/CombatPrototype/Map/objects.json) | MapObjectDefinitionConfig 数组 |
 
-SourceMode=BuiltIn 时明确使用内置来源，SourceMode=Json 时使用选中地图 JSON 和三份共享 JSON；Json 来源失败不自动回退 BuiltIn。Preset=Grassland 要求地图 ID 为 battle_grassland_01，Preset=Forest 要求 battle_forest_01。schemaVersion=9为契约版本，configRevision 为正整数修订号；不会自动递增。旧v1～v8或缺少movement/drops/treeHarvest/mining/gatherTools/interactionHud/inventoryPanel/treeObjectId/gatherObjectId/mineObjectId/mineDensityPer100m2 的文件明确失败，不补默认字段或回退来源。
+SourceMode=BuiltIn 时明确使用内置来源，SourceMode=Json 时使用选中地图 JSON 和三份共享 JSON；Json 来源失败不自动回退 BuiltIn。Preset=Grassland 要求地图 ID 为 battle_grassland_01，Preset=Forest 要求 battle_forest_01。schemaVersion=10为契约版本，configRevision须为正整数；旧v1～v9或缺少必填字段明确失败，不补字段或回退来源。
 
 [MapMovementConfig.cs](../../Assets/Scripts/CombatPrototype/Map/MapMovementConfig.cs) 是地图定义的必填 movement 段：
 
@@ -159,4 +159,4 @@ Map Baker 将再生开关/间隔写入物体定义，GatherSpawnSystem 复制到
 
 森林/草原：20/18 矿点、109/71 阻挡，关闭采矿后原布局保持；矿点再生编译/八次隔离烘焙已核对，用户确认人工通过，范围见[运行入口](Runtime.md)/[采矿](MapMining.md)。
 
-HUD用户通过限v7/10，工具限v8/11十二项；[面板](MapInventoryPanel.md)静态通过、人工UNKNOWN。
+HUD通过限v7/10，工具限v8/11、[面板](MapInventoryPanel.md)限v9/12原清单。[丢弃](MapInventoryDrop.md)已接入v10/13，静态通过、人工UNKNOWN。

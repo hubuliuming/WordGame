@@ -5,7 +5,7 @@ using Unity.NetCode;
 
 namespace Code_01.CombatPrototype.Map
 {
-    public enum CombatPrototypeMapDropPhase : byte { Airborne, Landed, Consumed }
+    public enum CombatPrototypeMapDropPhase : byte { Airborne, Landed, Consumed, Prepared }
 
     public struct CombatPrototypeMapDropState : IComponentData
     {

@@ -600,3 +600,18 @@
 - B本地开关，原库存正数量/原顺序滚动列表、两工具耐久和原配方/缺少材料预览；按钮条件只读原材料/工具/开关，沿原1/2事件、服务端资格、SavePrepared与反馈。面板内左键/镜头滚轮隔离，面板外和键盘操作保持，打开不暂停；显示开关独立，生命周期/关闭清掉未提交请求与旧显示。
 - 正常Unity编译无C# Error，四脚本导入、普通展示类、烘焙25字段及原输入生成类型已静态核对；十四次隔离Editor烘焙覆盖两地图Json/BuiltIn及关闭采矿/工具/F HUD/面板/两种显示，schema9/revision12、配置/玩家初值一致，原布局与引用保持、空间违规0，Console前后[0 Error,7 Warning,67 Log]，无新增烘焙警告，主场景干净、临时World/Scene释放。
 - 增量同步面板专题、相关模块、导航、配置建议模板与Runtime新十二项清单。主线程静态验收通过；本阶段GamePlayer人工结果UNKNOWN，旧工具v8/11及HUD v7/10等通过保持各自原范围。未修改Scene/SubScene、Prefab、Animator、旧meta、资源绑定、全部服务端玩法/存储链、原Ghost/输入字段、图片/字体、包或构建配置；AI未运行PlayMode、游戏模拟/GUI回调、逻辑单元测试、命令行构建、发布、性能采样或图片检查，未提交Git。字体、运行性能/带宽、平台/线上及独立失败/预测用例保持UNKNOWN。
+
+## 2026-10-04 用户确认材料背包与制作面板阶段人工验收通过
+
+- 用户明确反馈“我已验收通过”。主线程结合此前代码/编译/十四次隔离Editor烘焙静态核对与本次反馈判定阶段通过，范围限CombatPrototypeNetCode、schemaVersion=9/configRevision=12及运行入口面板十二项清单；玩家存档写v2/读取v1迁移边界保持。
+- 增量同步材料面板专题、运行入口、地图、交互HUD、背包、玩家、战斗、资源与数据、掉落、树木、采矿及项目外配置建议模板的验收状态；原配置、事实、全部验收编号和旧阶段通过范围保持。
+- 人工结论来自用户反馈；未实际触发的精确排版/命中、事件顺序、同tick、延迟/预测回放、晚加入及独立配置/网络条目/创建/准备/保存/提交/清理失败仍UNKNOWN。字体、运行性能/带宽、平台/线上及保存成功后意外ECS故障恢复仍未验证。
+- 本次只同步文档，未修改脚本、JSON、Scene、Prefab、Animator、资源/meta、导航或包/构建配置；AI未执行GamePlayer/PlayMode、游戏模拟/GUI回调、逻辑单元测试、命令行构建、发布、性能采样或图片检查，未创建子Agent或提交Git。
+
+## 2026-10-04 背包物品丢弃与地面掉落落地
+
+- 用户确认后由主线程按方案执行；新增inventoryDrop DTO、Settings/定义/所属反馈、服务端事务及普通客户端帮助类四个职责脚本，正常Unity导入生成meta。两份地图JSON和BuiltIn升为schema10/revision13，必填单次1/All开启/反馈2秒、苹果/木材/石材原资源映射和六文案，关闭仍严格校验，无热重载。
+- 原B面板材料行接入Drop/All、单个待提交请求和所属结果；原指针隔离、连接/本地玩家复核和关闭/死亡/断线/源/World释放清理保持。PlayerInput增加丢弃事件/稳定物品码/模式三字段，Player Baker增加所属Sequence/Kind/Quantity/Result。原制作、F/G/E/R及正式Map链保持。
+- 服务端复用原资格/预约互斥，同tick原操作优先；PrepareItemConsumption后创建Prepared，重取引用、SavePrepared成功才扣原库存并激活。DropPhase追加Prepared=3、Prefab初值Prepared/隐藏/不可拾取；原敌人/树木/矿点成功生成默认Airborne，复用原DropId/运动/G/到期/所有权。保存前失败仅释放当前准备态；文件替换后意外ECS故障不宣称完整回滚。世界掉落不保存，未拾取物重启消失且扣减已保存。
+- 正常Unity编译、13输入字段/新反馈Serializer、两模板/两来源及六种配置变体共16次隔离Editor烘焙静态通过，设置/原Prefab/玩家初值/默认布局符合契约；主场景干净、临时World/Scene已释放，原SubScene正常重新导入。导入过渡有两条旧程序集未知inventoryDrop字段异常，完成编译后严格读取/烘焙成功，Console前后[2 Error,2 Warning,0 Log]未新增错误/警告，保留原日志；两条编译警告为未修改第三方/工具文件。
+- 增量同步丢弃专题、相关模块、导航、项目外配置建议模板和Runtime十二项人工清单；主线程静态验收通过，GamePlayer人工UNKNOWN。原面板v9/12、工具v8/11、HUD v7/10及其他用户通过保持原版本/清单，全部旧验收编号保持。未修改Scene/SubScene、Prefab、Animator结构、旧meta、资源绑定/图片/字体、存储类、包/构建配置；AI未运行PlayMode、游戏模拟/GUI回调、逻辑单元测试、命令行构建、发布、性能采样或图片检查，未创建子Agent或提交Git。

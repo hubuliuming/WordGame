@@ -17,6 +17,9 @@ namespace Code_01.CombatPrototype.Networking
         public InputEvent Pickup;
         public InputEvent CraftAxe;
         public InputEvent CraftPickaxe;
+        public InputEvent DropInventory;
+        public byte InventoryDropItem;
+        public byte InventoryDropMode;
         public InputEvent HarvestTree; // Reserved; keyboard H is no longer submitted or consumed.
         public InputEvent Mine; // Reserved; keyboard J is no longer submitted or consumed.
     }
@@ -41,7 +44,7 @@ namespace Code_01.CombatPrototype.Networking
             var panelBinding = state.World.GetExistingSystemManaged<CombatPrototypeMapInteractionHudBindingSystem>();
             if (panelBinding == null)
                 throw new InvalidOperationException("Client input requires CombatPrototypeMapInteractionHudBindingSystem.");
-            var blocksMouse = panelBinding.ReadPanelInput(keyboard, mouse, out var panelCraftAxe, out var panelCraftPickaxe);
+            var blocksMouse = panelBinding.ReadPanelInput(keyboard, mouse, out var panelCraftAxe, out var panelCraftPickaxe, out var panelDrop);
             var cameraBinding = state.World.GetExistingSystemManaged<CombatPrototypeCameraBindingSystem>();
             move = cameraBinding.ReadMove(move, keyboard, blocksMouse ? null : mouse);
             var attack = (keyboard != null && keyboard.spaceKey.wasPressedThisFrame) ||
@@ -68,6 +71,12 @@ namespace Code_01.CombatPrototype.Networking
                     input.ValueRW.Pickup.Set();
                 if (craftAxe) input.ValueRW.CraftAxe.Set();
                 if (craftPickaxe) input.ValueRW.CraftPickaxe.Set();
+                if (panelDrop.Mode != CombatPrototypeMapInventoryDropMode.None)
+                {
+                    input.ValueRW.InventoryDropItem = (byte)panelDrop.Kind;
+                    input.ValueRW.InventoryDropMode = (byte)panelDrop.Mode;
+                    input.ValueRW.DropInventory.Set();
+                }
             }
         }
     }

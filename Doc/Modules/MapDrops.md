@@ -21,7 +21,7 @@
 
 ## 【FACT】JSON 契约与当前默认值
 
-[battle_forest_01.json](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[battle_grassland_01.json](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn来源](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)均为schemaVersion=9/configRevision=12，drops必填，工具配置归[采集工具](MapGatherTools.md)。原空间、移动、出生及drops/grounds值保持；mining与生态矿点字段归采矿专题，tree_normal/gather_apple/mine_rock均默认600秒再生。配置只在烘焙时读取，不支持热重载；各端须相同版本、输入布局与资源，未新增一致性协议。
+[battle_forest_01.json](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[battle_grassland_01.json](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn来源](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)均为schemaVersion=10/configRevision=13，drops必填，工具配置归[采集工具](MapGatherTools.md)。原空间、移动、出生及drops/grounds值保持；mining与生态矿点字段归采矿专题，tree_normal/gather_apple/mine_rock均默认600秒再生。配置只在烘焙时读取，不支持热重载；各端须相同版本、输入布局与资源，未新增一致性协议。
 
 | 字段 | 默认值 | 校验/行为 |
 |---|---|---|
@@ -37,7 +37,7 @@
 | visualScale | 0.5 | 有限正数，实例 LocalTransform 的统一缩放 |
 | lifetimeSeconds | 600 | 有限非负数；从生成时刻计时，0 关闭自动到期 |
 
-全部字段显式填写。字符串遵循原小写ASCII/数字/下划线及最长61字符；缺失/未知/重复字段、错类型或非法值沿严格UTF-8 JSON边界报错。旧地图v1～v8不迁移或补字段，Json失败不回退BuiltIn。资源键由原MapAuthoring.DecorationPrefabs解析，不查找或临时创建兜底。
+全部字段显式填写。字符串遵循原小写ASCII/数字/下划线及最长61字符；缺失/未知/重复字段、错类型或非法值沿严格UTF-8 JSON边界报错。旧地图v1～v9不迁移或补字段，Json失败不回退BuiltIn。资源键由原MapAuthoring.DecorationPrefabs解析，不查找或临时创建兜底。
 
 ## 【CURRENT STRATEGY】死亡、生成与飞行
 
@@ -45,7 +45,7 @@ DropSpawn 在服务端预测组的原 Reward 之后、EnemyAttack 之前读取 E
 
 实例初始位置为敌人死亡位置，服务端用地图种子与 DropId 生成圆内落点，终点高度为地图基准加贴地偏移。初始化 Transform、DropState 和 DropProgress 全部成功后才登记有效所有权；失败记录阶段、地图/敌人/DropId/物品/资源及原异常，清理当前半成品，其他死亡条目继续；不自动重放该敌人的生成尝试。没有 Collider、Rigidbody、树木/边界碰撞或落点避让，掉落不参加原移动阻挡和伤害链。
 
-状态为 Airborne → Landed → Consumed。DropMotion 在玩家伤害之后、拾取之前，根据服务端模拟时间计算 t=clamp((now-StartedAt)/FlightDuration,0,1)，位置为起终点线性插值加 Y 方向的 4×t×(1-t)×ArcHeight；t 达到 1 时进入 Landed。Airborne 显示且不可拾取，Landed 显示且可请求；客户端不自行生成、运动结算、入包或控制到期。
+DropPhase追加Prepared=3，原Airborne/Landed/Consumed=0/1/2保持。Prefab初值Prepared不运动、隐藏且不可拾取；原敌人/树木/矿点完成初始化后默认Airborne，随后Airborne → Landed → Consumed。DropMotion 在玩家伤害之后、拾取之前，根据服务端模拟时间计算 t=clamp((now-StartedAt)/FlightDuration,0,1)，位置为起终点线性插值加 Y 方向的 4×t×(1-t)×ArcHeight；t 达到 1 时进入 Landed。Airborne 显示且不可拾取，Landed 显示且可请求；客户端不自行生成、运动结算、入包或控制到期。
 
 ## 【CURRENT STRATEGY】G 请求与保存提交
 
@@ -105,4 +105,6 @@ v7/revision=10 接入 F 三类资源的目标提示与原服务端采集进度�
 
 [采集工具](MapGatherTools.md)不改变DropId、产出数量、飞行、G或释放链；使用斧头/镐子完成先准备并登记当前掉落、保存耐久，再提交资源完成。保存前失败只清理本次掉落并取消预约；保存成功后的意外ECS故障不执行旧资源回滚，恢复保证为UNKNOWN。G保存候选携带当前Tools，防止拾取覆盖耐久。本阶段编译/隔离烘焙已静态核对，用户确认工具人工通过限v8/revision=11及[运行入口](Runtime.md)十二项清单，未实际触发的独立事务失败仍为UNKNOWN，旧掉落用户通过范围保持。
 
-当前[材料面板](MapInventoryPanel.md)仅读取已入包库存并沿原工具事件请求制作，不接管G、掉落状态/生命周期或存档；拾取后显示随原Ghost刷新。v9/revision12显示接入静态通过，人工掉落/库存刷新回归UNKNOWN，原用户通过保持各自清单。
+v9阶段[材料面板](MapInventoryPanel.md)仅读取已入包库存并沿原工具事件请求制作，不接管G、掉落状态/生命周期或存档；拾取后显示随原Ghost刷新。v9/revision12显示接入静态通过，用户确认面板人工通过限[运行入口](Runtime.md)v9/revision12十二项，未实际触发的独立创建/保存/清理失败仍UNKNOWN；原用户通过保持各自清单。
+
+当前v10/13的[背包丢弃](MapInventoryDrop.md)调用原SpawnOwnedDrop并显式指定Prepared，保存扣减候选成功才激活Airborne；ReleaseDrop可携带InventoryDropRollback阶段，仅清理本次准备态实例。Single/All与其他掉落共用DropId/运动/G/到期/World所有权，任意合格玩家可拾取；drops.enabled不关闭背包丢弃。存档扣减已保存、未拾取物重启消失。编译/16次隔离烘焙静态通过，新增丢弃人工UNKNOWN，原用户通过保持各自版本/清单。

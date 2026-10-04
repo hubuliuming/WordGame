@@ -11,7 +11,8 @@ namespace Code_01.CombatPrototype.Map
     {
         public static Entity Instantiate(EntityManager manager, in CombatPrototypeMapData map,
             in CombatPrototypeMapDropSettings settings, Entity prefab, FixedString64Bytes resource,
-            FixedString64Bytes itemId, int quantity, int dropId, float3 start, double time)
+            FixedString64Bytes itemId, int quantity, int dropId, float3 start, double time,
+            CombatPrototypeMapDropPhase phase = CombatPrototypeMapDropPhase.Airborne)
         {
             var entity = Entity.Null;
             var stage = "PrepareDrop";
@@ -39,7 +40,7 @@ namespace Code_01.CombatPrototype.Map
                 manager.SetComponentData(entity, new CombatPrototypeMapDropState
                 {
                     DropId = dropId, ItemId = itemId, Quantity = quantity,
-                    Phase = CombatPrototypeMapDropPhase.Airborne
+                    Phase = phase
                 });
                 return entity;
             }

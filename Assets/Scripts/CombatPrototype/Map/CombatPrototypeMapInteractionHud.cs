@@ -82,7 +82,8 @@ namespace Code_01.CombatPrototype.Map
 
         internal void Configure(CombatPrototypeMapInteractionHudSettings settings,
             CombatPrototypeMapInventoryPanelSettings inventorySettings, CombatPrototypeMapGatherToolSettings toolSettings, CombatPrototypeMapGatherToolDefinition axe,
-            CombatPrototypeMapGatherToolDefinition pickaxe)
+            CombatPrototypeMapGatherToolDefinition pickaxe, CombatPrototypeMapInventoryDropSettings dropSettings,
+            DynamicBuffer<CombatPrototypeMapInventoryDropDefinition> dropDefinitions)
         {
             Reset();
             _settings = settings;
@@ -94,18 +95,19 @@ namespace Code_01.CombatPrototype.Map
             _gatherLabel = settings.GatherLabel.ToString();
             _treeLabel = settings.TreeLabel.ToString();
             _mineLabel = settings.MineLabel.ToString();
-            _inventoryPanel.Configure(inventorySettings, toolSettings, axe, pickaxe);
+            _inventoryPanel.Configure(inventorySettings, toolSettings, axe, pickaxe, dropSettings, dropDefinitions);
         }
 
         internal void Show(CombatPrototypeMapInteractionHudState state, DynamicBuffer<CombatPrototypeMapGatherTool> tools,
-            CombatPrototypeMapToolCraftFeedback feedback, DynamicBuffer<CombatPrototypeInventoryItem> inventory,
+            CombatPrototypeMapToolCraftFeedback feedback, CombatPrototypeMapInventoryDropFeedback dropFeedback,
+            DynamicBuffer<CombatPrototypeInventoryItem> inventory,
             Entity source, Entity player)
         {
             RefreshToolStatus(tools);
             ObserveFeedback(feedback);
             var hasFeedback = Time.unscaledTimeAsDouble < _feedbackUntil;
             _inventoryPanel.Show(inventory, _axeDurability, _pickaxeDurability,
-                hasFeedback ? _feedbackText : string.Empty, source, player);
+                hasFeedback ? _feedbackText : string.Empty, dropFeedback, source, player);
             if (_settings.Enabled == 0) { _visible = false; return; }
             if (state.Mode == CombatPrototypeMapInteractionHudMode.Hidden)
             {
@@ -221,8 +223,9 @@ namespace Code_01.CombatPrototype.Map
             _feedbackUntil = Time.unscaledTimeAsDouble + _toolSettings.CraftFeedbackSeconds;
         }
 
-        internal bool ReadPanelInput(Keyboard keyboard, Mouse mouse, out bool craftAxe, out bool craftPickaxe) =>
-            _inventoryPanel.ReadInput(keyboard, mouse, out craftAxe, out craftPickaxe);
+        internal bool ReadPanelInput(Keyboard keyboard, Mouse mouse, out bool craftAxe, out bool craftPickaxe,
+            out CombatPrototypeMapInventoryDropRequest dropRequest) =>
+            _inventoryPanel.ReadInput(keyboard, mouse, out craftAxe, out craftPickaxe, out dropRequest);
 
         internal void Clear()
         {

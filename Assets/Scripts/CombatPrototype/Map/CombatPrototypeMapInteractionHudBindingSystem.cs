@@ -65,19 +65,24 @@ namespace Code_01.CombatPrototype.Map
                 var definitions = EntityManager.GetBuffer<CombatPrototypeMapGatherToolDefinition>(source, true);
                 _hud.Configure(settings, inventorySettings, toolSettings,
                     CombatPrototypeMapGatherToolUtility.RequireDefinition(definitions, CombatPrototypeMapGatherToolKind.Axe),
-                    CombatPrototypeMapGatherToolUtility.RequireDefinition(definitions, CombatPrototypeMapGatherToolKind.Pickaxe));
+                    CombatPrototypeMapGatherToolUtility.RequireDefinition(definitions, CombatPrototypeMapGatherToolKind.Pickaxe),
+                    EntityManager.GetComponentData<CombatPrototypeMapInventoryDropSettings>(source),
+                    EntityManager.GetBuffer<CombatPrototypeMapInventoryDropDefinition>(source, true));
                 _source = source;
                 _player = player;
             }
             _hud.Show(EntityManager.GetComponentData<CombatPrototypeMapInteractionHudState>(player),
                 EntityManager.GetBuffer<CombatPrototypeMapGatherTool>(player, true),
                 EntityManager.GetComponentData<CombatPrototypeMapToolCraftFeedback>(player),
+                EntityManager.GetComponentData<CombatPrototypeMapInventoryDropFeedback>(player),
                 EntityManager.GetBuffer<CombatPrototypeInventoryItem>(player, true), source, player);
         }
 
-        public bool ReadPanelInput(Keyboard keyboard, Mouse mouse, out bool craftAxe, out bool craftPickaxe)
+        internal bool ReadPanelInput(Keyboard keyboard, Mouse mouse, out bool craftAxe, out bool craftPickaxe,
+            out CombatPrototypeMapInventoryDropRequest dropRequest)
         {
             craftAxe = craftPickaxe = false;
+            dropRequest = default;
             Dependency.Complete();
             if (_map.IsEmptyIgnoreFilter) { ResetBinding(); return false; }
             var source = _map.GetSingletonEntity();
@@ -92,7 +97,7 @@ namespace Code_01.CombatPrototype.Map
             if (_hud == null)
                 throw new InvalidOperationException("[CombatPrototype.Map] World=" + World.Name +
                     ", player=" + player + " requires the Main Camera HUD for panel input.");
-            return _hud.ReadPanelInput(keyboard, mouse, out craftAxe, out craftPickaxe);
+            return _hud.ReadPanelInput(keyboard, mouse, out craftAxe, out craftPickaxe, out dropRequest);
         }
 
         private bool HasInGameConnection(Entity player)

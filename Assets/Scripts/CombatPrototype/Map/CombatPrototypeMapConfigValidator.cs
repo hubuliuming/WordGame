@@ -10,7 +10,8 @@ namespace Code_01.CombatPrototype.Map
             if (config == null || config.map == null || config.map.geometry == null ||
                 config.map.layout == null || config.map.movement == null || config.map.drops == null || config.map.treeHarvest == null ||
                 config.map.mining == null || config.map.gatherTools == null || config.map.gatherTools.tools == null ||
-                config.map.interactionHud == null || config.map.inventoryPanel == null || config.map.population == null || config.map.spawn == null ||
+                config.map.interactionHud == null || config.map.inventoryPanel == null || config.map.inventoryDrop == null || config.map.inventoryDrop.items == null ||
+                config.map.population == null || config.map.spawn == null ||
                 config.biomes == null || config.grounds == null || config.objects == null ||
                 config.map.biomeIds == null || config.map.biomeRegions == null)
                 throw new InvalidOperationException("Map configuration is missing required sections.");
@@ -29,9 +30,10 @@ namespace Code_01.CombatPrototype.Map
             HudLabel(hud.treeLabel, "interactionHud.treeLabel");
             HudLabel(hud.mineLabel, "interactionHud.mineLabel");
             ValidateInventoryPanel(map.inventoryPanel);
+            ValidateInventoryDrop(map.inventoryDrop);
             Id(map.mapDefinitionId, "mapDefinitionId");
-            if (map.schemaVersion != 9 || map.configRevision < 1 || map.defaultSeed < 1)
-                throw new InvalidOperationException("Map requires schemaVersion=9, positive revision and seed.");
+            if (map.schemaVersion != 10 || map.configRevision < 1 || map.defaultSeed < 1)
+                throw new InvalidOperationException("Map requires schemaVersion=10, positive revision and seed.");
             var drops = map.drops;
             Id(drops.itemId, "drops.itemId");
             Id(drops.visualResourceKey, "drops.visualResourceKey");
@@ -221,6 +223,28 @@ namespace Code_01.CombatPrototype.Map
                 if (region.minX < 0f || region.minZ < 0f || region.maxX > 1f || region.maxZ > 1f ||
                     region.minX >= region.maxX || region.minZ >= region.maxZ)
                     throw new InvalidOperationException("Biome region must be a nonempty normalized rectangle.");
+            }
+        }
+
+        private static void ValidateInventoryDrop(MapInventoryDropConfig drop)
+        {
+            if (drop.singleDropQuantity <= 0 || drop.items.Length < 1 || drop.items.Length > 3)
+                throw new InvalidOperationException("inventoryDrop requires a positive single quantity and 1..3 item definitions.");
+            Positive(drop.feedbackSeconds, "inventoryDrop.feedbackSeconds");
+            HudLabel(drop.dropLabel, "inventoryDrop.dropLabel");
+            HudLabel(drop.dropAllLabel, "inventoryDrop.dropAllLabel");
+            HudLabel(drop.unavailableLabel, "inventoryDrop.unavailableLabel");
+            HudLabel(drop.successLabel, "inventoryDrop.successLabel");
+            HudLabel(drop.rejectedLabel, "inventoryDrop.rejectedLabel");
+            HudLabel(drop.failureLabel, "inventoryDrop.failureLabel");
+            var items = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var item in drop.items)
+            {
+                if (item == null) throw new InvalidOperationException("inventoryDrop.items does not allow null entries.");
+                Unique(items, item.itemId, "inventoryDrop.items.itemId");
+                CombatPrototypeMapInventoryDropUtility.ResolveKind(item.itemId);
+                CombatPrototypeMapYieldItemResolver.Resolve(item.itemId);
+                Id(item.visualResourceKey, "inventoryDrop.items.visualResourceKey");
             }
         }
 

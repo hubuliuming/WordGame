@@ -15,11 +15,11 @@
 
 ## 【FACT】当前默认配置
 
-Json/BuiltIn 为 v12/revision=15；三类资源600秒再生。F/HUD、[工具](MapGatherTools.md)、[树木](MapTreeHarvest.md)、[采矿](MapMining.md)、[G](MapPickupHud.md)/[掉落](MapDrops.md)、[高亮](MapInteractionHighlight.md)各按专题。
+Json/BuiltIn v13/16，三类资源600秒再生。[工具](MapGatherTools.md)、[树](MapTreeHarvest.md)、[矿](MapMining.md)、[G](MapPickupHud.md)/[掉落](MapDrops.md)、[高亮](MapInteractionHighlight.md)归专题；[状态](MapResourceStatusHud.md)静态及用户人工通过，限v13/16十项。
 
 | 配置字段 | 当前值与用途 |
 |---|---|
-| schemaVersion / configRevision | 12 / 15 |
+| schemaVersion / configRevision | 13 / 16 |
 | defaultSeed | 12345，用于确定性布置 |
 | geometry.cellSizeMeters | 2 米 |
 | geometry.cellsPerChunk | 每块单边 16 格，即 32×32 米 |
@@ -53,7 +53,7 @@ gather_apple 的 footprintRadiusMeters=0.3、minimumSameTypeSpacingMeters=1.5、
 
 ## 【FACT】JSON 文件与配置入口
 
-五份UTF-8无BOM JSON，地图v12/revision=15，movement/drops/treeHarvest/mining/gatherTools/interactionHud/pickupHud/interactionHighlight/inventoryPanel/inventoryDrop必填；生态含 treeObjectId/gatherObjectId/mineObjectId、mineDensityPer100m2，物体新增 mine_rock。原地表、空间、种子和出生值保持。
+五份UTF-8无BOM JSON，地图v13/16，原必填段及新增resourceStatusHud的完整契约见[状态](MapResourceStatusHud.md)。生态含treeObjectId/gatherObjectId/mineObjectId、mineDensityPer100m2，物体含mine_rock；原地表、空间、种子和出生保持。
 
 | MapAuthoring 字段 | 显式绑定文件 | JSON 根类型 |
 |---|---|---|
@@ -63,7 +63,7 @@ gather_apple 的 footprintRadiusMeters=0.3、minimumSameTypeSpacingMeters=1.5、
 | GroundsJson | [grounds.json](../../Assets/Config/CombatPrototype/Map/grounds.json) | GroundDefinitionConfig 数组 |
 | ObjectsJson | [objects.json](../../Assets/Config/CombatPrototype/Map/objects.json) | MapObjectDefinitionConfig 数组 |
 
-SourceMode=BuiltIn 时明确使用内置来源，SourceMode=Json 时使用选中地图 JSON 和三份共享 JSON；Json 来源失败不自动回退 BuiltIn。Preset=Grassland 要求地图 ID 为 battle_grassland_01，Preset=Forest 要求 battle_forest_01。schemaVersion=12为契约版本，configRevision须为正整数；旧v1～v11或缺少必填字段明确失败，不补字段或回退来源。
+SourceMode=BuiltIn 时明确使用内置来源，SourceMode=Json 时使用选中地图 JSON 和三份共享 JSON；Json 来源失败不自动回退 BuiltIn。Preset=Grassland 要求地图 ID 为 battle_grassland_01，Preset=Forest 要求 battle_forest_01。schemaVersion=13为契约版本，configRevision须为正整数；旧v1～v12或缺少必填字段明确失败，不补字段或回退来源。
 
 [MapMovementConfig.cs](../../Assets/Scripts/CombatPrototype/Map/MapMovementConfig.cs) 是地图定义的必填 movement 段：
 

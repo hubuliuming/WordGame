@@ -17,7 +17,7 @@ namespace Code_01.CombatPrototype.Map
             {
                 map = new MapDefinitionConfig
                 {
-                    schemaVersion = 12, configRevision = 15,
+                    schemaVersion = 13, configRevision = 16,
                     mapDefinitionId = mapDefinitionId, defaultSeed = 12345,
                     geometry = new MapGeometryConfig
                     {
@@ -94,6 +94,13 @@ namespace Code_01.CombatPrototype.Map
                         lineWidthPixels = 3f, segmentCount = 48,
                         readyColorHex = "#FFD166", workingColorHex = "#6ED88A", pickupColorHex = "#6EC6FF",
                         opacity = 0.9f, heightOffsetMeters = 0.03f
+                    },
+                    resourceStatusHud = new MapResourceStatusHudConfig
+                    {
+                        enabled = true, panelWidthPixels = 400f, panelHeightPixels = 52f,
+                        bottomMarginPixels = 236f, fontSize = 20, availableLabel = "Available",
+                        workingLabel = "Working", occupiedLabel = "In use", regrowingLabel = "Regrows in",
+                        waitingLabel = "Waiting to regrow", depletedLabel = "No regrowth"
                     },
                     inventoryPanel = new MapInventoryPanelConfig
                     {

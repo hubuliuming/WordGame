@@ -645,3 +645,25 @@
 - 五新职责脚本及Unity正常生成meta，原Map Baker追加固定Settings；原HUD/绑定委托普通解析/投影/客户端帮助类，Awake读取同对象Camera。只调整原F/G显示采样开关，文字关闭而对应高亮开启仍采样；三文字全关且高亮无启用通道才收起绑定，沿原所属连接/玩家及生命周期清缓存。
 - 正常Unity编译无C# Error，五类型/14配置字段、原13输入与F/G各四字段静态核对；两模板/两来源及主/F/G开关、三文字关/高亮开、全部显示关共14次隔离Editor烘焙通过。新Settings/RGB、原初值/反馈/掉落Prefab/Prepared及全部布置位置/朝向一致，Console前后[0 Error,6 Warning,47 Log]无新增错误/警告，保留原日志，主场景干净、临时World/Scene/TextAsset释放。
 - 增量同步新专题、相关模块、导航、项目外配置建议模板与Runtime十项人工清单；保留全部原157项编号/内容及旧版本用户通过范围。主线程静态验收通过，新高亮GamePlayer人工UNKNOWN；未改Player Baker、输入/Ghost/RPC、玩法选择/结算/存储、Scene/SubScene/Prefab/Animator结构、旧meta/资源绑定/网格/材质/图片/字体、包或构建配置。AI未执行PlayMode、游戏模拟/显示系统/GUI回调、逻辑单元测试、命令行构建、发布、性能采样或图片检查，未创建子Agent或提交Git。
+
+## 2026-10-04 用户确认资源交互目标高亮人工验收通过
+
+- 用户明确反馈“我已验收通过，接下来下一阶段”。主线程结合此前代码/正常编译/14次隔离Editor烘焙静态核对与本次反馈判定阶段通过，范围限CombatPrototypeNetCode、schemaVersion=12/configRevision=15及运行入口高亮十项清单；人工结论来自用户反馈。
+- 增量同步高亮专题、运行入口、地图、F/G提示、材料面板、背包丢弃、工具、树木、采矿、掉落、玩家、战斗、资源与数据及项目外配置建议模板的验收状态；参数、配置示例、全部167项人工验收编号/内容及旧阶段通过范围保持。
+- 未实际触发的独立排版/投影/缩放、身份/阶段时序、同tick、延迟/预测回放、多玩家/晚加入、生命周期及配置/解析/绘制/保存失败仍UNKNOWN；原屏幕叠加无真实深度遮挡边界保持，运行性能/带宽、平台/线上及旧保存成功后意外ECS恢复未验证。
+- 本次只同步文档，未修改脚本、JSON、Scene、Prefab、Animator、meta/资源绑定、导航、包或构建配置；AI未执行GamePlayer/PlayMode、游戏模拟/显示系统/GUI回调、逻辑单元测试、命令行构建、发布、性能采样或图片检查，未创建子Agent或提交Git。
+
+## 2026-10-04 资源状态与再生提示接入
+
+- 用户明确确认资源状态与再生提示方案，主线程按CombatPrototypeNetCode范围实施；新增五个职责脚本和正常Unity生成meta，原地图根追加11字段Settings、原Player Baker追加仅SendToOwner的Mode/Kind/PlacementIndex/RemainingSeconds四字段，Hidden为0/0/-1/0，RemainingSeconds不量化；原13输入及F/G各四字段保持。
+- 服务端在原F HUD采样后读取三类资源真实阶段/Collector/RegrowAt，F Ready/Working身份优先，无F目标时按原各类交互距离/XZ最近/同距PlacementIndex选择，包括占用与耗尽资源。显示可用、本人采集中、他人使用中、权威整秒倒计时、到期等待、不再生；允许移动/攻击时只读显示，不改原F/G资格、采集/工具/掉落/保存/再生/占位与阻挡历史。
+- 新resourceStatusHud必填true/400×52/底236/字号20及六文案，严格形状/类型、有限值、容纳/G间隔16与61 UTF-8字节校验，disabled仍校验。Json/BuiltIn/草地/森林统一schema13/revision16，旧v1～v12拒绝，无字段兜底/来源回退或热重载。原宿主/绑定接入独立状态行并沿Clear/Reset释放；F采样增加状态开关，状态关闭且其余显示全关才收起绑定。
+- 正常Unity编译无C# Error，所属Serializer/四字段/SendToOwner及原F/G/输入布局静态核对通过；Forest/Grassland各7种隔离Editor烘焙共14次，配置等价、新Settings/Hidden初值、原Prefab/反馈与完整布局一致，烘焙Console前后[0 Error,7 Warning,47 Log]无新增错误/警告，主场景干净、临时World/Scene/TextAsset释放。主线程静态验收通过，新增GamePlayer人工仍UNKNOWN。
+- 增量同步资源状态专题、受影响地图/显示/工具/树矿/掉落/玩家/战斗/数据/背包文档、导航、运行入口新增十项清单及项目外配置模板；原167项人工内容、旧验收版本/清单与UNKNOWN边界保持。未修改Scene/SubScene/Prefab/Animator结构、旧meta/资源绑定、包或构建配置；AI未运行PlayMode、游戏模拟/显示系统/GUI回调、逻辑单元测试、命令行构建、发布、性能采样或图片检查，未创建子Agent或提交Git。
+
+## 2026-10-04 用户确认资源状态与再生提示人工验收通过
+
+- 用户明确反馈“我已验收通过，接下来下一阶段”。主线程结合此前正常Unity编译、所属Serializer与14次隔离Editor烘焙静态核对及本次反馈判定阶段通过，范围限CombatPrototypeNetCode、schemaVersion=13/configRevision=16及运行入口资源状态十项清单；人工结论来自用户反馈。
+- 增量同步资源状态专题、运行入口及相关地图/显示/工具/树矿/掉落/玩家/战斗/资源与数据文档和项目外配置建议模板的验收状态；修正地图当前参数表残留的schema12/revision15为已确认13/16。全部177项人工验收编号/内容、配置默认值、原导航及旧阶段通过范围保持。
+- 未实际触发的独立倒计时/到期等待/再生关闭精确边界、距离/身份/输入时序、移动攻击显示、多玩家/晚加入/生命周期及配置/快照/绘制/保存失败仍UNKNOWN；字形、运行性能/带宽、平台/线上及旧保存成功后意外ECS恢复未验证。
+- 本次只同步文档，未修改脚本、JSON、Scene/SubScene、Prefab、Animator、meta/资源绑定、包或构建配置；AI未执行GamePlayer/PlayMode、游戏模拟/显示系统/GUI回调、逻辑单元测试、命令行构建、发布、性能采样或图片检查，未创建子Agent或提交Git。

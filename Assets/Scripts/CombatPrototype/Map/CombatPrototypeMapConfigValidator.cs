@@ -10,7 +10,7 @@ namespace Code_01.CombatPrototype.Map
             if (config == null || config.map == null || config.map.geometry == null ||
                 config.map.layout == null || config.map.movement == null || config.map.drops == null || config.map.treeHarvest == null ||
                 config.map.mining == null || config.map.gatherTools == null || config.map.gatherTools.tools == null ||
-                config.map.interactionHud == null || config.map.pickupHud == null || config.map.interactionHighlight == null || config.map.inventoryPanel == null || config.map.inventoryDrop == null || config.map.inventoryDrop.items == null ||
+                config.map.interactionHud == null || config.map.pickupHud == null || config.map.interactionHighlight == null || config.map.resourceStatusHud == null || config.map.inventoryPanel == null || config.map.inventoryDrop == null || config.map.inventoryDrop.items == null ||
                 config.map.population == null || config.map.spawn == null ||
                 config.biomes == null || config.grounds == null || config.objects == null ||
                 config.map.biomeIds == null || config.map.biomeRegions == null)
@@ -31,11 +31,12 @@ namespace Code_01.CombatPrototype.Map
             HudLabel(hud.mineLabel, "interactionHud.mineLabel");
             ValidatePickupHud(map.pickupHud, hud);
             ValidateInteractionHighlight(map.interactionHighlight);
+            ValidateResourceStatusHud(map.resourceStatusHud, map.pickupHud);
             ValidateInventoryPanel(map.inventoryPanel);
             ValidateInventoryDrop(map.inventoryDrop);
             Id(map.mapDefinitionId, "mapDefinitionId");
-            if (map.schemaVersion != 12 || map.configRevision < 1 || map.defaultSeed < 1)
-                throw new InvalidOperationException("Map requires schemaVersion=12, positive revision and seed.");
+            if (map.schemaVersion != 13 || map.configRevision < 1 || map.defaultSeed < 1)
+                throw new InvalidOperationException("Map requires schemaVersion=13, positive revision and seed.");
             var drops = map.drops;
             Id(drops.itemId, "drops.itemId");
             Id(drops.visualResourceKey, "drops.visualResourceKey");
@@ -226,6 +227,25 @@ namespace Code_01.CombatPrototype.Map
                     region.minX >= region.maxX || region.minZ >= region.maxZ)
                     throw new InvalidOperationException("Biome region must be a nonempty normalized rectangle.");
             }
+        }
+
+        private static void ValidateResourceStatusHud(MapResourceStatusHudConfig status, MapPickupHudConfig pickup)
+        {
+            Positive(status.panelWidthPixels, "resourceStatusHud.panelWidthPixels");
+            Positive(status.panelHeightPixels, "resourceStatusHud.panelHeightPixels");
+            Nonnegative(status.bottomMarginPixels, "resourceStatusHud.bottomMarginPixels");
+            if (status.fontSize <= 0 || status.panelWidthPixels <= 32f || status.panelWidthPixels > 1920f ||
+                status.panelHeightPixels < (double)status.fontSize + 32d ||
+                (double)status.panelHeightPixels + status.bottomMarginPixels > 1080d ||
+                status.bottomMarginPixels < (double)pickup.bottomMarginPixels + pickup.panelHeightPixels + 16d)
+                throw new InvalidOperationException("resourceStatusHud requires positive font size, width in (32,1920], " +
+                    "height >= fontSize+32, height+bottom margin <= 1080, and bottom margin at least 16 pixels above the G panel.");
+            HudLabel(status.availableLabel, "resourceStatusHud.availableLabel");
+            HudLabel(status.workingLabel, "resourceStatusHud.workingLabel");
+            HudLabel(status.occupiedLabel, "resourceStatusHud.occupiedLabel");
+            HudLabel(status.regrowingLabel, "resourceStatusHud.regrowingLabel");
+            HudLabel(status.waitingLabel, "resourceStatusHud.waitingLabel");
+            HudLabel(status.depletedLabel, "resourceStatusHud.depletedLabel");
         }
 
         private static void ValidateInteractionHighlight(MapInteractionHighlightConfig highlight)

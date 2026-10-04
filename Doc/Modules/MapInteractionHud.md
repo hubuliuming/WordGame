@@ -20,11 +20,11 @@
 
 ## 【FACT】当前 JSON 契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 为 schemaVersion=12/configRevision=15，interactionHud、[高亮](MapInteractionHighlight.md)、[G提示](MapPickupHud.md)、[工具配置](MapGatherTools.md)与[面板配置](MapInventoryPanel.md)均必填；interactionHud全部九个字段必填，沿原严格 UTF-8/字段/类型/重复键检查。旧 v1～v11 明确失败，不补默认段或回退来源；JSON 只在正常导入和烘焙后生效，无运行热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 为 schemaVersion=13/configRevision=16，interactionHud、[高亮](MapInteractionHighlight.md)、[G提示](MapPickupHud.md)、[工具配置](MapGatherTools.md)与[面板配置](MapInventoryPanel.md)均必填；interactionHud全部九个字段必填，沿原严格 UTF-8/字段/类型/重复键检查。旧 v1～v12 明确失败，不补默认段或回退来源；JSON 只在正常导入和烘焙后生效，无运行热重载。
 
 | 字段 | 默认值 | 契约 |
 |---|---|---|
-| enabled | true | 仅控制 F 文字/进度；F 文字与 F 高亮均关闭时快照 Hidden，原 F/G 继续 |
+| enabled | true | 仅控制 F 文字/进度；F文字/F高亮/资源状态均关闭时快照Hidden，原 F/G 继续 |
 | panelWidthPixels | 320 | 有限，32 < 宽度 <= 1920 |
 | panelHeightPixels | 104 | 有限正数；高度 >= 2×fontSize + progressBarHeightPixels + 54 |
 | bottomMarginPixels | 48 | 有限非负；高度 + 底距 <= 1080 |
@@ -53,7 +53,7 @@ CombatPrototypeMapInteractionHudState 用 OwnerSendType=SendToOwner 同步给所
 | PlacementIndex | int；Hidden 为 -1，其余是原布置索引 |
 | ProgressPermille | ushort，0～1000；非 Working 为 0 |
 
-状态仅含显示数据；FinishAt、RegrowAt、Collector实体引用和原资源计时配置仍仅服务端，工具Definitions由各端烘焙供所属工具行读取。F提示/进度不写资源Phase/Collector/历史/障碍、玩家输入/属性/库存、掉落或存档；同一宿主的背包面板只缓存按钮请求，由原输入系统消费。原资源Ghost字段与F/G/E/R效果保持，数字1/2制作归工具专题。服务器每tick重建缓存，字段不变不重复写；F文字与F高亮均关闭、连接无效、未采样或地图停止时清为Hidden；采样条件为interactionHud.enabled或interactionHighlight.enabled且fTargetsEnabled。
+状态仅含显示数据；FinishAt、RegrowAt、Collector实体引用和原资源计时配置仍仅服务端，工具Definitions由各端烘焙供所属工具行读取。F提示/进度不写资源Phase/Collector/历史/障碍、玩家输入/属性/库存、掉落或存档；同一宿主的背包面板只缓存按钮请求，由原输入系统消费。原资源Ghost字段与F/G/E/R效果保持，数字1/2制作归工具专题。服务器每tick重建缓存，字段不变不重复写；F文字、F高亮与资源状态均关闭，或连接无效、未采样、地图停止时清Hidden；采样条件为interactionHud.enabled、启用的F高亮通道或resourceStatusHud.enabled，后者保留原F身份供状态提示优先使用。
 
 客户端枚举启用的 GhostOwnerIsLocal，不在含该可启用组件的查询上调用单例 API；只显示本地所属玩家且死亡时收起，不显示远端玩家进度。F文字路径不读取PlayerView或世界位置；[高亮](MapInteractionHighlight.md)额外读取所选资源的客户端LocalToWorld，不替代官方Transform显示桥接。Main Camera 组件随 Client World 变更注册/解绑；无客户端、准入未完成、没有本地 Ghost 或地图停止时隐藏。World/Scene 释放清掉显示和引用，不保留上一局目标/进度/制作反馈；本地玩家或地图源变化也重置反馈序号观察。
 
@@ -71,8 +71,10 @@ Ready 显示“F  文案”；Working 显示“文案  百分比%”和按千分
 
 v9/revision12阶段复用原Main Camera宿主接入[材料背包与制作面板](MapInventoryPanel.md)，两个显示开关独立。关闭F HUD仍保留本地面板/制作反馈，关闭面板仍保留F HUD；绑定先核对所属Connected/InGame连接，v9时两者关闭或生命周期失效时清空；当前显示开关见末段。原服务端四字段不变，本次编译/十四次隔离烘焙静态通过；用户确认面板人工通过限v9/revision12及[运行入口](Runtime.md)十二项，未触发的独立失败/时序用例仍UNKNOWN。
 
-当前地图v12/15必填[背包丢弃](MapInventoryDrop.md)，复用原掉落资源及保存链；本专题原交互/工具/产出/再生行为保持。新增丢弃静态及用户人工通过限[运行入口](Runtime.md)v10/13十二项，未触发用例UNKNOWN；旧通过仍限原版本/清单。
+当前地图v13/16必填[背包丢弃](MapInventoryDrop.md)，复用原掉落资源及保存链；本专题原交互/工具/产出/再生行为保持。新增丢弃静态及用户人工通过限[运行入口](Runtime.md)v10/13十二项，未触发用例UNKNOWN；旧通过仍限原版本/清单。
 
 v11/14阶段复用原宿主/绑定接入[G提示](MapPickupHud.md)：pickupHud、interactionHud及inventoryPanel独立，三者全关闭或生命周期失效才收起整体绑定；F/G可同时显示，F四字段和进度/工具/反馈规则保持。G新增所属四字段、五职责脚本/meta及显示Settings，未改Scene/Prefab/Animator结构。编译/十次隔离烘焙静态通过，用户确认G显示人工通过，限v11/14十项，未触发用例UNKNOWN，旧通过保持原范围。
 
-当前v12/15复用原F四字段与Working锁定目标接入[资源交互高亮](MapInteractionHighlight.md)，不增加输入/Ghost字段。F/G文字与两类高亮独立，三文字全关且没有启用的高亮通道时才收起绑定。正常编译/14次隔离Editor烘焙静态通过；新高亮人工GamePlayer为UNKNOWN，旧F/G及工具/面板/丢弃用户通过仍限各自版本/清单。
+v12/15高亮复用原F四字段与Working锁定目标接入[资源交互高亮](MapInteractionHighlight.md)，不增加输入/Ghost字段。F/G文字与两类高亮独立，三文字全关、没有启用高亮通道且资源状态关闭时才收起绑定。正常编译/14次隔离Editor烘焙静态通过；用户确认高亮人工通过限v12/15十项，未触发独立用例UNKNOWN，旧F/G及工具/面板/丢弃用户通过仍限各自版本/清单。
+
+当前v13/16的[资源状态](MapResourceStatusHud.md)复用此宿主，独立显示三类资源状态与服务端剩余秒数，F文字面板本身保持。F采样增加状态开关作为身份消费者；仅状态开启时仍保留原F目标优先级。新显示静态及用户人工通过，限v13/16十项，未触发用例UNKNOWN；旧通过仍限各自版本/清单。

@@ -1,6 +1,6 @@
 # 背包展示与道具使用
 
-[返回总导航](../AI_Understanding.md)。本页负责格子生成、背包事件与场景道具；物品数据字段和资源映射归[资源与数据](DataResources.md)。
+返回[导航](../AI_Understanding.md)。本页负责背包格子/事件/道具；字段与映射见[数据](DataResources.md)，资源显示见[状态](MapResourceStatusHud.md)。
 
 ## 入口文件
 

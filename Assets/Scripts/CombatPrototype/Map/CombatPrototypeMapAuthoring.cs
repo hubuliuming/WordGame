@@ -132,6 +132,19 @@ namespace Code_01.CombatPrototype.Map
                     PickupColor = CombatPrototypeMapInteractionHighlightSettings.ColorFromHex(highlight.pickupColorHex),
                     Opacity = highlight.opacity, HeightOffset = highlight.heightOffsetMeters
                 });
+                var resourceStatus = config.map.resourceStatusHud;
+                AddComponent(entity, new CombatPrototypeMapResourceStatusHudSettings
+                {
+                    Enabled = (byte)(resourceStatus.enabled ? 1 : 0),
+                    PanelWidthPixels = resourceStatus.panelWidthPixels, PanelHeightPixels = resourceStatus.panelHeightPixels,
+                    BottomMarginPixels = resourceStatus.bottomMarginPixels, FontSize = resourceStatus.fontSize,
+                    AvailableLabel = new FixedString64Bytes(resourceStatus.availableLabel),
+                    WorkingLabel = new FixedString64Bytes(resourceStatus.workingLabel),
+                    OccupiedLabel = new FixedString64Bytes(resourceStatus.occupiedLabel),
+                    RegrowingLabel = new FixedString64Bytes(resourceStatus.regrowingLabel),
+                    WaitingLabel = new FixedString64Bytes(resourceStatus.waitingLabel),
+                    DepletedLabel = new FixedString64Bytes(resourceStatus.depletedLabel)
+                });
                 var inventoryPanel = config.map.inventoryPanel;
                 AddComponent(entity, new CombatPrototypeMapInventoryPanelSettings
                 {

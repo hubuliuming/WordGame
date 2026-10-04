@@ -17,11 +17,11 @@
 
 五个新脚本及正常Unity生成的meta已导入；解析、投影、客户端均为普通C#帮助类，没有新MonoBehaviour挂载。原Main Camera已挂Camera/FollowCamera/HUD，宿主Awake读取同对象Camera，不查找或创建替代节点。未修改Scene/SubScene/Prefab/Animator结构、旧meta、资源绑定、网格/材质/图片/字体、包或构建配置。
 
-原玩家输入仍13字段，F仍Mode/Kind/PlacementIndex/ProgressPermille四字段，G仍Mode/DropId/ItemId/Quantity四字段、SendToOwner；未改Player Baker、Ghost/RPC布局或存档。各端须使用同版代码/配置并重新烘焙；配置不参与新增联网版本协商。
+原玩家输入仍13字段，F仍Mode/Kind/PlacementIndex/ProgressPermille四字段，G仍Mode/DropId/ItemId/Quantity四字段、SendToOwner；高亮本身不改Player Baker、F/G/RPC或存档；新增所属状态归[资源状态](MapResourceStatusHud.md)。各端须使用同版代码/配置并重新烘焙；配置不参与新增联网版本协商。
 
 ## 【FACT】当前JSON契约与建议默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=12/configRevision=15。interactionHighlight段及14字段必填，沿原严格UTF-8、缺失/未知/重复字段、对象形状及标量类型检查；旧v1～v11明确失败，不迁移、补段或回退来源。正常导入/烘焙后生效，没有运行热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=13/configRevision=16。interactionHighlight段及14字段必填，沿原严格UTF-8、缺失/未知/重复字段、对象形状及标量类型检查；旧v1～v12明确失败，不迁移、补段或回退来源。正常导入/烘焙后生效，没有运行热重载。
 
 | 字段 | 当前默认值 | 契约/用途 |
 |---|---|---|
@@ -56,17 +56,17 @@ F按Kind/PlacementIndex查询原GatherState/TreeState/MineState，排除Prefab�
 
 在XZ平面缓存segmentCount个单位圆点和闭合终点；每帧复用屏幕点数组。Camera.WorldToScreenPoint后翻转屏幕Y，线段裁剪到Camera.pixelRect并给线宽留边；非有限投影、穿越近/远裁剪面时不画该圈。线宽按min(屏幕宽/1920,屏幕高/1080)缩放。仅EventType.Repaint绘制Texture2D.whiteTexture，恢复GUI.matrix/color；不消费键鼠事件，不绘制倒计时、轮廓描边、发光或闪烁。
 
-圆环属于屏幕投影叠加，没有真实深度遮挡，树木或其他物体前后关系不会裁去圆环；这不是世界网格/材质标记。渲染实际效果、可见性和缩放边界需人工GamePlayer核对。
+圆环属于屏幕投影叠加，没有真实深度遮挡，树木或其他物体前后关系不会裁去圆环；这不是世界网格/材质标记。人工通过范围见[运行入口](Runtime.md)十项清单，未触发的独立投影/缩放边界仍UNKNOWN。
 
 | 条件 | 当前采样/显示行为 |
 |---|---|
 | interactionHud开启，F高亮关闭 | 原F文字/进度继续采样，F圈关闭 |
-| interactionHud关闭，enabled且fTargetsEnabled开启 | 原F四字段继续采样，只可显示F圈；工具行/反馈遵循原文字开关 |
-| F文字与F高亮都关闭 | F快照清Hidden，原F玩法继续 |
+| interactionHud关闭，enabled且fTargetsEnabled开启 | 原F四字段继续采样，F文字隐藏、F圈可画；工具行/反馈遵循原文字开关，状态行独立 |
+| F文字/F高亮/资源状态均关闭 | F快照清Hidden，原F玩法继续 |
 | pickupHud开启，G高亮关闭 | 原G文字继续采样，G圈关闭 |
 | pickupHud关闭，enabled且gTargetsEnabled开启 | 原G四字段继续采样，只可显示G圈 |
 | G文字与G高亮都关闭 | G快照清Hidden，原G拾取继续 |
-| 三文字显示都关闭且没有启用的高亮通道 | 原整体绑定收起 |
+| 三文字关闭、无高亮通道且资源状态关闭 | 原整体绑定收起 |
 
 绑定仍只取本地启用GhostOwnerIsLocal、存活玩家及所属Connected/InGame连接，不在该可启用查询上调用单例API。死亡、断线、没有本地玩家/地图、源或玩家变化、World/Scene停止与释放沿原Clear/Reset清圆环、实体缓存和Camera引用，不残留上一局目标。单通道关闭只清该通道；Camera未启用时不绘制。
 
@@ -78,6 +78,8 @@ ResolveF/ResolveG错误分别记录World、地图、NetworkId及Kind/PlacementIn
 
 原完整布置位置/朝向逐项一致；森林/草原草丛601/744、碎石19/19、树木89/53、采集点36/38、矿点20/18、阻挡109/71保持。烘焙Console前后均[0 Error,6 Warning,47 Log]，无新增错误/警告；原运行Tick Batching及TreeObstacle顺序警告保留，未清空Console。原主场景干净，临时World/Scene/TextAsset已释放。
 
-主线程静态验收通过；新高亮GamePlayer人工为UNKNOWN，十项清单见[运行入口](Runtime.md)。旧G文字v11/14十项、丢弃v10/13十二项、面板v9/12十二项、工具v8/11十二项、F HUD v7/10八项及更早用户通过保持原版本/清单，不覆盖新增圆环行为。身份/阶段到达时序、取消/完成、投影边界、旋转/缩放、开关/生命周期、多玩家/晚加入及独立配置/解析/绘制失败尚未运行；性能/带宽、平台/线上及旧保存成功后意外ECS恢复仍UNKNOWN。
+主线程静态验收通过；用户已确认本阶段人工GamePlayer验收通过，主线程结合既有静态核对与用户反馈判定阶段通过，范围限CombatPrototypeNetCode、schemaVersion=12/configRevision=15及[运行入口](Runtime.md)十项清单。人工结论来自用户反馈；未实际触发的身份/阶段到达时序、取消/完成、投影边界、旋转/缩放、开关/生命周期、多玩家/晚加入及独立配置/解析/绘制失败仍UNKNOWN。旧G文字v11/14十项、丢弃v10/13十二项、面板v9/12十二项、工具v8/11十二项、F HUD v7/10八项及更早用户通过保持原版本/清单，不扩展为本阶段或全平台通过；性能/带宽、平台/线上及旧保存成功后意外ECS恢复仍UNKNOWN。
 
 AI未执行GamePlayer/PlayMode、游戏模拟/显示系统/GUI回调、逻辑单元测试、命令行构建、发布、性能采样或图片检查，未创建子Agent或提交Git。
+
+当前v13/16的[资源状态](MapResourceStatusHud.md)独立显示文字、在原G面板上方绘制；F Ready/Working身份优先，无F目标才选择附近状态目标。状态目标不新增圆环，不改原圈的资格/身份/颜色/半径。状态开启可保留F采样及绑定，新增所属四字段静态及用户人工通过，限v13/16十项，未触发用例UNKNOWN；高亮用户通过仍限v12/15十项。

@@ -654,7 +654,7 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 
 ## 【KNOWN ISSUES】资源交互目标高亮的人工验收
 
-入口CombatPrototypeNetCode，当前Forest/Grassland的Json/BuiltIn为schemaVersion=12/configRevision=15，interactionHighlight主/F/G开启、采集/树/矿/掉落半径0.65/0.9/0.9/0.45米、线宽3/48段、Ready黄#FFD166/Working绿#6ED88A/G蓝#6EC6FF、opacity=0.9、heightOffset=0.03。原F/G文字与背包面板默认开启。正常Unity编译及14次隔离Editor烘焙静态通过，14个新值/RGB、原输入13/F四/G四、F/G初值、原Prefab及全部布局保持；主线程静态验收通过。本阶段GamePlayer人工为UNKNOWN，以下十项尚待用户运行：
+入口CombatPrototypeNetCode，本段高亮验收版本为schemaVersion=12/configRevision=15，Forest/Grassland的Json/BuiltIn中interactionHighlight主/F/G开启、采集/树/矿/掉落半径0.65/0.9/0.9/0.45米、线宽3/48段、Ready黄#FFD166/Working绿#6ED88A/G蓝#6EC6FF、opacity=0.9、heightOffset=0.03。原F/G文字与背包面板默认开启。正常Unity编译及14次隔离Editor烘焙静态通过，14个新值/RGB、原输入13/F四/G四、F/G初值、原Prefab及全部布局保持；主线程静态验收通过。用户已确认本阶段人工GamePlayer验收通过，主线程结合既有静态核对与用户反馈判定阶段通过，范围限本入口、schemaVersion=12/configRevision=15及以下十项清单；未实际触发的独立用例仍UNKNOWN：
 
 1. 默认Forest进入，静止接近可采集植物/树木/矿点：F文字和黄色圆环对应同一最近权威目标，三类半径分别0.65/0.9/0.9米，远端玩家目标不显示；无目标或资格不符时隐藏。
 2. 开始F采集/砍树/采矿：Working圆环变绿色并跟随原锁定目标，附近更近物体不使其切换；原百分比、1/2/3秒徒手和1.5/2.25秒工具耗时保持，没有客户端提前完成。
@@ -667,4 +667,21 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 9. 两个Client仅显示本人圈；死亡/R、断线/重连、退出/重进、玩家或地图源变化后不残留上一局实体/位置/圈。Ghost晚到或快照分批到达先隐藏再按同身份恢复；不能触发的多玩家/时序分支保持UNKNOWN。
 10. 正常F采集入包、砍树/采矿掉落与600秒再生、G保存入包、工具制作/耗耐久、B/Drop/All以及原E/R/攻击继续；非法/缺失/未知/重复字段、旧v1～v11、非法颜色和边界数值在配置阶段明确失败且不补段/回退。不能触发的保存/解析/绘制独立失败保持UNKNOWN。
 
-本清单默认SourceMode=Json/Preset=Forest/schema12/revision15，interactionHighlight14值与本段一致；原seed/空间/出生/32敌人、F/G HUD、面板/工具/丢弃/drops/树矿/600秒再生保持。规则归[目标高亮](MapInteractionHighlight.md)，实际F/G行为归原资源/掉落模块。原157项验收编号/内容和各旧版本用户通过保持，新高亮不扩展旧通过。AI未运行GamePlayer/PlayMode、游戏模拟/显示系统/GUI回调、逻辑单元测试、命令行构建、发布、性能采样或图片检查。运行效果、网络/生命周期、独立故障、性能/带宽/平台/线上仍UNKNOWN。
+本清单默认SourceMode=Json/Preset=Forest/schema12/revision15，interactionHighlight14值与本段一致；原seed/空间/出生/32敌人、F/G HUD、面板/工具/丢弃/drops/树矿/600秒再生保持。规则归[目标高亮](MapInteractionHighlight.md)，实际F/G行为归原资源/掉落模块。原157项验收编号/内容和各旧版本用户通过保持，新高亮不扩展旧通过。AI未运行GamePlayer/PlayMode、游戏模拟/显示系统/GUI回调、逻辑单元测试、命令行构建、发布、性能采样或图片检查。本阶段人工结论来自用户反馈，限上述版本与清单；未实际触发的独立投影/缩放/身份时序/网络/生命周期及配置/解析/绘制/保存故障，以及性能/带宽/平台/线上仍UNKNOWN。
+
+## 【KNOWN ISSUES】资源状态与再生提示的人工验收
+
+入口CombatPrototypeNetCode，本段资源状态验收版本为Forest/Grassland的Json/BuiltIn schemaVersion=13/configRevision=16，resourceStatusHud=true/400×52/底236/字号20，六文案Available、Working、In use、Regrows in、Waiting to regrow、No regrowth。原F/G/B与高亮默认开启、三类原点再生600秒。正常编译/所属Serializer与14次隔离Editor烘焙静态通过；用户已确认本阶段人工GamePlayer验收通过，主线程结合既有静态核对与用户反馈判定阶段通过，范围限本段版本与以下十项清单，人工结论来自用户反馈：
+
+1. 默认Forest进入，静止接近可用植物/树木/矿点：G上方出现对应原名称与Available；与F Ready身份一致，没有有效附近资源时隐藏，远端玩家状态不显示。
+2. 本人F采集/砍树/采矿时显示Working，跟随原F锁定身份；附近更近资源不使其切换。原百分比、工具耗时/耐久和黄/绿圆环保持，不新增客户端工作计时或提前发奖。
+3. 另一玩家使用附近资源且本人没有F Ready/Working目标时显示In use；本人不能由提示获得预约权。相应资源恢复可用后随权威状态切换；单Client无法触发此分支时保持UNKNOWN。
+4. 耗尽植物后，在原2米交互范围、没有其他F目标时显示Regrows in Ns，按服务端期限向上取整变化；原点位置/身份保持，倒计时不使用本地时间补算、不写库存或保存。
+5. 砍倒树木/耗尽矿点后在原点附近核对再生剩余秒数；到期前不显示Available。需要缩短等待时可在PlayMode前临时配置三类regrowSeconds=2、正常导入/烘焙，验收后恢复600；这只改变原间隔接口。
+6. 树/矿到期时原点被存活玩家/敌人占用，状态显示Waiting to regrow，仍保持原隐藏/解除阻挡状态；离开占位区但仍在交互距离内，实际恢复后才显示Available。植物沿原再生逻辑，不新增占位条件。
+7. 关闭三类regrowEnabled后重新烘焙，耗尽且没有其他F目标时显示No regrowth，期限不补默认。关闭砍伐/采矿不选择对应资源。移动/攻击时仍可读状态，F/G资格和实际取消/结算规则保持；死亡隐藏全部显示。
+8. 状态关闭时原F/G/B/高亮照常；关闭其他文字及高亮、仅状态开启时仍显示并保留原F身份优先；全部显示关闭才收起绑定。状态不显示G掉落TTL，不新增圆环、点击或按键消费。
+9. 死亡/R、断线/重连、退出/重进、玩家或地图源及World/Scene变化清旧状态/秒数。两个Client只显示本人所属快照，晚加入读取当前权威秒数；未触发的独立时序/预测/网络分支保持UNKNOWN。
+10. PlayMode前修改新面板尺寸/底距/字号/六文案并正常导入烘焙，合法值生效；旧v1～v12、缺失/未知/重复字段、错类型、非有限尺寸、非正字号、文字容纳或G间隔不足、空白/控制字符/超61 UTF-8字节标签明确失败，不补段/回退，disabled仍校验。回归原F/G/掉落/600秒再生、工具/制作/Drop/All及E/R/战斗/镜头/阻挡/保存；未触发的独立失败、字形与性能保持UNKNOWN。
+
+本清单限SourceMode=Json/Preset=Forest/schema13/revision16及本段11默认值；原空间/seed/32敌人/出生、F/G/工具/面板/丢弃/高亮/产出与存储接口保持。规则归[资源状态](MapResourceStatusHud.md)，原再生/采集/掉落结算仍归原专题。全部177项验收编号/内容及旧用户通过保持各自版本/清单。AI未运行GamePlayer/PlayMode、游戏模拟/显示系统/GUI回调、逻辑单元测试、命令行构建、发布、性能采样或图片检查；未实际触发的独立倒计时/等待/距离/身份/输入时序、配置/快照/绘制/保存失败、多玩家/生命周期、字形、性能/带宽/平台/线上及旧保存成功后意外ECS恢复仍UNKNOWN。

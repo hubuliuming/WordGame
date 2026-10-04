@@ -21,7 +21,7 @@
 
 ## 【FACT】JSON契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=12/configRevision=15。inventoryDrop全部字段必填，沿原严格UTF-8/缺失/未知/重复字段及类型检查；旧v1～v11明确失败，不补段或回退来源。disabled仍校验全部字段与资源绑定；正常导入/烘焙后生效，没有运行热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=13/configRevision=16。inventoryDrop全部字段必填，沿原严格UTF-8/缺失/未知/重复字段及类型检查；旧v1～v12明确失败，不补段或回退来源。disabled仍校验全部字段与资源绑定；正常导入/烘焙后生效，没有运行热重载。
 
 | 字段 | 默认值 | 契约 |
 |---|---|---|
@@ -74,4 +74,6 @@ DropPhase追加Prepared=3，原Airborne/Landed/Consumed值0/1/2保持。Prefab�
 
 v11/14阶段新增[G提示](MapPickupHud.md)，与实际拾取共用资格/最近目标并显示实际数量；inventoryDrop列表不控制提示标签。未改变丢弃事务、请求/反馈、原13输入字段或v2存档；G新显示静态及用户人工通过，限v11/14十项，未触发用例UNKNOWN，丢弃用户通过仍限v10/13十二项。
 
-当前v12/15的[资源高亮](MapInteractionHighlight.md)只读取原F/G目标快照和对应客户端资源/掉落位置，不改变Drop/All请求、反馈、保存/扣料或地面生命周期。原13输入与玩家Ghost字段保持；新高亮静态通过、人工UNKNOWN，旧丢弃/G文字通过仍限原版本/清单。
+v12/15的[资源高亮](MapInteractionHighlight.md)只读取原F/G目标快照和对应客户端资源/掉落位置，不改变Drop/All请求、反馈、保存/扣料或地面生命周期。原13输入与玩家Ghost字段保持；高亮静态及用户人工通过限v12/15十项，未触发独立用例UNKNOWN，旧丢弃/G文字通过仍限原版本/清单。
+
+当前v13/16的[资源状态](MapResourceStatusHud.md)新增玩家所属四字段，只读采集物/树/矿，不读取掉落到期或改Drop/All请求、反馈、保存/扣料。原13输入与F/G各四字段保持，玩家烘焙布局新增状态组件，各端须同版重新烘焙。新显示静态及用户人工通过，限v13/16十项，未触发用例UNKNOWN，旧通过保持原范围。

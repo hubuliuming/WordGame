@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 12,
-  "configRevision": 15,
+  "schemaVersion": 13,
+  "configRevision": 16,
   "mapDefinitionId": "battle_grassland_01",
   "defaultSeed": 12345,
   "geometry": {
@@ -119,6 +119,19 @@
     "pickupColorHex": "#6EC6FF",
     "opacity": 0.9,
     "heightOffsetMeters": 0.03
+  },
+  "resourceStatusHud": {
+    "enabled": true,
+    "panelWidthPixels": 400,
+    "panelHeightPixels": 52,
+    "bottomMarginPixels": 236,
+    "fontSize": 20,
+    "availableLabel": "Available",
+    "workingLabel": "Working",
+    "occupiedLabel": "In use",
+    "regrowingLabel": "Regrows in",
+    "waitingLabel": "Waiting to regrow",
+    "depletedLabel": "No regrowth"
   },
   "inventoryPanel": {
     "enabled": true,

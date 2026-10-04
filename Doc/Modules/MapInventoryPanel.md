@@ -19,7 +19,7 @@
 
 ## 【FACT】JSON 契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 当前一致为 schemaVersion=12/configRevision=15。必填 inventoryPanel 共25字段，沿原严格UTF-8、完整字段/类型及未知/重复键检查；即使关闭面板也校验全部字段。旧地图v1～v11明确失败，不补段/默认值或回退来源；正常导入/烘焙后生效，无运行热重载。原工具配方/耐久仍从 gatherTools 唯一读取，面板不复制配置真值。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 当前一致为 schemaVersion=13/configRevision=16。必填 inventoryPanel 共25字段，沿原严格UTF-8、完整字段/类型及未知/重复键检查；即使关闭面板也校验全部字段。旧地图v1～v12明确失败，不补段/默认值或回退来源；正常导入/烘焙后生效，无运行热重载。原工具配方/耐久仍从 gatherTools 唯一读取，面板不复制配置真值。
 
 | 字段 | 默认值 | 契约 |
 |---|---|---|
@@ -82,4 +82,6 @@ v10/13在材料行下接入[Drop/All](MapInventoryDrop.md)，页脚优先展示�
 
 v11/14阶段的[G提示](MapPickupHud.md)与F HUD/本面板三开关独立，共用原宿主/连接及生命周期绑定；关闭本面板仍可显示G，v11时三者全关闭收起绑定。未修改B、列表/按钮、鼠标隔离或制作/丢弃事务，原13输入保持；新显示编译/十次隔离烘焙静态通过；用户确认人工通过限v11/14十项，未触发用例UNKNOWN。
 
-当前v12/15的[高亮](MapInteractionHighlight.md)复用同一宿主，圆环先于原面板绘制；文字/面板关闭而高亮开启仍绑定本地玩家。原B、鼠标隔离、按钮、输入与反馈保持，新增圆环不消费GUI事件。正常编译/14次隔离烘焙静态通过，新高亮人工UNKNOWN；旧面板/G提示用户通过仍限原版本/清单。
+v12/15的[高亮](MapInteractionHighlight.md)复用同一宿主，圆环先于原面板绘制；文字/面板关闭而高亮开启仍绑定本地玩家。原B、鼠标隔离、按钮、输入与反馈保持，新增圆环不消费GUI事件。正常编译/14次隔离烘焙静态通过，用户确认高亮人工通过限v12/15十项，未触发独立用例UNKNOWN；旧面板/G提示用户通过仍限原版本/清单。
+
+当前v13/16的[资源状态](MapResourceStatusHud.md)与B面板独立，仍复用原宿主/绑定；状态开启时即使其余显示全关仍绑定。新状态不消费GUI事件或制作请求，B按钮与鼠标隔离保持。状态静态及用户人工通过，限v13/16十项，未触发用例UNKNOWN；旧面板/G/高亮用户通过保持原范围。

@@ -19,6 +19,7 @@ namespace Code_01.CombatPrototype.Map
         public MapInteractionHudConfig interactionHud;
         public MapPickupHudConfig pickupHud;
         public MapInteractionHighlightConfig interactionHighlight;
+        public MapResourceStatusHudConfig resourceStatusHud;
         public MapInventoryPanelConfig inventoryPanel;
         public MapInventoryDropConfig inventoryDrop;
         public MapPopulationConfig population;

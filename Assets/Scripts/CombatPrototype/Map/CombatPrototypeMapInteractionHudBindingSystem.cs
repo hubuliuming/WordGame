@@ -59,9 +59,10 @@ namespace Code_01.CombatPrototype.Map
             var inventorySettings = EntityManager.GetComponentData<CombatPrototypeMapInventoryPanelSettings>(source);
             var pickupSettings = EntityManager.GetComponentData<CombatPrototypeMapPickupHudSettings>(source);
             var highlightSettings = EntityManager.GetComponentData<CombatPrototypeMapInteractionHighlightSettings>(source);
+            var resourceStatusSettings = EntityManager.GetComponentData<CombatPrototypeMapResourceStatusHudSettings>(source);
             var hasHighlight = highlightSettings.Enabled != 0 &&
                 (highlightSettings.FTargetsEnabled != 0 || highlightSettings.GTargetsEnabled != 0);
-            if (settings.Enabled == 0 && inventorySettings.Enabled == 0 && pickupSettings.Enabled == 0 && !hasHighlight)
+            if (settings.Enabled == 0 && inventorySettings.Enabled == 0 && pickupSettings.Enabled == 0 && !hasHighlight && resourceStatusSettings.Enabled == 0)
             {
                 ResetBinding();
                 return;
@@ -82,7 +83,7 @@ namespace Code_01.CombatPrototype.Map
                     CombatPrototypeMapGatherToolUtility.RequireDefinition(definitions, CombatPrototypeMapGatherToolKind.Pickaxe),
                     EntityManager.GetComponentData<CombatPrototypeMapInventoryDropSettings>(source),
                     EntityManager.GetBuffer<CombatPrototypeMapInventoryDropDefinition>(source, true), pickupSettings,
-                    highlightSettings, map.MapDefinitionId.ToString());
+                    highlightSettings, resourceStatusSettings, map.MapDefinitionId.ToString());
                 _source = source;
                 _player = player;
             }
@@ -97,6 +98,7 @@ namespace Code_01.CombatPrototype.Map
             _highlightTargets.Resolve(EntityManager, World.Name, map, highlightSettings,
                 EntityManager.GetComponentData<GhostOwner>(player).NetworkId, interaction, pickup, out var f, out var g);
             _hud.ShowHighlight(f, g);
+            _hud.ShowResourceStatus(EntityManager.GetComponentData<CombatPrototypeMapResourceStatusHudState>(player));
         }
 
         internal bool ReadPanelInput(Keyboard keyboard, Mouse mouse, out bool craftAxe, out bool craftPickaxe,

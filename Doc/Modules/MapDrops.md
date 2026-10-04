@@ -21,7 +21,7 @@
 
 ## 【FACT】JSON 契约与当前默认值
 
-[battle_forest_01.json](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[battle_grassland_01.json](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn来源](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)均为schemaVersion=12/configRevision=15，drops必填，工具配置归[采集工具](MapGatherTools.md)。原空间、移动、出生及drops/grounds值保持；mining与生态矿点字段归采矿专题，tree_normal/gather_apple/mine_rock均默认600秒再生。配置只在烘焙时读取，不支持热重载；各端须相同版本、输入布局与资源，未新增一致性协议。
+[battle_forest_01.json](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[battle_grassland_01.json](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn来源](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)均为schemaVersion=13/configRevision=16，drops必填，工具配置归[采集工具](MapGatherTools.md)。原空间、移动、出生及drops/grounds值保持；mining与生态矿点字段归采矿专题，tree_normal/gather_apple/mine_rock均默认600秒再生。配置只在烘焙时读取，不支持热重载；各端须相同版本、输入布局与资源，未新增一致性协议。
 
 | 字段 | 默认值 | 校验/行为 |
 |---|---|---|
@@ -37,7 +37,7 @@
 | visualScale | 0.5 | 有限正数，实例 LocalTransform 的统一缩放 |
 | lifetimeSeconds | 600 | 有限非负数；从生成时刻计时，0 关闭自动到期 |
 
-全部字段显式填写。字符串遵循原小写ASCII/数字/下划线及最长61字符；缺失/未知/重复字段、错类型或非法值沿严格UTF-8 JSON边界报错。旧地图v1～v11不迁移或补字段，Json失败不回退BuiltIn。资源键由原MapAuthoring.DecorationPrefabs解析，不查找或临时创建兜底。
+全部字段显式填写。字符串遵循原小写ASCII/数字/下划线及最长61字符；缺失/未知/重复字段、错类型或非法值沿严格UTF-8 JSON边界报错。旧地图v1～v12不迁移或补字段，Json失败不回退BuiltIn。资源键由原MapAuthoring.DecorationPrefabs解析，不查找或临时创建兜底。
 
 ## 【CURRENT STRATEGY】死亡、生成与飞行
 
@@ -111,4 +111,6 @@ v10/13接入的[背包丢弃](MapInventoryDrop.md)调用原SpawnOwnedDrop并显�
 
 v11/14阶段的[G提示](MapPickupHud.md)与实际G共用资格和DropTargetSelector，只有所属四字段显示数据；原保存入包、DropId及生命周期保持。编译/十次隔离烘焙静态通过，用户确认新显示人工通过，限v11/14十项，未触发用例UNKNOWN，旧用户通过保持原版本/清单。
 
-当前v12/15的[高亮](MapInteractionHighlight.md)复用原G四字段，按DropId解析客户端Landed位置显示半径0.45米蓝圈；不读取仅服务端期限、不另选目标、不写掉落或库存。G文字关闭而G高亮开启仍采样原显示快照。原生成/运动/G保存/到期/释放链保持，新显示静态通过、人工UNKNOWN。
+v12/15的[高亮](MapInteractionHighlight.md)复用原G四字段，按DropId解析客户端Landed位置显示半径0.45米蓝圈；不读取仅服务端期限、不另选目标、不写掉落或库存。G文字关闭而G高亮开启仍采样原显示快照。原生成/运动/G保存/到期/释放链保持，高亮静态及用户人工通过限v12/15十项，未触发独立用例UNKNOWN。
+
+当前v13/16的[资源状态](MapResourceStatusHud.md)只显示三类地图资源，不读取掉落ExpiresAt、显示掉落TTL或改G/生成/运动/保存/到期/清理。原掉落与G快照保持，新增玩家状态布局要求各端同版代码/配置重新烘焙。新显示静态及用户人工通过，限v13/16十项，未触发用例UNKNOWN，旧通过保持原范围。

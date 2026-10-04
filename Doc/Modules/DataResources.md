@@ -205,7 +205,7 @@ v1根对象恰含原五字段；v2增加Tools共六字段，库存/工具项均�
 
 ## 【FACT】网络战斗地图配置与资源
 
-Assets/Scripts/CombatPrototype/Map/包含四类配置、地图子段MapMovementConfig/MapDropConfig/MapTreeHarvestConfig/MapMiningConfig/MapGatherToolsConfig/MapInteractionHudConfig/MapPickupHudConfig/MapInteractionHighlightConfig/MapInventoryPanelConfig/MapInventoryDropConfig、配置集合/来源、严格JSON读取与校验、Authoring/Baker、地图显示与共享移动工具。SubScene的SourceMode=Json，显式绑定两份地图JSON及三份共享数组；材质/物体通过GroundMaterials/DecorationPrefabs稳定键绑定。契约和来源归[地图](Map.md)：当前schemaVersion=12/configRevision=15，必填movement/drops/treeHarvest/mining/gatherTools/interactionHud/pickupHud/interactionHighlight/inventoryPanel/inventoryDrop；生态含treeObjectId/gatherObjectId/mineObjectId/mineDensityPer100m2，物体含tree_normal/gather_apple/mine_rock。JSON在烘焙时成为固定ECS配置/布置及Disabled阻挡缓冲，相关Baker登记内容依赖；不增加玩家/敌人Prefab序列化字段，无外部配置运行加载、热重载或世界状态写盘。
+Assets/Scripts/CombatPrototype/Map/包含四类配置、地图子段MapMovementConfig/MapDropConfig/MapTreeHarvestConfig/MapMiningConfig/MapGatherToolsConfig/MapInteractionHudConfig/MapPickupHudConfig/MapInteractionHighlightConfig/MapResourceStatusHudConfig/MapInventoryPanelConfig/MapInventoryDropConfig、配置集合/来源、严格JSON读取与校验、Authoring/Baker、地图显示与共享移动工具。SubScene的SourceMode=Json，显式绑定两份地图JSON及三份共享数组；材质/物体通过GroundMaterials/DecorationPrefabs稳定键绑定。契约和来源归[地图](Map.md)：当前schemaVersion=13/configRevision=16，必填movement/drops/treeHarvest/mining/gatherTools/interactionHud/pickupHud/interactionHighlight/resourceStatusHud/inventoryPanel/inventoryDrop；生态含treeObjectId/gatherObjectId/mineObjectId/mineDensityPer100m2，物体含tree_normal/gather_apple/mine_rock。JSON在烘焙时成为固定ECS配置/布置及Disabled阻挡缓冲，相关Baker登记内容依赖；不增加玩家/敌人Prefab序列化字段，无外部配置运行加载、热重载或世界状态写盘。
 
 新资源位于 Assets/Art/Map/CombatPrototype/ 与 Assets/Prefabs/CombatPrototype/Map/，包括 8 个材质、6 个网格和 9 个物体 Prefab；草丛/碎石仍为静态，树木在砍伐关闭时使用原静态资源，GatherApple.mat、GatherApple.asset、GatherApple.prefab 为新单根插值 Ghost 采集资源。新增资源和脚本 meta 由 Unity 导入生成；既有玩家/敌人资源、旧 meta、Bundle、包与构建设置保持。地表运行网格及静态装饰由客户端地图显示系统拥有和清理，开启砍伐/采矿时树木/矿点 Ghost 分别由服务端 TreeSpawn/MineSpawn 拥有和清理，共享资源不随地图根实体释放而销毁。砍伐开启时树木为 Ghost，阻挡数据仍随地图根存在；玩家预测与敌人移动读取同一结构，按权威砍倒时刻更新 Disabled。服务端采集复用 PrepareReward → SavePrepared 后再提交库存及耗尽，按烘焙的 regrowEnabled/regrowSeconds 记录仅服务端 RegrowAt；到期只复用原 Ghost 恢复 Available，不发物品或写盘。默认 gather_apple 启用 600 秒再生，vitality_apple 显式映射活力苹果，不新增存档字段或修改旧存储类。玩家金币/经验/完整库存及Tools保存为v2，读取v1迁移；地图对象耗尽/再生期限不保存，重启服务端从 Available 重新生成资源。产出/失败规则归 [背包与道具](Inventory.md)，用户已确认第四阶段人工 GamePlayer 通过，主线程结合既有静态核对判定该阶段通过；数据范围限采集保存失败不入包/不耗尽、旧正式档保留、恢复存储后重新采集、原固定 ID 库存恢复与服务端重启资源重建，完整边界归 [运行入口](Runtime.md)。第五阶段只新增独立再生系统脚本及 Unity 生成的 meta，沿用原资源与显式绑定；再生配置烘焙已静态核对；用户已确认第五阶段人工 GamePlayer 通过，主线程结合既有静态核对判定该阶段通过，范围限再生不重复入包/写盘、关闭与失败/取消分支、同局期限及服务端重启按既有规则重建，完整边界归运行入口。存档耗时、平台和线上验证仍为 UNKNOWN。
 
@@ -233,13 +233,13 @@ MineState 同步 PlacementIndex/Phase/CollectorNetworkId/MinedTick 四字段，M
 
 ## 【FACT】统一 F 资源交互的配置边界
 
-F 复用原 Gather 输入，HarvestTree/Mine 字段保留但 H/J 停止触发/消费。服务端统一入口跨三类选目标，继续使用各类型既有距离、耗时与产出 JSON 字段；当前为schemaVersion=12/configRevision=15，原距离/耗时/产出接口、来源/烘焙、资源绑定及原玩家Items契约保持，存档写v2且保留Tools。统一 F 本身只增加两个交互脚本与 meta；矿点再生复用物体配置字段并增加 ECS 历史缓冲。当前[交互显示](MapInteractionHud.md)新增五个脚本/meta、地图显示配置及玩家所属 HUD 快照，主场景 Main Camera 仅追加一个 HUD 组件；Prefab/Animator与旧meta保持；存储类工具迁移/候选归[采集工具](MapGatherTools.md)。规则归[地图](Map.md)；人工交互/保存回归已获用户通过反馈，结论限[运行入口](Runtime.md)统一 F 八项清单，未触发的独立用例仍为 UNKNOWN。HUD 用户人工通过限 v7/revision=10 及运行入口对应八项清单，未实际触发的独立配置/烘焙/运行失败仍为 UNKNOWN。
+F 复用原 Gather 输入，HarvestTree/Mine 字段保留但 H/J 停止触发/消费。服务端统一入口跨三类选目标，继续使用各类型既有距离、耗时与产出 JSON 字段；当前为schemaVersion=13/configRevision=16，原距离/耗时/产出接口、来源/烘焙、资源绑定及原玩家Items契约保持，存档写v2且保留Tools。统一 F 本身只增加两个交互脚本与 meta；矿点再生复用物体配置字段并增加 ECS 历史缓冲。当前[交互显示](MapInteractionHud.md)新增五个脚本/meta、地图显示配置及玩家所属 HUD 快照，主场景 Main Camera 仅追加一个 HUD 组件；Prefab/Animator与旧meta保持；存储类工具迁移/候选归[采集工具](MapGatherTools.md)。规则归[地图](Map.md)；人工交互/保存回归已获用户通过反馈，结论限[运行入口](Runtime.md)统一 F 八项清单，未触发的独立用例仍为 UNKNOWN。HUD 用户人工通过限 v7/revision=10 及运行入口对应八项清单，未实际触发的独立配置/烘焙/运行失败仍为 UNKNOWN。
 
 矿点再生配置、仅服务端字段、历史 Ghost Serializer 及八次隔离烘焙已静态核对，默认 true/600 秒，关闭再生 false/600 和关闭采矿的烘焙结果一致。新 MineRegrowSystem 脚本及 meta GUID=9da8de47253e52f4ba3b80983082bcc3 由 Unity 导入；MineState 四字段保持，新增缓冲改变矿点烘焙后的 Ghost 布局，各端须使用同版代码、配置及重新烘焙的数据。用户已确认矿点再生人工 GamePlayer 通过，资源范围限[运行入口](Runtime.md)矿点再生八项清单及 v6/revision=9，规则归[采矿](MapMining.md)；未实际触发的晚加入/预测时序/独立失败分支仍为 UNKNOWN，历史内存/网络开销未测量。
 
 ## 【FACT】采集工具的数据与保存接入
 
-gatherTools为必填地图段，当前v12/revision=15默认斧头60/木3石2、镐子40/木2石3、成本1/倍率0.75，详细字段归[采集工具](MapGatherTools.md)。玩家准入先完整校验旧库存与Tools，再实例化/恢复；各个奖励、E、F植物、G、制作及工具完成候选都包含Tools，仍由SavePrepared同一路径替换正式档。使用工具的树木/矿点完成先保存耐久后提交资源，徒手不新增工具写盘；世界资源/掉落/期限仍不保存。正常编译/所属Serializer/十次隔离烘焙已静态核对；用户确认工具人工通过限v8/revision=11及[运行入口](Runtime.md)十二项清单；未实际触发的独立v1迁移/坏Tools/候选保存/故障恢复用例仍为UNKNOWN，旧存储用户通过仅限原版本/清单。同步写盘耗时/性能和文件替换后意外ECS异常仍未验证。
+gatherTools为必填地图段，当前v13/revision=16默认斧头60/木3石2、镐子40/木2石3、成本1/倍率0.75，详细字段归[采集工具](MapGatherTools.md)。玩家准入先完整校验旧库存与Tools，再实例化/恢复；各个奖励、E、F植物、G、制作及工具完成候选都包含Tools，仍由SavePrepared同一路径替换正式档。使用工具的树木/矿点完成先保存耐久后提交资源，徒手不新增工具写盘；世界资源/掉落/期限仍不保存。正常编译/所属Serializer/十次隔离烘焙已静态核对；用户确认工具人工通过限v8/revision=11及[运行入口](Runtime.md)十二项清单；未实际触发的独立v1迁移/坏Tools/候选保存/故障恢复用例仍为UNKNOWN，旧存储用户通过仅限原版本/清单。同步写盘耗时/性能和文件替换后意外ECS异常仍未验证。
 
 ## 【FACT】材料面板配置与数据边界
 
@@ -247,6 +247,8 @@ v9面板阶段：inventoryPanel必填25字段，默认true/初始关闭、380×6
 
 v10/13接入的[背包丢弃](MapInventoryDrop.md)复用原PrepareItemConsumption/SavePrepared投影完整Items/Tools候选，先创建Prepared并重取引用，保存成功才扣库存/激活掉落；存储类、v2契约、v1迁移及路径替换不变。四新脚本/meta与地图根Settings/定义、玩家所属反馈和输入三字段已导入，现有三个掉落Prefab及资源绑定保持。地面掉落仍不写盘，重启丢失未拾取物且不恢复已保存扣减；保存成功后意外ECS故障恢复未知。编译/16次隔离烘焙静态通过，用户确认丢弃人工通过限[运行入口](Runtime.md)v10/13十二项，未触发的独立配置/创建/保存/提交/清理失败仍UNKNOWN。
 
-当前v12/revision15必填[G提示](MapPickupHud.md)pickupHud九字段：true/400×52/底168/字号20及Pick up、Vitality Apple、Wood、Stone；严格类型/字段、有限尺寸/字号容纳/F间隔16及61UTF-8字节文案校验，旧v1～v11不补段或回退。五新脚本/meta、原地图Settings及玩家所属四字段已导入，原输入13字段、存储类/v2/v1迁移、资源绑定及地面物本局边界保持。正常编译/十次隔离烘焙静态通过，用户确认新显示人工通过，限v11/14十项，未触发用例UNKNOWN。
+当前v13/revision16必填[G提示](MapPickupHud.md)pickupHud九字段：true/400×52/底168/字号20及Pick up、Vitality Apple、Wood、Stone；严格类型/字段、有限尺寸/字号容纳/F间隔16及61UTF-8字节文案校验，旧v1～v12不补段或回退。五新脚本/meta、原地图Settings及玩家所属四字段已导入，原输入13字段、存储类/v2/v1迁移、资源绑定及地面物本局边界保持。正常编译/十次隔离烘焙静态通过，用户确认新显示人工通过，限v11/14十项，未触发用例UNKNOWN。
 
-当前v12/revision15必填[interactionHighlight](MapInteractionHighlight.md)14字段，默认主/F/G开启、采集/树/矿/掉落半径0.65/0.9/0.9/0.45米、线宽3/48段、黄/绿/蓝色、透明度0.9/地面偏移0.03米。关闭仍严格校验；旧v1～v11拒绝，不补段或回退。五新职责脚本及Unity正常生成meta，原Map Baker只追加固定Settings，原输入/Ghost字段及资源/存储契约保持。编译/14次隔离Editor烘焙静态通过，新高亮人工UNKNOWN。
+当前v13/revision16必填[interactionHighlight](MapInteractionHighlight.md)14字段，默认主/F/G开启、采集/树/矿/掉落半径0.65/0.9/0.9/0.45米、线宽3/48段、黄/绿/蓝色、透明度0.9/地面偏移0.03米。关闭仍严格校验；旧v1～v12拒绝，不补段或回退。五新职责脚本及Unity正常生成meta，原Map Baker只追加固定Settings，原输入/F/G显示字段及资源/存储契约保持。编译/14次隔离Editor烘焙静态通过，用户确认高亮人工通过限v12/15十项，未触发独立用例UNKNOWN。
+
+当前v13/16必填[resourceStatusHud](MapResourceStatusHud.md)11字段：true/400×52/底236/字号20和六文案；严格形状/类型、有限尺寸、字号容纳、G间隔16与61 UTF-8字节文案校验。五职责脚本及Unity生成meta、地图Settings和所属四字段已接入，无新输入或存档字段，原F/G与资源/再生/掉落契约保持。正常编译、Serializer/SendToOwner及14次隔离烘焙静态通过，用户确认人工通过限v13/16十项，未触发用例UNKNOWN；旧通过保持原版本/清单。

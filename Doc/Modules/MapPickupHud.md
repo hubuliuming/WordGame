@@ -19,7 +19,7 @@
 
 ## 【FACT】当前 JSON 契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为 schemaVersion=12/configRevision=15，pickupHud段及全部九字段必填，[interactionHighlight](MapInteractionHighlight.md)亦为必填地图段。沿原严格 UTF-8/缺失/未知/重复字段/类型和语义校验；旧 v1～v11 明确失败，不迁移、补默认段或回退来源。正常导入/烘焙后生效，没有运行热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为 schemaVersion=13/configRevision=16，pickupHud段及全部九字段必填，[interactionHighlight](MapInteractionHighlight.md)亦为必填地图段。沿原严格 UTF-8/缺失/未知/重复字段/类型和语义校验；旧 v1～v12 明确失败，不迁移、补默认段或回退来源。正常导入/烘焙后生效，没有运行热重载。
 
 | 字段 | 当前默认值 | 契约 |
 |---|---|---|
@@ -64,7 +64,7 @@ CombatPrototypeMapPickupHudState 使用 OwnerSendType=SendToOwner，四个 Ghost
 
 Ready 显示“G  Pick up  物品文案 ×实际数量”，Hidden 收起；DropId 保留在快照中供目标身份记录，屏幕不显示数值 ID。1920×1080 参考像素按 min(屏幕宽/1920,屏幕高/1080) 等比缩放，底部居中。默认400×52、底距168、字号20，与原320×104、底距48的 F 面板间隔16像素；两种提示可同时显示。黑色背景alpha=0.7、白色文字，复用内置GUI字体及Texture2D.whiteTexture，richText=false；仅Repaint绘制，缓存稳定文案/样式，恢复GUI.matrix/color，不接管鼠标或键盘事件。
 
-pickupHud.enabled、interactionHud.enabled、inventoryPanel.enabled与interactionHighlight的主开关/F/G通道独立。关闭G文字仍可显示G高亮和实际拾取；关闭F HUD和背包面板仍可只显示G。三文字全关闭且没有启用的高亮通道时原绑定收起，键盘原玩法继续。死亡/断线、无本地玩家或地图、玩家/地图源变化、World/Scene停止及释放沿原Clear/Reset清掉可见状态和缓存，不保留上一局目标。非法网络快照明确报错并保持 G 隐藏，不以默认标签伪装有效目标。
+pickupHud.enabled、interactionHud.enabled、inventoryPanel.enabled与interactionHighlight的主开关/F/G通道独立。关闭G文字仍可显示G高亮和实际拾取；关闭F HUD和背包面板仍可只显示G。三文字全关、无高亮通道且资源状态关闭时原绑定收起，键盘原玩法继续。死亡/断线、无本地玩家或地图、玩家/地图源变化、World/Scene停止及释放沿原Clear/Reset清掉可见状态和缓存，不保留上一局目标。非法网络快照明确报错并保持 G 隐藏，不以默认标签伪装有效目标。
 
 ## 【KNOWN ISSUES】静态证据与人工边界
 
@@ -74,4 +74,6 @@ v11/14拾取文字阶段正常Unity编译无C# Error，五脚本/meta、新Seria
 
 用户已确认本阶段人工GamePlayer验收通过，主线程结合既有静态核对与用户反馈判定通过，范围限CombatPrototypeNetCode、schemaVersion=11/configRevision=14及[运行入口](Runtime.md)十项清单。人工结论来自用户反馈；未实际触发的独立排版/字形/缩放、临界距离/同距、同tick、延迟/预测回放、多玩家/晚加入、断线/重连及配置/快照/保存失败仍为UNKNOWN。原丢弃v10/13、面板v9/12、工具v8/11、F HUD v7/10等用户通过保持各自版本/清单，不覆盖本次新显示。未验证的字体覆盖、运行性能/带宽、平台/线上及原保存成功后意外ECS恢复仍UNKNOWN。AI未运行GamePlayer/PlayMode、游戏模拟/显示系统/GUI回调、逻辑单元测试、命令行构建、发布、性能采样或图片检查，未创建子Agent或提交Git。
 
-当前v12/15的[高亮](MapInteractionHighlight.md)按原DropId解析同一客户端Landed Ghost，不另选最近目标或改变按G时的服务端选择。已核对新增14配置值、原G/F初值与13输入；正常编译及14次隔离Editor烘焙静态通过。新圆环的GamePlayer效果、网络/生命周期与独立失败用例仍UNKNOWN；上述v11/14文字提示用户通过保持原范围。
+v12/15的[高亮](MapInteractionHighlight.md)按原DropId解析同一客户端Landed Ghost，不另选最近目标或改变按G时的服务端选择。已核对新增14配置值、原G/F初值与13输入；正常编译及14次隔离Editor烘焙静态通过。用户确认高亮人工通过限v12/15十项，未实际触发的独立排版/网络/生命周期与失败用例仍UNKNOWN；上述v11/14文字提示用户通过保持原范围。
+
+当前v13/16的[资源状态](MapResourceStatusHud.md)在G面板上方增加一行；G的开关、采样资格、四字段、DropId与拾取规则保持。资源状态不显示掉落期限，也不改变G蓝圈；仅状态开启仍保留整体绑定。新显示静态及用户人工通过，限v13/16十项，未触发用例UNKNOWN，旧G/高亮通过保持原版本/清单。

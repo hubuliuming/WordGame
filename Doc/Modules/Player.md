@@ -251,4 +251,6 @@ v10/13接入的[背包丢弃](MapInventoryDrop.md)已接入。玩家输入新增
 
 v11/14阶段的[G提示](MapPickupHud.md)由玩家Baker追加Hidden初值、Mode/DropId/ItemId/Quantity四字段所属Ghost；原13输入、F四字段、丢弃反馈、生命/体力/R/库存/Tools及v2存档保持。客户端沿原本地玩家/Connected/InGame绑定，死亡/断线及World/玩家/地图源变化清掉旧提示；显示不开辟客户端结算入口。编译/十次隔离烘焙静态通过，用户确认新显示人工通过，限v11/14十项，未触发用例UNKNOWN，旧通过保持原范围。
 
-当前v12/15的[高亮](MapInteractionHighlight.md)沿原本地所属存活玩家/Connected/InGame绑定，仅读取F/G四字段及对应客户端目标位置；未改玩家Baker、13输入、Ghost字段、生命/体力/R/工具或存档。死亡/断线、玩家/地图源及World/Scene失效清圆环与缓存。新显示静态通过、人工UNKNOWN，旧通过保持原范围。
+v12/15的[高亮](MapInteractionHighlight.md)沿原本地所属存活玩家/Connected/InGame绑定，仅读取F/G四字段及对应客户端目标位置；未改玩家Baker、13输入、Ghost字段、生命/体力/R/工具或存档。死亡/断线、玩家/地图源及World/Scene失效清圆环与缓存。高亮静态及用户人工通过限v12/15十项，未触发独立用例UNKNOWN，旧通过保持原范围。
+
+当前v13/16的[资源状态](MapResourceStatusHud.md)由Player Baker追加所属Mode/Kind/PlacementIndex/RemainingSeconds四字段，初始Hidden/0/-1/0；原13输入、F/G各四字段、生命/体力/工具/存档保持。仅Connected/InGame、所有权匹配、启用Simulate且存活者获得状态，死亡/断线与World/Scene变化清显示。新布局/编译/烘焙静态及用户人工通过，限v13/16十项，未触发用例UNKNOWN，旧通过保持原范围。

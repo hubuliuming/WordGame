@@ -578,7 +578,7 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 
 ## 【KNOWN ISSUES】采集工具与耐久的人工验收
 
-入口为 CombatPrototypeNetCode，当前两份地图 Json/BuiltIn 为 schemaVersion=8/configRevision=11、gatherTools.enabled=true，玩家存档写 v2/读取 v1 迁移。数字 1/2 分别制作 Axe/Pickaxe，沿原 F 自动使用；各端须同版代码、输入、配置及重新烘焙数据。本阶段正常编译、新 Serializer/所属同步、系统声明顺序和十次隔离 Editor 烘焙已静态核对，主线程静态验收通过；人工 GamePlayer 未执行，以下清单均为 UNKNOWN，未由此前通过替代：
+入口为 CombatPrototypeNetCode，当前两份地图 Json/BuiltIn 为 schemaVersion=8/configRevision=11、gatherTools.enabled=true，玩家存档写 v2/读取 v1 迁移。数字 1/2 分别制作 Axe/Pickaxe，沿原 F 自动使用；各端须同版代码、输入、配置及重新烘焙数据。本阶段正常编译、新 Serializer/所属同步、系统声明顺序和十次隔离 Editor 烘焙已静态核对，主线程静态验收通过；用户已确认本阶段人工 GamePlayer 通过，主线程结合既有静态核对与用户反馈判定通过，范围限本入口、v8/revision=11 和以下十二项清单；未实际触发的独立用例仍为 UNKNOWN：
 
 1. 使用无档的新固定 ID 准入，工具为空；不用工具分别新 F 完成植物1秒、树木2秒、矿点3秒，仍是苹果×1直接保存入包和 wood/stone×3地面掉落，G/E/R及原最近目标规则保持。
 2. 用原 F/G 获取材料后静止，数字1单次扣木材3/石材2并获得 Axe 60/60，数字2扣木材2/石材3并获得 Pickaxe 40/40。数量归零移除该材料项，其他库存/金币/经验保持；按住不连续制作。材料不足、仍有可用工具均拒绝，不扣材料或补满。
@@ -595,4 +595,23 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 
 验收结束恢复 SourceMode=Json、Preset=Forest、schemaVersion=8/configRevision=11；gatherTools=true、反馈2秒、Axe60/成本1/倍率0.75/木3石2、Pickaxe40/成本1/倍率0.75/木2石3；HUD enabled=true、320×104/底距48/字号20/条高10、原英文文案。原seed=12345、32敌人、空间/出生/movement、drops、treeHarvest2秒/wood×3、mining3秒/stone×3和三类true/600秒再生保持。
 
-工具规则归[采集工具](MapGatherTools.md)，显示归[交互HUD](MapInteractionHud.md)，档案归[资源与数据](DataResources.md)。本阶段人工GamePlayer仍为 UNKNOWN；既有HUD v7/revision=10、矿点再生v6/revision=9、统一F v6/revision=8及其他通过保持各自版本/清单，未触发用例不替代。新增同步保存耗时/性能、带宽、平台与线上联调未验收。AI未执行PlayMode、游戏模拟/显示系统、逻辑单元测试、命令行构建、发布、性能采样或图片检查。
+工具规则归[采集工具](MapGatherTools.md)，显示归[交互HUD](MapInteractionHud.md)，档案归[资源与数据](DataResources.md)。本阶段人工通过来自用户反馈；未实际触发的精确边界、同tick、延迟/预测回放、晚加入及独立配置/创建/准备/保存/提交/清理/回滚失败仍为UNKNOWN。既有HUD v7/revision=10、矿点再生v6/revision=9、统一F v6/revision=8及其他通过保持各自版本/清单，未触发用例不替代。新增同步保存耗时/性能、带宽、平台与线上联调未验收。AI未执行PlayMode、游戏模拟/显示系统、逻辑单元测试、命令行构建、发布、性能采样或图片检查。
+
+## 【KNOWN ISSUES】材料背包与制作面板的人工验收
+
+入口CombatPrototypeNetCode，Forest/Grassland的Json/BuiltIn当前schemaVersion=9/configRevision=12。inventoryPanel=true/initiallyOpen=false、380×640/右24/上64/字号18/行32；原HUD仍true/320×104，工具参数及玩家v2保存/v1读取迁移保持。正常编译/类型导入/十四次隔离Editor烘焙已静态核对，主线程静态验收通过；以下人工GamePlayer均为UNKNOWN：
+
+1. 默认准入后面板关闭，B单次打开/再按关闭，按住不反复；底部关闭按钮有效。没有本地Ghost/未准入/死亡时不显示，打开不暂停世界、攻击/敌人/再生计时，WASD、空格、F/G/E/R及Z/X保持。
+2. 新固定ID空库存显示Empty，两工具Not owned；通过植物F、木材/石材G和敌人奖励看到Apple/Wood/Stone/Meat及实际数量，保持原条目顺序，同名累加、归零移除，数量超过99不拆格。原1/2在面板关闭时也可制作。
+3. 面板列出斧头木3/石2、镐子木2/石3的现有/需要及各材料缺少数量；不足时按钮禁用，足够且未持有/损坏时可点击。一次按钮操作沿原服务端链扣完整材料并生成满耐久工具，其余库存/金币/经验保持，成功反馈按原2秒且耐久区更新；UI不提前发工具或扣料。
+4. 两工具仍可用时按钮禁用，不允许补满；F成功扣耐久后列表更新，取消不扣。最后一次到0显示损坏，之后按钮/原1或2可重新制作，缺少材料仍禁用，重制扣完整配方并补对应满耐久，另一槽保持。
+5. 点击配方、关闭按钮、面板空白或滚动区时不触发左键攻击；面板外左键仍攻击，空格沿原规则。滚轮在面板内只滚动列表、面板外仍缩放镜头，Z/X和相机相对WASD保持；B关闭与面板内左键同帧无穿透。不同窗口尺寸、缩放及边界命中由人工核对，未触发精确边界保持UNKNOWN。
+6. 移动/攻击/受击/任意资源忙碌期间点击可用按钮时服务器继续按原资格接受或拒绝并反馈；F与制作同输入tick仍F优先，键1/2与按钮合并、两类同时仍斧头优先，不部分扣料或重复赠工具。客户端快照滞后不绕过服务端资格，同tick/预测回放未触发保持UNKNOWN。
+7. 可控条件下制作保存失败，按钮收到原失败反馈，旧材料/耐久/正式档保持，不自动重试；恢复后新按钮或数字键才重试。核对原G、植物F、奖励和E候选继续保留Tools，不能触发的独立保存/准备/提交/清理失败保持UNKNOWN，不宣称文件替换后意外ECS故障可完整回滚。
+8. 双客户端/两个固定ID各面板只显示本地所属库存、工具、配方与反馈，任一端制作不会显示为另一玩家制作成功；断线/重连和服务端重启恢复原材料/工具且默认关闭面板。晚加入、非法归属、延迟及同帧绑定变化未触发保持UNKNOWN。
+9. 面板打开或按钮尚未交给输入系统时关闭/死亡/断线/停止/地图或玩家更换，未提交请求与鼠标按下标记清掉，不由下一玩家或World继承。R/重连不补满工具，重新绑定不重播旧Sequence；已经提交到原输入命令的制作继续以原服务器结果为准。
+10. PlayMode前分别关闭inventoryPanel、interactionHud、两者及gatherTools并正常烘焙：面板关闭保留原F HUD及1/2制作，F HUD关闭保留B/列表/按钮/反馈，两者关闭仍可1/2，工具关闭保留库存/已有耐久并禁用面板按钮，F徒手。两模板/Json/BuiltIn均核对，不运行热切配置。
+11. 合法修改initiallyOpen、尺寸/边距/字号/行高/文案后正常导入/烘焙生效；可控条件下旧v8、缺段/字段、未知/重复字段、错类型、非有限/非法几何、空白/控制字符/超61UTF-8字节文案明确失败、不补默认或回退来源。确认字体之外的显示及滚动；中文字体/字形仍UNKNOWN。未触发配置/异常网络条目保持UNKNOWN。
+12. 回归原采集/砍伐/采矿计时与取消、工具损坏/重制、掉落飞行/G/到期、原点再生/占位等待、移动阻挡/战斗/E/R/镜头，以及停止重进的实例释放；原产出、存档v2/v1边界和地图布局保持，世界资源/期限仍不保存，面板没有库存容量/99拆格或额外物品使用效果。
+
+验收结束恢复SourceMode=Json/Preset=Forest/schema9/revision12、inventoryPanel=true/initiallyOpen=false及本节默认尺寸/英文文案；原seed12345、32敌人、HUD、工具、资源产出和600秒再生保持。新面板规则归[材料背包与制作面板](MapInventoryPanel.md)，原制作/耐久归[采集工具](MapGatherTools.md)。本阶段人工结果为UNKNOWN；工具v8/revision11、HUD v7/revision10及其他用户通过仍限旧版本/清单。字体、运行性能/带宽、平台与线上未验证，AI未执行PlayMode、游戏模拟/GUI回调、逻辑单元测试、命令行构建、发布、性能采样或图片检查。

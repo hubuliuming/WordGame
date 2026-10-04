@@ -23,7 +23,7 @@
 
 ## 【FACT】JSON 契约与当前默认值
 
-当前两份地图定义与 BuiltIn 均为 schemaVersion=8、configRevision=11，treeHarvest 段及全部字段必填。树木基础配置仍为2米/徒手2秒/wood×3；[斧头](MapGatherTools.md)可用时1.5秒，再生复用 objects.tree_normal 的 true/600 秒；原空间、种子、树木/采集物密度、出生及 movement/drops/grounds 数值保持。新增 mining 段与生态矿点字段归[采矿](MapMining.md)，树木规则独立。配置在 SubScene 烘焙时读取，Json 失败不回退 BuiltIn，不支持热重载或新的联网配置校验协议。
+当前两份地图定义与 BuiltIn 均为 schemaVersion=9、configRevision=12，treeHarvest 段及全部字段必填。树木基础配置仍为2米/徒手2秒/wood×3；[斧头](MapGatherTools.md)可用时1.5秒，再生复用 objects.tree_normal 的 true/600 秒；原空间、种子、树木/采集物密度、出生及 movement/drops/grounds 数值保持。新增 mining 段与生态矿点字段归[采矿](MapMining.md)，树木规则独立。配置在 SubScene 烘焙时读取，Json 失败不回退 BuiltIn，不支持热重载或新的联网配置校验协议。
 
 | 字段 | 当前默认值 | 校验与作用 |
 |---|---|---|
@@ -39,7 +39,7 @@
 
 再生复用 objects 中所选树木的 regrowEnabled=true、regrowSeconds=600，Map Baker 复制到地图根的服务端 TreeSettings。间隔必须有限且非负，启用时须大于 0；关闭时允许 0，沿原校验器检查，不新增 DTO 或默认补字段。开关只控制成功砍倒后的本局再生，砍伐开关关闭时仍是原静态树。gather_apple 的独立再生配置保持。
 
-字符串沿原小写ASCII/数字/下划线、最长61字符约束；产出ID由原Resolver校验vitality_apple/wood/stone，砍伐默认wood，未知ID失败。旧地图v1～v7、缺段/字段、未知/重复字段或错类型沿严格UTF-8边界报错，不补默认字段；enabled=false仍校验其余字段与资源绑定。工具定义归[采集工具](MapGatherTools.md)。
+字符串沿原小写ASCII/数字/下划线、最长61字符约束；产出ID由原Resolver校验vitality_apple/wood/stone，砍伐默认wood，未知ID失败。旧地图v1～v8、缺段/字段、未知/重复字段或错类型沿严格UTF-8边界报错，不补默认字段；enabled=false仍校验其余字段与资源绑定。工具定义归[采集工具](MapGatherTools.md)。
 
 木材复用 drops 的 pickupDistanceMeters=2、flightDurationSeconds=0.4、scatterRadiusMeters=0.6、arcHeightMeters=0.6、groundOffsetMeters=0.05、visualScale=0.5、lifetimeSeconds=600；寿命 0 关闭自动到期。drops.enabled 只控制敌人额外掉落，treeHarvest.enabled 控制树木产出，二者独立；数值、运动、G 和清理规则归掉落专题。
 
@@ -108,4 +108,6 @@ Tools/CombatPrototype/地图 下“生成第七阶段砍伐资源”预检原目
 
 采集点、树木和矿点现共用 F、跨类型最近选择，无 F/H/J 类型优先；旧 H 第七/第八阶段通过仍限原版本，统一 F 已获用户人工通过反馈，范围与未触发用例归[运行入口](Runtime.md)。
 
-当前工具v8/revision=11完成保存与锁定字段已编译/静态烘焙核对，人工扣耐久/失败/取消仍为UNKNOWN；旧树木用户通过只覆盖原版本/清单，见[工具](MapGatherTools.md)/[运行入口](Runtime.md)。
+工具v8/revision=11完成保存与锁定字段已编译/静态烘焙核对，用户确认工具人工通过限v8/revision=11十二项清单，未实际触发的独立失败/边界/预测用例仍为UNKNOWN；旧树木用户通过只覆盖原版本/清单，见[工具](MapGatherTools.md)/[运行入口](Runtime.md)。
+
+当前v9/revision12的[材料面板](MapInventoryPanel.md)只展示木材库存/斧头耐久和原配方，按钮沿原制作链；砍伐/木材/阻挡/再生逻辑保持，新增显示/输入回归人工UNKNOWN。

@@ -22,7 +22,7 @@
 
 ## 【FACT】当前 JSON 契约与数值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 BuiltIn 一致为 schemaVersion=8/configRevision=11，必填 gatherTools。沿原严格 UTF-8、完整字段、类型、未知/重复键校验；旧地图 v1～v7 明确失败，不补默认段或回退来源。配置仅在正常导入/烘焙后生效，无运行热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 BuiltIn 一致为 schemaVersion=9/configRevision=12，必填 gatherTools及[面板配置](MapInventoryPanel.md)。沿原严格 UTF-8、完整字段、类型、未知/重复键校验；旧地图 v1～v8 明确失败，不补默认段或回退来源。配置仅在正常导入/烘焙后生效，无运行热重载。
 
 gatherTools 的 enabled=true、craftFeedbackSeconds=2.0、tools 为恰好两条不重复定义；enabled=false 仍校验所有字段，停止制作和工具加速，但保留已拥有工具/耐久，F 沿原徒手耗时。
 
@@ -41,7 +41,7 @@ craftFeedbackSeconds 为有限正数。植物仍为徒手 1 秒；树木徒手 2
 
 ## 【CURRENT STRATEGY】制作与材料事务
 
-数字 1 请求斧头，数字 2 请求镐子；只对本地启用 GhostOwnerIsLocal 写入一次 InputEvent，按住不连续制作。服务端 CraftSystem 在 PlayerDamage/DropCleanup 后、统一 F 入口与 PlayerRespawn 前执行。Connected、InGame、无断线请求、CommandTarget 指向启用 Simulate 的网络玩家才收集；复用 F 的归属、存活、有限零 Move、无 Attack 请求及近战 Ready 条件。任何 Collecting/Chopping/Mining 预约均拒绝制作。
+数字 1 请求斧头，数字 2 请求镐子；[面板](MapInventoryPanel.md)按钮合并到这两个原事件；只对本地启用 GhostOwnerIsLocal 写入一次 InputEvent，按住不连续制作。服务端 CraftSystem 在 PlayerDamage/DropCleanup 后、统一 F 入口与 PlayerRespawn 前执行。Connected、InGame、无断线请求、CommandTarget 指向启用 Simulate 的网络玩家才收集；复用 F 的归属、存活、有限零 Move、无 Attack 请求及近战 Ready 条件。任何 Collecting/Chopping/Mining 预约均拒绝制作。
 
 同一输入 tick 有 F 和制作请求时 F 优先，制作不扣材料；同时有 1/2 时只处理斧头请求。工具不存在或当前耐久小于单次成本才允许制作；仍可用时拒绝，不覆盖/补满。非法归属连接不覆盖真正所属玩家反馈。
 
@@ -75,4 +75,6 @@ CombatPrototypeMapGatherTool 是唯一可变工具状态，内部容量 2，每�
 
 正常 Unity 编译无 C# Error；五个脚本导入、工具/反馈 SendToOwner Serializer/Snapshot、新输入字段、仅服务端锁定字段与系统声明顺序已静态核对。Forest/Grassland 各覆盖 Json 默认、BuiltIn 默认、Json 关闭采矿、关闭工具、关闭 HUD，共十次隔离 Editor 烘焙；v8/revision=11、全部默认工具值、玩家空工具/零反馈、资源初始零锁定及 HUD 320×104 一致，Json/BuiltIn 一致。全部初始布局位置/朝向和旧资源绑定保持，森林/草原树木89/53、采集点36/38、矿点20/18、阻挡109/71，空间违规为0；关闭采矿仍为原四类布局。烘焙 Console 前后均 [0 Error,2 Warning,0 Log]，无新增警告；原主场景干净，无临时烘焙 World 遗留。
 
-本阶段人工 GamePlayer 未执行，制作/扣料、成功与取消扣耐久、保存失败、v1 迁移、损坏重制、死亡/R/重连、双端归属、HUD 排版及故障/预测回放仍为 UNKNOWN，见运行入口新清单。既有 HUD、矿点再生和其他用户通过仅限各自原版本/清单。同步保存新增频率与耗时、带宽/性能、中文字体/字形、平台构建和线上联调未验证；文件替换成功后的意外 ECS 故障不宣称可完全回滚。AI 未运行 GamePlayer/PlayMode、游戏模拟/显示系统、逻辑单元测试、命令行构建、发布、性能采样或图片检查，未创建子Agent、未提交 Git。
+用户已确认本阶段人工 GamePlayer 验收通过，主线程结合既有静态核对与用户反馈判定通过，范围限 CombatPrototypeNetCode、v8/revision=11 和[运行入口](Runtime.md)工具十二项清单。人工结论来自用户反馈；未实际触发的精确边界、同 tick、延迟/预测回放、晚加入及独立配置/创建/准备/保存/提交/清理/回滚失败仍为 UNKNOWN。既有 HUD、矿点再生和其他用户通过仅限各自原版本/清单。同步保存新增频率与耗时、带宽/性能、中文字体/字形、平台构建和线上联调未验证；文件替换成功后的意外 ECS 故障不宣称可完全回滚。AI 未运行 GamePlayer/PlayMode、游戏模拟/显示系统、逻辑单元测试、命令行构建、发布、性能采样或图片检查，未创建子Agent、未提交 Git。
+
+当前v9/revision12增加本地材料背包/配方与按钮，独立开关和人工边界归[制作面板](MapInventoryPanel.md)。工具资格/事务/反馈及v2保存链保持，旧工具十二项通过仍限v8/revision11。

@@ -10,7 +10,7 @@ namespace Code_01.CombatPrototype.Map
             if (config == null || config.map == null || config.map.geometry == null ||
                 config.map.layout == null || config.map.movement == null || config.map.drops == null || config.map.treeHarvest == null ||
                 config.map.mining == null || config.map.gatherTools == null || config.map.gatherTools.tools == null ||
-                config.map.interactionHud == null || config.map.population == null || config.map.spawn == null ||
+                config.map.interactionHud == null || config.map.inventoryPanel == null || config.map.population == null || config.map.spawn == null ||
                 config.biomes == null || config.grounds == null || config.objects == null ||
                 config.map.biomeIds == null || config.map.biomeRegions == null)
                 throw new InvalidOperationException("Map configuration is missing required sections.");
@@ -28,9 +28,10 @@ namespace Code_01.CombatPrototype.Map
             HudLabel(hud.gatherLabel, "interactionHud.gatherLabel");
             HudLabel(hud.treeLabel, "interactionHud.treeLabel");
             HudLabel(hud.mineLabel, "interactionHud.mineLabel");
+            ValidateInventoryPanel(map.inventoryPanel);
             Id(map.mapDefinitionId, "mapDefinitionId");
-            if (map.schemaVersion != 8 || map.configRevision < 1 || map.defaultSeed < 1)
-                throw new InvalidOperationException("Map requires schemaVersion=8, positive revision and seed.");
+            if (map.schemaVersion != 9 || map.configRevision < 1 || map.defaultSeed < 1)
+                throw new InvalidOperationException("Map requires schemaVersion=9, positive revision and seed.");
             var drops = map.drops;
             Id(drops.itemId, "drops.itemId");
             Id(drops.visualResourceKey, "drops.visualResourceKey");
@@ -221,6 +222,40 @@ namespace Code_01.CombatPrototype.Map
                     region.minX >= region.maxX || region.minZ >= region.maxZ)
                     throw new InvalidOperationException("Biome region must be a nonempty normalized rectangle.");
             }
+        }
+
+        private static void ValidateInventoryPanel(MapInventoryPanelConfig panel)
+        {
+            Positive(panel.panelWidthPixels, "inventoryPanel.panelWidthPixels");
+            Positive(panel.panelHeightPixels, "inventoryPanel.panelHeightPixels");
+            Nonnegative(panel.rightMarginPixels, "inventoryPanel.rightMarginPixels");
+            Nonnegative(panel.topMarginPixels, "inventoryPanel.topMarginPixels");
+            Positive(panel.rowHeightPixels, "inventoryPanel.rowHeightPixels");
+            if (panel.fontSize <= 0 || panel.rowHeightPixels < (double)panel.fontSize + 8d ||
+                panel.panelWidthPixels < 12d * panel.fontSize + 48d ||
+                panel.panelHeightPixels < 8d * panel.rowHeightPixels + 48d ||
+                (double)panel.panelWidthPixels + panel.rightMarginPixels > 1920d ||
+                (double)panel.panelHeightPixels + panel.topMarginPixels > 1080d)
+                throw new InvalidOperationException("inventoryPanel requires positive font size, row height >= fontSize+8, " +
+                    "panel width >= 12*fontSize+48, panel height >= 8*rowHeight+48, " +
+                    "width+right margin <= 1920 and height+top margin <= 1080.");
+            HudLabel(panel.panelTitle, "inventoryPanel.panelTitle");
+            HudLabel(panel.materialsLabel, "inventoryPanel.materialsLabel");
+            HudLabel(panel.toolsLabel, "inventoryPanel.toolsLabel");
+            HudLabel(panel.craftLabel, "inventoryPanel.craftLabel");
+            HudLabel(panel.craftButtonLabel, "inventoryPanel.craftButtonLabel");
+            HudLabel(panel.emptyInventoryLabel, "inventoryPanel.emptyInventoryLabel");
+            HudLabel(panel.woodLabel, "inventoryPanel.woodLabel");
+            HudLabel(panel.stoneLabel, "inventoryPanel.stoneLabel");
+            HudLabel(panel.appleLabel, "inventoryPanel.appleLabel");
+            HudLabel(panel.meatLabel, "inventoryPanel.meatLabel");
+            HudLabel(panel.closeLabel, "inventoryPanel.closeLabel");
+            HudLabel(panel.missingLabel, "inventoryPanel.missingLabel");
+            HudLabel(panel.usableLabel, "inventoryPanel.usableLabel");
+            HudLabel(panel.brokenLabel, "inventoryPanel.brokenLabel");
+            HudLabel(panel.notOwnedLabel, "inventoryPanel.notOwnedLabel");
+            HudLabel(panel.disabledLabel, "inventoryPanel.disabledLabel");
+            HudLabel(panel.readyLabel, "inventoryPanel.readyLabel");
         }
 
         private static void HudLabel(string value, string field)

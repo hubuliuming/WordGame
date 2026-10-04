@@ -17,7 +17,7 @@ namespace Code_01.CombatPrototype.Map
             {
                 map = new MapDefinitionConfig
                 {
-                    schemaVersion = 8, configRevision = 11,
+                    schemaVersion = 9, configRevision = 12,
                     mapDefinitionId = mapDefinitionId, defaultSeed = 12345,
                     geometry = new MapGeometryConfig
                     {
@@ -79,6 +79,34 @@ namespace Code_01.CombatPrototype.Map
                         enabled = true, panelWidthPixels = 320f, panelHeightPixels = 104f,
                         bottomMarginPixels = 48f, fontSize = 20, progressBarHeightPixels = 10f,
                         gatherLabel = "Gather Apple", treeLabel = "Chop Tree", mineLabel = "Mine Rock"
+                    },
+                    inventoryPanel = new MapInventoryPanelConfig
+                    {
+                        enabled = true,
+                        initiallyOpen = false,
+                        panelWidthPixels = 380.0f,
+                        panelHeightPixels = 640.0f,
+                        rightMarginPixels = 24.0f,
+                        topMarginPixels = 64.0f,
+                        fontSize = 18,
+                        rowHeightPixels = 32.0f,
+                        panelTitle = "Inventory",
+                        materialsLabel = "Materials",
+                        toolsLabel = "Tools",
+                        craftLabel = "Crafting",
+                        craftButtonLabel = "Craft",
+                        emptyInventoryLabel = "Empty",
+                        woodLabel = "Wood",
+                        stoneLabel = "Stone",
+                        appleLabel = "Apple",
+                        meatLabel = "Meat",
+                        closeLabel = "B: Close",
+                        missingLabel = "Missing",
+                        usableLabel = "Still usable",
+                        brokenLabel = "Broken",
+                        notOwnedLabel = "Not owned",
+                        disabledLabel = "Disabled",
+                        readyLabel = "Ready"
                     },
                     spawn = new MapSpawnConfig
                     {

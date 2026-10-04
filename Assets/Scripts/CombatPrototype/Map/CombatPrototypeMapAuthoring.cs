@@ -107,6 +107,35 @@ namespace Code_01.CombatPrototype.Map
                     TreeLabel = new FixedString64Bytes(hud.treeLabel),
                     MineLabel = new FixedString64Bytes(hud.mineLabel)
                 });
+                var inventoryPanel = config.map.inventoryPanel;
+                AddComponent(entity, new CombatPrototypeMapInventoryPanelSettings
+                {
+                    Enabled = (byte)(inventoryPanel.enabled ? 1 : 0),
+                    InitiallyOpen = (byte)(inventoryPanel.initiallyOpen ? 1 : 0),
+                    PanelWidthPixels = inventoryPanel.panelWidthPixels,
+                    PanelHeightPixels = inventoryPanel.panelHeightPixels,
+                    RightMarginPixels = inventoryPanel.rightMarginPixels,
+                    TopMarginPixels = inventoryPanel.topMarginPixels,
+                    FontSize = inventoryPanel.fontSize,
+                    RowHeightPixels = inventoryPanel.rowHeightPixels,
+                    PanelTitle = new FixedString64Bytes(inventoryPanel.panelTitle),
+                    MaterialsLabel = new FixedString64Bytes(inventoryPanel.materialsLabel),
+                    ToolsLabel = new FixedString64Bytes(inventoryPanel.toolsLabel),
+                    CraftLabel = new FixedString64Bytes(inventoryPanel.craftLabel),
+                    CraftButtonLabel = new FixedString64Bytes(inventoryPanel.craftButtonLabel),
+                    EmptyInventoryLabel = new FixedString64Bytes(inventoryPanel.emptyInventoryLabel),
+                    WoodLabel = new FixedString64Bytes(inventoryPanel.woodLabel),
+                    StoneLabel = new FixedString64Bytes(inventoryPanel.stoneLabel),
+                    AppleLabel = new FixedString64Bytes(inventoryPanel.appleLabel),
+                    MeatLabel = new FixedString64Bytes(inventoryPanel.meatLabel),
+                    CloseLabel = new FixedString64Bytes(inventoryPanel.closeLabel),
+                    MissingLabel = new FixedString64Bytes(inventoryPanel.missingLabel),
+                    UsableLabel = new FixedString64Bytes(inventoryPanel.usableLabel),
+                    BrokenLabel = new FixedString64Bytes(inventoryPanel.brokenLabel),
+                    NotOwnedLabel = new FixedString64Bytes(inventoryPanel.notOwnedLabel),
+                    DisabledLabel = new FixedString64Bytes(inventoryPanel.disabledLabel),
+                    ReadyLabel = new FixedString64Bytes(inventoryPanel.readyLabel)
+                });
                 var gatheringTools = config.map.gatherTools;
                 AddComponent(entity, new CombatPrototypeMapGatherToolSettings
                 {

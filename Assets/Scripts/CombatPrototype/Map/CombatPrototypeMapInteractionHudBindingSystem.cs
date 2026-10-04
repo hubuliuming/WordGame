@@ -2,6 +2,7 @@ using System;
 using Code_01.CombatPrototype.Networking;
 using Unity.Entities;
 using Unity.NetCode;
+using UnityEngine.InputSystem;
 
 namespace Code_01.CombatPrototype.Map
 {
@@ -46,13 +47,14 @@ namespace Code_01.CombatPrototype.Map
             if (_hud != null) _hud.Clear();
             var source = _map.GetSingletonEntity();
             var settings = EntityManager.GetComponentData<CombatPrototypeMapInteractionHudSettings>(source);
-            if (settings.Enabled == 0)
+            var inventorySettings = EntityManager.GetComponentData<CombatPrototypeMapInventoryPanelSettings>(source);
+            if (settings.Enabled == 0 && inventorySettings.Enabled == 0)
             {
                 ResetBinding();
                 return;
             }
             var player = GetLocalPlayer();
-            if (player == Entity.Null) { ResetBinding(); return; }
+            if (player == Entity.Null || !HasInGameConnection(player)) { ResetBinding(); return; }
             if (_hud == null)
                 throw new InvalidOperationException("[CombatPrototype.Map] World=" + World.Name + ", player=" + player +
                     " requires the HUD component registered by Main Camera.");
@@ -61,7 +63,7 @@ namespace Code_01.CombatPrototype.Map
             {
                 var toolSettings = EntityManager.GetComponentData<CombatPrototypeMapGatherToolSettings>(source);
                 var definitions = EntityManager.GetBuffer<CombatPrototypeMapGatherToolDefinition>(source, true);
-                _hud.Configure(settings, toolSettings,
+                _hud.Configure(settings, inventorySettings, toolSettings,
                     CombatPrototypeMapGatherToolUtility.RequireDefinition(definitions, CombatPrototypeMapGatherToolKind.Axe),
                     CombatPrototypeMapGatherToolUtility.RequireDefinition(definitions, CombatPrototypeMapGatherToolKind.Pickaxe));
                 _source = source;
@@ -69,7 +71,37 @@ namespace Code_01.CombatPrototype.Map
             }
             _hud.Show(EntityManager.GetComponentData<CombatPrototypeMapInteractionHudState>(player),
                 EntityManager.GetBuffer<CombatPrototypeMapGatherTool>(player, true),
-                EntityManager.GetComponentData<CombatPrototypeMapToolCraftFeedback>(player));
+                EntityManager.GetComponentData<CombatPrototypeMapToolCraftFeedback>(player),
+                EntityManager.GetBuffer<CombatPrototypeInventoryItem>(player, true), source, player);
+        }
+
+        public bool ReadPanelInput(Keyboard keyboard, Mouse mouse, out bool craftAxe, out bool craftPickaxe)
+        {
+            craftAxe = craftPickaxe = false;
+            Dependency.Complete();
+            if (_map.IsEmptyIgnoreFilter) { ResetBinding(); return false; }
+            var source = _map.GetSingletonEntity();
+            var player = GetLocalPlayer();
+            if (player == Entity.Null || !HasInGameConnection(player) ||
+                EntityManager.GetComponentData<CombatPrototypePlayerHealth>(player).IsDead != 0 ||
+                source != _source || player != _player)
+            {
+                ResetBinding();
+                return false;
+            }
+            if (_hud == null)
+                throw new InvalidOperationException("[CombatPrototype.Map] World=" + World.Name +
+                    ", player=" + player + " requires the Main Camera HUD for panel input.");
+            return _hud.ReadPanelInput(keyboard, mouse, out craftAxe, out craftPickaxe);
+        }
+
+        private bool HasInGameConnection(Entity player)
+        {
+            var owner = EntityManager.GetComponentData<GhostOwner>(player).NetworkId;
+            foreach (var (stream, id) in SystemAPI.Query<RefRO<NetworkStreamConnection>, RefRO<NetworkId>>()
+                         .WithAll<NetworkStreamInGame>().WithNone<NetworkStreamRequestDisconnect>())
+                if (stream.ValueRO.CurrentState == ConnectionState.State.Connected && id.ValueRO.Value == owner) return true;
+            return false;
         }
 
         private Entity GetLocalPlayer()

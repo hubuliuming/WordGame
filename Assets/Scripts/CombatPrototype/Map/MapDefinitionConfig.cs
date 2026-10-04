@@ -17,6 +17,7 @@ namespace Code_01.CombatPrototype.Map
         public MapMiningConfig mining;
         public MapGatherToolsConfig gatherTools;
         public MapInteractionHudConfig interactionHud;
+        public MapInventoryPanelConfig inventoryPanel;
         public MapPopulationConfig population;
         public MapSpawnConfig spawn;
         public string[] biomeIds;

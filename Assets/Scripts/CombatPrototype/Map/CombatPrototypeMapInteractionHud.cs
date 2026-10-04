@@ -2,6 +2,8 @@ using System;
 using Unity.Entities;
 using Unity.NetCode;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using Code_01.CombatPrototype.Networking;
 
 namespace Code_01.CombatPrototype.Map
 {
@@ -36,6 +38,7 @@ namespace Code_01.CombatPrototype.Map
         private int _percent = -1;
         private float _progress;
         private bool _visible;
+        private readonly CombatPrototypeMapInventoryPanel _inventoryPanel = new CombatPrototypeMapInventoryPanel();
 
         private void OnEnable()
         {
@@ -78,7 +81,7 @@ namespace Code_01.CombatPrototype.Map
         }
 
         internal void Configure(CombatPrototypeMapInteractionHudSettings settings,
-            CombatPrototypeMapGatherToolSettings toolSettings, CombatPrototypeMapGatherToolDefinition axe,
+            CombatPrototypeMapInventoryPanelSettings inventorySettings, CombatPrototypeMapGatherToolSettings toolSettings, CombatPrototypeMapGatherToolDefinition axe,
             CombatPrototypeMapGatherToolDefinition pickaxe)
         {
             Reset();
@@ -91,14 +94,19 @@ namespace Code_01.CombatPrototype.Map
             _gatherLabel = settings.GatherLabel.ToString();
             _treeLabel = settings.TreeLabel.ToString();
             _mineLabel = settings.MineLabel.ToString();
+            _inventoryPanel.Configure(inventorySettings, toolSettings, axe, pickaxe);
         }
 
         internal void Show(CombatPrototypeMapInteractionHudState state, DynamicBuffer<CombatPrototypeMapGatherTool> tools,
-            CombatPrototypeMapToolCraftFeedback feedback)
+            CombatPrototypeMapToolCraftFeedback feedback, DynamicBuffer<CombatPrototypeInventoryItem> inventory,
+            Entity source, Entity player)
         {
             RefreshToolStatus(tools);
             ObserveFeedback(feedback);
             var hasFeedback = Time.unscaledTimeAsDouble < _feedbackUntil;
+            _inventoryPanel.Show(inventory, _axeDurability, _pickaxeDurability,
+                hasFeedback ? _feedbackText : string.Empty, source, player);
+            if (_settings.Enabled == 0) { _visible = false; return; }
             if (state.Mode == CombatPrototypeMapInteractionHudMode.Hidden)
             {
                 _mode = state.Mode;
@@ -213,14 +221,19 @@ namespace Code_01.CombatPrototype.Map
             _feedbackUntil = Time.unscaledTimeAsDouble + _toolSettings.CraftFeedbackSeconds;
         }
 
+        internal bool ReadPanelInput(Keyboard keyboard, Mouse mouse, out bool craftAxe, out bool craftPickaxe) =>
+            _inventoryPanel.ReadInput(keyboard, mouse, out craftAxe, out craftPickaxe);
+
         internal void Clear()
         {
             _visible = false;
+            _inventoryPanel.Clear();
         }
 
         internal void Reset()
         {
             Clear();
+            _inventoryPanel.Reset();
             _labelStyle = null;
             _text = _toolText = _feedbackText = string.Empty;
             _mode = CombatPrototypeMapInteractionHudMode.Hidden;
@@ -237,6 +250,7 @@ namespace Code_01.CombatPrototype.Map
 
         private void OnGUI()
         {
+            _inventoryPanel.Draw();
             if (!_visible || Event.current.type != EventType.Repaint || Screen.width <= 0 || Screen.height <= 0) return;
             if (_labelStyle == null)
             {

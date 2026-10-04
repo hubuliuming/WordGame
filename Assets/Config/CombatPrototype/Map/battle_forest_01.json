@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 8,
-  "configRevision": 11,
+  "schemaVersion": 9,
+  "configRevision": 12,
   "mapDefinitionId": "battle_forest_01",
   "defaultSeed": 12345,
   "geometry": {
@@ -92,6 +92,33 @@
     "gatherLabel": "Gather Apple",
     "treeLabel": "Chop Tree",
     "mineLabel": "Mine Rock"
+  },
+  "inventoryPanel": {
+    "enabled": true,
+    "initiallyOpen": false,
+    "panelWidthPixels": 380.0,
+    "panelHeightPixels": 640.0,
+    "rightMarginPixels": 24.0,
+    "topMarginPixels": 64.0,
+    "fontSize": 18,
+    "rowHeightPixels": 32.0,
+    "panelTitle": "Inventory",
+    "materialsLabel": "Materials",
+    "toolsLabel": "Tools",
+    "craftLabel": "Crafting",
+    "craftButtonLabel": "Craft",
+    "emptyInventoryLabel": "Empty",
+    "woodLabel": "Wood",
+    "stoneLabel": "Stone",
+    "appleLabel": "Apple",
+    "meatLabel": "Meat",
+    "closeLabel": "B: Close",
+    "missingLabel": "Missing",
+    "usableLabel": "Still usable",
+    "brokenLabel": "Broken",
+    "notOwnedLabel": "Not owned",
+    "disabledLabel": "Disabled",
+    "readyLabel": "Ready"
   },
   "population": {
     "initialEnemyCount": 32

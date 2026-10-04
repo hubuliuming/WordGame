@@ -20,7 +20,7 @@
 
 ## 【FACT】当前 JSON 契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 为 schemaVersion=8/configRevision=11，interactionHud与[工具配置](MapGatherTools.md)均必填；全部九个字段必填，沿原严格 UTF-8/字段/类型/重复键检查。旧 v1～v7 明确失败，不补默认段或回退来源；JSON 只在正常导入和烘焙后生效，无运行热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 为 schemaVersion=9/configRevision=12，interactionHud、[工具配置](MapGatherTools.md)与[面板配置](MapInventoryPanel.md)均必填；全部九个字段必填，沿原严格 UTF-8/字段/类型/重复键检查。旧 v1～v8 明确失败，不补默认段或回退来源；JSON 只在正常导入和烘焙后生效，无运行热重载。
 
 | 字段 | 默认值 | 契约 |
 |---|---|---|
@@ -53,11 +53,11 @@ CombatPrototypeMapInteractionHudState 用 OwnerSendType=SendToOwner 同步给所
 | PlacementIndex | int；Hidden 为 -1，其余是原布置索引 |
 | ProgressPermille | ushort，0～1000；非 Working 为 0 |
 
-状态仅含显示数据；FinishAt、RegrowAt、Collector和原资源计时配置仍仅服务端，工具Definitions由各端烘焙供所属工具行读取。HUD不写资源Phase/Collector/历史/障碍、玩家输入/属性/库存、掉落或存档。原资源Ghost字段与F/G/E/R效果保持，数字1/2制作归工具专题。服务器每tick重建缓存，字段不变不重复写；关闭HUD、连接无效、未采样或地图停止时清为Hidden。
+状态仅含显示数据；FinishAt、RegrowAt、Collector和原资源计时配置仍仅服务端，工具Definitions由各端烘焙供所属工具行读取。F提示/进度不写资源Phase/Collector/历史/障碍、玩家输入/属性/库存、掉落或存档；同一宿主的背包面板只缓存按钮请求，由原输入系统消费。原资源Ghost字段与F/G/E/R效果保持，数字1/2制作归工具专题。服务器每tick重建缓存，字段不变不重复写；关闭HUD、连接无效、未采样或地图停止时清为Hidden。
 
 客户端枚举启用的 GhostOwnerIsLocal，不在含该可启用组件的查询上调用单例 API；只显示本地所属玩家且死亡时收起，不显示远端玩家进度。Presentation 不读取 PlayerView 或世界位置，不替代官方 Transform 显示桥接。Main Camera 组件随 Client World 变更注册/解绑；无客户端、准入未完成、没有本地 Ghost 或地图停止时隐藏。World/Scene 释放清掉显示和引用，不保留上一局目标/进度/制作反馈；本地玩家或地图源变化也重置反馈序号观察。
 
-Ready 显示“F  文案”；Working 显示“文案  百分比%”和按千分比填充的进度条，整数百分比为 ProgressPermille/10。第二行读取所属工具缓冲显示对应名称/耐久、Hands或制作提示，制作反馈2秒；无F目标可临时显示结果，交互中只替换第二行。初次绑定只观察现有Sequence，不重播旧结果；只有反馈显示使用客户端unscaledTime。OnGUI仅Repaint绘制，不接按钮、鼠标或按键；缓存文案和样式，绘制后恢复 GUI.matrix/color。HUD 不显示掉落拾取提示、库存面板、世界标记或再生倒计时。
+Ready 显示“F  文案”；Working 显示“文案  百分比%”和按千分比填充的进度条，整数百分比为 ProgressPermille/10。第二行读取所属工具缓冲显示对应名称/耐久、Hands或制作提示，制作反馈2秒；无F目标可临时显示结果，交互中只替换第二行。初次绑定只观察现有Sequence，不重播旧结果；只有反馈显示使用客户端unscaledTime。F面板仍只在Repaint绘制，库存列表/按钮委托[制作面板](MapInventoryPanel.md)处理GUI事件；B由客户端输入系统读取。缓存文案与样式，绘制后恢复GUI.matrix/color/enabled。F面板不显示掉落拾取提示、世界标记或再生倒计时。
 
 资源采样错误按单项暴露地图、类型、布置索引、实体和原异常并继续；玩家帧错误按连接隔离，未生成有效快照者清为 Hidden。必需服务、地图 Settings、HUD 挂载或本地 HUD 数据缺失明确报错，不查找节点、不创建替代组件或默认配置；非法非隐藏网络快照明确报错并保持隐藏。
 
@@ -67,4 +67,6 @@ Ready 显示“F  文案”；Working 显示“文案  百分比%”和按千分
 
 主线程静态验收通过；用户已确认本阶段人工 GamePlayer 通过，主线程结合既有静态核对与用户反馈判定通过，范围限 CombatPrototypeNetCode、v7/revision=10 和[运行入口](Runtime.md)HUD 八项清单。人工结论来自用户反馈；未实际触发的精确距离/同距、同 tick、延迟/预测回放、晚加入和独立保存/创建/提交/清理/回滚失败仍为 UNKNOWN，中文字体/字形覆盖未确认。既有矿点再生、统一 F 与各旧阶段通过保持原版本/清单；第九阶段原 J、第二阶段独立 JSON 人工 UNKNOWN 保持。性能/带宽开销、平台构建和线上联调未测量。AI 未运行 GamePlayer/PlayMode、游戏模拟/显示系统、逻辑单元测试、命令行构建、发布、性能采样或图片检查，未创建子Agent或提交 Git。
 
-当前v8/revision=11新增工具第二行和制作反馈，实际锁定耗时用于服务器进度；正常编译和十次工具隔离烘焙已核对，显示人工结果仍为UNKNOWN，完整静态与人工边界见[采集工具](MapGatherTools.md)/[运行入口](Runtime.md)。原HUD八项用户通过不覆盖本次新行为。
+工具v8/revision=11接入第二行和制作反馈，实际锁定耗时用于服务器进度；正常编译和十次工具隔离烘焙已核对，用户确认工具显示人工通过限v8/revision=11十二项清单，未实际触发的独立用例仍为UNKNOWN，完整静态与人工边界见[采集工具](MapGatherTools.md)/[运行入口](Runtime.md)。原HUD八项用户通过不覆盖本次新行为。
+
+当前v9/revision12复用原Main Camera宿主接入[材料背包与制作面板](MapInventoryPanel.md)，两个显示开关独立。关闭F HUD仍保留本地面板/制作反馈，关闭面板仍保留F HUD；绑定先核对所属Connected/InGame连接，两者关闭或生命周期失效时清空。原服务端四字段不变，本次编译/十四次隔离烘焙静态通过，人工结果UNKNOWN。

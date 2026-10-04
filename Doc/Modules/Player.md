@@ -241,4 +241,8 @@ PlayerView 的现有网络 Owner 连接客户端表现脚本，后者只读取�
 
 ## 【FACT】所属工具、输入与生命边界
 
-原Player Baker追加空GatherTool缓冲与零CraftFeedback，两者SendToOwner；数字1/2单次InputEvent只由本地GhostOwnerIsLocal写入，F沿原选择自动使用对应工具。准入先完整校验v1/v2存档及当前工具定义，再恢复耐久；死亡/R保留工具，重连不补满。原生命/体力/近战/位置、Prefab/Animator与镜头规则保持，工具资格复用原F条件并拒绝资源预约期间制作。所属HUD读取工具/反馈，详细规则归[采集工具](MapGatherTools.md)/[交互HUD](MapInteractionHud.md)。v8/revision=11正常编译/烘焙静态通过，人工归属、死亡/R/重连及HUD仍为UNKNOWN，见[运行入口](Runtime.md)新清单；旧用户通过保持原范围。
+原Player Baker追加空GatherTool缓冲与零CraftFeedback，两者SendToOwner；数字1/2单次InputEvent只由本地GhostOwnerIsLocal写入，F沿原选择自动使用对应工具。准入先完整校验v1/v2存档及当前工具定义，再恢复耐久；死亡/R保留工具，重连不补满。原生命/体力/近战/位置、Prefab/Animator与镜头规则保持，工具资格复用原F条件并拒绝资源预约期间制作。所属HUD读取工具/反馈，详细规则归[采集工具](MapGatherTools.md)/[交互HUD](MapInteractionHud.md)。v8/revision=11正常编译/烘焙静态通过，用户确认人工通过，限v8/revision=11及[运行入口](Runtime.md)十二项清单，未实际触发的归属/预测时序/生命周期及独立失败仍为UNKNOWN；旧用户通过保持原范围。
+
+## 【FACT】材料面板的本地玩家输入
+
+[制作面板](MapInventoryPanel.md)读取本地启用GhostOwnerIsLocal的玩家及其Connected/InGame所属连接；B仅本地开关，按钮沿原CraftAxe/CraftPickaxe字段提交，未增Ghost/命令字段。面板内左键不触发攻击、滚轮不传镜头，面板外及键盘操作保持；死亡/断线/玩家或地图源变化/World释放清掉未提交按钮请求、投影与旧反馈。原生命、体力、R、库存/工具恢复和v2存档保持，正常编译/十四次隔离烘焙静态通过，当前v9/revision12人工结果UNKNOWN，见[运行入口](Runtime.md)新十二项。

@@ -1,3 +1,5 @@
+using System;
+using Code_01.CombatPrototype.Map;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.NetCode;
@@ -36,16 +38,20 @@ namespace Code_01.CombatPrototype.Networking
                 (keyboard.dKey.isPressed ? 1f : 0f) - (keyboard.aKey.isPressed ? 1f : 0f),
                 (keyboard.wKey.isPressed ? 1f : 0f) - (keyboard.sKey.isPressed ? 1f : 0f));
             move = math.normalizesafe(move);
+            var panelBinding = state.World.GetExistingSystemManaged<CombatPrototypeMapInteractionHudBindingSystem>();
+            if (panelBinding == null)
+                throw new InvalidOperationException("Client input requires CombatPrototypeMapInteractionHudBindingSystem.");
+            var blocksMouse = panelBinding.ReadPanelInput(keyboard, mouse, out var panelCraftAxe, out var panelCraftPickaxe);
             var cameraBinding = state.World.GetExistingSystemManaged<CombatPrototypeCameraBindingSystem>();
-            move = cameraBinding.ReadMove(move, keyboard, mouse);
+            move = cameraBinding.ReadMove(move, keyboard, blocksMouse ? null : mouse);
             var attack = (keyboard != null && keyboard.spaceKey.wasPressedThisFrame) ||
-                         (mouse != null && mouse.leftButton.wasPressedThisFrame);
+                         (mouse != null && mouse.leftButton.wasPressedThisFrame && !blocksMouse);
             var respawn = keyboard != null && keyboard.rKey.wasPressedThisFrame;
             var useItem = keyboard != null && keyboard.eKey.wasPressedThisFrame;
             var gather = keyboard != null && keyboard.fKey.wasPressedThisFrame;
             var pickup = keyboard != null && keyboard.gKey.wasPressedThisFrame;
-            var craftAxe = keyboard != null && keyboard.digit1Key.wasPressedThisFrame;
-            var craftPickaxe = keyboard != null && keyboard.digit2Key.wasPressedThisFrame;
+            var craftAxe = panelCraftAxe || (keyboard != null && keyboard.digit1Key.wasPressedThisFrame);
+            var craftPickaxe = panelCraftPickaxe || (keyboard != null && keyboard.digit2Key.wasPressedThisFrame);
 
             foreach (var input in SystemAPI.Query<RefRW<CombatPrototypePlayerInput>>().WithAll<GhostOwnerIsLocal>())
             {

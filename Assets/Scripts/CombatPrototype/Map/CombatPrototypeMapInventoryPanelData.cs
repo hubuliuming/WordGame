@@ -1,0 +1,34 @@
+using Unity.Collections;
+using Unity.Entities;
+
+namespace Code_01.CombatPrototype.Map
+{
+    public struct CombatPrototypeMapInventoryPanelSettings : IComponentData
+    {
+        public byte Enabled;
+        public byte InitiallyOpen;
+        public float PanelWidthPixels;
+        public float PanelHeightPixels;
+        public float RightMarginPixels;
+        public float TopMarginPixels;
+        public int FontSize;
+        public float RowHeightPixels;
+        public FixedString64Bytes PanelTitle;
+        public FixedString64Bytes MaterialsLabel;
+        public FixedString64Bytes ToolsLabel;
+        public FixedString64Bytes CraftLabel;
+        public FixedString64Bytes CraftButtonLabel;
+        public FixedString64Bytes EmptyInventoryLabel;
+        public FixedString64Bytes WoodLabel;
+        public FixedString64Bytes StoneLabel;
+        public FixedString64Bytes AppleLabel;
+        public FixedString64Bytes MeatLabel;
+        public FixedString64Bytes CloseLabel;
+        public FixedString64Bytes MissingLabel;
+        public FixedString64Bytes UsableLabel;
+        public FixedString64Bytes BrokenLabel;
+        public FixedString64Bytes NotOwnedLabel;
+        public FixedString64Bytes DisabledLabel;
+        public FixedString64Bytes ReadyLabel;
+    }
+}

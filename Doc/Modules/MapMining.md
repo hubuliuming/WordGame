@@ -25,7 +25,7 @@
 
 ## 【FACT】JSON 契约与默认值
 
-[battle_forest_01.json](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[battle_grassland_01.json](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 为 schemaVersion=8/configRevision=11。mining 及全部字段必填，interactionHud归[交互显示](MapInteractionHud.md)，gatherTools归[采集工具](MapGatherTools.md)；旧v1～v7、缺失/未知/重复字段、错误类型或无效引用明确失败，不补字段、不回退来源。配置只在烘焙时读取，无运行热重载或新联网配置校验协议。各端须使用相同代码、输入布局、Ghost、配置及资源。
+[battle_forest_01.json](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[battle_grassland_01.json](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 为 schemaVersion=9/configRevision=12。mining 及全部字段必填，interactionHud归[交互显示](MapInteractionHud.md)，gatherTools归[采集工具](MapGatherTools.md)；旧v1～v8、缺失/未知/重复字段、错误类型或无效引用明确失败，不补字段、不回退来源。配置只在烘焙时读取，无运行热重载或新联网配置校验协议。各端须使用相同代码、输入布局、Ghost、配置及资源。
 
 ```json
 "mining": {
@@ -124,4 +124,6 @@ Tools/CombatPrototype/地图/生成第九阶段采矿资源 要求空闲 EditMod
 
 用户已确认矿点原点再生人工 GamePlayer 验收通过，主线程结合既有代码/烘焙静态核对与用户反馈判定该阶段通过；范围限 schemaVersion=6/configRevision=9 及[运行入口](Runtime.md)矿点再生八项清单。人工结论来自用户反馈，未实际触发的精确距离/特殊 Simulate、同 tick/延迟/预测回放、晚加入及独立失败分支仍为 UNKNOWN。已有统一 F 及第七/第八阶段用户通过仅限各自原版本/清单，不扩展到新行为。矿点历史随本局轮次增长，其内存/网络开销及规模性能、平台构建与线上联调未测量；AI 未运行 GamePlayer/PlayMode、游戏模拟/显示系统、逻辑单元测试、命令行构建、发布、性能采样或图片检查。
 
-当前自动镐子/耐久归[采集工具](MapGatherTools.md)，v8/revision=11锁定字段/保存链已编译和静态烘焙核对，人工仍为UNKNOWN；旧采矿/再生用户通过仅限各自原版本与清单。
+当前自动镐子/耐久归[采集工具](MapGatherTools.md)，v8/revision=11锁定字段/保存链已编译和静态烘焙核对，用户确认工具人工通过限v8/revision=11及[运行入口](Runtime.md)十二项清单，未实际触发的独立失败/边界/预测用例仍为UNKNOWN；旧采矿/再生用户通过仅限各自原版本与清单。
+
+当前v9/revision12的[材料面板](MapInventoryPanel.md)只展示石材库存/镐子耐久和原配方，按钮沿原制作链；采矿/石材/阻挡/再生逻辑保持，新增显示/输入回归人工UNKNOWN。

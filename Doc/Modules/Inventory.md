@@ -119,11 +119,11 @@ KnapsackControl.OnStart 缓存当前 PlayerModel 与 FactoryUISystem，记录 Co
 
 统一入口先记录本 tick 已有交互，采集系统随后维护预约。移动输入、攻击请求或非 Ready、受击序号改变、死亡、超距、断线/目标失效均取消并释放为 Available，不发物品。期间采集者不强制锁定移动或攻击，取消不恢复体力；完成时间到达仍须先满足当次资格与范围。Available/Collecting 显示，Depleted 由客户端按 Ghost 状态隐藏，进度归[交互HUD](MapInteractionHud.md)，没有自动重试；耗尽后的再生沿下述独立服务端计时链。
 
-完成前取得库存与状态引用；按既有 ItemName 合并或新增，检查数量溢出并预留新增缓冲容量。PrepareReward 生成保持当前金币/经验的完整库存候选，SavePrepared 成功返回后同次提交库存、清除预约并设置 Depleted，同时按配置记录再生期限。准备/保存失败记录地图、布置索引、NetworkId、物品、阶段与原异常，库存数量及资源耗尽不提交，释放预约并继续其他点；玩家须重新按 F。全部奖励/消费/采集候选均保留Tools并写v2，地图耗尽及再生期限不写盘；客户端背包仍沿原 Ghost 缓冲同步及每 2 秒日志查看。
+完成前取得库存与状态引用；按既有 ItemName 合并或新增，检查数量溢出并预留新增缓冲容量。PrepareReward 生成保持当前金币/经验的完整库存候选，SavePrepared 成功返回后同次提交库存、清除预约并设置 Depleted，同时按配置记录再生期限。准备/保存失败记录地图、布置索引、NetworkId、物品、阶段与原异常，库存数量及资源耗尽不提交，释放预约并继续其他点；玩家须重新按 F。全部奖励/消费/采集候选均保留Tools并写v2，地图耗尽及再生期限不写盘；客户端背包沿原Ghost缓冲同步、每2秒日志及[网络面板](MapInventoryPanel.md)查看。
 
 ## 【CURRENT STRATEGY】采集物原点再生
 
-默认 gather_apple 启用 regrowEnabled=true、regrowSeconds=600；再生字段形状保持；当前地图契约为schemaVersion=8、configRevision=11，含drops/treeHarvest/mining/gatherTools/interactionHud段。Map Baker → GatherSpawnSystem 将开关和间隔送入仅服务端的 GatherConfig；仅在采集保存成功后，GatherProgress.RegrowAt 写为该次 Server World 模拟时间加间隔，Collector/StartHitSequence/FinishAt 清空。取消或准备/保存失败清空进度、释放预约，不发物品、不安排再生，也不自动重试。
+默认 gather_apple 启用 regrowEnabled=true、regrowSeconds=600；再生字段形状保持；当前地图契约为schemaVersion=9、configRevision=12，含drops/treeHarvest/mining/gatherTools/interactionHud/inventoryPanel段。Map Baker → GatherSpawnSystem 将开关和间隔送入仅服务端的 GatherConfig；仅在采集保存成功后，GatherProgress.RegrowAt 写为该次 Server World 模拟时间加间隔，Collector/StartHitSequence/FinishAt 清空。取消或准备/保存失败清空进度、释放预约，不发物品、不安排再生，也不自动重试。
 
 [GatherRegrowSystem](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapGatherRegrowSystem.cs) 在 PredictedSimulationSystemGroup 的 GatherSystem 之后、PlayerRespawnSystem 之前恢复到期 Depleted 点为 Available，并清空期限及采集者。原实体、位置和 PlacementIndex 保持，客户端复用原 Ghost 状态和显示系统恢复显示；再生不入包、不保存库存，也不自动开始下一次采集。玩家须重新按 F，完整资格/预约/保存规则继续生效；regrowEnabled=false 时点保持本局耗尽。计时与耗尽仅保留当前 Server World，停止重进生成新的 Available 点，已保存库存沿v2固定ID恢复，读取v1迁移。
 
@@ -135,7 +135,7 @@ KnapsackControl.OnStart 缓存当前 PlayerModel 与 FactoryUISystem，记录 Co
 
 敌人首次死亡额外生成活力苹果 ×1 的插值 Ghost；原金币/经验/小块肉统一击杀奖励与保存链保持。服务端 G 单次请求仅选择本人 X/Z 2 米内最近 Landed 且未到期的掉落，同距取较小 DropId，同次更新按 NetworkId 升序处理；在线当前玩家须存活、静止且近战 Ready，没有攻击请求。任意合格玩家均可拾取，没有击杀者专属所有权。
 
-拾取复用 PrepareReward → SavePrepared，保持当前金币/经验并合并同名库存；成功保存后同次提交库存与 Consumed，后续请求不能重复发放。保存失败不改库存数量或未到期掉落，继续其他请求，恢复后须新 G；到期仍按配置清理。世界掉落仅保留当前 Server World，已入包苹果沿v2固定ID保存、候选保留Tools。苹果没有新增使用效果或 UI；F 预约/耗尽/600 秒再生保持。配置、运动、Ghost 和清理职责归[掉落与拾取](MapDrops.md)。用户已确认第六阶段人工 GamePlayer 通过，主线程结合静态核对与用户反馈判定该阶段通过；库存范围限保存成功入包、同名累计、争抢一次提交、保存失败保留及固定 ID 恢复，完整边界归[运行入口](Runtime.md)第六阶段九项清单。
+拾取复用 PrepareReward → SavePrepared，保持当前金币/经验并合并同名库存；成功保存后同次提交库存与 Consumed，后续请求不能重复发放。保存失败不改库存数量或未到期掉落，继续其他请求，恢复后须新 G；到期仍按配置清理。世界掉落仅保留当前 Server World，已入包苹果沿v2固定ID保存、候选保留Tools。苹果没有新增使用效果；库存显示归[网络面板](MapInventoryPanel.md)；F 预约/耗尽/600 秒再生保持。配置、运动、Ghost 和清理职责归[掉落与拾取](MapDrops.md)。用户已确认第六阶段人工 GamePlayer 通过，主线程结合静态核对与用户反馈判定该阶段通过；库存范围限保存成功入包、同名累计、争抢一次提交、保存失败保留及固定 ID 恢复，完整边界归[运行入口](Runtime.md)第六阶段九项清单。
 
 ## 【FACT】砍伐木材与库存提交
 
@@ -147,7 +147,7 @@ F 统一选中树木后由 TreeHarvest 预约/计时，默认2米/徒手2秒（�
 
 ## 【FACT】采矿石材与库存提交
 
-统一 F 选中矿点后，服务端默认2米/徒手3秒（镐子2.25秒）完成只生成 stone ×3 地面掉落，完成时不直接入包。stone 显式映射新增 Msg.ItemName.石材；G 继续按实际 ItemId 调用原 PrepareReward → SavePrepared，再提交同名库存及 Consumed，原金币/经验保持，候选保留Tools、写v2并读取v1迁移。保存失败不改库存或未到期掉落，恢复后须新 G；已入包石材随固定 ID 库存恢复，矿点/未拾取石材只保留本局。石材没有新增使用效果或 UI，E 仍只用小块肉。规则归[采矿](MapMining.md)/[掉落](MapDrops.md)，第九阶段人工库存/保存/恢复验收为 UNKNOWN，归[运行入口](Runtime.md)。
+统一 F 选中矿点后，服务端默认2米/徒手3秒（镐子2.25秒）完成只生成 stone ×3 地面掉落，完成时不直接入包。stone 显式映射新增 Msg.ItemName.石材；G 继续按实际 ItemId 调用原 PrepareReward → SavePrepared，再提交同名库存及 Consumed，原金币/经验保持，候选保留Tools、写v2并读取v1迁移。保存失败不改库存或未到期掉落，恢复后须新 G；已入包石材随固定 ID 库存恢复，矿点/未拾取石材只保留本局。石材没有新增使用效果，库存显示归[网络面板](MapInventoryPanel.md)，E 仍只用小块肉。规则归[采矿](MapMining.md)/[掉落](MapDrops.md)，第九阶段人工库存/保存/恢复验收为 UNKNOWN，归[运行入口](Runtime.md)。
 
 矿点默认耗尽提交后 600 秒原点再生，占位等待；再生不发石材、不提交库存或存档，再次产出须新 F 完成后 G 保存入包。矿点期限/历史只属于当前 Server World，已入包石材沿v2固定ID恢复，读取v1迁移。规则归[采矿](MapMining.md)，用户已确认该阶段人工 GamePlayer 通过；库存范围限再生不发物品、新 F 石材/G 提交与 v1 库存恢复，完整边界归[运行入口](Runtime.md)矿点再生八项清单及 v6/revision=9，未触发独立失败分支仍为 UNKNOWN。
 
@@ -159,4 +159,8 @@ v7/revision=10 的[交互显示](MapInteractionHud.md)只显示 F 目标和原�
 
 ## 【FACT】工具制作的库存边界
 
-数字1/2分别用原木材/石材库存制作斧头/镐子，先验证全部配方、投影扣料和满耐久Tools并保存，成功后再同时提交；材料归零移除对应项，其他库存/金币/经验保持，失败不部分扣料。工具为独立所属缓冲，不混入ItemName/Quantity，不接正式背包UI；树木/矿点工具完成只保存耐久，地面产出仍须G入包。采集、G、E和奖励保存候选均保留当前Tools。规则归[采集工具](MapGatherTools.md)，本阶段静态通过、人工扣料/失败/持久化仍为UNKNOWN，见[运行入口](Runtime.md)新清单；旧用户通过保持各自版本/清单。
+数字1/2分别用原木材/石材库存制作斧头/镐子，先验证全部配方、投影扣料和满耐久Tools并保存，成功后再同时提交；材料归零移除对应项，其他库存/金币/经验保持，失败不部分扣料。工具为独立所属缓冲，不混入ItemName/Quantity，不接正式背包UI；树木/矿点工具完成只保存耐久，地面产出仍须G入包。采集、G、E和奖励保存候选均保留当前Tools。规则归[采集工具](MapGatherTools.md)，本阶段静态通过且用户确认人工通过，限v8/revision=11及[运行入口](Runtime.md)十二项清单，未实际触发的独立扣料/保存/恢复失败仍为UNKNOWN；旧用户通过保持各自版本/清单。
+
+## 【FACT】网络材料背包与制作面板
+
+v9/revision12的[制作面板](MapInventoryPanel.md)复用原所属玩家库存/工具，B开关、显示正数量原顺序/滚动及两工具耐久、材料配方/缺少数量；按钮和原1/2合并，按服务端既有资格与SavePrepared事务处理。客户端没有第二份可变库存、不拆99格、不改变正式Map背包或物品效果，展示和网络所有权边界归面板专题。正常编译/十四次隔离Editor烘焙静态通过，本阶段人工GamePlayer为UNKNOWN，见[运行入口](Runtime.md)新十二项清单；旧工具/HUD等用户通过保持各自原范围。

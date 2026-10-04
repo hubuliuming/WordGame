@@ -1,0 +1,119 @@
+using System;
+using System.Collections.Generic;
+using Code_01.CombatPrototype.Networking;
+using Unity.Collections;
+using Unity.Entities;
+using UnityEngine;
+
+namespace Code_01.CombatPrototype.Map
+{
+    // Presentation projection only. Neither the list nor its material counts write gameplay state.
+    internal sealed class CombatPrototypeMapInventoryPanelSnapshot
+    {
+        internal readonly struct Row
+        {
+            public readonly FixedString64Bytes Name;
+            public readonly string OriginalName;
+            public readonly int Quantity;
+            public readonly string Text;
+
+            public Row(FixedString64Bytes name, string originalName, int quantity, string label)
+            {
+                Name = name;
+                OriginalName = originalName;
+                Quantity = quantity;
+                Text = label + "  x" + quantity;
+            }
+        }
+
+        private static readonly FixedString64Bytes Wood = new FixedString64Bytes(Msg.ItemName.木材);
+        private static readonly FixedString64Bytes Stone = new FixedString64Bytes(Msg.ItemName.石材);
+        private static readonly FixedString64Bytes Apple = new FixedString64Bytes(Msg.ItemName.活力苹果);
+        private static readonly FixedString64Bytes Meat = new FixedString64Bytes(Msg.ItemName.小块肉);
+        private readonly List<Row> _items = new List<Row>();
+        private readonly HashSet<FixedString64Bytes> _names = new HashSet<FixedString64Bytes>();
+        private string _woodLabel;
+        private string _stoneLabel;
+        private string _appleLabel;
+        private string _meatLabel;
+
+        public IReadOnlyList<Row> Items => _items;
+        public int WoodQuantity { get; private set; }
+        public int StoneQuantity { get; private set; }
+        public int AxeDurability { get; private set; } = -1;
+        public int PickaxeDurability { get; private set; } = -1;
+        public bool InventoryValid { get; private set; }
+
+        public void Configure(CombatPrototypeMapInventoryPanelSettings settings)
+        {
+            Reset();
+            _woodLabel = settings.WoodLabel.ToString();
+            _stoneLabel = settings.StoneLabel.ToString();
+            _appleLabel = settings.AppleLabel.ToString();
+            _meatLabel = settings.MeatLabel.ToString();
+        }
+
+        public void Capture(DynamicBuffer<CombatPrototypeInventoryItem> inventory, int axeDurability,
+            int pickaxeDurability, Entity source, Entity player)
+        {
+            WoodQuantity = StoneQuantity = 0;
+            AxeDurability = axeDurability;
+            PickaxeDurability = pickaxeDurability;
+            InventoryValid = true;
+            _names.Clear();
+            var count = 0;
+            for (var index = 0; index < inventory.Length; index++)
+            {
+                var item = inventory[index];
+                var cached = count < _items.Count && _items[count].Name.Equals(item.ItemName);
+                var originalName = cached ? _items[count].OriginalName : item.ItemName.ToString();
+                if (!ValidName(originalName) || item.Quantity < 0 || !_names.Add(item.ItemName))
+                {
+                    InventoryValid = false;
+                    Debug.LogError("[CombatPrototype.InventoryPanel] Invalid item; stage=Snapshot, map=" + source +
+                        ", player=" + player + ", index=" + index + ", item=" + originalName + ", quantity=" +
+                        item.Quantity + ". Expected a unique nonblank name without control characters and nonnegative quantity.");
+                    continue;
+                }
+                // An absent/zero row means zero material, as in the existing crafting system.
+                if (item.Quantity == 0) continue;
+                if (item.ItemName.Equals(Wood)) WoodQuantity = item.Quantity;
+                if (item.ItemName.Equals(Stone)) StoneQuantity = item.Quantity;
+                if (!cached || _items[count].Quantity != item.Quantity)
+                {
+                    var row = new Row(item.ItemName, originalName, item.Quantity, DisplayName(item.ItemName, originalName));
+                    if (count < _items.Count) _items[count] = row;
+                    else _items.Add(row);
+                }
+                count++;
+            }
+            if (count < _items.Count) _items.RemoveRange(count, _items.Count - count);
+        }
+
+        private static bool ValidName(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name)) return false;
+            foreach (var character in name)
+                if (char.IsControl(character)) return false;
+            return true;
+        }
+
+        private string DisplayName(FixedString64Bytes name, string originalName)
+        {
+            if (name.Equals(Wood)) return _woodLabel;
+            if (name.Equals(Stone)) return _stoneLabel;
+            if (name.Equals(Apple)) return _appleLabel;
+            if (name.Equals(Meat)) return _meatLabel;
+            return originalName;
+        }
+
+        public void Reset()
+        {
+            _items.Clear();
+            _names.Clear();
+            WoodQuantity = StoneQuantity = 0;
+            AxeDurability = PickaxeDurability = -1;
+            InventoryValid = false;
+        }
+    }
+}

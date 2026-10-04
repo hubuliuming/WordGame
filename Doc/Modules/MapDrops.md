@@ -21,7 +21,7 @@
 
 ## 【FACT】JSON 契约与当前默认值
 
-[battle_forest_01.json](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[battle_grassland_01.json](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn来源](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)均为schemaVersion=8/configRevision=11，drops必填，工具配置归[采集工具](MapGatherTools.md)。原空间、移动、出生及drops/grounds值保持；mining与生态矿点字段归采矿专题，tree_normal/gather_apple/mine_rock均默认600秒再生。配置只在烘焙时读取，不支持热重载；各端须相同版本、输入布局与资源，未新增一致性协议。
+[battle_forest_01.json](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[battle_grassland_01.json](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn来源](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)均为schemaVersion=9/configRevision=12，drops必填，工具配置归[采集工具](MapGatherTools.md)。原空间、移动、出生及drops/grounds值保持；mining与生态矿点字段归采矿专题，tree_normal/gather_apple/mine_rock均默认600秒再生。配置只在烘焙时读取，不支持热重载；各端须相同版本、输入布局与资源，未新增一致性协议。
 
 | 字段 | 默认值 | 校验/行为 |
 |---|---|---|
@@ -37,7 +37,7 @@
 | visualScale | 0.5 | 有限正数，实例 LocalTransform 的统一缩放 |
 | lifetimeSeconds | 600 | 有限非负数；从生成时刻计时，0 关闭自动到期 |
 
-全部字段显式填写。字符串遵循原小写ASCII/数字/下划线及最长61字符；缺失/未知/重复字段、错类型或非法值沿严格UTF-8 JSON边界报错。旧地图v1～v7不迁移或补字段，Json失败不回退BuiltIn。资源键由原MapAuthoring.DecorationPrefabs解析，不查找或临时创建兜底。
+全部字段显式填写。字符串遵循原小写ASCII/数字/下划线及最长61字符；缺失/未知/重复字段、错类型或非法值沿严格UTF-8 JSON边界报错。旧地图v1～v8不迁移或补字段，Json失败不回退BuiltIn。资源键由原MapAuthoring.DecorationPrefabs解析，不查找或临时创建兜底。
 
 ## 【CURRENT STRATEGY】死亡、生成与飞行
 
@@ -55,7 +55,7 @@ Pickup 为原 IInputComponentData 的新增 InputEvent，客户端只对 GhostOw
 
 提交前按目标DropState.ItemId解析实际物品名，取得库存与状态可写引用，checked合并同名数量，新条目先预留容量。PrepareReward投影保持当前金币/经验/Tools的完整库存v2候选，SavePrepared成功才提交库存及Consumed；提交不做结构变更、分配或第二次查找。同次后续请求读取Consumed，不能重复入包；读取v1迁移，临时文件与正式档替换规则保持。
 
-准备/保存失败记录 NetworkId、DropId、物品、阶段及原异常，不提交库存数量或未到期掉落消耗，继续其他玩家请求；恢复后须新 G，不自动重试。到期规则仍生效，不为失败拾取延长寿命。背包沿原 Ghost 缓冲及每 2 秒日志同步观察；苹果/木材/石材没有新增使用效果或正式 UI，E 仍只用小块肉。F 预约、取消、保存后耗尽及 600 秒原点再生保持。
+准备/保存失败记录 NetworkId、DropId、物品、阶段及原异常，不提交库存数量或未到期掉落消耗，继续其他玩家请求；恢复后须新 G，不自动重试。到期规则仍生效，不为失败拾取延长寿命。背包沿原 Ghost 缓冲及每 2 秒日志同步观察；苹果/木材/石材没有新增使用效果，库存显示归[网络面板](MapInventoryPanel.md)，E 仍只用小块肉。F 预约、取消、保存后耗尽及 600 秒原点再生保持。
 
 ## 【CURRENT STRATEGY】Ghost、到期与释放
 
@@ -103,4 +103,6 @@ v7/revision=10 接入 F 三类资源的目标提示与原服务端采集进度�
 
 ## 【FACT】工具完成与掉落边界
 
-[采集工具](MapGatherTools.md)不改变DropId、产出数量、飞行、G或释放链；使用斧头/镐子完成先准备并登记当前掉落、保存耐久，再提交资源完成。保存前失败只清理本次掉落并取消预约；保存成功后的意外ECS故障不执行旧资源回滚，恢复保证为UNKNOWN。G保存候选携带当前Tools，防止拾取覆盖耐久。本阶段编译/隔离烘焙已静态核对，人工事务与回归均为UNKNOWN，旧掉落用户通过范围保持。
+[采集工具](MapGatherTools.md)不改变DropId、产出数量、飞行、G或释放链；使用斧头/镐子完成先准备并登记当前掉落、保存耐久，再提交资源完成。保存前失败只清理本次掉落并取消预约；保存成功后的意外ECS故障不执行旧资源回滚，恢复保证为UNKNOWN。G保存候选携带当前Tools，防止拾取覆盖耐久。本阶段编译/隔离烘焙已静态核对，用户确认工具人工通过限v8/revision=11及[运行入口](Runtime.md)十二项清单，未实际触发的独立事务失败仍为UNKNOWN，旧掉落用户通过范围保持。
+
+当前[材料面板](MapInventoryPanel.md)仅读取已入包库存并沿原工具事件请求制作，不接管G、掉落状态/生命周期或存档；拾取后显示随原Ghost刷新。v9/revision12显示接入静态通过，人工掉落/库存刷新回归UNKNOWN，原用户通过保持各自清单。

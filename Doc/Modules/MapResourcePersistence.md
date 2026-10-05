@@ -20,7 +20,7 @@
 
 ## 【FACT】配置与建议值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与BuiltIn当前schemaVersion=16/configRevision=19；新增必填resourcePersistence段，原所有地图段/数值保持。沿原严格字段、对象形状、标量类型与UTF-8校验，旧v1～v15拒绝，不迁移、补默认或回退来源；正常导入和烘焙后生效，无热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与BuiltIn当前schemaVersion=17/configRevision=20；resourcePersistence段必填，当前寿命显示归[G提示](MapPickupHud.md)。沿原严格字段、对象形状、标量类型与UTF-8校验，旧v1～v16拒绝，不迁移、补默认或回退来源；正常导入和烘焙后生效，无热重载。
 
 | 字段 | 默认值 | 校验 |
 |---|---|---|
@@ -29,7 +29,7 @@
 | resourcePersistence.saveIntervalSeconds | 10 | 有限正数秒，按Server World模拟时间决定检查点 |
 | resourcePersistence.saveGroundDrops | true | 必填布尔；enabled同时开启才恢复/保存地面物；false沿旧规则重启清空 |
 
-关闭存档仍校验全部字段。Map Baker写入Enabled/SaveGroundDrops/SaveSlotId/SaveIntervalSeconds/LayoutSignature五字段，签名为64个小写十六进制字符，使用FixedString128Bytes；另写一字段恢复状态，开启为Pending、关闭为Ready。地图根仍不是Ghost；新数据由服务端系统消费，没有玩家/资源Ghost字段或输入变化。当前输入15、F/G/资源状态各4及原反馈/资源字段保持，各端同版代码/配置重新烘焙。
+关闭存档仍校验全部字段。Map Baker写入Enabled/SaveGroundDrops/SaveSlotId/SaveIntervalSeconds/LayoutSignature五字段，签名为64个小写十六进制字符，使用FixedString128Bytes；另写一字段恢复状态，开启为Pending、关闭为Ready。地图根仍不是Ghost；存档数据由服务端系统消费，资源存档链未新增玩家/资源Ghost字段或输入。当前输入15、F4/G6/资源状态4及原反馈/资源字段保持，各端同版代码/配置重新烘焙。
 
 ## 【FACT】文件与身份
 
@@ -79,4 +79,6 @@ saveGroundDrops开启时同文件保存地面苹果/木材/石材、DropId及剩
 
 资源存档v15/18代码与配置静态验收通过；用户已确认该阶段人工GamePlayer验收通过，主线程结合既有静态核对与用户反馈判定通过，范围限CombatPrototypeNetCode、v15/18、世界v1及[运行入口](Runtime.md)十二项清单，结论来自用户反馈。旧修理v14/17十二项及更早用户通过保持各自版本/清单。AI未调用真实世界存档读写方法、游戏/显示系统或GUI回调，未执行逻辑单元测试、GamePlayer/PlayMode、命令行构建、发布、性能采样或图片检查，未创建子Agent或提交Git。未实际触发的独立文件I/O/坏档/替换/关闭恢复、到期占位/预测基态、多玩家时序/生命周期仍UNKNOWN；跨文件原子一致、意外ECS故障恢复、同槽多服务端并发、未覆盖字形与性能/带宽/平台/线上不属于通过范围，仍UNKNOWN。
 
-当前掉落持久化v16/19静态证据与新增人工UNKNOWN归[掉落存档](MapDropPersistence.md)；v15/18用户通过保持原世界v1及十二项清单。
+掉落持久化v16/19静态及用户人工通过限十二项，未触发的独立用例UNKNOWN，归[掉落存档](MapDropPersistence.md)；v15/18用户通过保持原世界v1及十二项清单。
+
+寿命提示v17/20归[G提示](MapPickupHud.md)：所属G六字段，原目标/拾取/期限/保存保持，主线程静态通过、新人工UNKNOWN；旧用户通过仍限原版本/清单。

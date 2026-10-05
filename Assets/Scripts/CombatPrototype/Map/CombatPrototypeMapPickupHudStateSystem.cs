@@ -82,6 +82,9 @@ namespace Code_01.CombatPrototype.Map
                                 Mode = CombatPrototypeMapPickupHudMode.Ready, DropId = dropId,
                                 ItemId = drop.ItemId, Quantity = drop.Quantity
                             };
+                            stage = "ReadLifetime";
+                            CombatPrototypeMapPickupLifetimeHudSnapshot.Apply(ref frame, settings,
+                                progresses[target].ExpiresAt, time);
                         }
                     }
                     _frames[player] = frame;
@@ -104,7 +107,8 @@ namespace Code_01.CombatPrototype.Map
                 var next = _frames.TryGetValue(entity, out var frame) ? frame : CombatPrototypeMapPickupHudState.Hidden;
                 var old = current.ValueRO;
                 if (old.Mode != next.Mode || old.DropId != next.DropId || !old.ItemId.Equals(next.ItemId) ||
-                    old.Quantity != next.Quantity) current.ValueRW = next;
+                    old.Quantity != next.Quantity || old.LifetimeMode != next.LifetimeMode ||
+                    old.RemainingSeconds != next.RemainingSeconds) current.ValueRW = next;
             }
         }
 

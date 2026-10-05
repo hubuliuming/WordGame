@@ -19,7 +19,7 @@
 
 ## 【FACT】JSON 契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 当前一致为 schemaVersion=16/configRevision=19。必填 inventoryPanel 共28字段，沿原严格UTF-8、完整字段/类型及未知/重复键检查；即使关闭面板也校验全部字段。旧地图v1～v15明确失败，不补段/默认值或回退来源；正常导入/烘焙后生效，无运行热重载。原工具配方/耐久仍从 gatherTools 唯一读取，面板不复制配置真值。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 当前一致为 schemaVersion=17/configRevision=20。必填 inventoryPanel 共28字段，沿原严格UTF-8、完整字段/类型及未知/重复键检查；即使关闭面板也校验全部字段。旧地图v1～v16明确失败，不补段/默认值或回退来源；正常导入/烘焙后生效，无运行热重载。原工具配方/耐久仍从 gatherTools 唯一读取，面板不复制配置真值。
 
 | 字段 | 默认值 | 契约 |
 |---|---|---|
@@ -89,8 +89,10 @@ v12/15的[高亮](MapInteractionHighlight.md)复用同一宿主，圆环先于�
 
 v13/16的[资源状态](MapResourceStatusHud.md)与B面板独立，仍复用原宿主/绑定；状态开启时即使其余显示全关仍绑定。新状态不消费GUI事件或制作请求，B按钮与鼠标隔离保持。状态静态及用户人工通过，限v13/16十项，未触发用例UNKNOWN；旧面板/G/高亮用户通过保持原范围。
 
-当前v16/19的[工具修理](MapToolRepair.md)在制作区后追加11滚动行，预览封顶恢复值、材料现有/需要及缺口，3/4按钮沿原鼠标按下标记和输入绑定消费一次。关闭面板或生命周期失效清未提交修理，关闭面板仍可键盘3/4；库存展示错误禁用修理按钮。原380×640/字号18/行32、制作、Drop/All及鼠标隔离保持。配置28字段/20文案、工具根/定义和新反馈经编译/18次隔离烘焙静态通过；用户确认修理人工通过，限v14/17十二项，未触发用例UNKNOWN。
+当前v17/20的[工具修理](MapToolRepair.md)在制作区后追加11滚动行，预览封顶恢复值、材料现有/需要及缺口，3/4按钮沿原鼠标按下标记和输入绑定消费一次。关闭面板或生命周期失效清未提交修理，关闭面板仍可键盘3/4；库存展示错误禁用修理按钮。原380×640/字号18/行32、制作、Drop/All及鼠标隔离保持。配置28字段/20文案、工具根/定义和新反馈经编译/18次隔离烘焙静态通过；用户确认修理人工通过，限v14/17十二项，未触发用例UNKNOWN。
 
 ## 【FACT】地图资源存档接入边界
 
-资源存档不增加B页、按钮或本地可变库存；原制作/修理/Drop/All与输入保持。地图恢复完成才接纳玩家，世界文件职责归[资源存档](MapResourcePersistence.md)，资源存档人工通过限v15/18十二项，未触发用例UNKNOWN。 掉落恢复及同文件快照归[掉落存档](MapDropPersistence.md)，本阶段人工UNKNOWN。
+资源存档不增加B页、按钮或本地可变库存；原制作/修理/Drop/All与输入保持。地图恢复完成才接纳玩家，世界文件职责归[资源存档](MapResourcePersistence.md)，资源存档人工通过限v15/18十二项，未触发用例UNKNOWN。 掉落恢复及同文件快照归[掉落存档](MapDropPersistence.md)，人工通过限v16/19十二项，未触发用例UNKNOWN。
+
+寿命提示v17/20归[G提示](MapPickupHud.md)：所属G六字段，原目标/拾取/期限/保存保持，主线程静态通过、新人工UNKNOWN；旧用户通过仍限原版本/清单。

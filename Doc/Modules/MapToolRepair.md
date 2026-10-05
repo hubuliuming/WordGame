@@ -21,7 +21,7 @@
 
 ## 【FACT】当前配置契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=16/configRevision=19。resourcePersistence/geometry/layout/movement/drops/treeHarvest/mining/gatherTools/interactionHud/pickupHud/interactionHighlight/resourceStatusHud/inventoryPanel/inventoryDrop/population/spawn均必填；新增字段沿原严格UTF-8、对象形状、缺失/未知/重复字段与标量类型校验。旧v1～v15明确拒绝，不迁移、补默认或回退来源；正常导入/烘焙后生效，无热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=17/configRevision=20。resourcePersistence/geometry/layout/movement/drops/treeHarvest/mining/gatherTools/interactionHud/pickupHud/interactionHighlight/resourceStatusHud/inventoryPanel/inventoryDrop/population/spawn均必填；新增字段沿原严格UTF-8、对象形状、缺失/未知/重复字段与标量类型校验。旧v1～v16明确拒绝，不迁移、补默认或回退来源；正常导入/烘焙后生效，无热重载。
 
 | 配置位置/字段 | 默认值 | 校验或行为 |
 |---|---|---|
@@ -35,7 +35,7 @@
 | inventoryPanel.repairButtonLabel | Repair | 同上 |
 | inventoryPanel.fullDurabilityLabel | Full durability | 同上 |
 
-gatherTools根当前5字段，tools每条11字段；共新增2个根字段及每工具3字段。inventoryPanel由25字段增至28字段，20个文案均必填。关闭修理、工具或面板仍校验全部字段；不以开关补参数。0木材或0石材成本合法，但两者不可同时为0。工具ID、槽数、最大耐久60/40、制作配方木3石2/木2石3、成功消耗1/工具倍率0.75、原F/G/B/高亮/资源状态默认值、三类600秒再生及地图空间/种子/32敌人/出生保持。
+gatherTools根当前5字段，tools每条11字段；共新增2个根字段及每工具3字段。inventoryPanel由25字段增至28字段，20个文案均必填。关闭修理、工具或面板仍校验全部字段；不以开关补参数。0木材或0石材成本合法，但两者不可同时为0。工具ID、槽数、最大耐久60/40、制作配方木3石2/木2石3、成功消耗1/工具倍率0.75、原F/B/高亮默认值、三类600秒再生及地图空间/种子/32敌人/出生保持。
 
 ## 【CURRENT STRATEGY】服务端资格与事务
 
@@ -55,7 +55,7 @@ RepairSystem在原CraftSystem之后、InventoryDrop/统一F入口/PlayerRespawn�
 
 CombatPrototypePlayerInput新增RepairAxe/RepairPickaxe两个InputEvent，共15实例字段；数字3/4单次按下与B按钮布尔请求合并，按住不连续修理。原13字段及F/G/1/2语义保持。修理反馈CombatPrototypeMapToolRepairFeedback仅SendToOwner同步Sequence(uint)、Kind(byte工具枚举)、Result(byte结果枚举)，Baker初始0/None/None；不是库存或耐久真值。
 
-Result依次为None、Success、Disabled、NotOwned、AlreadyFull、InsufficientMaterials、Busy、ExistingOperationHasPriority、PlayerUnavailable、Failed。原工具缓冲仍唯一同步ToolId/Durability，原制作/丢弃反馈与F/G/资源状态各四字段保持；无新RPC或协商协议。输入和玩家Ghost烘焙布局变化，各端必须同版代码/配置并重新烘焙。
+Result依次为None、Success、Disabled、NotOwned、AlreadyFull、InsufficientMaterials、Busy、ExistingOperationHasPriority、PlayerUnavailable、Failed。原工具缓冲仍唯一同步ToolId/Durability，原制作/丢弃反馈、F/资源状态各四字段及G六字段保持；无新RPC或协商协议。输入和玩家Ghost烘焙布局变化，各端必须同版代码/配置并重新烘焙。
 
 玩家存档仍写v2、读v1迁移，路径、UTF-8、原子文件替换与Tools[ToolId/Durability]契约保持；修理只保存原材料/工具字段，不保存反馈、面板或输入。重连/重启沿原加载恢复修理后的Tools，死亡/R不补满。
 
@@ -71,10 +71,12 @@ Result依次为None、Success、Disabled、NotOwned、AlreadyFull、Insufficient
 
 ## 【KNOWN ISSUES】静态证据与人工边界
 
-正常Unity编译无C# Error，新所属Ghost Serializer已生成；3反馈字段/SendToOwner、15输入、F/G/资源状态各4、工具定义11、工具Settings4、面板配置28经静态反射核对。Forest/Grassland各9次隔离Editor烘焙共18次：Json默认、BuiltIn默认、修理关闭、工具关闭、面板关闭、F文字关闭、全部显示关闭、采矿关闭及自定义修理值/文案（单类材料为0）。两来源等价，4个工具Settings/两条11字段定义/全部28面板设置、玩家零修理/制作反馈和空工具、原F/G/资源状态初值、掉落Prepared/Prefab与完整配置对应布局核对通过。默认树89/53、采集36/38、矿20/18、阻挡109/71保持；烘焙Console前后均[0 Error,8 Warning,47 Log]，主场景干净，临时World/Scene/TextAsset释放。
+修理v14/17阶段正常Unity编译无C# Error，新所属Ghost Serializer已生成；3反馈字段/SendToOwner、15输入、F/G/资源状态各4、工具定义11、工具Settings4、面板配置28经静态反射核对。Forest/Grassland各9次隔离Editor烘焙共18次：Json默认、BuiltIn默认、修理关闭、工具关闭、面板关闭、F文字关闭、全部显示关闭、采矿关闭及自定义修理值/文案（单类材料为0）。两来源等价，4个工具Settings/两条11字段定义/全部28面板设置、玩家零修理/制作反馈和空工具、原F/G/资源状态初值、掉落Prepared/Prefab与完整配置对应布局核对通过。默认树89/53、采集36/38、矿20/18、阻挡109/71保持；烘焙Console前后均[0 Error,8 Warning,47 Log]，主场景干净，临时World/Scene/TextAsset释放。
 
 用户已确认本阶段人工GamePlayer验收通过，主线程结合既有静态核对与用户反馈判定阶段通过；范围限CombatPrototypeNetCode、schemaVersion=14/configRevision=17及[运行入口](Runtime.md)十二项清单。人工结论来自用户反馈；旧资源状态v13/16十项、高亮v12/15十项、G文字v11/14十项、丢弃v10/13十二项、面板v9/12十二项、工具v8/11十二项及更早用户通过保持原版本/清单。未实际触发的独立资格/同tick/延迟/预测、配置/快照/保存/提交/恢复、多玩家/晚加入/生命周期分支，以及未覆盖字形/排版、性能/带宽、平台/线上与文件替换后意外ECS故障恢复仍UNKNOWN。AI未执行GamePlayer/PlayMode、游戏模拟/显示系统/GUI回调、逻辑单元测试、命令行构建、发布、性能采样或图片检查，未创建子Agent或提交Git。
 
 ## 【FACT】地图资源存档接入边界
 
-当前地图另接[资源存档](MapResourcePersistence.md)，原修理先保存后扣料/耐久、15输入及所属结果保持；世界档不保存Tools或修理反馈。修理用户通过限v14/17十二项，资源存档人工通过限v15/18十二项，未触发用例UNKNOWN。 掉落恢复及同文件快照归[掉落存档](MapDropPersistence.md)，本阶段人工UNKNOWN。
+当前地图另接[资源存档](MapResourcePersistence.md)，原修理先保存后扣料/耐久、15输入及所属结果保持；世界档不保存Tools或修理反馈。修理用户通过限v14/17十二项，资源存档人工通过限v15/18十二项，未触发用例UNKNOWN。 掉落恢复及同文件快照归[掉落存档](MapDropPersistence.md)，人工通过限v16/19十二项，未触发用例UNKNOWN。
+
+寿命提示v17/20归[G提示](MapPickupHud.md)：所属G六字段，原目标/拾取/期限/保存保持，主线程静态通过、新人工UNKNOWN；旧用户通过仍限原版本/清单。

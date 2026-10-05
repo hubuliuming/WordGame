@@ -15,11 +15,11 @@
 
 ## 【FACT】当前默认配置
 
-Json/BuiltIn v16/19，三类资源600秒再生。[工具](MapGatherTools.md)、[树](MapTreeHarvest.md)、[矿](MapMining.md)、[G](MapPickupHud.md)/[掉落](MapDrops.md)、[高亮](MapInteractionHighlight.md)归专题；[状态](MapResourceStatusHud.md)静态及用户人工通过，限v13/16十项。
+Json/BuiltIn v17/20，三类资源600秒再生。[工具](MapGatherTools.md)、[树](MapTreeHarvest.md)、[矿](MapMining.md)、[G](MapPickupHud.md)/[掉落](MapDrops.md)、[高亮](MapInteractionHighlight.md)归专题；[状态](MapResourceStatusHud.md)静态及用户人工通过，限v13/16十项。
 
 | 配置字段 | 当前值与用途 |
 |---|---|
-| schemaVersion / configRevision | 16 / 19 |
+| schemaVersion / configRevision | 17 / 20 |
 | defaultSeed | 12345，用于确定性布置 |
 | geometry.cellSizeMeters | 2 米 |
 | geometry.cellsPerChunk | 每块单边 16 格，即 32×32 米 |
@@ -53,7 +53,7 @@ gather_apple 的 footprintRadiusMeters=0.3、minimumSameTypeSpacingMeters=1.5、
 
 ## 【FACT】JSON 文件与配置入口
 
-五份UTF-8无BOM JSON，地图v16/19；[存档](MapResourcePersistence.md)含[掉落](MapDropPersistence.md)；旧v15/18通过限十二项。生态含treeObjectId/gatherObjectId/mineObjectId、mineDensityPer100m2，物体含mine_rock；原地表、空间、种子和出生保持。
+五份UTF-8无BOM JSON，地图v17/20；[存档](MapResourcePersistence.md)含[掉落](MapDropPersistence.md)；v15/18、v16/19各通过十二项。生态含treeObjectId/gatherObjectId/mineObjectId、mineDensityPer100m2，物体含mine_rock；原地表、空间、种子和出生保持。
 
 | MapAuthoring 字段 | 显式绑定文件 | JSON 根类型 |
 |---|---|---|
@@ -63,7 +63,7 @@ gather_apple 的 footprintRadiusMeters=0.3、minimumSameTypeSpacingMeters=1.5、
 | GroundsJson | [grounds.json](../../Assets/Config/CombatPrototype/Map/grounds.json) | GroundDefinitionConfig 数组 |
 | ObjectsJson | [objects.json](../../Assets/Config/CombatPrototype/Map/objects.json) | MapObjectDefinitionConfig 数组 |
 
-SourceMode=BuiltIn 时明确使用内置来源，SourceMode=Json 时使用选中地图 JSON 和三份共享 JSON；Json 来源失败不自动回退 BuiltIn。Preset=Grassland 要求地图 ID 为 battle_grassland_01，Preset=Forest 要求 battle_forest_01。schemaVersion=16为契约版本，configRevision须为正整数；旧v1～v15或缺少必填字段明确失败，不补字段或回退来源。
+SourceMode=BuiltIn 时明确使用内置来源，SourceMode=Json 时使用选中地图 JSON 和三份共享 JSON；Json 来源失败不自动回退 BuiltIn。Preset=Grassland 要求地图 ID 为 battle_grassland_01，Preset=Forest 要求 battle_forest_01。schemaVersion=17为契约版本，configRevision须为正整数；旧v1～v16或缺少必填字段明确失败，不补字段或回退来源。
 
 [MapMovementConfig.cs](../../Assets/Scripts/CombatPrototype/Map/MapMovementConfig.cs) 是地图定义的必填 movement 段：
 
@@ -161,4 +161,4 @@ Map Baker 将再生开关/间隔写入物体定义，GatherSpawnSystem 复制到
 
 HUD通过限v7/10，工具限v8/11、[面板](MapInventoryPanel.md)限v9/12原清单。[丢弃](MapInventoryDrop.md)v10/13静态及用户人工通过限十二项，未触发用例UNKNOWN。
 
-[G提示](MapPickupHud.md)静态及用户人工通过，范围见专题。
+[G提示](MapPickupHud.md)原验收及寿命范围见专题。

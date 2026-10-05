@@ -43,8 +43,8 @@ namespace Code_01.CombatPrototype.Map
             ValidateInventoryPanel(map.inventoryPanel);
             ValidateInventoryDrop(map.inventoryDrop);
             Id(map.mapDefinitionId, "mapDefinitionId");
-            if (map.schemaVersion != 16 || map.configRevision < 1 || map.defaultSeed < 1)
-                throw new InvalidOperationException("Map requires schemaVersion=16, positive revision and seed.");
+            if (map.schemaVersion != 17 || map.configRevision < 1 || map.defaultSeed < 1)
+                throw new InvalidOperationException("Map requires schemaVersion=17, positive revision and seed.");
             var drops = map.drops;
             Id(drops.itemId, "drops.itemId");
             Id(drops.visualResourceKey, "drops.visualResourceKey");
@@ -304,16 +304,24 @@ namespace Code_01.CombatPrototype.Map
             Positive(pickup.panelWidthPixels, "pickupHud.panelWidthPixels");
             Positive(pickup.panelHeightPixels, "pickupHud.panelHeightPixels");
             Nonnegative(pickup.bottomMarginPixels, "pickupHud.bottomMarginPixels");
+            Positive(pickup.expiryWarningSeconds, "pickupHud.expiryWarningSeconds");
+            var minimumHeight = pickup.lifetimeEnabled ? 2d * pickup.fontSize + 40d : (double)pickup.fontSize + 32d;
             if (pickup.fontSize <= 0 || pickup.panelWidthPixels <= 32f || pickup.panelWidthPixels > 1920f ||
-                pickup.panelHeightPixels < (double)pickup.fontSize + 32d ||
+                pickup.panelHeightPixels < minimumHeight ||
                 (double)pickup.panelHeightPixels + pickup.bottomMarginPixels > 1080d ||
                 pickup.bottomMarginPixels < (double)interaction.bottomMarginPixels + interaction.panelHeightPixels + 16d)
                 throw new InvalidOperationException("pickupHud requires positive font size, width in (32,1920], " +
-                    "height >= fontSize+32, height+bottom margin <= 1080, and bottom margin at least 16 pixels above the F panel.");
+                    "height >= 2*fontSize+40 with lifetime enabled (otherwise fontSize+32), " +
+                    "height+bottom margin <= 1080, and bottom margin at least 16 pixels above the F panel.");
             HudLabel(pickup.pickupLabel, "pickupHud.pickupLabel");
             HudLabel(pickup.appleLabel, "pickupHud.appleLabel");
             HudLabel(pickup.woodLabel, "pickupHud.woodLabel");
             HudLabel(pickup.stoneLabel, "pickupHud.stoneLabel");
+            HudLabel(pickup.expiresInLabel, "pickupHud.expiresInLabel");
+            HudLabel(pickup.permanentLabel, "pickupHud.permanentLabel");
+            HudLabel(pickup.expiringSoonLabel, "pickupHud.expiringSoonLabel");
+            HudLabel(pickup.secondsLabel, "pickupHud.secondsLabel");
+            HighlightColor(pickup.expiryWarningColorHex, "pickupHud.expiryWarningColorHex");
         }
 
         private static void ValidateInventoryDrop(MapInventoryDropConfig drop)

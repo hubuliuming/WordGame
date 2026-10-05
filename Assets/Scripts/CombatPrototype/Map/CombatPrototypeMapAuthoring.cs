@@ -127,7 +127,15 @@ namespace Code_01.CombatPrototype.Map
                     PickupLabel = new FixedString64Bytes(pickupHud.pickupLabel),
                     AppleLabel = new FixedString64Bytes(pickupHud.appleLabel),
                     WoodLabel = new FixedString64Bytes(pickupHud.woodLabel),
-                    StoneLabel = new FixedString64Bytes(pickupHud.stoneLabel)
+                    StoneLabel = new FixedString64Bytes(pickupHud.stoneLabel),
+                    LifetimeEnabled = (byte)(pickupHud.lifetimeEnabled ? 1 : 0),
+                    ExpiryWarningEnabled = (byte)(pickupHud.expiryWarningEnabled ? 1 : 0),
+                    ExpiryWarningSeconds = pickupHud.expiryWarningSeconds,
+                    ExpiresInLabel = new FixedString64Bytes(pickupHud.expiresInLabel),
+                    PermanentLabel = new FixedString64Bytes(pickupHud.permanentLabel),
+                    ExpiringSoonLabel = new FixedString64Bytes(pickupHud.expiringSoonLabel),
+                    SecondsLabel = new FixedString64Bytes(pickupHud.secondsLabel),
+                    ExpiryWarningColor = CombatPrototypeMapInteractionHighlightSettings.ColorFromHex(pickupHud.expiryWarningColorHex)
                 });
                 var highlight = config.map.interactionHighlight;
                 AddComponent(entity, new CombatPrototypeMapInteractionHighlightSettings

@@ -6,32 +6,39 @@
 
 | 文件 | 当前职责 |
 |---|---|
-| [MapPickupHudConfig](../../Assets/Scripts/CombatPrototype/Map/MapPickupHudConfig.cs) | pickupHud 的九个必填 JSON 字段 |
-| [PickupHudData](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapPickupHudData.cs) | 原地图根显示 Settings 与玩家所属四字段快照 |
+| [MapPickupHudConfig](../../Assets/Scripts/CombatPrototype/Map/MapPickupHudConfig.cs) | pickupHud 的17个必填 JSON 字段 |
+| [PickupHudData](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapPickupHudData.cs) | 原地图根17字段Settings与玩家所属六字段快照 |
 | [DropTargetSelector](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapDropTargetSelector.cs) | 原 G 与新提示共用的只读最近掉落选择 |
 | [PickupHudStateSystem](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapPickupHudStateSystem.cs) | 服务端在 PlayerRespawn 后采样资格/目标，只提交显示状态 |
-| [PickupHudClient](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapPickupHudClient.cs) | 普通 C# 帮助类，缓存文案/样式并在 Repaint 绘制 |
+| [PickupHudClient](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapPickupHudClient.cs) | 原G行及双行布局；读取错误在显示边界记录并收起 |
+| [寿命快照](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapPickupLifetimeHudSnapshot.cs) | 服务端读取目标实际ExpiresAt，投影寿命模式/向上取整秒数 |
+| [寿命绘制](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapPickupLifetimeHudClient.cs) | 校验所属寿命字段，缓存文案与预警颜色，沿原Repaint委托绘制 |
 | [原G入口](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapDropPickupSystem.cs) | GetPickupHintRejection 共用原资格，Select 共用目标；结算块保持 |
 | [原HUD宿主](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapInteractionHud.cs) / [绑定](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapInteractionHudBindingSystem.cs) | 原 Main Camera 组件委托独立 G 面板，沿原本地玩家/连接与生命周期绑定 |
 | [Map Baker](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapAuthoring.cs) / [Player Baker](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypePlayerNetCodeAuthoring.cs) | 地图 Settings 与玩家初始 Hidden 数据 |
 
-五个新脚本及 meta 已由正常 Unity 导入。新客户端类不是 MonoBehaviour，未新增组件挂载或 Scene/SubScene/Prefab/Animator 结构，也未修改旧 meta、资源绑定、网格/材质/字体/图片、包或构建配置。Baker 追加玩家 ECS 显示数据，烘焙后的 Ghost 布局变化；各端须同版代码、配置并重新烘焙。当前输入15字段的新增修理归[专题](MapToolRepair.md)，G没有新增目标命令、RPC、版本协商或玩家存档字段。
+v11/14阶段五个新脚本及meta、v17/20寿命接入两个普通助手及meta均由正常Unity导入。新客户端类不是 MonoBehaviour，未新增组件挂载或 Scene/SubScene/Prefab/Animator 结构，也未修改旧 meta、资源绑定、网格/材质/字体/图片、包或构建配置。Baker 追加玩家 ECS 显示数据，烘焙后的 Ghost 布局变化；各端须同版代码、配置并重新烘焙。当前输入15字段的新增修理归[专题](MapToolRepair.md)，G没有新增目标命令、RPC、版本协商或玩家存档字段。
 
 ## 【FACT】当前 JSON 契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为 schemaVersion=16/configRevision=19，pickupHud段及全部九字段必填，[interactionHighlight](MapInteractionHighlight.md)亦为必填地图段。沿原严格 UTF-8/缺失/未知/重复字段/类型和语义校验；旧 v1～v15 明确失败，不迁移、补默认段或回退来源。正常导入/烘焙后生效，没有运行热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为 schemaVersion=17/configRevision=20，pickupHud段及全部17字段必填，[interactionHighlight](MapInteractionHighlight.md)亦为必填地图段。沿原严格 UTF-8/缺失/未知/重复字段/类型和语义校验；旧 v1～v16 明确失败，不迁移、补默认段或回退来源。正常导入/烘焙后生效，没有运行热重载。
 
 | 字段 | 当前默认值 | 契约 |
 |---|---|---|
 | enabled | true | 仅控制 G 文字；G 文字与 G 高亮均关闭时快照 Hidden，原 G 结算继续 |
 | panelWidthPixels | 400 | 有限，32 < 宽度 <= 1920 |
-| panelHeightPixels | 52 | 有限正数，至少 fontSize+32 |
+| panelHeightPixels | 84 | 有限正数；lifetimeEnabled时至少2*fontSize+40，否则至少fontSize+32 |
 | bottomMarginPixels | 168 | 有限非负；高度+底距<=1080，且至少为 F 面板底距+高度+16 |
 | fontSize | 20 | 正整数 |
 | pickupLabel | Pick up | 非空白、无控制字符、最多61个UTF-8字节 |
 | appleLabel | Vitality Apple | 同上，对应 vitality_apple |
 | woodLabel | Wood | 同上，对应 wood |
 | stoneLabel | Stone | 同上，对应 stone |
+| lifetimeEnabled | true | 必填布尔，控制G目标的寿命第二行 |
+| expiryWarningEnabled | true | 必填布尔，仅寿命开启且真实余时不超过阈值时预警 |
+| expiryWarningSeconds | 30 | 有限正数，关闭仍校验，不受新掉落600秒默认值限制 |
+| expiresInLabel / permanentLabel / expiringSoonLabel / secondsLabel | Expires in / Permanent / Expiring soon / s | 四个必填文案，沿原非空白/无控制字符/最多61个UTF-8字节规则 |
+| expiryWarningColorHex | #FFB454 | 必填#RRGGBB，六位大小写十六进制；Baker写RGB float3，文字alpha为1 |
 
 关闭显示仍校验全部字段、几何关系与文案。F 面板尺寸改变时，G 底距须满足上述间隔；没有自动搬移或默认位置兜底。拾取距离唯一读取原 drops.pickupDistanceMeters，默认2米；没有另设提示半径。标签独立于 inventoryDrop.items，仍支持原三种掉落物品，不因敌人掉落或某种产出功能关闭而关闭已有物体的提示。
 
@@ -47,7 +54,7 @@ PickupHudStateSystem 在服务端 PredictedSimulation、PlayerRespawn 后执行�
 
 ## 【FACT】所属 Ghost 快照
 
-CombatPrototypeMapPickupHudState 使用 OwnerSendType=SendToOwner，四个 GhostField 仅发送给所属玩家：
+CombatPrototypeMapPickupHudState使用OwnerSendType=SendToOwner，六个GhostField仅发送给所属玩家；实际生成Serializer/Snapshot已包含新增两字段：
 
 | 字段 | 当前含义 |
 |---|---|
@@ -55,14 +62,18 @@ CombatPrototypeMapPickupHudState 使用 OwnerSendType=SendToOwner，四个 Ghost
 | DropId | int，Ready 为原正数 ID；Hidden 为0 |
 | ItemId | FixedString64Bytes，原 vitality_apple/wood/stone；Hidden 为空 |
 | Quantity | int，Ready 为目标实际正数量；Hidden 为0 |
+| LifetimeMode | byte枚举：0 None、1 Timed、2 ExpiringSoon、3 Permanent；Hidden或G文字/寿命关闭时None |
+| RemainingSeconds | float、Quantization=0；Timed/ExpiringSoon为有限正整数秒，Permanent/None/Hidden为0 |
 
-没有同步世界位置、到期时间或另一套工作计时器，原四字段 F 状态保持。新状态不是输入/结算依据；网络延迟可能使提示滞后，显示后目标也可能被其他玩家取走或到期。当前位置下的 G 实际目标始终由服务端决定。
+不发送世界位置或绝对ExpiresAt；仅投影目标余时，不新增工作计时器。原F及资源状态各四字段、15输入、Drop Ghost四字段保持；G布局由四变六，各端须同版重新烘焙。新状态不是输入/结算依据；网络延迟可能使提示滞后，显示后目标也可能被其他玩家取走或到期。当前位置下的 G 实际目标始终由服务端决定。
 
 ## 【CURRENT STRATEGY】显示、开关与释放
 
 沿原绑定枚举启用 GhostOwnerIsLocal 并核对所属 Connected/InGame 连接，只取本地存活玩家快照；不在含可启用组件的查询上调用单例 API。PickupHudClient只读取烘焙Settings和显示快照，不读PlayerView/世界坐标，不修改玩家或服务端数据。原绑定另委托[高亮解析](MapInteractionHighlight.md)读取对应客户端掉落位置；Main Camera原宿主先画G/F圆环，再走原B、G、F面板路径，原输入和制作/丢弃反馈保持。
 
-Ready 显示“G  Pick up  物品文案 ×实际数量”，Hidden 收起；DropId 保留在快照中供目标身份记录，屏幕不显示数值 ID。1920×1080 参考像素按 min(屏幕宽/1920,屏幕高/1080) 等比缩放，底部居中。默认400×52、底距168、字号20，与原320×104、底距48的 F 面板间隔16像素；两种提示可同时显示。黑色背景alpha=0.7、白色文字，复用内置GUI字体及Texture2D.whiteTexture，richText=false；仅Repaint绘制，缓存稳定文案/样式，恢复GUI.matrix/color，不接管鼠标或键盘事件。
+Ready第一行继续显示“G  Pick up  物品文案 ×实际数量”，寿命开启时第二行显示“Expires in 120s”；真实余时≤30秒且预警开启时显示橙色“Expiring soon 30s”；ExpiresAt=0显示白色“Permanent”。服务端按当前目标的实际ExpiresAt减模拟时间、向上取整投影秒数，预警使用未取整余时；不从drops.lifetimeSeconds重新计算、不在客户端用墙钟递减。到期仍由原G选择/清理链处理，合法未到期物不提前显示0秒；保存恢复后显示原恢复期限，离线暂停规则保持。状态变化才写六字段，平稳同秒不因时间推进重复改快照；网络延迟可使文字滞后，实际到期/拾取以服务端为准。
+
+默认G为400×84、底距168、字号20；资源状态行400×52的底距由236改268，保持与G间隔16像素，F仍320×104/底48。两行各字号+4高、间隔8，整体垂直居中；寿命关闭沿单行G路径，默认配置高度仍84，可显式配置52并同步状态底距236。Hidden收起两行。沿1920×1080参考像素等比缩放、黑底alpha0.7、普通白字、内置GUI字体和Texture2D.whiteTexture、richText=false；只在父G面板的Repaint委托绘制，缓存稳定文案/样式并恢复GUI.matrix/color，不消费键鼠事件。
 
 pickupHud.enabled、interactionHud.enabled、inventoryPanel.enabled与interactionHighlight的主开关/F/G通道独立。关闭G文字仍可显示G高亮和实际拾取；关闭F HUD和背包面板仍可只显示G。三文字全关、无高亮通道且资源状态关闭时原绑定收起，键盘原玩法继续。死亡/断线、无本地玩家或地图、玩家/地图源变化、World/Scene停止及释放沿原Clear/Reset清掉可见状态和缓存，不保留上一局目标。非法网络快照明确报错并保持 G 隐藏，不以默认标签伪装有效目标。
 
@@ -78,8 +89,14 @@ v12/15的[高亮](MapInteractionHighlight.md)按原DropId解析同一客户端La
 
 v13/16的[资源状态](MapResourceStatusHud.md)在G面板上方增加一行；G的开关、采样资格、四字段、DropId与拾取规则保持。资源状态不显示掉落期限，也不改变G蓝圈；仅状态开启仍保留整体绑定。新显示静态及用户人工通过，限v13/16十项，未触发用例UNKNOWN，旧G/高亮通过保持原版本/清单。
 
-当前v16/19的[工具修理](MapToolRepair.md)新增两个输入和所属结果，遇同tick G请求时修理拒绝；G目标/资格/入包/保存/显示均保持原链，新增修理静态及用户人工通过，限v14/17十二项，未触发用例UNKNOWN。
+当前v17/20的[工具修理](MapToolRepair.md)新增两个输入和所属结果，遇同tick G请求时修理拒绝；G目标/资格/入包/保存/显示均保持原链，新增修理静态及用户人工通过，限v14/17十二项，未触发用例UNKNOWN。
 
 ## 【FACT】地图资源存档接入边界
 
-世界v2档开启掉落开关时恢复地面物及编号上限，详见[掉落存档](MapDropPersistence.md)；原G目标/所属四字段/TTL和入包事务保持。资源存档人工通过限v15/18十二项，未触发用例UNKNOWN，见[资源存档](MapResourcePersistence.md)。
+世界v2档开启掉落开关时恢复地面物及编号上限，详见[掉落存档](MapDropPersistence.md)；原G目标/TTL和入包事务保持；所属显示由四变六，寿命仅属上述显示投影。资源存档人工通过限v15/18十二项，未触发用例UNKNOWN，见[资源存档](MapResourcePersistence.md)。
+
+## 【KNOWN ISSUES】寿命提示与到期预警的验收边界
+
+v17/revision20寿命链正常Unity编译无C# Error；实际Assembly与生成Serializer/Snapshot六字段、SendToOwner、RemainingSeconds无量化、17配置/Settings及两助手已核对。原15输入、F/资源状态各4、Drop Ghost4、世界根9/掉落条目8保持。Forest/Grassland各13种隔离Editor烘焙共26次：Json/BuiltIn、寿命关闭、预警关闭、G文字关闭、文字/G圈均关、自定义5.5秒/四文案/秒单位/RGB与尺寸、资源状态关闭、寿命关闭且恢复52/236布局、仅G文字、永久Lifetime=0、世界存档关闭、地面存档关闭。两来源等价，17Settings及Hidden/None/0初值、三掉落Prefab/Prepared、原工具/反馈/F/高亮/资源状态、完整原布置与资源签名均通过；森林/草地树89/53、采集36/38、矿20/18、阻挡109/71保持。编译后及隔离烘焙前后Console均[0 Error,0 Warning,0 Log]，主场景干净、临时World/Scene/TextAsset释放；AI未主动清Console。
+
+主线程代码/配置静态验收通过；本阶段人工GamePlayer为UNKNOWN，十二项清单归[运行入口](Runtime.md)。原G文字v11/14十项、高亮v12/15十项、资源状态v13/16十项、工具修理v14/17十二项、资源存档v15/18十二项、掉落存档v16/19十二项及更早用户通过保持旧版本/清单，不覆盖新增寿命显示。真实倒计时/30秒或小数阈值边界/永久物/恢复余时、排版/颜色/字形、模式与目标切换、同tick/延迟/多玩家/晚加入/断线及独立配置/绑定/快照/绘制/保存/清理失败仍UNKNOWN；带宽/性能/平台/线上、玩家与世界跨文件原子一致/防重复及意外ECS恢复不属于通过范围。未修改Scene/SubScene/Prefab/Animator/旧meta/资源引用、原G/选择/运动/到期/保存链、输入或HUD宿主/绑定脚本；两助手不挂组件。AI未运行游戏/显示系统/GUI回调、GamePlayer/PlayMode、逻辑单元测试、构建、发布、性能采样或图片检查，未读取真实存档、创建子Agent或提交Git。

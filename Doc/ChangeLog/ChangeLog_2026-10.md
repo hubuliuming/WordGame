@@ -713,3 +713,17 @@
 - 只保存已提交未到期物及编号上限，排除Prepared/Consumed/清理队列；飞行物保存原落点、恢复Landed，离线暂停TTL，永久物保持。玩家准入前完整恢复并登记原所有权，失败清理本批并Failed；资源/掉落双完整缓存同时交换，关闭只读缓存，世界写失败不回滚原结算，跨文件重复物品风险明确保留。
 - 正常Unity编译与实际字段反射通过，Forest/Grassland各12种隔离Editor烘焙共24次通过；Settings5/配置4/世界根9/掉落8，原输入15/DropGhost4及原布局/Prefab/反馈保持。Console前后[0 Error,1 Warning,0 Log]相同，主场景干净、临时对象释放。Scene/SubScene/Prefab/Animator、旧meta/资源绑定/图片字体材质、包/构建配置与原G/结算/清理保持。
 - 增量同步新掉落存档专题、相关模块/导航、项目外配置模板及Runtime十二项清单，原201项编号/内容及旧用户通过保持原范围。主线程静态验收通过，新GamePlayer/真实I-O/迁移重启/飞行TTL/多人生命周期/独立失败/跨文件ECS/性能平台线上UNKNOWN；AI未运行真实存档读写、游戏/显示系统、GUI回调、逻辑单元测试、PlayMode、构建、发布、采样或图片检查，未创建子Agent或提交Git。
+
+## 2026-10-05 地面掉落物存档人工验收通过
+
+- 用户确认地面掉落物存档与恢复人工GamePlayer验收通过；主线程结合既有代码/配置静态核对与用户反馈判定通过，范围限CombatPrototypeNetCode、地图v16/revision19、世界v2及Runtime对应十二项清单，结论来自用户反馈。
+- 同步掉落/资源存档专题、地图/背包/数据入口、相关模块边界、AI导航和项目外配置建议模板的验收状态；保留原213项编号/内容及更早通过范围。未触发独立失败、跨文件防重复/原子一致、意外ECS恢复、同槽并发、未覆盖字形与性能/带宽/平台/线上保持UNKNOWN。
+- 本次只更新文档及UTF-8/链接/体量/差异静态检查；未修改脚本、JSON、Scene/SubScene/Prefab/Animator、meta、资源或构建配置，未读取图片或真实存档，未执行PlayMode/游戏系统/GUI回调、逻辑单元测试、编译/烘焙、构建、发布、采样，未创建子Agent或提交Git。
+
+## 2026-10-05 掉落物寿命提示与到期预警接入
+
+- 按已确认范围接入CombatPrototypeNetCode G目标寿命第二行；两个普通C#助手负责实际ExpiresAt投影与文案/预警绘制，meta由Unity正常导入。原G选择/拾取、生成/运动/到期清理、玩家/世界存档、输入及HUD宿主/绑定保持。
+- 两地图Json与BuiltIn升级schema17/revision20，pickupHud由9变17必填字段：寿命true、预警true、30秒、四文案/秒单位及#FFB454；关闭仍严格校验。G高度52改84，资源状态底距236改268，保持16像素间隔；新字段经原Baker写入17Settings。
+- 所属G显示由4变6：LifetimeMode及无量化RemainingSeconds，生成Serializer/Snapshot已实际反射核对。基于目标服务端实际余时、向上取整秒数与未取整预警边界；永久为Permanent/0，Hidden或关闭为None/0。原15输入、F/资源状态各4、Drop Ghost4及存档v2格式/路径和合法v1读取保持，各端须同版重新烘焙。
+- 正常Unity编译无C# Error；Forest/Grassland各13种隔离Editor烘焙共26次通过，配置/Settings/六字段初值、原布局/签名/三个掉落Prefab及反馈保持。隔离烘焙Console前后[0 Error,0 Warning,0 Log]一致，主场景干净、临时对象释放；同步相关专题/入口/策划模板，追加12项人工清单，原213项保留后共225项。
+- 主线程代码/配置静态验收通过，新增人工GamePlayer及实际倒计时/边界/永久物/恢复余时、布局/字形/颜色、独立失败、多玩家/延迟/生命周期/性能/带宽/平台/线上UNKNOWN。原用户通过保持旧版本/清单；Scene/SubScene/Prefab/Animator、旧meta、资源/包/构建配置未改，未运行游戏/GUI回调、逻辑单元测试、PlayMode、构建、发布、采样或图片检查，未读取真实存档、创建子Agent或提交Git。

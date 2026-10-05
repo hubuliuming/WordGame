@@ -17,7 +17,7 @@ namespace Code_01.CombatPrototype.Map
             {
                 map = new MapDefinitionConfig
                 {
-                    schemaVersion = 16, configRevision = 19,
+                    schemaVersion = 17, configRevision = 20,
                     mapDefinitionId = mapDefinitionId, defaultSeed = 12345,
                     resourcePersistence = new MapResourcePersistenceConfig
                     {
@@ -88,9 +88,12 @@ namespace Code_01.CombatPrototype.Map
                     },
                     pickupHud = new MapPickupHudConfig
                     {
-                        enabled = true, panelWidthPixels = 400f, panelHeightPixels = 52f,
+                        enabled = true, panelWidthPixels = 400f, panelHeightPixels = 84f,
                         bottomMarginPixels = 168f, fontSize = 20, pickupLabel = "Pick up",
-                        appleLabel = "Vitality Apple", woodLabel = "Wood", stoneLabel = "Stone"
+                        appleLabel = "Vitality Apple", woodLabel = "Wood", stoneLabel = "Stone",
+                        lifetimeEnabled = true, expiryWarningEnabled = true, expiryWarningSeconds = 30f,
+                        expiresInLabel = "Expires in", permanentLabel = "Permanent", expiringSoonLabel = "Expiring soon",
+                        secondsLabel = "s", expiryWarningColorHex = "#FFB454"
                     },
                     interactionHighlight = new MapInteractionHighlightConfig
                     {
@@ -104,7 +107,7 @@ namespace Code_01.CombatPrototype.Map
                     resourceStatusHud = new MapResourceStatusHudConfig
                     {
                         enabled = true, panelWidthPixels = 400f, panelHeightPixels = 52f,
-                        bottomMarginPixels = 236f, fontSize = 20, availableLabel = "Available",
+                        bottomMarginPixels = 268f, fontSize = 20, availableLabel = "Available",
                         workingLabel = "Working", occupiedLabel = "In use", regrowingLabel = "Regrows in",
                         waitingLabel = "Waiting to regrow", depletedLabel = "No regrowth"
                     },

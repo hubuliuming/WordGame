@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 16,
-  "configRevision": 19,
+  "schemaVersion": 17,
+  "configRevision": 20,
   "mapDefinitionId": "battle_grassland_01",
   "defaultSeed": 12345,
   "resourcePersistence": {
@@ -110,13 +110,21 @@
   "pickupHud": {
     "enabled": true,
     "panelWidthPixels": 400.0,
-    "panelHeightPixels": 52.0,
+    "panelHeightPixels": 84,
     "bottomMarginPixels": 168.0,
     "fontSize": 20,
     "pickupLabel": "Pick up",
     "appleLabel": "Vitality Apple",
     "woodLabel": "Wood",
-    "stoneLabel": "Stone"
+    "stoneLabel": "Stone",
+    "lifetimeEnabled": true,
+    "expiryWarningEnabled": true,
+    "expiryWarningSeconds": 30,
+    "expiresInLabel": "Expires in",
+    "permanentLabel": "Permanent",
+    "expiringSoonLabel": "Expiring soon",
+    "secondsLabel": "s",
+    "expiryWarningColorHex": "#FFB454"
   },
   "interactionHighlight": {
     "enabled": true,
@@ -138,7 +146,7 @@
     "enabled": true,
     "panelWidthPixels": 400,
     "panelHeightPixels": 52,
-    "bottomMarginPixels": 236,
+    "bottomMarginPixels": 268,
     "fontSize": 20,
     "availableLabel": "Available",
     "workingLabel": "Working",

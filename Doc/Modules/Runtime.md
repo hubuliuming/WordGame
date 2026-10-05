@@ -726,7 +726,7 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 
 ## 【KNOWN ISSUES】地面掉落物存档与恢复的人工验收
 
-入口CombatPrototypeNetCode，Json/Forest默认schemaVersion=16/configRevision=19、resourcePersistence=true/default_world/10秒/saveGroundDrops=true，世界档写v2、读v1迁移。正常Unity编译、字段反射及24次隔离Editor烘焙静态通过；新GamePlayer人工UNKNOWN，以下十二项待用户运行。单一服务端写同槽，各端同版代码/配置重新烘焙，沿原SinglePlayer或Online启动。
+入口CombatPrototypeNetCode，Json/Forest默认schemaVersion=16/configRevision=19、resourcePersistence=true/default_world/10秒/saveGroundDrops=true，世界档写v2、读v1迁移。正常Unity编译、字段反射及24次隔离Editor烘焙静态通过；用户已确认人工GamePlayer验收通过，主线程结合既有静态核对与用户反馈判定通过，限以下十二项清单；未实际触发的独立用例UNKNOWN。单一服务端写同槽，各端同版代码/配置重新烘焙，沿原SinglePlayer或Online启动。
 
 1. 首次无世界档进入，先保存九字段v2且Resources/Drops为空、LastDropId=0，再Ready准入。默认资源/布局、15输入、Drop四Ghost字段、F/G/资源状态四字段及玩家v2加载保持；客户端不读写世界文件。初始写失败不准入。
 2. 分别触发敌人苹果、砍树木材、采矿石材及背包Single/All丢弃；快照保留ItemId、实际数量、唯一DropId、落点及剩余寿命，LastDropId包含已分配空号。正常关闭/重启后，未领取物在原保存落点恢复Landed；不直接入包、不重新扣材料/耐久、不补偿发奖。
@@ -741,4 +741,23 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 11. 两Client、晚加入/重连读取服务端恢复的同一物品ID/数量/位置，G提示/高亮和拾取结算正常；恢复编号上限后新敌人/木材/石材/丢弃物不撞号，World释放仍由原DropSpawn/ECB拥有和清理。玩家/世界分别保存，G已入包后世界更新失败并中断可能重现旧物，本阶段不承诺跨文件防重复或同槽多服务端并发。
 12. 森林/草地、槽名/seed/资源签名隔离沿原规则；正常退出/重启、源更换/Scene/World退出重进只保存最后完整缓存，不读取已释放实体、无重复恢复/销毁。回归三类F采集/600秒再生/占位阻挡、G、工具制作/修理、Drop/All、B显示/高亮/资源状态、E/R/战斗/镜头及玩家保存。未实际触发的时序/清理/字形/性能用例UNKNOWN。
 
-本清单限v16/19、世界v2及本段默认四配置字段，完整契约归[掉落存档](MapDropPersistence.md)/[资源存档](MapResourcePersistence.md)。原201项编号/内容与v15/18资源存档十二项及更早用户通过保持原版本/清单，新增后共213项。本阶段人工、真实I/O/迁移/重启/飞行窗口/到期与永久物、独立解析/绑定/捕获/实例化/保存/清理失败、多玩家/生命周期与时序、跨文件/ECS、同槽并发、字形/性能/带宽/平台/线上仍UNKNOWN。AI未调用真实世界/玩家存档读写或运行游戏/显示系统、GUI回调、逻辑单元测试、GamePlayer/PlayMode、构建、发布、性能采样或图片检查，未创建子Agent或提交Git。
+本清单限v16/19、世界v2及本段默认四配置字段，完整契约归[掉落存档](MapDropPersistence.md)/[资源存档](MapResourcePersistence.md)。原201项编号/内容与v15/18资源存档十二项及更早用户通过保持原版本/清单，新增后共213项。本阶段人工结论来自用户反馈；未实际触发的独立I/O/迁移/重启/飞行窗口/到期与永久物、解析/绑定/捕获/实例化/保存/清理失败、多玩家/生命周期与时序仍UNKNOWN；跨文件原子一致与防重复、意外ECS故障恢复、同槽并发、未覆盖字形及性能/带宽/平台/线上不属于通过范围，仍UNKNOWN。AI未调用真实世界/玩家存档读写或运行游戏/显示系统、GUI回调、逻辑单元测试、GamePlayer/PlayMode、构建、发布、性能采样或图片检查，未创建子Agent或提交Git。
+
+## 【KNOWN ISSUES】掉落物寿命提示与到期预警的人工验收
+
+入口CombatPrototypeNetCode，Json/Forest默认schemaVersion=17/configRevision=20，各端同版重新烘焙。pickupHud新增寿命/预警两个true、阈值30秒、Expires in/Permanent/Expiring soon/s四文案及#FFB454；G400×84/底168/字号20，资源状态底268。正常Unity编译、六字段所属Serializer/Snapshot反射、17配置/Settings和26次隔离Editor烘焙静态通过；本阶段人工GamePlayer为UNKNOWN，以下十二项待用户运行。
+
+1. 森林/草地Json与BuiltIn默认生效，17字段完整必填、G所属六字段Hidden/None/0初值正确。关闭仍校验阈值/文案/颜色/尺寸；旧v1～v16、缺失/重复/未知字段、错布尔/数值/字符串、非有限或非正阈值、非法#RRGGBB和双行高度/G-F/资源状态间隔错误明确失败，无补默认/回退。独立失败未触发则UNKNOWN。
+2. 静止合格玩家靠近Landed苹果/木材/石材，第一行仍G Pick up物品×数量，第二行Expires in剩余秒数；只显示原最近G目标，2米及同距小DropId规则保持。Prepared/Airborne/Consumed、过期及范围外不显示；切换同种/异种目标和不同数量/余时无旧缓存残留。
+3. 剩余秒数由目标实际ExpiresAt减服务端模拟时间向上取整；30秒以上白字，实际余时≤30秒切橙色Expiring soon，取整不提前触发预警。有效余时不足1秒仍显示1s，实际到期后原选择/清理收起或切下一目标。检查默认及自定义5.5秒阈值，精确边界未触发保持UNKNOWN。
+4. PlayMode前设drops.lifetimeSeconds=0并正常重新烘焙，新永久物显示白色Permanent且余时字段0，不切预警、不倒数或自动过期。世界v2恢复的HasExpiry=false/0条目同样永久；Timed与Permanent切换不保留颜色/旧秒数。
+5. 存档开启并有成功快照后正常关闭/重启，原掉落ID/数量与余时恢复；新显示使用恢复后的ExpiresAt，不把旧物重置为当前600秒或新Lifetime，离线暂停计时。飞行物仍按原定落点恢复Landed再显示。世界仍写v2/合法v1内存迁移、玩家仍写v2/读v1，UI字段不写入存档或资源签名。
+6. lifetimeEnabled=false重新烘焙，仅原G一行及蓝圈/拾取保持；默认配置G高度仍84，可显式设52并将资源状态底距设236。expiryWarningEnabled=false仍显示剩余秒数，临期继续白色Expires in；原到期时刻保持。全部17字段即使关闭仍须合法。
+7. pickupHud.enabled=false、G高亮开启时只显示原蓝圈，G所属目标仍采样但寿命None/0；G文字与G圈同时关闭时六字段Hidden/零，原G仍可拾取。单独关闭F HUD/背包或资源状态仍可显示G寿命；全部显示关闭正确释放绑定。
+8. 改阈值、四文案、秒单位和颜色#12ABEF，经正常导入/烘焙生效；两行居中、间隔8、字号/宽度/双行最小高度校验正确。F320×104/底48、G400×84/底168、资源状态400×52/底268各相隔16，B及F同时显示、不同分辨率/缩放下不重叠；未覆盖排版/字形UNKNOWN。
+9. 移动/攻击/非Ready近战/死亡沿原G资格隐藏目标及寿命，恢复合格后重新采样；断线、重连/新玩家、地图/World/Scene源变化清可见状态与缓存。Hidden或关闭寿命时新字段必须None/0；非法寿命枚举/非有限/非正/非整数秒或Permanent非零余时在显示边界记录DropId/itemId/原异常并保持G隐藏。
+10. 按G仍由处理tick重新选目标、先保存玩家候选才库存/Consumed；成功后寿命行随目标消失或切换，保存失败且未到期时保留物和实际余时，不显示保存成功。仅文字绘制不发命令、不自动拾取或修改期限/数量/库存/工具。世界写失败及跨文件风险沿原边界。
+11. 两Client、晚加入/重连只收本人六字段快照，不使用客户端墙钟推演或读取其他玩家目标/服务端DropProgress；同一目标仍按原服务端时刻到期。网络延迟可能使文字滞后，实际拾取/到期依原服务端判断，未触发多玩家/延迟/预测时序保持UNKNOWN。
+12. 回归F三类采集/600秒再生/阻挡、G文字与蓝圈、B/工具制作与修理、Drop/All、E/R/战斗/镜头及玩家/资源/掉落保存。15输入、F/资源状态各4、Drop Ghost4和原反馈保持；关闭/重启及生命周期无上一局文字或预警颜色残留。独立绑定/捕获/绘制/保存/清理、性能/带宽/平台/线上UNKNOWN。
+
+本清单限v17/revision20寿命显示；原213项编号/内容与v16/19掉落存档十二项及更早用户通过保持旧版本/清单，新增后共225项。完整规则归[拾取提示](MapPickupHud.md)。新增人工、真实倒计时/小数阈值/永久物/恢复余时、排版/颜色/字形、独立失败、多玩家/晚加入/延迟与生命周期仍UNKNOWN；跨文件原子一致/防重复、意外ECS故障恢复、同槽并发及性能/带宽/平台/线上不属于通过范围。AI未调用真实玩家/世界存档读写或运行游戏/显示系统/GUI回调、GamePlayer/PlayMode、逻辑单元测试、构建、发布、采样或图片检查，未创建子Agent或提交Git。

@@ -17,11 +17,12 @@ namespace Code_01.CombatPrototype.Map
             {
                 map = new MapDefinitionConfig
                 {
-                    schemaVersion = 17, configRevision = 20,
+                    schemaVersion = 18, configRevision = 21,
                     mapDefinitionId = mapDefinitionId, defaultSeed = 12345,
                     resourcePersistence = new MapResourcePersistenceConfig
                     {
-                        enabled = true, saveSlotId = "default_world", saveIntervalSeconds = 10f, saveGroundDrops = true
+                        enabled = true, saveSlotId = "default_world", saveIntervalSeconds = 10f, saveGroundDrops = true,
+                        manualSaveEnabled = true, manualSaveCooldownSeconds = 5f
                     },
                     geometry = new MapGeometryConfig
                     {
@@ -110,6 +111,15 @@ namespace Code_01.CombatPrototype.Map
                         bottomMarginPixels = 268f, fontSize = 20, availableLabel = "Available",
                         workingLabel = "Working", occupiedLabel = "In use", regrowingLabel = "Regrows in",
                         waitingLabel = "Waiting to regrow", depletedLabel = "No regrowth"
+                    },
+                    worldSaveHud = new MapWorldSaveHudConfig
+                    {
+                        enabled = true, panelWidthPixels = 400f, panelHeightPixels = 84f,
+                        bottomMarginPixels = 336f, fontSize = 20, feedbackSeconds = 3f,
+                        disabledLabel = "World saving disabled", notSavedLabel = "No world checkpoint yet",
+                        savedLabel = "World saved", captureFailedLabel = "Snapshot failed", saveFailedLabel = "World save failed",
+                        manualSaveLabel = "F5 Save world", manualDisabledLabel = "Manual save disabled",
+                        cooldownLabel = "Save cooldown", unavailableLabel = "Save unavailable", errorColorHex = "#FF6B6B"
                     },
                     inventoryPanel = new MapInventoryPanelConfig
                     {

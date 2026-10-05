@@ -727,3 +727,20 @@
 - 所属G显示由4变6：LifetimeMode及无量化RemainingSeconds，生成Serializer/Snapshot已实际反射核对。基于目标服务端实际余时、向上取整秒数与未取整预警边界；永久为Permanent/0，Hidden或关闭为None/0。原15输入、F/资源状态各4、Drop Ghost4及存档v2格式/路径和合法v1读取保持，各端须同版重新烘焙。
 - 正常Unity编译无C# Error；Forest/Grassland各13种隔离Editor烘焙共26次通过，配置/Settings/六字段初值、原布局/签名/三个掉落Prefab及反馈保持。隔离烘焙Console前后[0 Error,0 Warning,0 Log]一致，主场景干净、临时对象释放；同步相关专题/入口/策划模板，追加12项人工清单，原213项保留后共225项。
 - 主线程代码/配置静态验收通过，新增人工GamePlayer及实际倒计时/边界/永久物/恢复余时、布局/字形/颜色、独立失败、多玩家/延迟/生命周期/性能/带宽/平台/线上UNKNOWN。原用户通过保持旧版本/清单；Scene/SubScene/Prefab/Animator、旧meta、资源/包/构建配置未改，未运行游戏/GUI回调、逻辑单元测试、PlayMode、构建、发布、采样或图片检查，未读取真实存档、创建子Agent或提交Git。
+
+
+## 2026-10-05 掉落物寿命提示与到期预警人工验收通过
+
+- 用户反馈“我已验收通过，接下来下一阶段”；主线程结合既有代码/配置静态核对、正常Unity编译、实际所属Serializer反射和26次隔离Editor烘焙，判定寿命显示阶段通过，限CombatPrototypeNetCode、schemaVersion=17/configRevision=20及Runtime对应十二项清单。人工结论来自用户反馈，AI未运行GamePlayer/PlayMode。
+- 同步G提示主文档、Runtime、相关模块、导航和策划模板的通过状态；原225项人工清单编号/内容及旧阶段版本范围保持。未实际触发的独立边界、失败、多玩家/延迟/生命周期与性能/平台仍UNKNOWN；玩家与世界跨文件原子一致、防重复和意外ECS恢复不在通过范围。
+- 本次仅修改验收文档；代码、JSON、Scene/SubScene/Prefab/Animator、meta/资源引用、包及构建配置保持。未执行逻辑单元测试、构建、发布、游戏/GUI回调、真实存档读写、采样或图片检查，未创建子Agent或提交Git。
+
+## 2026-10-05 地图存档状态提示与手动保存接入
+
+- 按已确认方案由主线程接入CombatPrototypeNetCode F5 SaveWorld，输入15→16；新普通请求助手执行所属资格、模拟时间全局冷却5秒与同tick请求合并。移动/攻击/采集预约允许，死亡/归属/连接/Simulate与Ready规则沿确认边界。
+- 原SaveSystem接受请求后当前tick完整捕获，手动与原自动触发仅一次写入；捕获失败不能用旧缓存完成手动请求，真实SavePrepared成功返回才Saved/Success。原变化/10秒检查点/关闭缓存保存、世界v2路径/9根/4资源/8掉落条目、合法v1读取及玩家v2保存链保持。
+- 两地图JSON及BuiltIn升级schema18/revision21，resourcePersistence配置4→6/Settings5→7，手动true/全局冷却5秒；新增worldSaveHud16必填字段，默认true/400×84/底336/字号20/反馈3秒/9文案/#FF6B6B。独立显示开关，关闭仍严格校验，资源状态上方间隔16；未增加热重载或新RPC。
+- 五新职责脚本/meta由Unity正常导入，Player增加Mode/ManualSequence/ManualResult所属3字段/Hidden初值，原HUD宿主/绑定委托新普通缓存类绘制。第一行当前会话保存结果，第二行本人序号变化结果；初次绑定不重播。原F4/G6/资源状态4、DropGhost4与资源签名保持，各端同版重新烘焙。
+- 正常Unity编译无C# Error，实际Assembly与生成Serializer/Snapshot字段核对通过；Forest/Grassland各13种隔离Editor烘焙共26次通过，两来源/新设置/初值/原布局/签名/Prefab/反馈一致。Console前后[2 Error,1 Warning,0 Log]不增加：2条为接入中提前刷新旧Forest缺manualSaveEnabled的历史错误，补齐升级后重新烘焙成功；1条MCP WebSocket警告。未清Console，主场景干净，临时对象释放。
+- 同步F5主文档、模块/导航/策划模板和Runtime，原225项人工清单完整保留后追加12项，共237项。编译/字段/配置烘焙静态通过，新增人工GamePlayer及真实写盘、冷却/同tick/多人/延迟/晚加入、失败/关闭恢复、布局/字形/颜色/生命周期/性能/平台仍UNKNOWN；旧用户通过限原版本/清单。跨文件事务/防重复、同槽并发及意外ECS恢复未新增保证。
+- Scene/SubScene/Prefab/Animator、旧meta、资源引用、图片/字体/材质、包及构建配置保持；原玩家存储与世界DTO/Store/Restore、资源/掉落结算及清理未改。未运行逻辑单元测试、GamePlayer/PlayMode、游戏/显示系统/GUI回调、真实存档读写、构建、发布、采样或图片检查，未创建子Agent或提交Git。

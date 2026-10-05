@@ -6,21 +6,21 @@
 
 | 文件 | 职责 |
 |---|---|
-| [配置DTO](../../Assets/Scripts/CombatPrototype/Map/MapResourcePersistenceConfig.cs) | enabled/saveSlotId/saveIntervalSeconds/saveGroundDrops四个必填字段 |
-| [运行数据](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapResourcePersistenceData.cs) | 五字段Settings、Pending/Ready/Failed恢复状态及资源身份绑定 |
+| [配置DTO](../../Assets/Scripts/CombatPrototype/Map/MapResourcePersistenceConfig.cs) | enabled/saveSlotId/saveIntervalSeconds/saveGroundDrops/manualSaveEnabled/manualSaveCooldownSeconds六个必填字段 |
+| [运行数据](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapResourcePersistenceData.cs) | 七字段Settings、Pending/Ready/Failed恢复状态及资源身份绑定 |
 | [存档DTO](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapResourceSaveData.cs) | 写v2九字段根、读v1迁移；耗尽四字段/掉落八字段 |
 | [布局签名](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapResourceLayoutSignature.cs) | 烘焙边界计算资源布局/再生规则SHA-256 |
 | [存储](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapResourceSaveStore.cs) | 严格UTF-8/JSON/身份校验和临时文件原子替换 |
 | [恢复](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapResourceRestoreSystem.cs) | 三类实例生成后整体校验、恢复耗尽/期限/阻挡，再开放准入 |
-| [保存](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapResourceSaveSystem.cs) | 原资源结算/再生后采样完整状态、变更/10秒检查点/关闭保存 |
+| [保存](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapResourceSaveSystem.cs) | 原资源结算/再生后采样完整状态、变更/10秒检查点/F5/关闭保存 |
 | [Map Baker](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapAuthoring.cs) | 原地图根追加Settings与恢复状态，不修改挂载 |
 | [原准入](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypeNetCodeLifecycle.cs) | Pending保留请求等待，Failed消费请求并断开，Ready沿原玩家加载 |
 
-七个新脚本均无MonoBehaviour挂载，meta由Unity正常导入生成。资源存档v15/18阶段未修改原采集、砍树、采矿、三类再生、工具/修理、玩家SaveStore、G及掉落脚本；当前新增掉落助手并调整DropSpawn/SpawnUtility，其他原结算/清理脚本保持；通过独立系统读取原已提交结果。Scene/SubScene/Prefab/Animator、旧meta、图片/字体/材质、资源引用、包和构建配置保持。
+资源存档v15/18阶段七个新脚本均无MonoBehaviour挂载，meta由Unity正常导入生成。资源存档v15/18阶段未修改原采集、砍树、采矿、三类再生、工具/修理、玩家SaveStore、G及掉落脚本；掉落存档阶段新增助手并调整DropSpawn/SpawnUtility，当前F5调整原SaveSystem，其他原结算/清理脚本保持；通过独立系统读取原已提交结果。Scene/SubScene/Prefab/Animator、旧meta、图片/字体/材质、资源引用、包和构建配置保持。
 
 ## 【FACT】配置与建议值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与BuiltIn当前schemaVersion=17/configRevision=20；resourcePersistence段必填，当前寿命显示归[G提示](MapPickupHud.md)。沿原严格字段、对象形状、标量类型与UTF-8校验，旧v1～v16拒绝，不迁移、补默认或回退来源；正常导入和烘焙后生效，无热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与BuiltIn当前schemaVersion=18/configRevision=21；resourcePersistence段必填，当前寿命显示归[G提示](MapPickupHud.md)。沿原严格字段、对象形状、标量类型与UTF-8校验，旧v1～v17拒绝，不迁移、补默认或回退来源；正常导入和烘焙后生效，无热重载。
 
 | 字段 | 默认值 | 校验 |
 |---|---|---|
@@ -28,8 +28,10 @@
 | resourcePersistence.saveSlotId | default_world | 1～61个小写ASCII字母、数字或下划线；拒绝con/prn/aux/nul/com1～com9/lpt1～lpt9 |
 | resourcePersistence.saveIntervalSeconds | 10 | 有限正数秒，按Server World模拟时间决定检查点 |
 | resourcePersistence.saveGroundDrops | true | 必填布尔；enabled同时开启才恢复/保存地面物；false沿旧规则重启清空 |
+| resourcePersistence.manualSaveEnabled | true | 必填布尔；F5开关，不关闭原自动保存 |
+| resourcePersistence.manualSaveCooldownSeconds | 5 | 有限正数秒，服务端全局冷却，接受失败也占用；规则归[F5](MapWorldSaveHud.md) |
 
-关闭存档仍校验全部字段。Map Baker写入Enabled/SaveGroundDrops/SaveSlotId/SaveIntervalSeconds/LayoutSignature五字段，签名为64个小写十六进制字符，使用FixedString128Bytes；另写一字段恢复状态，开启为Pending、关闭为Ready。地图根仍不是Ghost；存档数据由服务端系统消费，资源存档链未新增玩家/资源Ghost字段或输入。当前输入15、F4/G6/资源状态4及原反馈/资源字段保持，各端同版代码/配置重新烘焙。
+关闭存档仍校验全部字段。Map Baker写入Enabled/SaveGroundDrops/SaveSlotId/SaveIntervalSeconds/LayoutSignature/ManualSaveEnabled/ManualSaveCooldownSeconds七字段，签名为64个小写十六进制字符，使用FixedString128Bytes；另写一字段恢复状态，开启为Pending、关闭为Ready。地图根仍不是Ghost；存档数据由服务端系统消费，资源存档原阶段未新增Ghost或输入；当前F5新增SaveWorld及所属三字段归[保存提示](MapWorldSaveHud.md)。当前输入16、F4/G6/资源状态4及原反馈/资源字段保持，各端同版代码/配置重新烘焙。
 
 ## 【FACT】文件与身份
 
@@ -65,7 +67,7 @@ RestoreSystem仅ServerSimulation，在Simulation组的GatherSpawn/TreeSpawn/Mine
 
 SaveSystem仅ServerSimulation，位于预测组的三类Regrow之后、PlayerRespawn之前，并在DropCleanup/InventoryDrop之后，采样资源最终结果和已提交地面物。Ready且存档开启才绑定原恢复身份集合；每tick用预分配双缓冲采样全部资源，同时捕获DropSpawn拥有的未到期地面物及编号上限，两类均完整合法才交换缓存。工作阶段归为未耗尽，耗尽状态及启用再生的绝对期限变化触发保存；剩余秒数按最后完整采样模拟时间计算，钳制到[0,RegrowSeconds]。
 
-平稳期间按默认10秒检查点保存剩余秒数；状态变化触发当前保存点。只有保存时建立DTO/序列化，不每tick序列化或写盘。捕获失败记录map/slot/placement/原异常，保留最后完整缓存，按间隔再采样，不把半批读取写成世界档。世界文件使用同目录.tmp、Flush(true)、File.Replace（已有正式档）或File.Move（首次）；失败保留旧正式档并保持待保存状态，下一个状态变化/检查点再尝试，无玩家奖励/耐久回滚。
+平稳期间按默认10秒检查点保存剩余秒数；状态变化触发当前保存点。F5与原自动触发共用当前tick完整快照/一次写入，捕获失败不能用旧缓存完成手动请求；全局冷却及本人结果归[保存提示](MapWorldSaveHud.md)。只有保存时建立DTO/序列化，不每tick序列化或写盘。捕获失败记录map/slot/placement/原异常，保留最后完整缓存，按间隔再采样，不把半批读取写成世界档。世界文件使用同目录.tmp、Flush(true)、File.Replace（已有正式档）或File.Move（首次）；失败保留旧正式档并保持待保存状态，下一个状态变化/检查点再尝试，无玩家奖励/耐久回滚。
 
 资源完成与世界快照是两条独立提交链：植物原SavePrepared成功才入包/耗尽，工具完成原保存耐久才提交，G原保存才入包；新增世界保存位于这些结果之后，写失败不撤销成功结算。玩家与世界分别原子替换，异常中断时不保证跨文件事务一致，恢复以各自最近成功文件为准；没有同槽多服务端写权锁，相关并发保证UNKNOWN。同步世界写盘耗时/频率、容量和性能仍UNKNOWN。
 
@@ -81,4 +83,6 @@ saveGroundDrops开启时同文件保存地面苹果/木材/石材、DropId及剩
 
 掉落持久化v16/19静态及用户人工通过限十二项，未触发的独立用例UNKNOWN，归[掉落存档](MapDropPersistence.md)；v15/18用户通过保持原世界v1及十二项清单。
 
-寿命提示v17/20归[G提示](MapPickupHud.md)：所属G六字段，原目标/拾取/期限/保存保持，主线程静态通过、新人工UNKNOWN；旧用户通过仍限原版本/清单。
+寿命提示v17/20归[G提示](MapPickupHud.md)：所属G六字段，原目标/拾取/期限/保存保持；静态及用户人工通过限十二项，未触发独立用例UNKNOWN；旧用户通过仍限原版本/清单。
+
+地图v18/21的[F5/保存提示](MapWorldSaveHud.md)已接入：当前16输入、新增所属3字段；原F/G、工具及世界/玩家存档格式保持。编译/字段/烘焙静态通过，人工UNKNOWN；旧通过限原版本/清单。

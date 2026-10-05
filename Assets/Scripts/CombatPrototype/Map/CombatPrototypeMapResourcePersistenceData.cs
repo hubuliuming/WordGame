@@ -7,6 +7,8 @@ namespace Code_01.CombatPrototype.Map
     {
         public byte Enabled;
         public byte SaveGroundDrops;
+        public byte ManualSaveEnabled;
+        public float ManualSaveCooldownSeconds;
         public FixedString64Bytes SaveSlotId;
         public float SaveIntervalSeconds;
         public FixedString128Bytes LayoutSignature;

@@ -15,6 +15,7 @@ namespace Code_01.CombatPrototype.Networking
         public InputEvent UseItem;
         public InputEvent Gather; // Unified F resource interaction reuses the original event.
         public InputEvent Pickup;
+        public InputEvent SaveWorld;
         public InputEvent CraftAxe;
         public InputEvent CraftPickaxe;
         public InputEvent RepairAxe;
@@ -56,6 +57,7 @@ namespace Code_01.CombatPrototype.Networking
             var useItem = keyboard != null && keyboard.eKey.wasPressedThisFrame;
             var gather = keyboard != null && keyboard.fKey.wasPressedThisFrame;
             var pickup = keyboard != null && keyboard.gKey.wasPressedThisFrame;
+            var saveWorld = keyboard != null && keyboard.f5Key.wasPressedThisFrame;
             var craftAxe = panelCraftAxe || (keyboard != null && keyboard.digit1Key.wasPressedThisFrame);
             var craftPickaxe = panelCraftPickaxe || (keyboard != null && keyboard.digit2Key.wasPressedThisFrame);
             var repairAxe = panelRepairAxe || (keyboard != null && keyboard.digit3Key.wasPressedThisFrame);
@@ -74,6 +76,7 @@ namespace Code_01.CombatPrototype.Networking
                     input.ValueRW.Gather.Set();
                 if (pickup)
                     input.ValueRW.Pickup.Set();
+                if (saveWorld) input.ValueRW.SaveWorld.Set();
                 if (craftAxe) input.ValueRW.CraftAxe.Set();
                 if (craftPickaxe) input.ValueRW.CraftPickaxe.Set();
                 if (repairAxe) input.ValueRW.RepairAxe.Set();

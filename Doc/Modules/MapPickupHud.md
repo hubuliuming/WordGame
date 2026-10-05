@@ -17,11 +17,11 @@
 | [原HUD宿主](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapInteractionHud.cs) / [绑定](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapInteractionHudBindingSystem.cs) | 原 Main Camera 组件委托独立 G 面板，沿原本地玩家/连接与生命周期绑定 |
 | [Map Baker](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapAuthoring.cs) / [Player Baker](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypePlayerNetCodeAuthoring.cs) | 地图 Settings 与玩家初始 Hidden 数据 |
 
-v11/14阶段五个新脚本及meta、v17/20寿命接入两个普通助手及meta均由正常Unity导入。新客户端类不是 MonoBehaviour，未新增组件挂载或 Scene/SubScene/Prefab/Animator 结构，也未修改旧 meta、资源绑定、网格/材质/字体/图片、包或构建配置。Baker 追加玩家 ECS 显示数据，烘焙后的 Ghost 布局变化；各端须同版代码、配置并重新烘焙。当前输入15字段的新增修理归[专题](MapToolRepair.md)，G没有新增目标命令、RPC、版本协商或玩家存档字段。
+v11/14阶段五个新脚本及meta、v17/20寿命接入两个普通助手及meta均由正常Unity导入。新客户端类不是 MonoBehaviour，未新增组件挂载或 Scene/SubScene/Prefab/Animator 结构，也未修改旧 meta、资源绑定、网格/材质/字体/图片、包或构建配置。Baker 追加玩家 ECS 显示数据，烘焙后的 Ghost 布局变化；各端须同版代码、配置并重新烘焙。当前输入16字段，SaveWorld归[F5](MapWorldSaveHud.md)，修理归[专题](MapToolRepair.md)，G没有新增目标命令、RPC、版本协商或玩家存档字段。
 
 ## 【FACT】当前 JSON 契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为 schemaVersion=17/configRevision=20，pickupHud段及全部17字段必填，[interactionHighlight](MapInteractionHighlight.md)亦为必填地图段。沿原严格 UTF-8/缺失/未知/重复字段/类型和语义校验；旧 v1～v16 明确失败，不迁移、补默认段或回退来源。正常导入/烘焙后生效，没有运行热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为 schemaVersion=18/configRevision=21，pickupHud段及全部17字段必填，[interactionHighlight](MapInteractionHighlight.md)亦为必填地图段。沿原严格 UTF-8/缺失/未知/重复字段/类型和语义校验；旧 v1～v17 明确失败，不迁移、补默认段或回退来源。正常导入/烘焙后生效，没有运行热重载。
 
 | 字段 | 当前默认值 | 契约 |
 |---|---|---|
@@ -65,7 +65,7 @@ CombatPrototypeMapPickupHudState使用OwnerSendType=SendToOwner，六个GhostFie
 | LifetimeMode | byte枚举：0 None、1 Timed、2 ExpiringSoon、3 Permanent；Hidden或G文字/寿命关闭时None |
 | RemainingSeconds | float、Quantization=0；Timed/ExpiringSoon为有限正整数秒，Permanent/None/Hidden为0 |
 
-不发送世界位置或绝对ExpiresAt；仅投影目标余时，不新增工作计时器。原F及资源状态各四字段、15输入、Drop Ghost四字段保持；G布局由四变六，各端须同版重新烘焙。新状态不是输入/结算依据；网络延迟可能使提示滞后，显示后目标也可能被其他玩家取走或到期。当前位置下的 G 实际目标始终由服务端决定。
+不发送世界位置或绝对ExpiresAt；仅投影目标余时，不新增工作计时器。原F及资源状态各四字段、Drop Ghost四字段保持；当前16输入的SaveWorld归[F5](MapWorldSaveHud.md)；G布局由四变六，各端须同版重新烘焙。新状态不是输入/结算依据；网络延迟可能使提示滞后，显示后目标也可能被其他玩家取走或到期。当前位置下的 G 实际目标始终由服务端决定。
 
 ## 【CURRENT STRATEGY】显示、开关与释放
 
@@ -75,7 +75,7 @@ Ready第一行继续显示“G  Pick up  物品文案 ×实际数量”，寿命
 
 默认G为400×84、底距168、字号20；资源状态行400×52的底距由236改268，保持与G间隔16像素，F仍320×104/底48。两行各字号+4高、间隔8，整体垂直居中；寿命关闭沿单行G路径，默认配置高度仍84，可显式配置52并同步状态底距236。Hidden收起两行。沿1920×1080参考像素等比缩放、黑底alpha0.7、普通白字、内置GUI字体和Texture2D.whiteTexture、richText=false；只在父G面板的Repaint委托绘制，缓存稳定文案/样式并恢复GUI.matrix/color，不消费键鼠事件。
 
-pickupHud.enabled、interactionHud.enabled、inventoryPanel.enabled与interactionHighlight的主开关/F/G通道独立。关闭G文字仍可显示G高亮和实际拾取；关闭F HUD和背包面板仍可只显示G。三文字全关、无高亮通道且资源状态关闭时原绑定收起，键盘原玩法继续。死亡/断线、无本地玩家或地图、玩家/地图源变化、World/Scene停止及释放沿原Clear/Reset清掉可见状态和缓存，不保留上一局目标。非法网络快照明确报错并保持 G 隐藏，不以默认标签伪装有效目标。
+pickupHud.enabled、interactionHud.enabled、inventoryPanel.enabled与interactionHighlight的主开关/F/G通道独立。关闭G文字仍可显示G高亮和实际拾取；关闭F HUD和背包面板仍可只显示G。三文字全关、无高亮通道且资源状态/存档HUD均关闭时原绑定收起，键盘原玩法继续。死亡/断线、无本地玩家或地图、玩家/地图源变化、World/Scene停止及释放沿原Clear/Reset清掉可见状态和缓存，不保留上一局目标。非法网络快照明确报错并保持 G 隐藏，不以默认标签伪装有效目标。
 
 ## 【KNOWN ISSUES】静态证据与人工边界
 
@@ -89,7 +89,7 @@ v12/15的[高亮](MapInteractionHighlight.md)按原DropId解析同一客户端La
 
 v13/16的[资源状态](MapResourceStatusHud.md)在G面板上方增加一行；G的开关、采样资格、四字段、DropId与拾取规则保持。资源状态不显示掉落期限，也不改变G蓝圈；仅状态开启仍保留整体绑定。新显示静态及用户人工通过，限v13/16十项，未触发用例UNKNOWN，旧G/高亮通过保持原版本/清单。
 
-当前v17/20的[工具修理](MapToolRepair.md)新增两个输入和所属结果，遇同tick G请求时修理拒绝；G目标/资格/入包/保存/显示均保持原链，新增修理静态及用户人工通过，限v14/17十二项，未触发用例UNKNOWN。
+当前v18/21的[工具修理](MapToolRepair.md)新增两个输入和所属结果，遇同tick G请求时修理拒绝；G目标/资格/入包/保存/显示均保持原链，新增修理静态及用户人工通过，限v14/17十二项，未触发用例UNKNOWN。
 
 ## 【FACT】地图资源存档接入边界
 
@@ -99,4 +99,6 @@ v13/16的[资源状态](MapResourceStatusHud.md)在G面板上方增加一行；G
 
 v17/revision20寿命链正常Unity编译无C# Error；实际Assembly与生成Serializer/Snapshot六字段、SendToOwner、RemainingSeconds无量化、17配置/Settings及两助手已核对。原15输入、F/资源状态各4、Drop Ghost4、世界根9/掉落条目8保持。Forest/Grassland各13种隔离Editor烘焙共26次：Json/BuiltIn、寿命关闭、预警关闭、G文字关闭、文字/G圈均关、自定义5.5秒/四文案/秒单位/RGB与尺寸、资源状态关闭、寿命关闭且恢复52/236布局、仅G文字、永久Lifetime=0、世界存档关闭、地面存档关闭。两来源等价，17Settings及Hidden/None/0初值、三掉落Prefab/Prepared、原工具/反馈/F/高亮/资源状态、完整原布置与资源签名均通过；森林/草地树89/53、采集36/38、矿20/18、阻挡109/71保持。编译后及隔离烘焙前后Console均[0 Error,0 Warning,0 Log]，主场景干净、临时World/Scene/TextAsset释放；AI未主动清Console。
 
-主线程代码/配置静态验收通过；本阶段人工GamePlayer为UNKNOWN，十二项清单归[运行入口](Runtime.md)。原G文字v11/14十项、高亮v12/15十项、资源状态v13/16十项、工具修理v14/17十二项、资源存档v15/18十二项、掉落存档v16/19十二项及更早用户通过保持旧版本/清单，不覆盖新增寿命显示。真实倒计时/30秒或小数阈值边界/永久物/恢复余时、排版/颜色/字形、模式与目标切换、同tick/延迟/多玩家/晚加入/断线及独立配置/绑定/快照/绘制/保存/清理失败仍UNKNOWN；带宽/性能/平台/线上、玩家与世界跨文件原子一致/防重复及意外ECS恢复不属于通过范围。未修改Scene/SubScene/Prefab/Animator/旧meta/资源引用、原G/选择/运动/到期/保存链、输入或HUD宿主/绑定脚本；两助手不挂组件。AI未运行游戏/显示系统/GUI回调、GamePlayer/PlayMode、逻辑单元测试、构建、发布、性能采样或图片检查，未读取真实存档、创建子Agent或提交Git。
+主线程代码/配置静态验收通过；用户已确认本阶段人工GamePlayer验收通过，主线程结合既有静态核对与用户反馈判定通过，限CombatPrototypeNetCode、schemaVersion=17/configRevision=20及[运行入口](Runtime.md)十二项清单。人工结论来自用户反馈。原G文字v11/14十项、高亮v12/15十项、资源状态v13/16十项、工具修理v14/17十二项、资源存档v15/18十二项、掉落存档v16/19十二项及更早用户通过保持旧版本/清单，不覆盖新增寿命显示。未实际触发的独立倒计时/30秒或小数阈值边界/永久物/恢复余时、排版/颜色/字形、模式与目标切换、同tick/延迟/多玩家/晚加入/断线及配置/绑定/快照/绘制/保存/清理失败仍UNKNOWN；带宽/性能/平台/线上、玩家与世界跨文件原子一致/防重复及意外ECS恢复不属于通过范围。未修改Scene/SubScene/Prefab/Animator/旧meta/资源引用、原G/选择/运动/到期/保存链、输入或HUD宿主/绑定脚本；两助手不挂组件。AI未运行游戏/显示系统/GUI回调、GamePlayer/PlayMode、逻辑单元测试、构建、发布、性能采样或图片检查，未读取真实存档、创建子Agent或提交Git。
+
+地图v18/21的[F5/保存提示](MapWorldSaveHud.md)已接入：当前16输入、新增所属3字段；原F/G、工具及世界/玩家存档格式保持。编译/字段/烘焙静态通过，人工UNKNOWN；旧通过限原版本/清单。

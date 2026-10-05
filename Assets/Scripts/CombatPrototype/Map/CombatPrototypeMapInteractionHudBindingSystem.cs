@@ -60,9 +60,11 @@ namespace Code_01.CombatPrototype.Map
             var pickupSettings = EntityManager.GetComponentData<CombatPrototypeMapPickupHudSettings>(source);
             var highlightSettings = EntityManager.GetComponentData<CombatPrototypeMapInteractionHighlightSettings>(source);
             var resourceStatusSettings = EntityManager.GetComponentData<CombatPrototypeMapResourceStatusHudSettings>(source);
+            var worldSaveSettings = EntityManager.GetComponentData<CombatPrototypeMapWorldSaveHudSettings>(source);
             var hasHighlight = highlightSettings.Enabled != 0 &&
                 (highlightSettings.FTargetsEnabled != 0 || highlightSettings.GTargetsEnabled != 0);
-            if (settings.Enabled == 0 && inventorySettings.Enabled == 0 && pickupSettings.Enabled == 0 && !hasHighlight && resourceStatusSettings.Enabled == 0)
+            if (settings.Enabled == 0 && inventorySettings.Enabled == 0 && pickupSettings.Enabled == 0 && !hasHighlight &&
+                resourceStatusSettings.Enabled == 0 && worldSaveSettings.Enabled == 0)
             {
                 ResetBinding();
                 return;
@@ -83,7 +85,8 @@ namespace Code_01.CombatPrototype.Map
                     CombatPrototypeMapGatherToolUtility.RequireDefinition(definitions, CombatPrototypeMapGatherToolKind.Pickaxe),
                     EntityManager.GetComponentData<CombatPrototypeMapInventoryDropSettings>(source),
                     EntityManager.GetBuffer<CombatPrototypeMapInventoryDropDefinition>(source, true), pickupSettings,
-                    highlightSettings, resourceStatusSettings, map.MapDefinitionId.ToString());
+                    highlightSettings, resourceStatusSettings, worldSaveSettings,
+                    EntityManager.GetComponentData<CombatPrototypeMapResourcePersistenceSettings>(source), map.MapDefinitionId.ToString());
                 _source = source;
                 _player = player;
             }
@@ -100,6 +103,7 @@ namespace Code_01.CombatPrototype.Map
                 EntityManager.GetComponentData<GhostOwner>(player).NetworkId, interaction, pickup, out var f, out var g);
             _hud.ShowHighlight(f, g);
             _hud.ShowResourceStatus(EntityManager.GetComponentData<CombatPrototypeMapResourceStatusHudState>(player));
+            _hud.ShowWorldSave(EntityManager.GetComponentData<CombatPrototypeMapWorldSaveHudState>(player));
         }
 
         internal bool ReadPanelInput(Keyboard keyboard, Mouse mouse, out bool craftAxe, out bool craftPickaxe, out bool repairAxe, out bool repairPickaxe,

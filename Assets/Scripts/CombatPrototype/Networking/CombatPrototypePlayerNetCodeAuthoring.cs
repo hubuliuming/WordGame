@@ -69,6 +69,7 @@ namespace Code_01.CombatPrototype.Networking
                 AddComponent(entity, CombatPrototypeMapInteractionHudState.Hidden);
                 AddComponent(entity, CombatPrototypeMapPickupHudState.Hidden);
                 AddComponent(entity, CombatPrototypeMapResourceStatusHudState.Hidden);
+                AddComponent(entity, CombatPrototypeMapWorldSaveHudState.Hidden);
             }
         }
     }

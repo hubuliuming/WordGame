@@ -11,7 +11,7 @@ namespace Code_01.CombatPrototype.Map
                 config.map.resourcePersistence == null || config.map.layout == null || config.map.movement == null || config.map.drops == null || config.map.treeHarvest == null ||
                 config.map.mining == null || config.map.gatherTools == null || config.map.gatherTools.tools == null ||
                 config.map.interactionHud == null || config.map.pickupHud == null || config.map.interactionHighlight == null || config.map.resourceStatusHud == null || config.map.inventoryPanel == null || config.map.inventoryDrop == null || config.map.inventoryDrop.items == null ||
-                config.map.population == null || config.map.spawn == null ||
+                config.map.worldSaveHud == null || config.map.population == null || config.map.spawn == null ||
                 config.biomes == null || config.grounds == null || config.objects == null ||
                 config.map.biomeIds == null || config.map.biomeRegions == null)
                 throw new InvalidOperationException("Map configuration is missing required sections.");
@@ -24,6 +24,7 @@ namespace Code_01.CombatPrototype.Map
                  slot[3] >= '1' && slot[3] <= '9'))
                 throw new InvalidOperationException("resourcePersistence.saveSlotId cannot be a reserved file name.");
             Positive(persistence.saveIntervalSeconds, "resourcePersistence.saveIntervalSeconds");
+            Positive(persistence.manualSaveCooldownSeconds, "resourcePersistence.manualSaveCooldownSeconds");
             var hud = map.interactionHud;
             Positive(hud.panelWidthPixels, "interactionHud.panelWidthPixels");
             Positive(hud.panelHeightPixels, "interactionHud.panelHeightPixels");
@@ -40,11 +41,12 @@ namespace Code_01.CombatPrototype.Map
             ValidatePickupHud(map.pickupHud, hud);
             ValidateInteractionHighlight(map.interactionHighlight);
             ValidateResourceStatusHud(map.resourceStatusHud, map.pickupHud);
+            ValidateWorldSaveHud(map.worldSaveHud, map.resourceStatusHud);
             ValidateInventoryPanel(map.inventoryPanel);
             ValidateInventoryDrop(map.inventoryDrop);
             Id(map.mapDefinitionId, "mapDefinitionId");
-            if (map.schemaVersion != 17 || map.configRevision < 1 || map.defaultSeed < 1)
-                throw new InvalidOperationException("Map requires schemaVersion=17, positive revision and seed.");
+            if (map.schemaVersion != 18 || map.configRevision < 1 || map.defaultSeed < 1)
+                throw new InvalidOperationException("Map requires schemaVersion=18, positive revision and seed.");
             var drops = map.drops;
             Id(drops.itemId, "drops.itemId");
             Id(drops.visualResourceKey, "drops.visualResourceKey");
@@ -259,6 +261,30 @@ namespace Code_01.CombatPrototype.Map
             HudLabel(status.regrowingLabel, "resourceStatusHud.regrowingLabel");
             HudLabel(status.waitingLabel, "resourceStatusHud.waitingLabel");
             HudLabel(status.depletedLabel, "resourceStatusHud.depletedLabel");
+        }
+
+        private static void ValidateWorldSaveHud(MapWorldSaveHudConfig hud, MapResourceStatusHudConfig status)
+        {
+            Positive(hud.panelWidthPixels, "worldSaveHud.panelWidthPixels");
+            Positive(hud.panelHeightPixels, "worldSaveHud.panelHeightPixels");
+            Nonnegative(hud.bottomMarginPixels, "worldSaveHud.bottomMarginPixels");
+            Positive(hud.feedbackSeconds, "worldSaveHud.feedbackSeconds");
+            if (hud.fontSize <= 0 || hud.panelWidthPixels <= 32f || hud.panelWidthPixels > 1920f ||
+                hud.panelHeightPixels < 2d * hud.fontSize + 40d ||
+                (double)hud.panelHeightPixels + hud.bottomMarginPixels > 1080d ||
+                hud.bottomMarginPixels < (double)status.bottomMarginPixels + status.panelHeightPixels + 16d)
+                throw new InvalidOperationException("worldSaveHud requires positive font size, width in (32,1920], " +
+                    "height >= 2*fontSize+40, height+bottom margin <= 1080, and bottom margin at least 16 pixels above the resource status panel.");
+            HudLabel(hud.disabledLabel, "worldSaveHud.disabledLabel");
+            HudLabel(hud.notSavedLabel, "worldSaveHud.notSavedLabel");
+            HudLabel(hud.savedLabel, "worldSaveHud.savedLabel");
+            HudLabel(hud.captureFailedLabel, "worldSaveHud.captureFailedLabel");
+            HudLabel(hud.saveFailedLabel, "worldSaveHud.saveFailedLabel");
+            HudLabel(hud.manualSaveLabel, "worldSaveHud.manualSaveLabel");
+            HudLabel(hud.manualDisabledLabel, "worldSaveHud.manualDisabledLabel");
+            HudLabel(hud.cooldownLabel, "worldSaveHud.cooldownLabel");
+            HudLabel(hud.unavailableLabel, "worldSaveHud.unavailableLabel");
+            HighlightColor(hud.errorColorHex, "worldSaveHud.errorColorHex");
         }
 
         private static void ValidateInteractionHighlight(MapInteractionHighlightConfig highlight)

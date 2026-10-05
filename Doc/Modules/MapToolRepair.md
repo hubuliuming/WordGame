@@ -21,7 +21,7 @@
 
 ## 【FACT】当前配置契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=17/configRevision=20。resourcePersistence/geometry/layout/movement/drops/treeHarvest/mining/gatherTools/interactionHud/pickupHud/interactionHighlight/resourceStatusHud/inventoryPanel/inventoryDrop/population/spawn均必填；新增字段沿原严格UTF-8、对象形状、缺失/未知/重复字段与标量类型校验。旧v1～v16明确拒绝，不迁移、补默认或回退来源；正常导入/烘焙后生效，无热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=18/configRevision=21。resourcePersistence/geometry/layout/movement/drops/treeHarvest/mining/gatherTools/interactionHud/pickupHud/interactionHighlight/resourceStatusHud/worldSaveHud/inventoryPanel/inventoryDrop/population/spawn均必填；新增字段沿原严格UTF-8、对象形状、缺失/未知/重复字段与标量类型校验。旧v1～v17明确拒绝，不迁移、补默认或回退来源；正常导入/烘焙后生效，无热重载。
 
 | 配置位置/字段 | 默认值 | 校验或行为 |
 |---|---|---|
@@ -77,6 +77,8 @@ Result依次为None、Success、Disabled、NotOwned、AlreadyFull、Insufficient
 
 ## 【FACT】地图资源存档接入边界
 
-当前地图另接[资源存档](MapResourcePersistence.md)，原修理先保存后扣料/耐久、15输入及所属结果保持；世界档不保存Tools或修理反馈。修理用户通过限v14/17十二项，资源存档人工通过限v15/18十二项，未触发用例UNKNOWN。 掉落恢复及同文件快照归[掉落存档](MapDropPersistence.md)，人工通过限v16/19十二项，未触发用例UNKNOWN。
+当前地图另接[资源存档](MapResourcePersistence.md)，原修理先保存后扣料/耐久及所属结果保持，当前16输入的SaveWorld归[F5](MapWorldSaveHud.md)；世界档不保存Tools或修理反馈。修理用户通过限v14/17十二项，资源存档人工通过限v15/18十二项，未触发用例UNKNOWN。 掉落恢复及同文件快照归[掉落存档](MapDropPersistence.md)，人工通过限v16/19十二项，未触发用例UNKNOWN。
 
-寿命提示v17/20归[G提示](MapPickupHud.md)：所属G六字段，原目标/拾取/期限/保存保持，主线程静态通过、新人工UNKNOWN；旧用户通过仍限原版本/清单。
+寿命提示v17/20归[G提示](MapPickupHud.md)：所属G六字段，原目标/拾取/期限/保存保持；静态及用户人工通过限十二项，未触发独立用例UNKNOWN；旧用户通过仍限原版本/清单。
+
+地图v18/21的[F5/保存提示](MapWorldSaveHud.md)已接入：当前16输入、新增所属3字段；原F/G、工具及世界/玩家存档格式保持。编译/字段/烘焙静态通过，人工UNKNOWN；旧通过限原版本/清单。

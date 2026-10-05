@@ -745,7 +745,7 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 
 ## 【KNOWN ISSUES】掉落物寿命提示与到期预警的人工验收
 
-入口CombatPrototypeNetCode，Json/Forest默认schemaVersion=17/configRevision=20，各端同版重新烘焙。pickupHud新增寿命/预警两个true、阈值30秒、Expires in/Permanent/Expiring soon/s四文案及#FFB454；G400×84/底168/字号20，资源状态底268。正常Unity编译、六字段所属Serializer/Snapshot反射、17配置/Settings和26次隔离Editor烘焙静态通过；本阶段人工GamePlayer为UNKNOWN，以下十二项待用户运行。
+入口CombatPrototypeNetCode，Json/Forest默认schemaVersion=17/configRevision=20，各端同版重新烘焙。pickupHud新增寿命/预警两个true、阈值30秒、Expires in/Permanent/Expiring soon/s四文案及#FFB454；G400×84/底168/字号20，资源状态底268。正常Unity编译、六字段所属Serializer/Snapshot反射、17配置/Settings和26次隔离Editor烘焙静态通过；用户已确认本阶段人工GamePlayer验收通过，主线程结合既有静态核对与用户反馈判定通过，限本节v17/revision20十二项清单；人工结论来自用户反馈，以下保留通过范围，未实际触发的独立用例仍UNKNOWN。
 
 1. 森林/草地Json与BuiltIn默认生效，17字段完整必填、G所属六字段Hidden/None/0初值正确。关闭仍校验阈值/文案/颜色/尺寸；旧v1～v16、缺失/重复/未知字段、错布尔/数值/字符串、非有限或非正阈值、非法#RRGGBB和双行高度/G-F/资源状态间隔错误明确失败，无补默认/回退。独立失败未触发则UNKNOWN。
 2. 静止合格玩家靠近Landed苹果/木材/石材，第一行仍G Pick up物品×数量，第二行Expires in剩余秒数；只显示原最近G目标，2米及同距小DropId规则保持。Prepared/Airborne/Consumed、过期及范围外不显示；切换同种/异种目标和不同数量/余时无旧缓存残留。
@@ -760,4 +760,23 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 11. 两Client、晚加入/重连只收本人六字段快照，不使用客户端墙钟推演或读取其他玩家目标/服务端DropProgress；同一目标仍按原服务端时刻到期。网络延迟可能使文字滞后，实际拾取/到期依原服务端判断，未触发多玩家/延迟/预测时序保持UNKNOWN。
 12. 回归F三类采集/600秒再生/阻挡、G文字与蓝圈、B/工具制作与修理、Drop/All、E/R/战斗/镜头及玩家/资源/掉落保存。15输入、F/资源状态各4、Drop Ghost4和原反馈保持；关闭/重启及生命周期无上一局文字或预警颜色残留。独立绑定/捕获/绘制/保存/清理、性能/带宽/平台/线上UNKNOWN。
 
-本清单限v17/revision20寿命显示；原213项编号/内容与v16/19掉落存档十二项及更早用户通过保持旧版本/清单，新增后共225项。完整规则归[拾取提示](MapPickupHud.md)。新增人工、真实倒计时/小数阈值/永久物/恢复余时、排版/颜色/字形、独立失败、多玩家/晚加入/延迟与生命周期仍UNKNOWN；跨文件原子一致/防重复、意外ECS故障恢复、同槽并发及性能/带宽/平台/线上不属于通过范围。AI未调用真实玩家/世界存档读写或运行游戏/显示系统/GUI回调、GamePlayer/PlayMode、逻辑单元测试、构建、发布、采样或图片检查，未创建子Agent或提交Git。
+本清单限v17/revision20寿命显示；原213项编号/内容与v16/19掉落存档十二项及更早用户通过保持旧版本/清单，新增后共225项。完整规则归[拾取提示](MapPickupHud.md)。用户人工通过限本节十二项；未实际触发的独立倒计时/小数阈值/永久物/恢复余时、排版/颜色/字形、失败、多玩家/晚加入/延迟与生命周期仍UNKNOWN；跨文件原子一致/防重复、意外ECS故障恢复、同槽并发及性能/带宽/平台/线上不属于通过范围。AI未调用真实玩家/世界存档读写或运行游戏/显示系统/GUI回调、GamePlayer/PlayMode、逻辑单元测试、构建、发布、采样或图片检查，未创建子Agent或提交Git。
+
+## 【KNOWN ISSUES】地图存档状态提示与手动保存的人工验收
+
+入口CombatPrototypeNetCode，Forest/Grassland Json与BuiltIn默认schemaVersion=18/configRevision=21，各端同版代码/配置重新烘焙，沿原SinglePlayer或Online启动，单一服务端写同槽。默认resourcePersistence.manualSaveEnabled=true/全局冷却5秒，worldSaveHud=true/400×84/底336/字号20/反馈3秒/#FF6B6B。正常Unity编译、实际所属Serializer反射与26次隔离Editor烘焙静态通过；以下新增人工GamePlayer结果全部UNKNOWN，旧用户通过不覆盖本阶段。
+
+1. 默认森林/草地、Json/BuiltIn重新烘焙后，玩家输入16字段，所属保存状态3字段初值Hidden/0/None，配置与Settings各16，resourcePersistence配置6/Settings7。首次无档且无资源/掉落变化时，Ready后第一行No world checkpoint yet，第一次原检查点或F5实际写成功后World saved；首次建档/加载本身不冒充本服务已保存。客户端不读取服务端文件，字段不进入世界/玩家档。
+2. 按F5一次由本人SaveWorld事件提交，服务端在当tick完整捕获全部资源及开启时地面物后沿原SavePrepared保存一次，日志reason=ManualRequest，成功返回才第一行World saved及第二行本人World saved。检查耗尽/余时、掉落/编号符合当tick已提交状态，沿原同一v2文件/路径；按住不连续保存。
+3. 成功或接受失败后的5秒全局冷却内再次按F5，本人第二行Save cooldown，不因此再次写盘；冷却后新F5可尝试。默认反馈3秒后第二行恢复F5 Save world。自动变化/10秒检查点不占手动冷却，仍按原规则保存；精确边界/失败冷却未触发则UNKNOWN。
+4. 移动、攻击/非Ready近战及活动F采集预约时，存活在线所属玩家仍可F5；不取消预约、额外扣耐久、发物品或阻断原请求。死亡、CommandTarget/归属不匹配、断线、未InGame或Simulate失效不保存；合法所属但资格未满足拒绝，未Ready时HUD隐藏、不产生成功。独立资格分支未触发则UNKNOWN。
+5. 两Client在同tick提交F5，合格请求共用一次完整捕获/世界写入，每人收到自己的Success/Failed序号；不同tick冷却内请求拒绝。F5与状态变化或检查点同时满足也只写一次，不重复序列化/替换。共享世界Mode一致，手动序号/结果仅SendToOwner，其他玩家不能收到本人的拒绝反馈；无法触发同tick保持UNKNOWN。
+6. 用可控只读/权限故障触发世界写失败，第一行World save failed及本人失败结果使用#FF6B6B，原正式档保留，已成功F/G/工具/Drop结算不回滚；恢复写权限后冷却后的新F5或下一原保存点保存当前完整状态。不得在失败时显示成功或自动重发F5；未实际触发I/O/替换失败UNKNOWN。
+7. 可控完整捕获失败时第一行Snapshot failed、本人结果Failed，记录stage/map/slot/placement及原异常，手动请求不能用上一完整缓存写成成功。恢复捕获条件后新F5可在冷却结束时主动尝试，即使原捕获等待尚未结束；原关闭仍只用最后完整缓存、不读取已释放实体。未实际触发捕获/关闭失败UNKNOWN，不为触发用例擅改运行ECS。
+8. PlayMode前分别关闭manualSaveEnabled、worldSaveHud.enabled、resourcePersistence.enabled、saveGroundDrops并正常重新烘焙：仅手动关闭保留自动结果/F5明确拒绝；仅HUD关闭F5继续；世界总开关关闭不读写世界档并显示World saving disabled/Manual save disabled；地面保存关闭仍保存资源，成功世界档Drops=[]/LastDropId=0。开关组合未触发则UNKNOWN。
+9. 单独存档HUD开启、其他F/G/B/高亮/资源状态显示均关闭时绑定保留，存档双行仍显示；全部显示关闭收起绑定，键盘F5仍按服务端设置处理。与默认F/G/资源状态相邻间隔16，不同分辨率等比缩放、两行居中及错误色正确；可恢复单行G52/状态底236/存档底304。未覆盖排版/字形/颜色UNKNOWN。
+10. 修改全局冷却2.5、反馈1.5、9文案、#12ABEF及合法宽/高/底距后正常导入/烘焙生效。旧v1～v17、缺失/未知/重复字段、错布尔/数值/字符串、非有限/非正冷却或反馈、非法文案/颜色、双行高度和16像素间隔错误明确失败；关闭仍严格校验，无补默认/回退/热重载。未触发独立配置失败UNKNOWN。
+11. 初次绑定、晚加入/重连只观察已有本人序号，不重播旧3秒结果；死亡/断线、玩家/地图源、World/Scene变化清文案/期限/旧序号，全局冷却及服务缓存随源/系统结束释放。非法枚举、None配非零序号或非零Hidden快照在显示边界记录原异常并隐藏；网络延迟仅使提示滞后，不产生客户端写盘或业务修改。独立生命周期/异常快照未触发UNKNOWN。
+12. 回归原状态变化/10秒检查点/正常关闭保存、世界v2/合法v1读取与离线暂停、F三类资源/600秒再生/占位阻挡、G寿命与蓝圈、B/制作/修理/Drop/All、E/R/战斗/镜头及玩家v2保存。原F4/G6/资源状态4、Drop Ghost4、世界根9/掉落条目8和布局/资源签名保持。玩家与世界分别保存，F5不保存玩家位置/战斗或建立跨文件事务，相关防重复/ECS/同槽并发与性能/平台仍UNKNOWN。
+
+完整当前契约归[F5/保存提示](MapWorldSaveHud.md)。原225项编号/内容及旧版本用户通过保留，本段新增12项后共237项；当前人工验收待用户反馈，主线程尚未判定运行通过。AI只执行编译/反射和隔离Editor烘焙，未调用真实玩家/世界存档读写、游戏/显示系统/GUI回调、GamePlayer/PlayMode、逻辑单元测试、命令行构建、发布、采样或图片检查，未创建子Agent或提交Git。未实际触发的独立资格/冷却边界/同tick/多Client/延迟/晚加入、捕获/保存/关闭恢复失败、字形/布局/颜色和生命周期仍UNKNOWN；跨文件原子一致/防重复、意外ECS故障恢复、同槽并发与性能/带宽/平台/线上不属于静态通过范围。

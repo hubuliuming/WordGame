@@ -22,7 +22,7 @@
 
 ## 【FACT】当前 JSON 契约与数值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 BuiltIn 一致为 schemaVersion=17/configRevision=20，必填 gatherTools及[面板配置](MapInventoryPanel.md)。沿原严格 UTF-8、完整字段、类型、未知/重复键校验；旧地图 v1～v16 明确失败，不补默认段或回退来源。配置仅在正常导入/烘焙后生效，无运行热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 BuiltIn 一致为 schemaVersion=18/configRevision=21，必填 gatherTools及[面板配置](MapInventoryPanel.md)。沿原严格 UTF-8、完整字段、类型、未知/重复键校验；旧地图 v1～v17 明确失败，不补默认段或回退来源。配置仅在正常导入/烘焙后生效，无运行热重载。
 
 gatherTools 的 enabled=true、craftFeedbackSeconds=2.0、tools 为恰好两条不重复定义；enabled=false 仍校验所有字段，停止制作、修理和工具加速，但保留已拥有工具/耐久，F 沿原徒手耗时。
 
@@ -79,7 +79,7 @@ CombatPrototypeMapGatherTool 是唯一可变工具状态，内部容量 2，每�
 
 v9/revision12阶段增加本地材料背包/配方与按钮，独立开关和人工边界归[制作面板](MapInventoryPanel.md)。工具资格/事务/反馈及v2保存链保持，旧工具十二项通过仍限v8/revision11。
 
-当前地图v17/20必填[背包丢弃](MapInventoryDrop.md)，复用原掉落资源及保存链；本专题原交互/工具/产出/再生行为保持。新增丢弃静态及用户人工通过限[运行入口](Runtime.md)v10/13十二项，未触发用例UNKNOWN；旧通过仍限原版本/清单。
+当前地图v18/21必填[背包丢弃](MapInventoryDrop.md)，复用原掉落资源及保存链；本专题原交互/工具/产出/再生行为保持。新增丢弃静态及用户人工通过限[运行入口](Runtime.md)v10/13十二项，未触发用例UNKNOWN；旧通过仍限原版本/清单。
 
 v11/14阶段的[G提示](MapPickupHud.md)只读共用掉落目标，与原F目标/工具进度独立；不修改本专题资源状态、产出、工具耐久、再生或保存。新显示编译/十次隔离烘焙静态通过；用户确认人工通过限v11/14十项，未触发用例UNKNOWN，旧用户通过保持各自版本/清单。
 
@@ -87,10 +87,12 @@ v12/15的[资源高亮](MapInteractionHighlight.md)复用原F四字段，Working
 
 v13/16的[资源状态](MapResourceStatusHud.md)显示资源阶段及服务端再生秒数；本人采集中优先原F锁定身份，不更改工具锁定耗时、耐久、制作或保存。移动/攻击时状态可显示，但F及制作资格保持。新显示静态及用户人工通过，限v13/16十项，未触发用例UNKNOWN，旧工具通过保持原范围。
 
-当前v17/20的[工具修理](MapToolRepair.md)新增3/4和B按钮、所属三字段反馈；复用原唯一工具槽和候选保存，先保存再扣完整配方/提交封顶耐久，损坏0可修复。制作1/2资格与原F工具锁定/耗时/消耗保持。静态及用户人工通过，限v14/17十二项，未触发用例UNKNOWN；旧工具及资源状态通过保持原版本/清单。
+当前v18/21的[工具修理](MapToolRepair.md)新增3/4和B按钮、所属三字段反馈；复用原唯一工具槽和候选保存，先保存再扣完整配方/提交封顶耐久，损坏0可修复。制作1/2资格与原F工具锁定/耗时/消耗保持。静态及用户人工通过，限v14/17十二项，未触发用例UNKNOWN；旧工具及资源状态通过保持原版本/清单。
 
 ## 【FACT】地图资源存档接入边界
 
 使用工具的原耐久保存/资源完成顺序保持，新增世界保存位于已提交资源结果之后；世界写失败不回滚工具结算，不保证玩家/世界跨文件原子一致。修理仍限原v14/17通过，资源存档人工通过限v15/18十二项，未触发用例UNKNOWN，见[资源存档](MapResourcePersistence.md)。 掉落恢复及同文件快照归[掉落存档](MapDropPersistence.md)，人工通过限v16/19十二项，未触发用例UNKNOWN。
 
-寿命提示v17/20归[G提示](MapPickupHud.md)：所属G六字段，原目标/拾取/期限/保存保持，主线程静态通过、新人工UNKNOWN；旧用户通过仍限原版本/清单。
+寿命提示v17/20归[G提示](MapPickupHud.md)：所属G六字段，原目标/拾取/期限/保存保持；静态及用户人工通过限十二项，未触发独立用例UNKNOWN；旧用户通过仍限原版本/清单。
+
+地图v18/21的[F5/保存提示](MapWorldSaveHud.md)已接入：当前16输入、新增所属3字段；原F/G、工具及世界/玩家存档格式保持。编译/字段/烘焙静态通过，人工UNKNOWN；旧通过限原版本/清单。

@@ -1,13 +1,15 @@
 {
-  "schemaVersion": 17,
-  "configRevision": 20,
+  "schemaVersion": 18,
+  "configRevision": 21,
   "mapDefinitionId": "battle_grassland_01",
   "defaultSeed": 12345,
   "resourcePersistence": {
     "enabled": true,
     "saveSlotId": "default_world",
     "saveIntervalSeconds": 10,
-    "saveGroundDrops": true
+    "saveGroundDrops": true,
+    "manualSaveEnabled": true,
+    "manualSaveCooldownSeconds": 5
   },
   "geometry": {
     "cellSizeMeters": 2.0,
@@ -154,6 +156,24 @@
     "regrowingLabel": "Regrows in",
     "waitingLabel": "Waiting to regrow",
     "depletedLabel": "No regrowth"
+  },
+  "worldSaveHud": {
+    "enabled": true,
+    "panelWidthPixels": 400,
+    "panelHeightPixels": 84,
+    "bottomMarginPixels": 336,
+    "fontSize": 20,
+    "feedbackSeconds": 3,
+    "disabledLabel": "World saving disabled",
+    "notSavedLabel": "No world checkpoint yet",
+    "savedLabel": "World saved",
+    "captureFailedLabel": "Snapshot failed",
+    "saveFailedLabel": "World save failed",
+    "manualSaveLabel": "F5 Save world",
+    "manualDisabledLabel": "Manual save disabled",
+    "cooldownLabel": "Save cooldown",
+    "unavailableLabel": "Save unavailable",
+    "errorColorHex": "#FF6B6B"
   },
   "inventoryPanel": {
     "enabled": true,

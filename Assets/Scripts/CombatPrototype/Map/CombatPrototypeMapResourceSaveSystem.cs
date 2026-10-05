@@ -17,6 +17,10 @@ namespace Code_01.CombatPrototype.Map
     public partial class CombatPrototypeMapResourceSaveSystem : SystemBase
     {
         private Entity _source;
+        private Entity _statusSource;
+        private EntityQuery _connections;
+        private CombatPrototypeMapWorldSaveHudMode _status;
+        private readonly CombatPrototypeMapWorldSaveManualRequests _manual = new CombatPrototypeMapWorldSaveManualRequests();
         private CombatPrototypeMapData _map;
         private CombatPrototypeMapResourcePersistenceSettings _settings;
         private CombatPrototypeMapResourceBinding[] _bindings;
@@ -34,39 +38,60 @@ namespace Code_01.CombatPrototype.Map
             RequireForUpdate<CombatPrototypeMapResourcePersistenceSettings>();
             RequireForUpdate<CombatPrototypeMapResourceRestoreState>();
             RequireForUpdate<CombatPrototypePlayerSpawner>();
+            _connections = GetEntityQuery(new EntityQueryDesc
+            {
+                All = new[] { ComponentType.ReadOnly<NetworkStreamConnection>(), ComponentType.ReadOnly<CommandTarget>(),
+                    ComponentType.ReadOnly<NetworkId>(), ComponentType.ReadOnly<NetworkStreamInGame>() },
+                None = new[] { ComponentType.ReadOnly<NetworkStreamRequestDisconnect>() }
+            });
         }
 
         protected override void OnUpdate()
         {
             Dependency.Complete();
             var source = SystemAPI.GetSingletonEntity<CombatPrototypeMapData>();
-            if (_source != source) { FlushAndReset("SourceChanged"); }
-            var settings = EntityManager.GetComponentData<CombatPrototypeMapResourcePersistenceSettings>(source);
-            if (settings.Enabled == 0 || EntityManager.GetComponentData<CombatPrototypeMapResourceRestoreState>(source).Phase !=
-                CombatPrototypeMapResourceRestorePhase.Ready) return;
-            if (_source == Entity.Null)
+            if (_statusSource != source)
             {
-                _source = source;
-                _map = EntityManager.GetComponentData<CombatPrototypeMapData>(source);
-                _settings = settings;
-                var restore = World.GetExistingSystemManaged<CombatPrototypeMapResourceRestoreSystem>();
-                _bindings = restore.Bindings;
-                if (settings.SaveGroundDrops != 0)
-                {
-                    _dropOwner = World.GetExistingSystemManaged<CombatPrototypeMapDropSpawnSystem>();
-                    _dropBindings = restore.DropBindings;
-                    _drops = new CombatPrototypeMapDropPersistenceSnapshot();
-                    _nextDrops = new CombatPrototypeMapDropPersistenceSnapshot();
-                }
-                _depleted = new bool[_bindings.Length]; _nextDepleted = new bool[_bindings.Length];
-                _deadlines = new double[_bindings.Length]; _nextDeadlines = new double[_bindings.Length];
-                _nextSaveAt = SystemAPI.Time.ElapsedTime + settings.SaveIntervalSeconds;
+                FlushAndReset("SourceChanged");
+                _statusSource = source;
+                _status = CombatPrototypeMapWorldSaveHudMode.NotSaved;
             }
+            var settings = EntityManager.GetComponentData<CombatPrototypeMapResourcePersistenceSettings>(source);
+            var map = EntityManager.GetComponentData<CombatPrototypeMapData>(source);
+            var phase = EntityManager.GetComponentData<CombatPrototypeMapResourceRestoreState>(source).Phase;
             var time = SystemAPI.Time.ElapsedTime;
-            if (time < _nextCaptureAt) return;
+            var manual = _manual.Collect(EntityManager, _connections, map.MapDefinitionId, settings, phase, time);
+            if (settings.Enabled == 0 || phase != CombatPrototypeMapResourceRestorePhase.Ready)
+            {
+                _status = settings.Enabled == 0 ? CombatPrototypeMapWorldSaveHudMode.Disabled : CombatPrototypeMapWorldSaveHudMode.Hidden;
+                return;
+            }
+            if (!manual && time < _nextCaptureAt) return;
             var placement = -1;
+            var stage = "BindSnapshot";
+            var saved = false;
             try
             {
+                if (_source == Entity.Null)
+                {
+                    _map = map;
+                    _settings = settings;
+                    var restore = World.GetExistingSystemManaged<CombatPrototypeMapResourceRestoreSystem>();
+                    _bindings = restore.Bindings;
+                    if (settings.SaveGroundDrops != 0)
+                    {
+                        _dropOwner = World.GetExistingSystemManaged<CombatPrototypeMapDropSpawnSystem>();
+                        _dropBindings = restore.DropBindings;
+                        _drops = new CombatPrototypeMapDropPersistenceSnapshot();
+                        _nextDrops = new CombatPrototypeMapDropPersistenceSnapshot();
+                    }
+                    _depleted = new bool[_bindings.Length]; _nextDepleted = new bool[_bindings.Length];
+                    _deadlines = new double[_bindings.Length]; _nextDeadlines = new double[_bindings.Length];
+                    _nextSaveAt = time + settings.SaveIntervalSeconds;
+                    _source = source;
+                    _status = CombatPrototypeMapWorldSaveHudMode.NotSaved;
+                }
+                stage = "CaptureCompleteSnapshot";
                 var changed = false;
                 for (var index = 0; index < _bindings.Length; index++)
                 {
@@ -89,16 +114,28 @@ namespace Code_01.CombatPrototype.Map
                 var deadlineSwap = _deadlines; _deadlines = _nextDeadlines; _nextDeadlines = deadlineSwap;
                 _observedTime = time;
                 _hasSnapshot = true;
+                _nextCaptureAt = 0d;
                 _dirty |= changed;
-                if ((_dirty && (changed || time >= _nextSaveAt)) || time >= _nextSaveAt)
-                    TrySave(changed ? "StateChanged" : "Checkpoint");
+                if (manual || (_dirty && (changed || time >= _nextSaveAt)) || time >= _nextSaveAt)
+                    saved = TrySave(manual ? "ManualRequest" : changed ? "StateChanged" : "Checkpoint");
             }
             catch (Exception exception)
             {
-                _nextCaptureAt = time + _settings.SaveIntervalSeconds;
-                Debug.LogError("[CombatPrototype.Map] World snapshot capture failed; stage=CaptureCompleteSnapshot, map=" + _map.MapDefinitionId +
-                    ", slot=" + _settings.SaveSlotId + ", placement=" + placement + ". " + exception);
+                _status = CombatPrototypeMapWorldSaveHudMode.CaptureFailed;
+                _nextCaptureAt = time + settings.SaveIntervalSeconds;
+                Debug.LogError("[CombatPrototype.Map] World snapshot capture failed; stage=" + stage + ", map=" + map.MapDefinitionId +
+                    ", slot=" + settings.SaveSlotId + ", placement=" + placement + ". " + exception);
             }
+            finally { if (manual) _manual.Complete(saved); }
+        }
+
+        internal CombatPrototypeMapWorldSaveHudState ReadHud(Entity source, Entity player)
+        {
+            if (_statusSource != source || _status == CombatPrototypeMapWorldSaveHudMode.Hidden)
+                return CombatPrototypeMapWorldSaveHudState.Hidden;
+            var frame = new CombatPrototypeMapWorldSaveHudState { Mode = _status };
+            _manual.ApplyFeedback(player, ref frame);
+            return frame;
         }
 
         private void Read(CombatPrototypeMapResourceBinding binding, out bool depleted, out double deadline)
@@ -129,7 +166,7 @@ namespace Code_01.CombatPrototype.Map
             }
         }
 
-        private void TrySave(string reason)
+        private bool TrySave(string reason)
         {
             var path = CombatPrototypeMapResourceSaveStore.GetSavePath(_settings.SaveSlotId.ToString(), _map.MapDefinitionId.ToString());
             _nextSaveAt = _observedTime + _settings.SaveIntervalSeconds;
@@ -158,14 +195,18 @@ namespace Code_01.CombatPrototype.Map
                 }
                 CombatPrototypeMapResourceSaveStore.SavePrepared(data);
                 _dirty = false;
+                _status = CombatPrototypeMapWorldSaveHudMode.Saved;
                 Debug.Log("[CombatPrototype.Map] World snapshot saved; map=" + _map.MapDefinitionId + ", slot=" +
                     _settings.SaveSlotId + ", reason=" + reason + ", depleted=" + count + ", drops=" + data.Drops.Length + ", lastDropId=" + data.LastDropId + ", path=" + path + ".");
+                return true;
             }
             catch (Exception exception)
             {
                 _dirty = true;
+                _status = CombatPrototypeMapWorldSaveHudMode.SaveFailed;
                 Debug.LogError("[CombatPrototype.Map] World snapshot save failed; map=" + _map.MapDefinitionId + ", slot=" +
                     _settings.SaveSlotId + ", reason=" + reason + ", path=" + path + ". " + exception);
+                return false;
             }
         }
 
@@ -174,6 +215,9 @@ namespace Code_01.CombatPrototype.Map
             // Owned caches survive resource destruction; shutdown never reads released ECS entities.
             if (_hasSnapshot) TrySave(reason);
             _source = Entity.Null; _hasSnapshot = false; _dirty = false;
+            _statusSource = Entity.Null;
+            _status = CombatPrototypeMapWorldSaveHudMode.Hidden;
+            _manual.Reset();
             _bindings = null; _depleted = _nextDepleted = null; _deadlines = _nextDeadlines = null;
             _dropOwner = null; _dropBindings = null; _drops = _nextDrops = null;
             _nextSaveAt = _nextCaptureAt = 0;

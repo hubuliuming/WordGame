@@ -17,11 +17,11 @@
 
 五个新脚本及正常Unity生成的meta已导入；解析、投影、客户端均为普通C#帮助类，没有新MonoBehaviour挂载。原Main Camera已挂Camera/FollowCamera/HUD，宿主Awake读取同对象Camera，不查找或创建替代节点。未修改Scene/SubScene/Prefab/Animator结构、旧meta、资源绑定、网格/材质/图片/字体、包或构建配置。
 
-当前玩家输入15字段，新增修理归[专题](MapToolRepair.md)，F仍Mode/Kind/PlacementIndex/ProgressPermille四字段，G为Mode/DropId/ItemId/Quantity/LifetimeMode/RemainingSeconds六字段、SendToOwner，新增寿命归[G提示](MapPickupHud.md)；高亮本身不改Player Baker、F/G/RPC或存档；新增所属状态归[资源状态](MapResourceStatusHud.md)。各端须使用同版代码/配置并重新烘焙；配置不参与新增联网版本协商。
+当前玩家输入16字段，SaveWorld归[F5](MapWorldSaveHud.md)，修理归[专题](MapToolRepair.md)，F仍Mode/Kind/PlacementIndex/ProgressPermille四字段，G为Mode/DropId/ItemId/Quantity/LifetimeMode/RemainingSeconds六字段、SendToOwner，新增寿命归[G提示](MapPickupHud.md)；高亮本身不改Player Baker、F/G/RPC或存档；新增所属状态归[资源状态](MapResourceStatusHud.md)。各端须使用同版代码/配置并重新烘焙；配置不参与新增联网版本协商。
 
 ## 【FACT】当前JSON契约与建议默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=17/configRevision=20。interactionHighlight段及14字段必填，沿原严格UTF-8、缺失/未知/重复字段、对象形状及标量类型检查；旧v1～v16明确失败，不迁移、补段或回退来源。正常导入/烘焙后生效，没有运行热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=18/configRevision=21。interactionHighlight段及14字段必填，沿原严格UTF-8、缺失/未知/重复字段、对象形状及标量类型检查；旧v1～v17明确失败，不迁移、补段或回退来源。正常导入/烘焙后生效，没有运行热重载。
 
 | 字段 | 当前默认值 | 契约/用途 |
 |---|---|---|
@@ -84,10 +84,12 @@ AI未执行GamePlayer/PlayMode、游戏模拟/显示系统/GUI回调、逻辑单
 
 v13/16的[资源状态](MapResourceStatusHud.md)独立显示文字、在原G面板上方绘制；F Ready/Working身份优先，无F目标才选择附近状态目标。状态目标不新增圆环，不改原圈的资格/身份/颜色/半径。状态开启可保留F采样及绑定，新增所属四字段静态及用户人工通过，限v13/16十项，未触发用例UNKNOWN；高亮用户通过仍限v12/15十项。
 
-当前v17/20的[工具修理](MapToolRepair.md)只恢复既有工具耐久，不预约资源或新增圆环；F/G原目标身份、颜色/投影及生命周期保持。新增输入与所属结果要求各端同版重新烘焙，修理静态及用户人工通过，限v14/17十二项，未触发用例UNKNOWN。
+当前v18/21的[工具修理](MapToolRepair.md)只恢复既有工具耐久，不预约资源或新增圆环；F/G原目标身份、颜色/投影及生命周期保持。新增输入与所属结果要求各端同版重新烘焙，修理静态及用户人工通过，限v14/17十二项，未触发用例UNKNOWN。
 
 ## 【FACT】地图资源存档接入边界
 
 资源恢复重建耗尽阶段和本次阻挡基态，圆环仍沿原F/G权威身份/阶段绘制，不读取文件或增加Ghost字段。资源存档人工通过限v15/18十二项，未触发用例UNKNOWN，见[资源存档](MapResourcePersistence.md)。 掉落恢复及同文件快照归[掉落存档](MapDropPersistence.md)，人工通过限v16/19十二项，未触发用例UNKNOWN。
 
-寿命提示v17/20归[G提示](MapPickupHud.md)：所属G六字段，原目标/拾取/期限/保存保持，主线程静态通过、新人工UNKNOWN；旧用户通过仍限原版本/清单。
+寿命提示v17/20归[G提示](MapPickupHud.md)：所属G六字段，原目标/拾取/期限/保存保持；静态及用户人工通过限十二项，未触发独立用例UNKNOWN；旧用户通过仍限原版本/清单。
+
+地图v18/21的[F5/保存提示](MapWorldSaveHud.md)已接入：当前16输入、新增所属3字段；原F/G、工具及世界/玩家存档格式保持。编译/字段/烘焙静态通过，人工UNKNOWN；旧通过限原版本/清单。

@@ -101,6 +101,8 @@ namespace Code_01.CombatPrototype.Map
                 {
                     Enabled = (byte)(persistence.enabled ? 1 : 0), SaveSlotId = persistence.saveSlotId,
                     SaveIntervalSeconds = persistence.saveIntervalSeconds, SaveGroundDrops = (byte)(persistence.saveGroundDrops ? 1 : 0),
+                    ManualSaveEnabled = (byte)(persistence.manualSaveEnabled ? 1 : 0),
+                    ManualSaveCooldownSeconds = persistence.manualSaveCooldownSeconds,
                     LayoutSignature = new FixedString128Bytes(CombatPrototypeMapResourceLayoutSignature.Compute(config, layout))
                 });
                 AddComponent(entity, new CombatPrototypeMapResourceRestoreState
@@ -163,6 +165,23 @@ namespace Code_01.CombatPrototype.Map
                     RegrowingLabel = new FixedString64Bytes(resourceStatus.regrowingLabel),
                     WaitingLabel = new FixedString64Bytes(resourceStatus.waitingLabel),
                     DepletedLabel = new FixedString64Bytes(resourceStatus.depletedLabel)
+                });
+                var worldSave = config.map.worldSaveHud;
+                AddComponent(entity, new CombatPrototypeMapWorldSaveHudSettings
+                {
+                    Enabled = (byte)(worldSave.enabled ? 1 : 0), PanelWidthPixels = worldSave.panelWidthPixels,
+                    PanelHeightPixels = worldSave.panelHeightPixels, BottomMarginPixels = worldSave.bottomMarginPixels,
+                    FontSize = worldSave.fontSize, FeedbackSeconds = worldSave.feedbackSeconds,
+                    DisabledLabel = new FixedString64Bytes(worldSave.disabledLabel),
+                    NotSavedLabel = new FixedString64Bytes(worldSave.notSavedLabel),
+                    SavedLabel = new FixedString64Bytes(worldSave.savedLabel),
+                    CaptureFailedLabel = new FixedString64Bytes(worldSave.captureFailedLabel),
+                    SaveFailedLabel = new FixedString64Bytes(worldSave.saveFailedLabel),
+                    ManualSaveLabel = new FixedString64Bytes(worldSave.manualSaveLabel),
+                    ManualDisabledLabel = new FixedString64Bytes(worldSave.manualDisabledLabel),
+                    CooldownLabel = new FixedString64Bytes(worldSave.cooldownLabel),
+                    UnavailableLabel = new FixedString64Bytes(worldSave.unavailableLabel),
+                    ErrorColor = CombatPrototypeMapInteractionHighlightSettings.ColorFromHex(worldSave.errorColorHex)
                 });
                 var inventoryPanel = config.map.inventoryPanel;
                 AddComponent(entity, new CombatPrototypeMapInventoryPanelSettings

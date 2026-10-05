@@ -43,6 +43,7 @@ namespace Code_01.CombatPrototype.Map
         private readonly CombatPrototypeMapInteractionHighlightClient _highlight = new CombatPrototypeMapInteractionHighlightClient();
         private readonly CombatPrototypeMapResourceStatusHudClient _resourceStatus = new CombatPrototypeMapResourceStatusHudClient();
         private readonly CombatPrototypeMapGatherToolRepairFeedbackClient _repairFeedback = new CombatPrototypeMapGatherToolRepairFeedbackClient();
+        private readonly CombatPrototypeMapWorldSaveHudClient _worldSaveHud = new CombatPrototypeMapWorldSaveHudClient();
         private Camera _highlightCamera;
 
         private void Awake()
@@ -97,7 +98,8 @@ namespace Code_01.CombatPrototype.Map
             CombatPrototypeMapGatherToolDefinition pickaxe, CombatPrototypeMapInventoryDropSettings dropSettings,
             DynamicBuffer<CombatPrototypeMapInventoryDropDefinition> dropDefinitions, CombatPrototypeMapPickupHudSettings pickupSettings,
             CombatPrototypeMapInteractionHighlightSettings highlightSettings,
-            CombatPrototypeMapResourceStatusHudSettings resourceStatusSettings, string mapId)
+            CombatPrototypeMapResourceStatusHudSettings resourceStatusSettings, CombatPrototypeMapWorldSaveHudSettings worldSaveSettings,
+            CombatPrototypeMapResourcePersistenceSettings persistenceSettings, string mapId)
         {
             Reset();
             _settings = settings;
@@ -114,6 +116,7 @@ namespace Code_01.CombatPrototype.Map
             _highlight.Configure(highlightSettings, mapId, _highlightCamera);
             _resourceStatus.Configure(resourceStatusSettings, settings, mapId);
             _repairFeedback.Configure(toolSettings, inventorySettings, axe, pickaxe, mapId);
+            _worldSaveHud.Configure(worldSaveSettings, persistenceSettings, mapId);
         }
 
         internal void Show(CombatPrototypeMapInteractionHudState state, DynamicBuffer<CombatPrototypeMapGatherTool> tools,
@@ -175,6 +178,7 @@ namespace Code_01.CombatPrototype.Map
         }
 
         internal void ShowResourceStatus(CombatPrototypeMapResourceStatusHudState state) => _resourceStatus.Show(state);
+        internal void ShowWorldSave(CombatPrototypeMapWorldSaveHudState state) => _worldSaveHud.Show(state);
 
         private void RefreshToolStatus(DynamicBuffer<CombatPrototypeMapGatherTool> tools)
         {
@@ -267,6 +271,7 @@ namespace Code_01.CombatPrototype.Map
             _pickupHud.Clear();
             _highlight.Clear();
             _resourceStatus.Clear();
+            _worldSaveHud.Clear();
         }
 
         internal void Reset()
@@ -277,6 +282,7 @@ namespace Code_01.CombatPrototype.Map
             _highlight.Reset();
             _resourceStatus.Reset();
             _repairFeedback.Reset();
+            _worldSaveHud.Reset();
             _labelStyle = null;
             _text = _toolText = _feedbackText = string.Empty;
             _mode = CombatPrototypeMapInteractionHudMode.Hidden;
@@ -297,6 +303,7 @@ namespace Code_01.CombatPrototype.Map
             _inventoryPanel.Draw();
             _pickupHud.Draw();
             _resourceStatus.Draw();
+            _worldSaveHud.Draw();
             if (!_visible || Event.current.type != EventType.Repaint || Screen.width <= 0 || Screen.height <= 0) return;
             if (_labelStyle == null)
             {

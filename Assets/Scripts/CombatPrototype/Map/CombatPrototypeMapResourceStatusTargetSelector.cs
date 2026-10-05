@@ -23,6 +23,7 @@ namespace Code_01.CombatPrototype.Map
             List<Target> targets, Dictionary<(byte, int), Target> identities, HashSet<(byte, int)> failed)
         {
             if (interaction.Mode == CombatPrototypeMapInteractionHudMode.Ready ||
+                interaction.Mode == CombatPrototypeMapInteractionHudMode.NoSpace ||
                 interaction.Mode == CombatPrototypeMapInteractionHudMode.Working)
             {
                 // CaptureState already reports a failed resource; do not report the same failure per player.
@@ -30,7 +31,7 @@ namespace Code_01.CombatPrototype.Map
                 if (!identities.TryGetValue((interaction.Kind, interaction.PlacementIndex), out var current))
                     throw new InvalidOperationException("The authoritative F target is absent from resource status data; type=" +
                         interaction.Kind + ", placement=" + interaction.PlacementIndex + ".");
-                if (interaction.Mode == CombatPrototypeMapInteractionHudMode.Ready ?
+                if (interaction.Mode != CombatPrototypeMapInteractionHudMode.Working ?
                     current.Mode != CombatPrototypeMapResourceStatusHudMode.Available :
                     current.Mode != CombatPrototypeMapResourceStatusHudMode.Occupied || current.Collector != player)
                     throw new InvalidOperationException("Resource state does not match the authoritative F target.");

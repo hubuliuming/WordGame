@@ -15,6 +15,8 @@ namespace Code_01.CombatPrototype.Map
         public float RowHeightPixels;
         public FixedString64Bytes PanelTitle;
         public FixedString64Bytes MaterialsLabel;
+        public FixedString64Bytes CapacityLabel;
+        public FixedString64Bytes UnlimitedLabel;
         public FixedString64Bytes ToolsLabel;
         public FixedString64Bytes CraftLabel;
         public FixedString64Bytes CraftButtonLabel;

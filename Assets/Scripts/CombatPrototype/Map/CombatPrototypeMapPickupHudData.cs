@@ -5,7 +5,7 @@ using Unity.NetCode;
 
 namespace Code_01.CombatPrototype.Map
 {
-    public enum CombatPrototypeMapPickupHudMode : byte { Hidden, Ready }
+    public enum CombatPrototypeMapPickupHudMode : byte { Hidden, Ready, NoSpace }
     public enum CombatPrototypeMapPickupLifetimeHudMode : byte { None, Timed, ExpiringSoon, Permanent }
 
     [GhostComponent(OwnerSendType = SendToOwnerType.SendToOwner)]
@@ -32,6 +32,7 @@ namespace Code_01.CombatPrototype.Map
         public FixedString64Bytes AppleLabel;
         public FixedString64Bytes WoodLabel;
         public FixedString64Bytes StoneLabel;
+        public FixedString64Bytes NoSpaceLabel;
         public byte LifetimeEnabled;
         public byte ExpiryWarningEnabled;
         public float ExpiryWarningSeconds;

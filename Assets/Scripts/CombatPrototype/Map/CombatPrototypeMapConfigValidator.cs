@@ -11,7 +11,8 @@ namespace Code_01.CombatPrototype.Map
                 config.map.resourcePersistence == null || config.map.layout == null || config.map.movement == null || config.map.drops == null || config.map.treeHarvest == null ||
                 config.map.mining == null || config.map.gatherTools == null || config.map.gatherTools.tools == null ||
                 config.map.interactionHud == null || config.map.pickupHud == null || config.map.interactionHighlight == null || config.map.resourceStatusHud == null || config.map.inventoryPanel == null || config.map.inventoryDrop == null || config.map.inventoryDrop.items == null ||
-                config.map.worldSaveHud == null || config.map.population == null || config.map.spawn == null ||
+                config.map.worldSaveHud == null || config.map.inventoryCapacity == null || config.map.inventoryCapacity.items == null ||
+                config.map.population == null || config.map.spawn == null ||
                 config.biomes == null || config.grounds == null || config.objects == null ||
                 config.map.biomeIds == null || config.map.biomeRegions == null)
                 throw new InvalidOperationException("Map configuration is missing required sections.");
@@ -38,15 +39,17 @@ namespace Code_01.CombatPrototype.Map
             HudLabel(hud.gatherLabel, "interactionHud.gatherLabel");
             HudLabel(hud.treeLabel, "interactionHud.treeLabel");
             HudLabel(hud.mineLabel, "interactionHud.mineLabel");
+            HudLabel(hud.noSpaceLabel, "interactionHud.noSpaceLabel");
             ValidatePickupHud(map.pickupHud, hud);
             ValidateInteractionHighlight(map.interactionHighlight);
             ValidateResourceStatusHud(map.resourceStatusHud, map.pickupHud);
             ValidateWorldSaveHud(map.worldSaveHud, map.resourceStatusHud);
             ValidateInventoryPanel(map.inventoryPanel);
+            ValidateInventoryCapacity(map.inventoryCapacity);
             ValidateInventoryDrop(map.inventoryDrop);
             Id(map.mapDefinitionId, "mapDefinitionId");
-            if (map.schemaVersion != 18 || map.configRevision < 1 || map.defaultSeed < 1)
-                throw new InvalidOperationException("Map requires schemaVersion=18, positive revision and seed.");
+            if (map.schemaVersion != 19 || map.configRevision < 1 || map.defaultSeed < 1)
+                throw new InvalidOperationException("Map requires schemaVersion=19, positive revision and seed.");
             var drops = map.drops;
             Id(drops.itemId, "drops.itemId");
             Id(drops.visualResourceKey, "drops.visualResourceKey");
@@ -343,6 +346,7 @@ namespace Code_01.CombatPrototype.Map
             HudLabel(pickup.appleLabel, "pickupHud.appleLabel");
             HudLabel(pickup.woodLabel, "pickupHud.woodLabel");
             HudLabel(pickup.stoneLabel, "pickupHud.stoneLabel");
+            HudLabel(pickup.noSpaceLabel, "pickupHud.noSpaceLabel");
             HudLabel(pickup.expiresInLabel, "pickupHud.expiresInLabel");
             HudLabel(pickup.permanentLabel, "pickupHud.permanentLabel");
             HudLabel(pickup.expiringSoonLabel, "pickupHud.expiringSoonLabel");
@@ -372,6 +376,21 @@ namespace Code_01.CombatPrototype.Map
             }
         }
 
+        private static void ValidateInventoryCapacity(MapInventoryCapacityConfig capacity)
+        {
+            if (capacity.maxTotalQuantity <= 0 || capacity.items.Length != 3)
+                throw new InvalidOperationException("inventoryCapacity requires a positive total and exactly vitality_apple, wood and stone.");
+            var ids = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var item in capacity.items)
+            {
+                if (item == null) throw new InvalidOperationException("inventoryCapacity.items does not allow null entries.");
+                Unique(ids, item.itemId, "inventoryCapacity.items.itemId");
+                CombatPrototypeMapYieldItemResolver.Resolve(item.itemId);
+                if (item.maxQuantity <= 0)
+                    throw new InvalidOperationException("inventoryCapacity.items.maxQuantity must be positive for " + item.itemId);
+            }
+        }
+
         private static void ValidateInventoryPanel(MapInventoryPanelConfig panel)
         {
             Positive(panel.panelWidthPixels, "inventoryPanel.panelWidthPixels");
@@ -389,6 +408,8 @@ namespace Code_01.CombatPrototype.Map
                     "width+right margin <= 1920 and height+top margin <= 1080.");
             HudLabel(panel.panelTitle, "inventoryPanel.panelTitle");
             HudLabel(panel.materialsLabel, "inventoryPanel.materialsLabel");
+            HudLabel(panel.capacityLabel, "inventoryPanel.capacityLabel");
+            HudLabel(panel.unlimitedLabel, "inventoryPanel.unlimitedLabel");
             HudLabel(panel.toolsLabel, "inventoryPanel.toolsLabel");
             HudLabel(panel.craftLabel, "inventoryPanel.craftLabel");
             HudLabel(panel.craftButtonLabel, "inventoryPanel.craftButtonLabel");

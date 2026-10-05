@@ -1,6 +1,6 @@
 # 背包展示与道具使用
 
-返回[导航](../AI_Understanding.md)。背包规则；[数据](DataResources.md)、[修理](MapToolRepair.md)、[世界存档](MapResourcePersistence.md)、[掉落存档](MapDropPersistence.md)已验收。
+返回[导航](../AI_Understanding.md)。材料容量归[容量](MapInventoryCapacity.md)，其余背包/存档规则归下述专题。
 
 ## 入口文件
 
@@ -119,11 +119,11 @@ KnapsackControl.OnStart 缓存当前 PlayerModel 与 FactoryUISystem，记录 Co
 
 统一入口先记录本 tick 已有交互，采集系统随后维护预约。移动输入、攻击请求或非 Ready、受击序号改变、死亡、超距、断线/目标失效均取消并释放为 Available，不发物品。期间采集者不强制锁定移动或攻击，取消不恢复体力；完成时间到达仍须先满足当次资格与范围。Available/Collecting 显示，Depleted 由客户端按 Ghost 状态隐藏，进度归[交互HUD](MapInteractionHud.md)，没有自动重试；耗尽后的再生沿下述独立服务端计时链。
 
-完成前取得库存与状态引用；按既有 ItemName 合并或新增，检查数量溢出并预留新增缓冲容量。PrepareReward 生成保持当前金币/经验的完整库存候选，SavePrepared 成功返回后同次提交库存、清除预约并设置 Depleted，同时按配置记录再生期限。准备/保存失败记录地图、布置索引、NetworkId、物品、阶段与原异常，库存数量及资源耗尽不提交，释放预约并继续其他点；玩家须重新按 F。全部奖励/消费/采集候选均保留Tools并写v2，地图状态另存世界档；客户端背包沿原Ghost缓冲同步、每2秒日志及[网络面板](MapInventoryPanel.md)查看。
+完成前取得库存与状态引用，复核[容量](MapInventoryCapacity.md)；通过后同名合并/新增，checked检查数量并预留缓冲。PrepareReward 生成保持当前金币/经验的完整库存候选，SavePrepared 成功返回后同次提交库存、清除预约并设置 Depleted，同时按配置记录再生期限。准备/保存失败记录地图、布置索引、NetworkId、物品、阶段与原异常，库存数量及资源耗尽不提交，释放预约并继续其他点；玩家须重新按 F。全部奖励/消费/采集候选均保留Tools并写v2，地图状态另存世界档；客户端背包沿原Ghost缓冲同步、每2秒日志及[网络面板](MapInventoryPanel.md)查看。
 
 ## 【CURRENT STRATEGY】采集物原点再生
 
-默认 gather_apple 启用 regrowEnabled=true、regrowSeconds=600；形状保持；当前地图v18/21，完整配置段归[地图](Map.md)。Map Baker → GatherSpawnSystem 将开关和间隔送入仅服务端的 GatherConfig；仅在采集保存成功后，GatherProgress.RegrowAt 写为该次 Server World 模拟时间加间隔，Collector/StartHitSequence/FinishAt 清空。取消或准备/保存失败清空进度、释放预约，不发物品、不安排再生，也不自动重试。
+默认 gather_apple 启用 regrowEnabled=true、regrowSeconds=600；形状保持；当前地图v19/22，完整配置段归[地图](Map.md)。Map Baker → GatherSpawnSystem 将开关和间隔送入仅服务端的 GatherConfig；仅在采集保存成功后，GatherProgress.RegrowAt 写为该次 Server World 模拟时间加间隔，Collector/StartHitSequence/FinishAt 清空。取消或准备/保存失败清空进度、释放预约，不发物品、不安排再生，也不自动重试。
 
 [GatherRegrowSystem](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapGatherRegrowSystem.cs) 在 PredictedSimulationSystemGroup 的 GatherSystem 之后、PlayerRespawnSystem 之前恢复到期 Depleted 点为 Available，并清空期限及采集者。原实体、位置和 PlacementIndex 保持，客户端复用原 Ghost 状态和显示系统恢复显示；再生不入包、不保存库存，也不自动开始下一次采集。玩家须重新按 F，完整资格/预约/保存规则继续生效；regrowEnabled=false 时点保持本局耗尽。该再生阶段仅保留本局，当前按资源存档开关恢复，已保存库存沿v2固定ID恢复，读取v1迁移。
 
@@ -165,4 +165,4 @@ v7/revision=10 的[交互显示](MapInteractionHud.md)只显示 F 目标和原�
 
 [制作面板](MapInventoryPanel.md)显示原库存/工具、B开关和配方按钮，v9/12编译/十四次烘焙及用户人工十二项已通过，限原版本/清单。v10/13的[背包丢弃](MapInventoryDrop.md)支持苹果/木材/石材Single与All：服务端准备消费候选及不可领取掉落，保存成功才扣库存并激活；沿原G拾取，该丢弃阶段未拾取物重启消失，当前见掉落存档。没有99拆格或新物品效果，金币/经验/Tools及v2存储保持。丢弃静态及用户人工通过限v10/13十二项，未触发用例UNKNOWN，清单见[运行入口](Runtime.md)。
 
-[G提示](MapPickupHud.md)寿命已验收；[F5](MapWorldSaveHud.md)只存世界，人工UNKNOWN。
+[G提示](MapPickupHud.md)寿命已验收；[F5](MapWorldSaveHud.md)只存世界，已验收。

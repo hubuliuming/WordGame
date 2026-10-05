@@ -20,6 +20,7 @@ namespace Code_01.CombatPrototype.Map
         private string _gatherLabel;
         private string _treeLabel;
         private string _mineLabel;
+        private string _noSpaceLabel;
         private string _text;
         private string _toolText;
         private string _feedbackText;
@@ -99,7 +100,9 @@ namespace Code_01.CombatPrototype.Map
             DynamicBuffer<CombatPrototypeMapInventoryDropDefinition> dropDefinitions, CombatPrototypeMapPickupHudSettings pickupSettings,
             CombatPrototypeMapInteractionHighlightSettings highlightSettings,
             CombatPrototypeMapResourceStatusHudSettings resourceStatusSettings, CombatPrototypeMapWorldSaveHudSettings worldSaveSettings,
-            CombatPrototypeMapResourcePersistenceSettings persistenceSettings, string mapId)
+            CombatPrototypeMapResourcePersistenceSettings persistenceSettings,
+            CombatPrototypeMapInventoryCapacitySettings capacity, DynamicBuffer<CombatPrototypeMapInventoryCapacityDefinition> capacityDefinitions,
+            string mapId)
         {
             Reset();
             _settings = settings;
@@ -111,7 +114,8 @@ namespace Code_01.CombatPrototype.Map
             _gatherLabel = settings.GatherLabel.ToString();
             _treeLabel = settings.TreeLabel.ToString();
             _mineLabel = settings.MineLabel.ToString();
-            _inventoryPanel.Configure(inventorySettings, toolSettings, axe, pickaxe, dropSettings, dropDefinitions);
+            _noSpaceLabel = settings.NoSpaceLabel.ToString();
+            _inventoryPanel.Configure(inventorySettings, toolSettings, axe, pickaxe, dropSettings, dropDefinitions, capacity, capacityDefinitions);
             _pickupHud.Configure(pickupSettings);
             _highlight.Configure(highlightSettings, mapId, _highlightCamera);
             _resourceStatus.Configure(resourceStatusSettings, settings, mapId);
@@ -149,8 +153,10 @@ namespace Code_01.CombatPrototype.Map
                 _toolText = hasFeedback ? ToolStatus(feedbackKind) : string.Empty;
                 return;
             }
-            if ((state.Mode != CombatPrototypeMapInteractionHudMode.Ready && state.Mode != CombatPrototypeMapInteractionHudMode.Working) ||
+            if ((state.Mode != CombatPrototypeMapInteractionHudMode.Ready && state.Mode != CombatPrototypeMapInteractionHudMode.Working &&
+                 state.Mode != CombatPrototypeMapInteractionHudMode.NoSpace) ||
                 state.Kind < (byte)CombatPrototypeMapInteractionKind.Gather || state.Kind > (byte)CombatPrototypeMapInteractionKind.Mine ||
+                (state.Mode == CombatPrototypeMapInteractionHudMode.NoSpace && (state.Kind != (byte)CombatPrototypeMapInteractionKind.Gather || state.ProgressPermille != 0)) ||
                 state.PlacementIndex < 0 || state.ProgressPermille > 1000)
                 throw new InvalidOperationException("[CombatPrototype.Map] Invalid owner HUD snapshot; mode=" + state.Mode +
                     ", type=" + state.Kind + ", placement=" + state.PlacementIndex + ", progress=" + state.ProgressPermille + ".");
@@ -159,13 +165,14 @@ namespace Code_01.CombatPrototype.Map
             {
                 var label = (CombatPrototypeMapInteractionKind)state.Kind == CombatPrototypeMapInteractionKind.Gather ?
                     _gatherLabel : (CombatPrototypeMapInteractionKind)state.Kind == CombatPrototypeMapInteractionKind.Tree ? _treeLabel : _mineLabel;
-                _text = state.Mode == CombatPrototypeMapInteractionHudMode.Ready ? "F  " + label : label + "  " + percent + "%";
+                _text = state.Mode == CombatPrototypeMapInteractionHudMode.NoSpace ? _noSpaceLabel :
+                    state.Mode == CombatPrototypeMapInteractionHudMode.Ready ? "F  " + label : label + "  " + percent + "%";
                 _mode = state.Mode;
                 _kind = state.Kind;
                 _percent = percent;
             }
             _progress = state.ProgressPermille / 1000f;
-            _toolText = hasFeedback ? displayFeedback :
+            _toolText = state.Mode == CombatPrototypeMapInteractionHudMode.NoSpace ? "F  " + _gatherLabel : hasFeedback ? displayFeedback :
                 state.Kind == (byte)CombatPrototypeMapInteractionKind.Gather ? "Hands" :
                 ToolStatus(state.Kind == (byte)CombatPrototypeMapInteractionKind.Tree ?
                     CombatPrototypeMapGatherToolKind.Axe : CombatPrototypeMapGatherToolKind.Pickaxe);

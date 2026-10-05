@@ -14,6 +14,7 @@ namespace Code_01.CombatPrototype.Map
         public string appleLabel;
         public string woodLabel;
         public string stoneLabel;
+        public string noSpaceLabel;
         public bool lifetimeEnabled;
         public bool expiryWarningEnabled;
         public float expiryWarningSeconds;

@@ -14,5 +14,6 @@ namespace Code_01.CombatPrototype.Map
         public string gatherLabel;
         public string treeLabel;
         public string mineLabel;
+        public string noSpaceLabel;
     }
 }

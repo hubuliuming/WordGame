@@ -4,7 +4,7 @@ using Unity.NetCode;
 
 namespace Code_01.CombatPrototype.Map
 {
-    public enum CombatPrototypeMapInteractionHudMode : byte { Hidden, Ready, Working }
+    public enum CombatPrototypeMapInteractionHudMode : byte { Hidden, Ready, Working, NoSpace }
 
     [GhostComponent(OwnerSendType = SendToOwnerType.SendToOwner)]
     public struct CombatPrototypeMapInteractionHudState : IComponentData
@@ -29,5 +29,6 @@ namespace Code_01.CombatPrototype.Map
         public FixedString64Bytes GatherLabel;
         public FixedString64Bytes TreeLabel;
         public FixedString64Bytes MineLabel;
+        public FixedString64Bytes NoSpaceLabel;
     }
 }

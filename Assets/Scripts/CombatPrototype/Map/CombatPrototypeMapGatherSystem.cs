@@ -49,7 +49,10 @@ namespace Code_01.CombatPrototype.Map
         protected override void OnUpdate()
         {
             Dependency.Complete();
-            var map = SystemAPI.GetSingleton<CombatPrototypeMapData>();
+            var source = SystemAPI.GetSingletonEntity<CombatPrototypeMapData>();
+            var map = EntityManager.GetComponentData<CombatPrototypeMapData>(source);
+            var capacity = EntityManager.GetComponentData<CombatPrototypeMapInventoryCapacitySettings>(source);
+            var capacityDefinitions = EntityManager.GetBuffer<CombatPrototypeMapInventoryCapacityDefinition>(source, true);
             var time = SystemAPI.Time.ElapsedTime;
             using var points = _points.ToEntityArray(Allocator.Temp);
             var players = new NativeList<OnlinePlayer>(Allocator.Temp);
@@ -121,7 +124,7 @@ namespace Code_01.CombatPrototype.Map
                             continue;
                         }
                         if (time >= progress.ValueRO.FinishAt)
-                            Complete(current, progress, config, player, access, map.MapDefinitionId, point, time);
+                            Complete(current, progress, config, player, access, map.MapDefinitionId, point, time, capacity, capacityDefinitions);
                     }
                     catch (Exception exception)
                     {
@@ -204,15 +207,24 @@ namespace Code_01.CombatPrototype.Map
 
         private static void Complete(RefRW<CombatPrototypeMapGatherState> state,
             RefRW<CombatPrototypeMapGatherProgress> progress, CombatPrototypeMapGatherConfig config,
-            OnlinePlayer player, PlayerLookups access, FixedString64Bytes mapId, Entity point, double time)
+            OnlinePlayer player, PlayerLookups access, FixedString64Bytes mapId, Entity point, double time,
+            CombatPrototypeMapInventoryCapacitySettings capacity, DynamicBuffer<CombatPrototypeMapInventoryCapacityDefinition> capacityDefinitions)
         {
-            var stage = "PrepareReward";
+            var stage = "CheckCapacity";
             var placement = state.ValueRO.PlacementIndex;
             try
             {
                 var playerId = access.Identities[player.Entity].PlayerId;
                 var reward = access.Rewards[player.Entity];
                 var inventory = access.Inventories[player.Entity];
+                var rejection = CombatPrototypeMapInventoryCapacityUtility.GetRejection(capacity, capacityDefinitions,
+                    inventory, config.YieldItemName, config.YieldQuantity);
+                if (rejection != null)
+                {
+                    Cancel(state, progress, mapId, point, rejection);
+                    return;
+                }
+                stage = "PrepareReward";
                 var itemIndex = -1;
                 for (var i = 0; i < inventory.Length; i++)
                     if (inventory[i].ItemName.Equals(config.YieldItemName)) { itemIndex = i; break; }

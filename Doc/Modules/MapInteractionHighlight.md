@@ -21,7 +21,7 @@
 
 ## 【FACT】当前JSON契约与建议默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=18/configRevision=21。interactionHighlight段及14字段必填，沿原严格UTF-8、缺失/未知/重复字段、对象形状及标量类型检查；旧v1～v17明确失败，不迁移、补段或回退来源。正常导入/烘焙后生效，没有运行热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=19/configRevision=22。interactionHighlight段及14字段必填，沿原严格UTF-8、缺失/未知/重复字段、对象形状及标量类型检查；旧v1～v18明确失败，不迁移、补段或回退来源。正常导入/烘焙后生效，没有运行热重载。
 
 | 字段 | 当前默认值 | 契约/用途 |
 |---|---|---|
@@ -44,9 +44,9 @@
 
 ## 【CURRENT STRATEGY】复用权威目标、读取客户端位置
 
-原服务端快照继续决定身份：F Ready选原最近可交互资源，Working锁定本人原Collector目标，G Ready选原最近可拾取掉落。文字与圆环读取同一份所属快照；解析器不按客户端距离重新选择，不上传目标或新增预约。按F/G仍在原实际处理tick使用原资格与选择/结算链，显示可能因网络延迟滞后。
+原服务端快照继续决定身份：F Ready/NoSpace选原最近可交互资源，Working锁定本人原Collector目标，G Ready/NoSpace选原最近掉落；空间不足规则归[容量](MapInventoryCapacity.md)。文字与圆环读取同一份所属快照；解析器不按客户端距离重新选择，不上传目标或新增预约。按F/G仍在原实际处理tick使用原资格与选择/结算链，显示可能因网络延迟滞后。
 
-F按Kind/PlacementIndex查询原GatherState/TreeState/MineState，排除Prefab并缓存实体；每次核对实体仍存在且身份一致。Ready仅接受原Available/Standing/Available，Working仅接受原Collecting/Chopping/Mining且CollectorNetworkId匹配本人。G按DropId解析原DropState，仅接受Landed。准备态/飞行/Consumed不画G圈；到期由原服务端处理和所属Hidden快照反映，客户端不读取仅服务端ExpiresAt。
+F按Kind/PlacementIndex查询原GatherState/TreeState/MineState，排除Prefab并缓存实体；每次核对实体仍存在且身份一致。Ready/NoSpace仅接受原Available/Standing/Available，NoSpace仅允许Gather且进度0，Working仅接受原Collecting/Chopping/Mining且CollectorNetworkId匹配本人。G按DropId解析原DropState，仅接受Landed。准备态/飞行/Consumed不画G圈；到期由原服务端处理和所属Hidden快照反映，客户端不读取仅服务端ExpiresAt。
 
 原所属与资源Ghost可分批到达：目标暂未找到或阶段尚未与所属快照一致时当前帧不画，后续按相同身份继续解析；不猜位置、转选其他实体或保留上一局圈。Hidden/身份变更/实体失效重置对应缓存。已知非隐藏快照的非法模式/身份/Phase、重复身份或必要LocalToWorld缺失均暴露原异常，清空当前通道，不创建默认配置或替代实体。
 
@@ -84,7 +84,7 @@ AI未执行GamePlayer/PlayMode、游戏模拟/显示系统/GUI回调、逻辑单
 
 v13/16的[资源状态](MapResourceStatusHud.md)独立显示文字、在原G面板上方绘制；F Ready/Working身份优先，无F目标才选择附近状态目标。状态目标不新增圆环，不改原圈的资格/身份/颜色/半径。状态开启可保留F采样及绑定，新增所属四字段静态及用户人工通过，限v13/16十项，未触发用例UNKNOWN；高亮用户通过仍限v12/15十项。
 
-当前v18/21的[工具修理](MapToolRepair.md)只恢复既有工具耐久，不预约资源或新增圆环；F/G原目标身份、颜色/投影及生命周期保持。新增输入与所属结果要求各端同版重新烘焙，修理静态及用户人工通过，限v14/17十二项，未触发用例UNKNOWN。
+当前v19/22的[工具修理](MapToolRepair.md)只恢复既有工具耐久，不预约资源或新增圆环；F/G原目标身份、颜色/投影及生命周期保持。新增输入与所属结果要求各端同版重新烘焙，修理静态及用户人工通过，限v14/17十二项，未触发用例UNKNOWN。
 
 ## 【FACT】地图资源存档接入边界
 
@@ -92,4 +92,4 @@ v13/16的[资源状态](MapResourceStatusHud.md)独立显示文字、在原G面�
 
 寿命提示v17/20归[G提示](MapPickupHud.md)：所属G六字段，原目标/拾取/期限/保存保持；静态及用户人工通过限十二项，未触发独立用例UNKNOWN；旧用户通过仍限原版本/清单。
 
-地图v18/21的[F5/保存提示](MapWorldSaveHud.md)已接入：当前16输入、新增所属3字段；原F/G、工具及世界/玩家存档格式保持。编译/字段/烘焙静态通过，人工UNKNOWN；旧通过限原版本/清单。
+地图v18/21的[F5/保存提示](MapWorldSaveHud.md)已接入：当前16输入、新增所属3字段；原F/G、工具及世界/玩家存档格式保持。静态及用户人工通过限v18/revision21十二项，未触发独立用例UNKNOWN；旧通过限原版本/清单。

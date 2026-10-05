@@ -23,6 +23,7 @@ namespace Code_01.CombatPrototype.Map
         public MapResourceStatusHudConfig resourceStatusHud;
         public MapWorldSaveHudConfig worldSaveHud;
         public MapInventoryPanelConfig inventoryPanel;
+        public MapInventoryCapacityConfig inventoryCapacity;
         public MapInventoryDropConfig inventoryDrop;
         public MapPopulationConfig population;
         public MapSpawnConfig spawn;

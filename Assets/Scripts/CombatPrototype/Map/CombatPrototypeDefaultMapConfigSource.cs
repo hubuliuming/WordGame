@@ -17,7 +17,7 @@ namespace Code_01.CombatPrototype.Map
             {
                 map = new MapDefinitionConfig
                 {
-                    schemaVersion = 18, configRevision = 21,
+                    schemaVersion = 19, configRevision = 22,
                     mapDefinitionId = mapDefinitionId, defaultSeed = 12345,
                     resourcePersistence = new MapResourcePersistenceConfig
                     {
@@ -85,13 +85,13 @@ namespace Code_01.CombatPrototype.Map
                     {
                         enabled = true, panelWidthPixels = 320f, panelHeightPixels = 104f,
                         bottomMarginPixels = 48f, fontSize = 20, progressBarHeightPixels = 10f,
-                        gatherLabel = "Gather Apple", treeLabel = "Chop Tree", mineLabel = "Mine Rock"
+                        gatherLabel = "Gather Apple", treeLabel = "Chop Tree", mineLabel = "Mine Rock", noSpaceLabel = "Not enough space"
                     },
                     pickupHud = new MapPickupHudConfig
                     {
                         enabled = true, panelWidthPixels = 400f, panelHeightPixels = 84f,
                         bottomMarginPixels = 168f, fontSize = 20, pickupLabel = "Pick up",
-                        appleLabel = "Vitality Apple", woodLabel = "Wood", stoneLabel = "Stone",
+                        appleLabel = "Vitality Apple", woodLabel = "Wood", stoneLabel = "Stone", noSpaceLabel = "Not enough space",
                         lifetimeEnabled = true, expiryWarningEnabled = true, expiryWarningSeconds = 30f,
                         expiresInLabel = "Expires in", permanentLabel = "Permanent", expiringSoonLabel = "Expiring soon",
                         secondsLabel = "s", expiryWarningColorHex = "#FFB454"
@@ -133,6 +133,7 @@ namespace Code_01.CombatPrototype.Map
                         rowHeightPixels = 32.0f,
                         panelTitle = "Inventory",
                         materialsLabel = "Materials",
+                        capacityLabel = "Capacity", unlimitedLabel = "Unlimited",
                         toolsLabel = "Tools",
                         craftLabel = "Crafting",
                         craftButtonLabel = "Craft",
@@ -149,6 +150,16 @@ namespace Code_01.CombatPrototype.Map
                         disabledLabel = "Disabled",
                         readyLabel = "Ready",
                         repairLabel = "Repair", repairButtonLabel = "Repair", fullDurabilityLabel = "Full durability"
+                    },
+                    inventoryCapacity = new MapInventoryCapacityConfig
+                    {
+                        enabled = true, maxTotalQuantity = 300,
+                        items = new[]
+                        {
+                            new MapInventoryCapacityItemConfig { itemId = CombatPrototypeMapYieldItemResolver.VitalityAppleId, maxQuantity = 200 },
+                            new MapInventoryCapacityItemConfig { itemId = CombatPrototypeMapYieldItemResolver.WoodId, maxQuantity = 200 },
+                            new MapInventoryCapacityItemConfig { itemId = CombatPrototypeMapYieldItemResolver.StoneId, maxQuantity = 200 }
+                        }
                     },
                     inventoryDrop = new MapInventoryDropConfig
                     {

@@ -18,6 +18,7 @@ namespace Code_01.CombatPrototype.Map
         private string _appleLabel;
         private string _woodLabel;
         private string _stoneLabel;
+        private string _noSpaceLabel;
         private string _text;
         private bool _visible;
 
@@ -29,6 +30,7 @@ namespace Code_01.CombatPrototype.Map
             _appleLabel = settings.AppleLabel.ToString();
             _woodLabel = settings.WoodLabel.ToString();
             _stoneLabel = settings.StoneLabel.ToString();
+            _noSpaceLabel = settings.NoSpaceLabel.ToString();
             _lifetimeHud.Configure(settings);
         }
 
@@ -44,7 +46,8 @@ namespace Code_01.CombatPrototype.Map
                     _lifetimeHud.Show(state);
                     return;
                 }
-                if (state.Mode != CombatPrototypeMapPickupHudMode.Ready || state.DropId <= 0 || state.Quantity <= 0)
+                if ((state.Mode != CombatPrototypeMapPickupHudMode.Ready && state.Mode != CombatPrototypeMapPickupHudMode.NoSpace) ||
+                    state.DropId <= 0 || state.Quantity <= 0)
                     InvalidSnapshot(state);
                 string label;
                 if (state.ItemId.Equals(_appleId)) label = _appleLabel;
@@ -53,7 +56,8 @@ namespace Code_01.CombatPrototype.Map
                 else { InvalidSnapshot(state); return; }
                 _lifetimeHud.Show(state);
                 if (_state.Mode != state.Mode || !_state.ItemId.Equals(state.ItemId) || _state.Quantity != state.Quantity)
-                    _text = "G  " + _pickupLabel + "  " + label + " ×" + state.Quantity.ToString(CultureInfo.InvariantCulture);
+                    _text = "G  " + (state.Mode == CombatPrototypeMapPickupHudMode.NoSpace ? _noSpaceLabel : _pickupLabel) +
+                        "  " + label + " ×" + state.Quantity.ToString(CultureInfo.InvariantCulture);
                 _state = state;
                 _visible = true;
             }
@@ -84,7 +88,7 @@ namespace Code_01.CombatPrototype.Map
             _settings = default;
             _state = CombatPrototypeMapPickupHudState.Hidden;
             _labelStyle = null;
-            _pickupLabel = _appleLabel = _woodLabel = _stoneLabel = _text = string.Empty;
+            _pickupLabel = _appleLabel = _woodLabel = _stoneLabel = _noSpaceLabel = _text = string.Empty;
         }
 
         internal void Draw()

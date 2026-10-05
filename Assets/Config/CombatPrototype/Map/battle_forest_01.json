@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 18,
-  "configRevision": 21,
+  "schemaVersion": 19,
+  "configRevision": 22,
   "mapDefinitionId": "battle_forest_01",
   "defaultSeed": 12345,
   "resourcePersistence": {
@@ -107,7 +107,8 @@
     "progressBarHeightPixels": 10.0,
     "gatherLabel": "Gather Apple",
     "treeLabel": "Chop Tree",
-    "mineLabel": "Mine Rock"
+    "mineLabel": "Mine Rock",
+    "noSpaceLabel": "Not enough space"
   },
   "pickupHud": {
     "enabled": true,
@@ -120,6 +121,7 @@
     "woodLabel": "Wood",
     "stoneLabel": "Stone",
     "lifetimeEnabled": true,
+    "noSpaceLabel": "Not enough space",
     "expiryWarningEnabled": true,
     "expiryWarningSeconds": 30,
     "expiresInLabel": "Expires in",
@@ -186,6 +188,8 @@
     "rowHeightPixels": 32.0,
     "panelTitle": "Inventory",
     "materialsLabel": "Materials",
+    "capacityLabel": "Capacity",
+    "unlimitedLabel": "Unlimited",
     "toolsLabel": "Tools",
     "craftLabel": "Crafting",
     "craftButtonLabel": "Craft",
@@ -204,6 +208,15 @@
     "repairLabel": "Repair",
     "repairButtonLabel": "Repair",
     "fullDurabilityLabel": "Full durability"
+  },
+  "inventoryCapacity": {
+    "enabled": true,
+    "maxTotalQuantity": 300,
+    "items": [
+      { "itemId": "vitality_apple", "maxQuantity": 200 },
+      { "itemId": "wood", "maxQuantity": 200 },
+      { "itemId": "stone", "maxQuantity": 200 }
+    ]
   },
   "inventoryDrop": {
     "enabled": true,

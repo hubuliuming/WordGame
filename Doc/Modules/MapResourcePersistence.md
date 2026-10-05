@@ -20,7 +20,7 @@
 
 ## 【FACT】配置与建议值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与BuiltIn当前schemaVersion=18/configRevision=21；resourcePersistence段必填，当前寿命显示归[G提示](MapPickupHud.md)。沿原严格字段、对象形状、标量类型与UTF-8校验，旧v1～v17拒绝，不迁移、补默认或回退来源；正常导入和烘焙后生效，无热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与BuiltIn当前schemaVersion=19/configRevision=22；resourcePersistence段必填，当前寿命显示归[G提示](MapPickupHud.md)。沿原严格字段、对象形状、标量类型与UTF-8校验，旧v1～v18拒绝，不迁移、补默认或回退来源；正常导入和烘焙后生效，无热重载。
 
 | 字段 | 默认值 | 校验 |
 |---|---|---|
@@ -85,4 +85,4 @@ saveGroundDrops开启时同文件保存地面苹果/木材/石材、DropId及剩
 
 寿命提示v17/20归[G提示](MapPickupHud.md)：所属G六字段，原目标/拾取/期限/保存保持；静态及用户人工通过限十二项，未触发独立用例UNKNOWN；旧用户通过仍限原版本/清单。
 
-地图v18/21的[F5/保存提示](MapWorldSaveHud.md)已接入：当前16输入、新增所属3字段；原F/G、工具及世界/玩家存档格式保持。编译/字段/烘焙静态通过，人工UNKNOWN；旧通过限原版本/清单。
+地图v18/21的[F5/保存提示](MapWorldSaveHud.md)已接入：当前16输入、新增所属3字段；原F/G、工具及世界/玩家存档格式保持。静态及用户人工通过限v18/revision21十二项，未触发独立用例UNKNOWN；旧通过限原版本/清单。

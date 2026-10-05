@@ -18,7 +18,7 @@
 
 ## 【FACT】当前JSON契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=18/configRevision=21。原geometry/layout/movement/drops/treeHarvest/mining/gatherTools/interactionHud/pickupHud/interactionHighlight/inventoryPanel/inventoryDrop/population/spawn及新增resourceStatusHud均必填。新段全部11字段沿原严格UTF-8、对象形状、未知/缺失/重复字段与标量类型校验；旧v1～v17拒绝，不迁移、补字段或回退来源。仅正常导入/烘焙后生效，没有热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=19/configRevision=22。原geometry/layout/movement/drops/treeHarvest/mining/gatherTools/interactionHud/pickupHud/interactionHighlight/inventoryPanel/inventoryDrop/population/spawn及新增resourceStatusHud均必填。新段全部11字段沿原严格UTF-8、对象形状、未知/缺失/重复字段与标量类型校验；旧v1～v18拒绝，不迁移、补字段或回退来源。仅正常导入/烘焙后生效，没有热重载。
 
 | 字段 | 当前默认值 | 校验 |
 |---|---|---|
@@ -40,7 +40,7 @@ disabled仍校验全部字段。名称复用interactionHud.gatherLabel/treeLabel
 
 服务端PredictedSimulation中在原InteractionHudStateSystem之后采样，原资源维护/再生及PlayerRespawn均已完成。每tick按资源捕获一次阶段、X/Z位置、原交互距离、Collector与RegrowAt，复用列表/身份缓存，再为Connected/InGame、未请求断线、CommandTarget所有权匹配、启用Simulate、存活且位置有限的玩家生成显示帧；只在字段变化时写入。状态采样不要求静止或近战Ready，不改变原F/G资格。
 
-原F为Working或Ready时优先Kind/PlacementIndex身份：Working仍跟随本人原Collector，其他更近资源不使其切换；Ready仍对应原F有效目标。原F为Hidden时，在各类原交互距离内按X/Z中心距离平方选择最近的可用、使用中或耗尽资源，同距取小PlacementIndex，无类型优先。当前各类距离2米；关闭砍伐/采矿不选相应类型。该后备选择只用于状态文字，不改变实际F/G目标或原圆环身份，不发预约/输入/物品。
+原F为Working、Ready或NoSpace时优先Kind/PlacementIndex身份：Working仍跟随本人原Collector，其他更近资源不使其切换；Ready/NoSpace仍对应原F有效目标；[容量](MapInventoryCapacity.md)不足的植物仍为Available。原F为Hidden时，在各类原交互距离内按X/Z中心距离平方选择最近的可用、使用中或耗尽资源，同距取小PlacementIndex，无类型优先。当前各类距离2米；关闭砍伐/采矿不选相应类型。该后备选择只用于状态文字，不改变实际F/G目标或原圆环身份，不发预约/输入/物品。
 
 | Mode | 显示状态与依据 |
 |---|---|
@@ -72,7 +72,7 @@ v13/16资源状态阶段正常Unity编译无C# Error，所属Ghost Serializer已
 
 用户已确认本阶段人工GamePlayer验收通过，主线程结合既有静态核对与用户反馈判定阶段通过，范围限CombatPrototypeNetCode、schemaVersion=13/configRevision=16及[运行入口](Runtime.md)资源状态十项清单，人工结论来自用户反馈。旧高亮v12/15十项、G文字v11/14十项、丢弃v10/13十二项、面板v9/12十二项、工具v8/11十二项、F HUD v7/10八项及更早用户通过保持各自版本/清单。未实际触发的倒计时/到期等待/再生关闭精确边界、后备最近目标/原F锁定时序、移动攻击显示、多玩家/晚加入/断线及独立配置/快照/绘制/保存失败仍UNKNOWN；性能/带宽、平台/线上与旧保存成功后意外ECS恢复未验证。AI未执行GamePlayer/PlayMode、游戏模拟/显示系统/GUI回调、逻辑单元测试、命令行构建、发布、性能采样或图片检查，未创建子Agent或提交Git。
 
-当前v18/21的[工具修理](MapToolRepair.md)不修改本专题四字段、目标优先级或资源/再生期限；绑定增加修理反馈与按钮输入交接，原状态/倒计时仍只读权威链。修理静态及用户人工通过，限v14/17十二项，未触发用例UNKNOWN；资源状态用户通过仍限v13/16十项。
+当前v19/22的[工具修理](MapToolRepair.md)不修改本专题四字段、目标优先级或资源/再生期限；绑定增加修理反馈与按钮输入交接，原状态/倒计时仍只读权威链。修理静态及用户人工通过，限v14/17十二项，未触发用例UNKNOWN；资源状态用户通过仍限v13/16十项。
 
 ## 【FACT】地图资源存档接入边界
 
@@ -80,4 +80,4 @@ v13/16资源状态阶段正常Unity编译无C# Error，所属Ghost Serializer已
 
 寿命提示v17/20归[G提示](MapPickupHud.md)：所属G六字段，原目标/拾取/期限/保存保持；静态及用户人工通过限十二项，未触发独立用例UNKNOWN；旧用户通过仍限原版本/清单。
 
-地图v18/21的[F5/保存提示](MapWorldSaveHud.md)已接入：当前16输入、新增所属3字段；原F/G、工具及世界/玩家存档格式保持。编译/字段/烘焙静态通过，人工UNKNOWN；旧通过限原版本/清单。
+地图v18/21的[F5/保存提示](MapWorldSaveHud.md)已接入：当前16输入、新增所属3字段；原F/G、工具及世界/玩家存档格式保持。静态及用户人工通过限v18/revision21十二项，未触发独立用例UNKNOWN；旧通过限原版本/清单。

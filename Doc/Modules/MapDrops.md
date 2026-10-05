@@ -21,7 +21,7 @@
 
 ## 【FACT】JSON 契约与当前默认值
 
-[battle_forest_01.json](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[battle_grassland_01.json](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn来源](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)均为schemaVersion=18/configRevision=21，drops必填，工具配置归[采集工具](MapGatherTools.md)。原空间、移动、出生及drops/grounds值保持；mining与生态矿点字段归采矿专题，tree_normal/gather_apple/mine_rock均默认600秒再生。配置只在烘焙时读取，不支持热重载；各端须相同版本、输入布局与资源，未新增一致性协议。
+[battle_forest_01.json](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[battle_grassland_01.json](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn来源](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)均为schemaVersion=19/configRevision=22，drops必填，工具配置归[采集工具](MapGatherTools.md)。原空间、移动、出生及drops/grounds值保持；mining与生态矿点字段归采矿专题，tree_normal/gather_apple/mine_rock均默认600秒再生。配置只在烘焙时读取，不支持热重载；各端须相同版本、输入布局与资源，未新增一致性协议。
 
 | 字段 | 默认值 | 校验/行为 |
 |---|---|---|
@@ -115,7 +115,7 @@ v12/15的[高亮](MapInteractionHighlight.md)复用原G四字段，按DropId解�
 
 v13/16的[资源状态](MapResourceStatusHud.md)只显示三类地图资源，不读取掉落ExpiresAt、显示掉落TTL或改G/生成/运动/保存/到期/清理。原掉落与G快照保持，新增玩家状态布局要求各端同版代码/配置重新烘焙。新显示静态及用户人工通过，限v13/16十项，未触发用例UNKNOWN，旧通过保持原范围。
 
-当前v18/21的[工具修理](MapToolRepair.md)：修理不生成/拾取掉落；同tick G请求使修理拒绝，修理请求使Drop拒绝，原生成/运动/到期/拾取/保存及DropId保持。新链静态及用户人工通过，限v14/17十二项，未触发用例UNKNOWN，旧掉落用户通过保持原版本/清单。
+当前v19/22的[工具修理](MapToolRepair.md)：修理不生成/拾取掉落；同tick G请求使修理拒绝，修理请求使Drop拒绝，原生成/运动/到期/拾取/保存及DropId保持。新链静态及用户人工通过，限v14/17十二项，未触发用例UNKNOWN，旧掉落用户通过保持原版本/清单。
 
 ## 【FACT】地图资源存档接入边界
 
@@ -123,4 +123,8 @@ v13/16的[资源状态](MapResourceStatusHud.md)只显示三类地图资源，�
 
 寿命提示v17/20归[G提示](MapPickupHud.md)：所属G六字段，原目标/拾取/期限/保存保持；静态及用户人工通过限十二项，未触发独立用例UNKNOWN；旧用户通过仍限原版本/清单。
 
-地图v18/21的[F5/保存提示](MapWorldSaveHud.md)已接入：当前16输入、新增所属3字段；原F/G、工具及世界/玩家存档格式保持。编译/字段/烘焙静态通过，人工UNKNOWN；旧通过限原版本/清单。
+地图v18/21的[F5/保存提示](MapWorldSaveHud.md)已接入：当前16输入、新增所属3字段；原F/G、工具及世界/玩家存档格式保持。静态及用户人工通过限v18/revision21十二项，未触发独立用例UNKNOWN；旧通过限原版本/清单。
+
+## 【FACT】材料入包容量
+
+当前[容量](MapInventoryCapacity.md)只在选定原最近G目标后、准备候选/保存前判断整批入包；拒绝保留原DropId/数量/阶段/期限，不部分拾取或转选。树木/矿点满包仍沿原完成产出地面物，寿命与恢复链保持。静态通过，人工十六项UNKNOWN；旧掉落用户通过保持原版本/清单。

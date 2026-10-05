@@ -41,6 +41,8 @@ namespace Code_01.CombatPrototype.Map
             }
 
             var dropSettings = EntityManager.GetComponentData<CombatPrototypeMapDropSettings>(source);
+            var capacity = EntityManager.GetComponentData<CombatPrototypeMapInventoryCapacitySettings>(source);
+            var capacityDefinitions = EntityManager.GetBuffer<CombatPrototypeMapInventoryCapacityDefinition>(source, true);
             var time = SystemAPI.Time.ElapsedTime;
             using var drops = _drops.ToEntityArray(Allocator.Temp);
             var inputs = SystemAPI.GetComponentLookup<CombatPrototypePlayerInput>(true);
@@ -82,6 +84,12 @@ namespace Code_01.CombatPrototype.Map
                                 Mode = CombatPrototypeMapPickupHudMode.Ready, DropId = dropId,
                                 ItemId = drop.ItemId, Quantity = drop.Quantity
                             };
+                            stage = "CheckCapacity";
+                            if (CombatPrototypeMapInventoryCapacityUtility.GetRejection(capacity, capacityDefinitions,
+                                EntityManager.GetBuffer<CombatPrototypeInventoryItem>(player, true),
+                                CombatPrototypeMapInventoryCapacityUtility.RequireItemDefinition(capacityDefinitions, drop.ItemId).ItemName,
+                                drop.Quantity) != null)
+                                frame.Mode = CombatPrototypeMapPickupHudMode.NoSpace;
                             stage = "ReadLifetime";
                             CombatPrototypeMapPickupLifetimeHudSnapshot.Apply(ref frame, settings,
                                 progresses[target].ExpiresAt, time);

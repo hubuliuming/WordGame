@@ -15,6 +15,8 @@ namespace Code_01.CombatPrototype.Map
         public float rowHeightPixels;
         public string panelTitle;
         public string materialsLabel;
+        public string capacityLabel;
+        public string unlimitedLabel;
         public string toolsLabel;
         public string craftLabel;
         public string craftButtonLabel;

@@ -59,6 +59,8 @@ namespace Code_01.CombatPrototype.Map
 
             var tree = EntityManager.GetComponentData<CombatPrototypeMapTreeSettings>(source);
             var mine = EntityManager.GetComponentData<CombatPrototypeMapMineSettings>(source);
+            var capacity = EntityManager.GetComponentData<CombatPrototypeMapInventoryCapacitySettings>(source);
+            var capacityDefinitions = EntityManager.GetBuffer<CombatPrototypeMapInventoryCapacityDefinition>(source, true);
             var time = SystemAPI.Time.ElapsedTime;
             using var points = _points.ToEntityArray(Allocator.Temp);
             using var trees = _trees.ToEntityArray(Allocator.Temp);
@@ -103,6 +105,14 @@ namespace Code_01.CombatPrototype.Map
                                     Mode = CombatPrototypeMapInteractionHudMode.Ready, Kind = (byte)target.Kind,
                                     PlacementIndex = target.PlacementIndex
                                 };
+                            if (target.Entity != Entity.Null && target.Kind == CombatPrototypeMapInteractionKind.Gather)
+                            {
+                                stage = "CheckCapacity";
+                                var config = EntityManager.GetComponentData<CombatPrototypeMapGatherConfig>(target.Entity);
+                                if (CombatPrototypeMapInventoryCapacityUtility.GetRejection(capacity, capacityDefinitions,
+                                    EntityManager.GetBuffer<CombatPrototypeInventoryItem>(player, true), config.YieldItemName, config.YieldQuantity) != null)
+                                    frame.Mode = CombatPrototypeMapInteractionHudMode.NoSpace;
+                            }
                         }
                     }
                     _frames[player] = frame;

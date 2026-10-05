@@ -86,7 +86,9 @@ namespace Code_01.CombatPrototype.Map
                     EntityManager.GetComponentData<CombatPrototypeMapInventoryDropSettings>(source),
                     EntityManager.GetBuffer<CombatPrototypeMapInventoryDropDefinition>(source, true), pickupSettings,
                     highlightSettings, resourceStatusSettings, worldSaveSettings,
-                    EntityManager.GetComponentData<CombatPrototypeMapResourcePersistenceSettings>(source), map.MapDefinitionId.ToString());
+                    EntityManager.GetComponentData<CombatPrototypeMapResourcePersistenceSettings>(source),
+                    EntityManager.GetComponentData<CombatPrototypeMapInventoryCapacitySettings>(source),
+                    EntityManager.GetBuffer<CombatPrototypeMapInventoryCapacityDefinition>(source, true), map.MapDefinitionId.ToString());
                 _source = source;
                 _player = player;
             }

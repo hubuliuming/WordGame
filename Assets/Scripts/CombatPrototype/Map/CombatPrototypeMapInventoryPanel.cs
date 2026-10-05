@@ -29,7 +29,8 @@ namespace Code_01.CombatPrototype.Map
 
         public void Configure(CombatPrototypeMapInventoryPanelSettings settings, CombatPrototypeMapGatherToolSettings toolSettings,
             CombatPrototypeMapGatherToolDefinition axe, CombatPrototypeMapGatherToolDefinition pickaxe,
-            CombatPrototypeMapInventoryDropSettings dropSettings, DynamicBuffer<CombatPrototypeMapInventoryDropDefinition> dropDefinitions)
+            CombatPrototypeMapInventoryDropSettings dropSettings, DynamicBuffer<CombatPrototypeMapInventoryDropDefinition> dropDefinitions,
+            CombatPrototypeMapInventoryCapacitySettings capacity, DynamicBuffer<CombatPrototypeMapInventoryCapacityDefinition> capacityDefinitions)
         {
             Reset();
             _settings = settings;
@@ -55,7 +56,7 @@ namespace Code_01.CombatPrototype.Map
             _pickaxeName = pickaxe.DisplayName.ToString();
             _axeButton = "1: " + _craftButton + " " + _axeName;
             _pickaxeButton = "2: " + _craftButton + " " + _pickaxeName;
-            _snapshot.Configure(settings);
+            _snapshot.Configure(settings, capacity, capacityDefinitions);
             _drop.Configure(dropSettings, dropDefinitions, settings);
             _repair.Configure(settings, toolSettings, axe, pickaxe);
             _configured = true;
@@ -195,7 +196,7 @@ namespace Code_01.CombatPrototype.Map
                 GUI.Label(new Rect(panel.x + 12f, panel.y + 12f, panel.width - 24f, _settings.RowHeightPixels), _title, _labelStyle);
                 var viewport = new Rect(panel.x + 12f, panel.y + 12f + _settings.RowHeightPixels,
                     panel.width - 24f, panel.height - 3f * _settings.RowHeightPixels - 24f);
-                var rows = Mathf.Max(_snapshot.Items.Count * 2, 1) + 13 + CombatPrototypeMapGatherToolRepairPanel.RowCount;
+                var rows = Mathf.Max(_snapshot.Items.Count * 2, 1) + 14 + CombatPrototypeMapGatherToolRepairPanel.RowCount;
                 var content = new Rect(0f, 0f, viewport.width - 18f, rows * _settings.RowHeightPixels);
                 _scroll = GUI.BeginScrollView(viewport, _scroll, content);
                 try { DrawBody(content.width); }
@@ -218,6 +219,7 @@ namespace Code_01.CombatPrototype.Map
         {
             var y = 0f;
             Label(width, ref y, _materials);
+            Label(width, ref y, _snapshot.CapacityText);
             if (_snapshot.Items.Count == 0) Label(width, ref y, _empty);
             foreach (var item in _snapshot.Items)
             {

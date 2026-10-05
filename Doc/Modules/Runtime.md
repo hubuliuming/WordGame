@@ -764,7 +764,7 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 
 ## 【KNOWN ISSUES】地图存档状态提示与手动保存的人工验收
 
-入口CombatPrototypeNetCode，Forest/Grassland Json与BuiltIn默认schemaVersion=18/configRevision=21，各端同版代码/配置重新烘焙，沿原SinglePlayer或Online启动，单一服务端写同槽。默认resourcePersistence.manualSaveEnabled=true/全局冷却5秒，worldSaveHud=true/400×84/底336/字号20/反馈3秒/#FF6B6B。正常Unity编译、实际所属Serializer反射与26次隔离Editor烘焙静态通过；以下新增人工GamePlayer结果全部UNKNOWN，旧用户通过不覆盖本阶段。
+入口CombatPrototypeNetCode，Forest/Grassland Json与BuiltIn默认schemaVersion=18/configRevision=21，各端同版代码/配置重新烘焙，沿原SinglePlayer或Online启动，单一服务端写同槽。默认resourcePersistence.manualSaveEnabled=true/全局冷却5秒，worldSaveHud=true/400×84/底336/字号20/反馈3秒/#FF6B6B。正常Unity编译、实际所属Serializer反射与26次隔离Editor烘焙静态通过；用户已确认本阶段人工GamePlayer验收通过，主线程结合既有静态核对与用户反馈判定通过，限本节v18/revision21十二项清单。人工结论来自用户反馈，以下保留通过范围，未实际触发的独立用例仍UNKNOWN；旧通过保持原版本/清单。
 
 1. 默认森林/草地、Json/BuiltIn重新烘焙后，玩家输入16字段，所属保存状态3字段初值Hidden/0/None，配置与Settings各16，resourcePersistence配置6/Settings7。首次无档且无资源/掉落变化时，Ready后第一行No world checkpoint yet，第一次原检查点或F5实际写成功后World saved；首次建档/加载本身不冒充本服务已保存。客户端不读取服务端文件，字段不进入世界/玩家档。
 2. 按F5一次由本人SaveWorld事件提交，服务端在当tick完整捕获全部资源及开启时地面物后沿原SavePrepared保存一次，日志reason=ManualRequest，成功返回才第一行World saved及第二行本人World saved。检查耗尽/余时、掉落/编号符合当tick已提交状态，沿原同一v2文件/路径；按住不连续保存。
@@ -779,4 +779,27 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 11. 初次绑定、晚加入/重连只观察已有本人序号，不重播旧3秒结果；死亡/断线、玩家/地图源、World/Scene变化清文案/期限/旧序号，全局冷却及服务缓存随源/系统结束释放。非法枚举、None配非零序号或非零Hidden快照在显示边界记录原异常并隐藏；网络延迟仅使提示滞后，不产生客户端写盘或业务修改。独立生命周期/异常快照未触发UNKNOWN。
 12. 回归原状态变化/10秒检查点/正常关闭保存、世界v2/合法v1读取与离线暂停、F三类资源/600秒再生/占位阻挡、G寿命与蓝圈、B/制作/修理/Drop/All、E/R/战斗/镜头及玩家v2保存。原F4/G6/资源状态4、Drop Ghost4、世界根9/掉落条目8和布局/资源签名保持。玩家与世界分别保存，F5不保存玩家位置/战斗或建立跨文件事务，相关防重复/ECS/同槽并发与性能/平台仍UNKNOWN。
 
-完整当前契约归[F5/保存提示](MapWorldSaveHud.md)。原225项编号/内容及旧版本用户通过保留，本段新增12项后共237项；当前人工验收待用户反馈，主线程尚未判定运行通过。AI只执行编译/反射和隔离Editor烘焙，未调用真实玩家/世界存档读写、游戏/显示系统/GUI回调、GamePlayer/PlayMode、逻辑单元测试、命令行构建、发布、采样或图片检查，未创建子Agent或提交Git。未实际触发的独立资格/冷却边界/同tick/多Client/延迟/晚加入、捕获/保存/关闭恢复失败、字形/布局/颜色和生命周期仍UNKNOWN；跨文件原子一致/防重复、意外ECS故障恢复、同槽并发与性能/带宽/平台/线上不属于静态通过范围。
+完整当前契约归[F5/保存提示](MapWorldSaveHud.md)。原225项编号/内容及旧版本用户通过保留，本段新增12项后共237项；用户已确认本阶段人工GamePlayer通过，主线程结合静态核对判定通过，限本节v18/revision21十二项；结论来自用户反馈。AI只执行编译/反射和隔离Editor烘焙，未调用真实玩家/世界存档读写、游戏/显示系统/GUI回调、GamePlayer/PlayMode、逻辑单元测试、命令行构建、发布、采样或图片检查，未创建子Agent或提交Git。未实际触发的独立资格/冷却边界/同tick/多Client/延迟/晚加入、捕获/保存/关闭恢复失败、字形/布局/颜色和生命周期仍UNKNOWN；跨文件原子一致/防重复、意外ECS故障恢复、同槽并发与性能/带宽/平台/线上不属于静态通过范围。
+
+## 【KNOWN ISSUES】材料背包容量与拾取限制的人工验收
+
+入口CombatPrototypeNetCode，Forest/Grassland Json与BuiltIn默认v19/revision22、inventoryCapacity=true/总量300/三种各200。正常Unity编译、所属Snapshot字段/SendToOwner反射与18次隔离Editor Bake静态通过；人工GamePlayer未执行，结果UNKNOWN。旧237项逐字保留，旧F5用户通过仍限v18/revision21十二项及其余各原版本/清单，不扩展为容量通过。
+
+1. 默认森林/草地、Json/BuiltIn使用schemaVersion=19/configRevision=22重新烘焙，各端同版。B显示Capacity总量/300，木材/石材/苹果行显示数量/200；小块肉、工具、金币/经验不计入总量。空库存为0/300，沿原顺序与鼠标隔离；没有99拆格或第二份库存。
+2. 木材197加最近wood×3恰好到200允许整份入包，总量仍须不超300；再加wood×1时按单种限制拒绝，即使其他材料仍有空间，目标数量/阶段保持。边界未触发则UNKNOWN。
+3. 分别覆盖活力苹果与石材单种200上限；植物F苹果×1与G苹果/石材按相同规则计算，同名累计与原映射保持。其他合法物品行沿原数量显示，E/敌人小块肉奖励不因材料满拒绝。
+4. 三种合计297且目标单种可装时，G领取×3恰好到300；随后新增任一受管材料拒绝。总量上限和单种上限同时成立才成功，不因仅单种有余量绕过总量。
+5. 总量298且最近wood×3或stone×3时整批拒绝，库存仍298、地面仍原×3/DropId/Landed；剩余2不部分接收。ExpiresAt不重置，寿命提示继续，到期仍按原清理。
+6. 最近掉落的单种已满而较远另一材料可装时，G仍拒绝最近目标；最近植物不能接收而较远树木可交互时，F不切到较远树木。满包提示与圆环继续指向原目标，距离/同距小PlacementIndex或DropId保持。
+7. 植物预约前空间不足时，按F不进入Collecting、不启动进度、耗尽或再生、不保存采集结果。植物仍Available，F显示Not enough space与原目标，原资源状态显示Available。
+8. 植物F开始时可接收，采集中G使总量或单种不足；完成复核后取消预约、进度/采集者清空，植物恢复Available，不新增苹果/耗尽/再生或保存该次采集。G已成功物品保留，释放容量后新F可重新采集；精确同tick未触发则UNKNOWN。
+9. 材料满时仍可按原资格F砍树/采矿，原工具耗时/耐久结算、地面wood/stone×3、耗尽/再生保持；随后G按容量拒绝。满包本身不取消Tree/Mine预约或截断其地面产出。
+10. 制作、修理或Single/All丢弃按原成功保存规则减少材料后，新F/G恢复；原使用/资格/同tick互斥保持。已拒绝请求不自动重试，释放空间后须新的按键；制作/修理反馈在B页脚保持。
+11. 固定ID合法旧库存总量超过300或任一材料超过200时，加入/恢复完整保留，B显示实际超限值，不截断/删档/拒绝准入。全部受管新入包拒绝，其他原减少操作继续；总量与每种均回到上限内才恢复。配置降低上限并重Bake同样处理。
+12. 两玩家独立库存：满包者拒绝不占用或消耗地面物，另一有空间者仍可G领取；同tick按原NetworkId顺序且只能成功领取一次。所属NoSpace仅本人收到，其他玩家F/G/B不被替换；未触发同tick保持UNKNOWN。
+13. 容量通过但玩家候选保存失败时，原库存/未到期地面物不提交，植物取消并恢复Available；写权限恢复后新按键可尝试。受管重复/负数库存或定义/数量错误记录真实异常，不伪装普通满包，隔离当前请求/采样后其他条目继续；未触发独立错误UNKNOWN。
+14. PlayMode前关闭inventoryCapacity.enabled并重新烘焙，三种材料可超过300/200，B显示总量/Unlimited及原数量行，原int checked与保存规则保持；关闭仍严格校验根/三条配置，开启后旧超限数据仍保留。
+15. 分别关闭F文字、G文字、B面板及全部显示后，服务端容量仍生效；只保留高亮/资源状态时NoSpace仍识别原目标。Working进度、G寿命/预警/永久、F5/存档提示与原制作/修理/Drop/All独立。不同分辨率、新容量滚动行与中文字形未覆盖则UNKNOWN。
+16. 自定义总量150/单种71苹果83木材97石材、调换items顺序和四文案后导入/烘焙生效；旧v1～v18、缺失/未知/重复字段、未知/重复ID、null条目、错误类型及非正上限明确失败，无补默认/回退/热重载。死亡/断线、玩家/地图源变化或World/Scene结束沿原生命周期清显示/请求，晚加入/重连显示当前库存；运行未触发部分UNKNOWN。
+
+完整当前契约归[材料容量](MapInventoryCapacity.md)。新增十六项后共253项；主线程静态验收通过，本阶段人工验收仍UNKNOWN。AI未调用真实玩家/世界存档读写、游戏/显示系统/GUI回调、GamePlayer/PlayMode、逻辑单元测试、命令行构建、发布、采样或图片检查，未创建子Agent或提交Git。独立边界/并发/保存失败、运行显示/字体/生命周期、性能/平台及既有跨文件原子一致/意外ECS故障恢复均不属于静态通过范围。

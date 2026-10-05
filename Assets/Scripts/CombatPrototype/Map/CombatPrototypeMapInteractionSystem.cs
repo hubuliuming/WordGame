@@ -95,6 +95,8 @@ namespace Code_01.CombatPrototype.Map
                 }
                 var treeSettings = EntityManager.GetComponentData<CombatPrototypeMapTreeSettings>(source);
                 var mineSettings = EntityManager.GetComponentData<CombatPrototypeMapMineSettings>(source);
+                var capacity = EntityManager.GetComponentData<CombatPrototypeMapInventoryCapacitySettings>(source);
+                var capacityDefinitions = EntityManager.GetBuffer<CombatPrototypeMapInventoryCapacityDefinition>(source, true);
                 if ((treeSettings.Enabled != 0 || mineSettings.Enabled != 0) &&
                     (World.GetExistingSystemManaged<CombatPrototypeMapDropSpawnSystem>() == null ||
                      !SystemAPI.GetSingleton<NetworkTime>().ServerTick.IsValid))
@@ -149,6 +151,18 @@ namespace Code_01.CombatPrototype.Map
                         {
                             Reject(map.MapDefinitionId, request, "NoAvailableTarget");
                             continue;
+                        }
+                        if (target.Kind == CombatPrototypeMapInteractionKind.Gather)
+                        {
+                            stage = "CheckCapacity";
+                            var config = EntityManager.GetComponentData<CombatPrototypeMapGatherConfig>(target.Entity);
+                            var capacityReason = CombatPrototypeMapInventoryCapacityUtility.GetRejection(capacity, capacityDefinitions,
+                                EntityManager.GetBuffer<CombatPrototypeInventoryItem>(request.Player, true), config.YieldItemName, config.YieldQuantity);
+                            if (capacityReason != null)
+                            {
+                                Reject(map.MapDefinitionId, request, capacityReason);
+                                continue;
+                            }
                         }
                         stage = "ReserveTarget";
                         bool started;

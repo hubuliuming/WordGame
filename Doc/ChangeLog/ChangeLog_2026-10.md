@@ -744,3 +744,18 @@
 - 正常Unity编译无C# Error，实际Assembly与生成Serializer/Snapshot字段核对通过；Forest/Grassland各13种隔离Editor烘焙共26次通过，两来源/新设置/初值/原布局/签名/Prefab/反馈一致。Console前后[2 Error,1 Warning,0 Log]不增加：2条为接入中提前刷新旧Forest缺manualSaveEnabled的历史错误，补齐升级后重新烘焙成功；1条MCP WebSocket警告。未清Console，主场景干净，临时对象释放。
 - 同步F5主文档、模块/导航/策划模板和Runtime，原225项人工清单完整保留后追加12项，共237项。编译/字段/配置烘焙静态通过，新增人工GamePlayer及真实写盘、冷却/同tick/多人/延迟/晚加入、失败/关闭恢复、布局/字形/颜色/生命周期/性能/平台仍UNKNOWN；旧用户通过限原版本/清单。跨文件事务/防重复、同槽并发及意外ECS恢复未新增保证。
 - Scene/SubScene/Prefab/Animator、旧meta、资源引用、图片/字体/材质、包及构建配置保持；原玩家存储与世界DTO/Store/Restore、资源/掉落结算及清理未改。未运行逻辑单元测试、GamePlayer/PlayMode、游戏/显示系统/GUI回调、真实存档读写、构建、发布、采样或图片检查，未创建子Agent或提交Git。
+
+## 2026-10-05 地图存档状态提示与手动保存人工验收通过
+
+- 用户反馈“我已验收通过，接下来下一阶段”；主线程结合既有代码/配置静态核对、正常Unity编译、实际所属Serializer反射与26次隔离Editor烘焙，判定本阶段通过，限CombatPrototypeNetCode、schemaVersion=18/configRevision=21及Runtime对应十二项清单。人工结论来自用户反馈，AI未运行GamePlayer/PlayMode。
+- 同步F5专题、Runtime、相关模块、导航与策划模板的通过状态；原237项人工清单编号/内容及旧阶段版本范围保持。未实际触发的独立资格/冷却/同tick/多人/延迟/晚加入、捕获/保存/关闭恢复失败、布局/字形/颜色/生命周期与性能/平台仍UNKNOWN；跨文件原子一致、防重复、意外ECS恢复及同槽并发仍不在通过范围。
+- 本次仅修改验收文档；代码、JSON、Scene/SubScene/Prefab/Animator、meta/资源引用、包及构建配置保持。未执行逻辑单元测试、构建、发布、游戏/GUI回调、真实存档读写、采样或图片检查，未创建子Agent或提交Git。
+
+## 2026-10-05 材料背包容量与拾取限制
+
+- 按用户已确认方案，由主线程在CombatPrototypeNetCode接入inventoryCapacity：默认总量300、vitality_apple/wood/stone各200，每件计1；保留原聚合库存及小块肉/Tools/金币/经验规则。新增四个配置/数据/判定脚本及Unity正常导入meta。
+- 两地图JSON与BuiltIn升级schema19/revision22；容量根3字段/条目2字段，Map根Settings2字段/Definition3字段×3。F/G各新增noSpaceLabel，B新增capacityLabel/unlimitedLabel，配置/Settings分别10/18/30；全部严格必填，旧v1～v18拒绝，关闭仍校验。
+- 统一F植物预约前与Gather完成前、G选定最近目标后检查实际库存；整批通过才沿原SavePrepared后提交。拒绝不部分入包/转选/消耗地面物，完成拒绝释放植物为Available；砍树/采矿满包仍产地面物。旧合法超限库存准入/保存保持完整，降低上限同样限制新入包，减少操作沿原规则。
+- F四字段追加NoSpace=3、G六字段追加NoSpace=2，保留目标/寿命，适配原高亮/资源状态；B追加总量滚动行/单种上限，显示关闭不关闭权威容量。16输入、保存所属3字段、资源/掉落Ghost、存档格式/路径与原Scene/Prefab/Animator及旧meta保持。
+- 正常Unity编译无C# Error；最终辅助方法、所属生成Snapshot4/6字段与SendToOwner已反射。Forest/Grassland各9种配置，共18次隔离Editor Bake：默认Json/BuiltIn、关闭容量、自定义上限/顺序/文案、F/G/B独立关闭及全显示关闭组合；新值/初值及旧参数符合，原区块/格子/布置/障碍/资源签名逐项保持。Bake Console前后[0,8,74]，无新增Bake警告；两条未修改PEListener/DOTween编译警告和六条既有运行警告按当时快照记录，末次反射Console[0,6,74]；临时World/Scene释放，主场景干净。
+- 已增量同步地图/背包/显示/数据/玩家等受影响文档、导航与策划模板，新增MapInventoryCapacity主专题及Runtime十六项人工清单；旧237项保留，合计253项。本阶段静态通过，人工GamePlayer UNKNOWN；旧用户通过保持原版本/清单。未执行逻辑单元测试、GamePlayer/PlayMode、游戏/显示系统/GUI回调、真实存档I/O、命令行构建、发布、性能/图片检查、子Agent或Git提交。

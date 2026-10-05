@@ -65,8 +65,10 @@ namespace Code_01.CombatPrototype.Map
             CombatPrototypeMapInteractionHighlightSettings settings, int owner, CombatPrototypeMapInteractionHudState state)
         {
             if (state.Mode == CombatPrototypeMapInteractionHudMode.Hidden) { ResetF(); return default; }
-            if ((state.Mode != CombatPrototypeMapInteractionHudMode.Ready && state.Mode != CombatPrototypeMapInteractionHudMode.Working) ||
+            if ((state.Mode != CombatPrototypeMapInteractionHudMode.Ready && state.Mode != CombatPrototypeMapInteractionHudMode.Working &&
+                 state.Mode != CombatPrototypeMapInteractionHudMode.NoSpace) ||
                 state.Kind < (byte)CombatPrototypeMapInteractionKind.Gather || state.Kind > (byte)CombatPrototypeMapInteractionKind.Mine ||
+                (state.Mode == CombatPrototypeMapInteractionHudMode.NoSpace && (state.Kind != (byte)CombatPrototypeMapInteractionKind.Gather || state.ProgressPermille != 0)) ||
                 state.PlacementIndex < 0)
                 throw new InvalidOperationException("Invalid owner interaction target snapshot.");
             if (_fKind != state.Kind || _fPlacement != state.PlacementIndex)
@@ -120,7 +122,7 @@ namespace Code_01.CombatPrototype.Map
             CombatPrototypeMapInteractionHighlightSettings settings, CombatPrototypeMapPickupHudState state)
         {
             if (state.Mode == CombatPrototypeMapPickupHudMode.Hidden) { ResetG(); return default; }
-            if (state.Mode != CombatPrototypeMapPickupHudMode.Ready || state.DropId <= 0)
+            if ((state.Mode != CombatPrototypeMapPickupHudMode.Ready && state.Mode != CombatPrototypeMapPickupHudMode.NoSpace) || state.DropId <= 0)
                 throw new InvalidOperationException("Invalid owner pickup target snapshot.");
             if (_gDropId != state.DropId) { ResetG(); _gDropId = state.DropId; }
             if (_gEntity != Entity.Null && (!manager.Exists(_gEntity) ||

@@ -109,6 +109,18 @@ namespace Code_01.CombatPrototype.Map
                 {
                     Phase = persistence.enabled ? CombatPrototypeMapResourceRestorePhase.Pending : CombatPrototypeMapResourceRestorePhase.Ready
                 });
+                var capacity = config.map.inventoryCapacity;
+                AddComponent(entity, new CombatPrototypeMapInventoryCapacitySettings
+                {
+                    Enabled = (byte)(capacity.enabled ? 1 : 0), MaxTotalQuantity = capacity.maxTotalQuantity
+                });
+                var capacityDefinitions = AddBuffer<CombatPrototypeMapInventoryCapacityDefinition>(entity);
+                foreach (var item in capacity.items)
+                    capacityDefinitions.Add(new CombatPrototypeMapInventoryCapacityDefinition
+                    {
+                        ItemId = item.itemId, ItemName = CombatPrototypeMapYieldItemResolver.Resolve(item.itemId),
+                        MaxQuantity = item.maxQuantity
+                    });
                 var hud = config.map.interactionHud;
                 AddComponent(entity, new CombatPrototypeMapInteractionHudSettings
                 {
@@ -118,7 +130,7 @@ namespace Code_01.CombatPrototype.Map
                     ProgressBarHeightPixels = hud.progressBarHeightPixels,
                     GatherLabel = new FixedString64Bytes(hud.gatherLabel),
                     TreeLabel = new FixedString64Bytes(hud.treeLabel),
-                    MineLabel = new FixedString64Bytes(hud.mineLabel)
+                    MineLabel = new FixedString64Bytes(hud.mineLabel), NoSpaceLabel = new FixedString64Bytes(hud.noSpaceLabel)
                 });
                 var pickupHud = config.map.pickupHud;
                 AddComponent(entity, new CombatPrototypeMapPickupHudSettings
@@ -130,6 +142,7 @@ namespace Code_01.CombatPrototype.Map
                     AppleLabel = new FixedString64Bytes(pickupHud.appleLabel),
                     WoodLabel = new FixedString64Bytes(pickupHud.woodLabel),
                     StoneLabel = new FixedString64Bytes(pickupHud.stoneLabel),
+                    NoSpaceLabel = new FixedString64Bytes(pickupHud.noSpaceLabel),
                     LifetimeEnabled = (byte)(pickupHud.lifetimeEnabled ? 1 : 0),
                     ExpiryWarningEnabled = (byte)(pickupHud.expiryWarningEnabled ? 1 : 0),
                     ExpiryWarningSeconds = pickupHud.expiryWarningSeconds,
@@ -196,6 +209,8 @@ namespace Code_01.CombatPrototype.Map
                     RowHeightPixels = inventoryPanel.rowHeightPixels,
                     PanelTitle = new FixedString64Bytes(inventoryPanel.panelTitle),
                     MaterialsLabel = new FixedString64Bytes(inventoryPanel.materialsLabel),
+                    CapacityLabel = new FixedString64Bytes(inventoryPanel.capacityLabel),
+                    UnlimitedLabel = new FixedString64Bytes(inventoryPanel.unlimitedLabel),
                     ToolsLabel = new FixedString64Bytes(inventoryPanel.toolsLabel),
                     CraftLabel = new FixedString64Bytes(inventoryPanel.craftLabel),
                     CraftButtonLabel = new FixedString64Bytes(inventoryPanel.craftButtonLabel),

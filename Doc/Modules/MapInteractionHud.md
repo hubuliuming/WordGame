@@ -6,7 +6,7 @@
 
 | 文件 | 职责 |
 |---|---|
-| [HUD 配置](../../Assets/Scripts/CombatPrototype/Map/MapInteractionHudConfig.cs) | interactionHud 的九个 JSON 字段 |
+| [HUD 配置](../../Assets/Scripts/CombatPrototype/Map/MapInteractionHudConfig.cs) | interactionHud 的十个 JSON 字段 |
 | [HUD 数据](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapInteractionHudData.cs) | 地图烘焙显示配置与玩家所属 Ghost 快照 |
 | [服务端状态](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapInteractionHudStateSystem.cs) | 在原资源维护/再生与 PlayerRespawn 后读取目标和真实进度，只写 HUD |
 | [客户端绑定](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapInteractionHudBindingSystem.cs) | Presentation 读取本地所属玩家快照并交给显示组件 |
@@ -20,7 +20,7 @@
 
 ## 【FACT】当前 JSON 契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 为 schemaVersion=18/configRevision=21，interactionHud、[高亮](MapInteractionHighlight.md)、[G提示](MapPickupHud.md)、[工具配置](MapGatherTools.md)与[面板配置](MapInventoryPanel.md)均必填；interactionHud全部九个字段必填，沿原严格 UTF-8/字段/类型/重复键检查。旧 v1～v17 明确失败，不补默认段或回退来源；JSON 只在正常导入和烘焙后生效，无运行热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 为 schemaVersion=19/configRevision=22，interactionHud、[高亮](MapInteractionHighlight.md)、[G提示](MapPickupHud.md)、[工具配置](MapGatherTools.md)与[面板配置](MapInventoryPanel.md)均必填；interactionHud全部十个字段必填，沿原严格 UTF-8/字段/类型/重复键检查。旧 v1～v18 明确失败，不补默认段或回退来源；JSON 只在正常导入和烘焙后生效，无运行热重载。
 
 | 字段 | 默认值 | 契约 |
 |---|---|---|
@@ -33,6 +33,7 @@
 | gatherLabel | Gather Apple | 非空白、无控制字符、至多 61 UTF-8 字节 |
 | treeLabel | Chop Tree | 同上 |
 | mineLabel | Mine Rock | 同上 |
+| noSpaceLabel | Not enough space | 同上；[容量](MapInventoryCapacity.md)拒绝时使用 |
 
 即使 enabled=false，其余字段仍按上述契约校验。显示按 1920×1080 参考像素，以 min(屏幕宽/1920,屏幕高/1080) 等比缩放，底部居中；面板黑色背景 alpha=0.7，文字白色，进度背景白色 alpha=0.2，填充 RGB=(0.85,0.65,0.3)。使用内置 GUI 样式字体与 Texture2D.whiteTexture，不导入新的字体/纹理；当前英文文案，中文文案字段可配置，但中文字体与实际字形覆盖未确认。
 
@@ -42,13 +43,13 @@
 
 本人正在 Collecting/Chopping/Mining 时固定使用原 Collector 实体对应目标，不因其他资源更近而切换。进度由服务端模拟时间和原 FinishAt、本次锁定的 ActualDuration（植物仍为原 GatherDuration） 计算 round(clamp(1-(FinishAt-now)/duration,0,1)×1000)。默认徒手耗时1/2/3秒，斧头/镐子为1.5/2.25秒；工具完成保存归[采集工具](MapGatherTools.md)，HUD不另起工作计时器或提前完成。
 
-空闲时复用同一Select：各类型原交互距离筛选，只选Available/Standing/Available，按X/Z中心最近、同距较小PlacementIndex；关闭砍伐/采矿不选相应类型。提示不预约，按F仍由当tick选择/预约。不可交互时F提示/进度隐藏，工具制作反馈可独立临时显示；死亡时整个HUD收起。收到取消/完成状态后清进度，可显示下一有效目标或隐藏；显示代表最近权威快照，网络延迟可滞后，Working百分比不是发奖/保存成功标志。
+空闲植物目标另按[容量](MapInventoryCapacity.md)检查，拒绝时NoSpace而非Working；保留最近目标身份。空闲时复用同一Select：各类型原交互距离筛选，只选Available/Standing/Available，按X/Z中心最近、同距较小PlacementIndex；关闭砍伐/采矿不选相应类型。提示不预约，按F仍由当tick选择/预约。不可交互时F提示/进度隐藏，工具制作反馈可独立临时显示；死亡时整个HUD收起。收到取消/完成状态后清进度，可显示下一有效目标或隐藏；显示代表最近权威快照，网络延迟可滞后，Working百分比不是发奖/保存成功标志。
 
 CombatPrototypeMapInteractionHudState 用 OwnerSendType=SendToOwner 同步给所属玩家：
 
 | 字段 | 声明与含义 |
 |---|---|
-| Mode | byte 枚举：0 Hidden、1 Ready、2 Working |
+| Mode | byte 枚举：0 Hidden、1 Ready、2 Working、3 NoSpace（仅Gather） |
 | Kind | byte：0 None、1 Gather、2 Tree、3 Mine |
 | PlacementIndex | int；Hidden 为 -1，其余是原布置索引 |
 | ProgressPermille | ushort，0～1000；非 Working 为 0 |
@@ -57,7 +58,7 @@ CombatPrototypeMapInteractionHudState 用 OwnerSendType=SendToOwner 同步给所
 
 客户端枚举启用的 GhostOwnerIsLocal，不在含该可启用组件的查询上调用单例 API；只显示本地所属玩家且死亡时收起，不显示远端玩家进度。F文字路径不读取PlayerView或世界位置；[高亮](MapInteractionHighlight.md)额外读取所选资源的客户端LocalToWorld，不替代官方Transform显示桥接。Main Camera 组件随 Client World 变更注册/解绑；无客户端、准入未完成、没有本地 Ghost 或地图停止时隐藏。World/Scene 释放清掉显示和引用，不保留上一局目标/进度/制作反馈；本地玩家或地图源变化也重置反馈序号观察。
 
-Ready 显示“F  文案”；Working 显示“文案  百分比%”和按千分比填充的进度条，整数百分比为 ProgressPermille/10。第二行读取所属工具缓冲显示对应名称/耐久、Hands或制作提示，制作/修理反馈默认各2秒；未到期修理优先于制作，无F目标可临时显示结果，交互中只替换第二行。初次绑定只观察现有Sequence，不重播旧结果；只有反馈显示使用客户端unscaledTime。F面板仍只在Repaint绘制，库存列表/按钮委托[制作面板](MapInventoryPanel.md)处理GUI事件；B由客户端输入系统读取。缓存文案与样式，绘制后恢复GUI.matrix/color/enabled。F文字面板不显示掉落拾取提示、世界标记或再生倒计时；独立G面板归[拾取提示](MapPickupHud.md)，宿主先绘制[投影圆环](MapInteractionHighlight.md)再绘制原面板。
+NoSpace第一行显示noSpaceLabel、第二行显示F目标，不画进度；Ready 显示“F  文案”；Working 显示“文案  百分比%”和按千分比填充的进度条，整数百分比为 ProgressPermille/10。第二行读取所属工具缓冲显示对应名称/耐久、Hands或制作提示，制作/修理反馈默认各2秒；除NoSpace第二行优先目标外，未到期修理优先于制作，无F目标可临时显示结果，交互中只替换第二行；NoSpace时原反馈仍可在B页脚查看。初次绑定只观察现有Sequence，不重播旧结果；只有反馈显示使用客户端unscaledTime。F面板仍只在Repaint绘制，库存列表/按钮委托[制作面板](MapInventoryPanel.md)处理GUI事件；B由客户端输入系统读取。缓存文案与样式，绘制后恢复GUI.matrix/color/enabled。F文字面板不显示掉落拾取提示、世界标记或再生倒计时；独立G面板归[拾取提示](MapPickupHud.md)，宿主先绘制[投影圆环](MapInteractionHighlight.md)再绘制原面板。
 
 资源采样错误按单项暴露地图、类型、布置索引、实体和原异常并继续；玩家帧错误按连接隔离，未生成有效快照者清为 Hidden。必需服务、地图 Settings、HUD 挂载或本地 HUD 数据缺失明确报错，不查找节点、不创建替代组件或默认配置；非法非隐藏网络快照明确报错并保持隐藏。
 
@@ -71,7 +72,7 @@ Ready 显示“F  文案”；Working 显示“文案  百分比%”和按千分
 
 v9/revision12阶段复用原Main Camera宿主接入[材料背包与制作面板](MapInventoryPanel.md)，两个显示开关独立。关闭F HUD仍保留本地面板/制作反馈，关闭面板仍保留F HUD；绑定先核对所属Connected/InGame连接，v9时两者关闭或生命周期失效时清空；当前显示开关见末段。原服务端四字段不变，本次编译/十四次隔离烘焙静态通过；用户确认面板人工通过限v9/revision12及[运行入口](Runtime.md)十二项，未触发的独立失败/时序用例仍UNKNOWN。
 
-当前地图v18/21必填[背包丢弃](MapInventoryDrop.md)，复用原掉落资源及保存链；本专题原交互/工具/产出/再生行为保持。新增丢弃静态及用户人工通过限[运行入口](Runtime.md)v10/13十二项，未触发用例UNKNOWN；旧通过仍限原版本/清单。
+当前地图v19/22必填[背包丢弃](MapInventoryDrop.md)，复用原掉落资源及保存链；本专题原交互/工具/产出/再生行为保持。新增丢弃静态及用户人工通过限[运行入口](Runtime.md)v10/13十二项，未触发用例UNKNOWN；旧通过仍限原版本/清单。
 
 v11/14阶段复用原宿主/绑定接入[G提示](MapPickupHud.md)：pickupHud、interactionHud及inventoryPanel独立，三者全关闭或生命周期失效才收起整体绑定；F/G可同时显示，F四字段和进度/工具/反馈规则保持。G新增所属四字段、五职责脚本/meta及显示Settings，未改Scene/Prefab/Animator结构。编译/十次隔离烘焙静态通过，用户确认G显示人工通过，限v11/14十项，未触发用例UNKNOWN，旧通过保持原范围。
 
@@ -79,7 +80,7 @@ v12/15高亮复用原F四字段与Working锁定目标接入[资源交互高亮](
 
 v13/16的[资源状态](MapResourceStatusHud.md)复用此宿主，独立显示三类资源状态与服务端剩余秒数，F文字面板本身保持。F采样增加状态开关作为身份消费者；仅状态开启时仍保留原F目标优先级。新显示静态及用户人工通过，限v13/16十项，未触发用例UNKNOWN；旧通过仍限各自版本/清单。
 
-当前v18/21的[修理反馈](MapToolRepair.md)由新普通缓存类读取所属Sequence/Kind/Result并委托原F第二行/B页脚显示，初次绑定不重播；无F目标显示结果及对应工具。非法修理反馈只清本通道并记录原异常，Configure/Reset清旧序号、期限/身份。原F进度、G、高亮/资源状态开关及计时保持；静态及用户人工通过，限v14/17十二项，未触发用例UNKNOWN。
+当前v19/22的[修理反馈](MapToolRepair.md)由新普通缓存类读取所属Sequence/Kind/Result并委托原F第二行/B页脚显示，初次绑定不重播；无F目标显示结果及对应工具。非法修理反馈只清本通道并记录原异常，Configure/Reset清旧序号、期限/身份。原F进度、G、高亮/资源状态开关及计时保持；静态及用户人工通过，限v14/17十二项，未触发用例UNKNOWN。
 
 ## 【FACT】地图资源存档接入边界
 
@@ -87,4 +88,4 @@ v13/16的[资源状态](MapResourceStatusHud.md)复用此宿主，独立显示�
 
 寿命提示v17/20归[G提示](MapPickupHud.md)：所属G六字段，原目标/拾取/期限/保存保持；静态及用户人工通过限十二项，未触发独立用例UNKNOWN；旧用户通过仍限原版本/清单。
 
-地图v18/21的[F5/保存提示](MapWorldSaveHud.md)由原Main Camera宿主/绑定委托新普通助手绘制；只关闭worldSaveHud不关闭F5，所有原显示关闭但本HUD开启仍保留绑定。原F进度/工具反馈优先与G/高亮/资源状态保持；编译/字段/烘焙静态通过，人工UNKNOWN。
+地图v18/21的[F5/保存提示](MapWorldSaveHud.md)由原Main Camera宿主/绑定委托新普通助手绘制；只关闭worldSaveHud不关闭F5，所有原显示关闭但本HUD开启仍保留绑定。原F进度/工具反馈优先与G/高亮/资源状态保持；静态及用户人工通过限v18/revision21十二项，未触发独立用例UNKNOWN。

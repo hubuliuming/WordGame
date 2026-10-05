@@ -19,7 +19,7 @@
 
 ## 【FACT】JSON 契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 当前一致为 schemaVersion=18/configRevision=21。必填 inventoryPanel 共28字段，沿原严格UTF-8、完整字段/类型及未知/重复键检查；即使关闭面板也校验全部字段。旧地图v1～v17明确失败，不补段/默认值或回退来源；正常导入/烘焙后生效，无运行热重载。原工具配方/耐久仍从 gatherTools 唯一读取，面板不复制配置真值。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 当前一致为 schemaVersion=19/configRevision=22。必填 inventoryPanel 共30字段，沿原严格UTF-8、完整字段/类型及未知/重复键检查；即使关闭面板也校验全部字段。旧地图v1～v18明确失败，不补段/默认值或回退来源；正常导入/烘焙后生效，无运行热重载。原工具配方/耐久仍从 gatherTools 唯一读取，面板不复制配置真值。
 
 | 字段 | 默认值 | 契约 |
 |---|---|---|
@@ -34,6 +34,7 @@
 |---|---|
 | panelTitle | Inventory |
 | materialsLabel | Materials |
+| capacityLabel / unlimitedLabel | Capacity / Unlimited |
 | toolsLabel | Tools |
 | craftLabel | Crafting |
 | craftButtonLabel | Craft |
@@ -53,11 +54,11 @@
 | repairButtonLabel | Repair |
 | fullDurabilityLabel | Full durability |
 
-全部20文案须非空白、无控制字符且最多61个UTF-8字节，烘焙为FixedString64Bytes。内置GUI字体和白色纹理复用；当前英文文案，中文接口保留，字体/字形覆盖为UNKNOWN，没有读取图片或界面截图。
+全部22文案须非空白、无控制字符且最多61个UTF-8字节，烘焙为FixedString64Bytes。内置GUI字体和白色纹理复用；当前英文文案，中文接口保留，字体/字形覆盖为UNKNOWN，没有读取图片或界面截图。
 
 ## 【CURRENT STRATEGY】库存、工具与配方显示
 
-客户端仅枚举启用GhostOwnerIsLocal的一个玩家，并核对其GhostOwner对应Connected/InGame且无断线请求的连接；没有有效本地Ghost/连接时清空显示。展示原CombatPrototypeInventoryItem的正数量条目及原顺序，不设第二份可变库存，不按99拆格、不排序或扩充容量；零数量不列出。木材/石材/活力苹果/小块肉映射上述Wood/Stone/Apple/Meat文案，其余合法名称直接按原ItemName显示。ToolId/Durability仍来自原所属工具缓冲，工具独立于库存，两槽显示当前/最大耐久、未持有或损坏/功能关闭状态。
+客户端仅枚举启用GhostOwnerIsLocal的一个玩家，并核对其GhostOwner对应Connected/InGame且无断线请求的连接；没有有效本地Ghost/连接时清空显示。展示原CombatPrototypeInventoryItem的正数量条目及原顺序，不设第二份可变库存，不按99拆格、不排序；零数量不列出。材料标题后增加一行总量/上限，受管材料行显示数量/单种上限，关闭限制显示Unlimited，规则归[容量](MapInventoryCapacity.md)。木材/石材/活力苹果/小块肉映射上述Wood/Stone/Apple/Meat文案，其余合法名称直接按原ItemName显示。ToolId/Durability仍来自原所属工具缓冲，工具独立于库存，两槽显示当前/最大耐久、未持有或损坏/功能关闭状态。
 
 新Snapshot只缓存显示文本/数量；条目名称空白/控制字符、负数量或重复名称按索引/地图/玩家记录错误并跳过该项，其余独立条目继续，当前快照有错误时禁用制作、修理和丢弃按钮，不用展示数据修正库存。原工具网络数据仍由原HUD统一校验。必需地图配置、客户端绑定/宿主缺失明确暴露错误，不查找或创建组件兜底。
 
@@ -89,7 +90,7 @@ v12/15的[高亮](MapInteractionHighlight.md)复用同一宿主，圆环先于�
 
 v13/16的[资源状态](MapResourceStatusHud.md)与B面板独立，仍复用原宿主/绑定；状态开启时即使其余显示全关仍绑定。新状态不消费GUI事件或制作请求，B按钮与鼠标隔离保持。状态静态及用户人工通过，限v13/16十项，未触发用例UNKNOWN；旧面板/G/高亮用户通过保持原范围。
 
-当前v18/21的[工具修理](MapToolRepair.md)在制作区后追加11滚动行，预览封顶恢复值、材料现有/需要及缺口，3/4按钮沿原鼠标按下标记和输入绑定消费一次。关闭面板或生命周期失效清未提交修理，关闭面板仍可键盘3/4；库存展示错误禁用修理按钮。原380×640/字号18/行32、制作、Drop/All及鼠标隔离保持。配置28字段/20文案、工具根/定义和新反馈经编译/18次隔离烘焙静态通过；用户确认修理人工通过，限v14/17十二项，未触发用例UNKNOWN。
+v14/17修理阶段的[工具修理](MapToolRepair.md)在制作区后追加11滚动行，预览封顶恢复值、材料现有/需要及缺口，3/4按钮沿原鼠标按下标记和输入绑定消费一次。关闭面板或生命周期失效清未提交修理，关闭面板仍可键盘3/4；库存展示错误禁用修理按钮。原380×640/字号18/行32、制作、Drop/All及鼠标隔离保持。配置28字段/20文案、工具根/定义和新反馈经编译/18次隔离烘焙静态通过；用户确认修理人工通过，限v14/17十二项，未触发用例UNKNOWN。
 
 ## 【FACT】地图资源存档接入边界
 
@@ -97,4 +98,4 @@ v13/16的[资源状态](MapResourceStatusHud.md)与B面板独立，仍复用原�
 
 寿命提示v17/20归[G提示](MapPickupHud.md)：所属G六字段，原目标/拾取/期限/保存保持；静态及用户人工通过限十二项，未触发独立用例UNKNOWN；旧用户通过仍限原版本/清单。
 
-地图v18/21的[F5/保存提示](MapWorldSaveHud.md)已接入：当前16输入、新增所属3字段；原F/G、工具及世界/玩家存档格式保持。编译/字段/烘焙静态通过，人工UNKNOWN；旧通过限原版本/清单。
+地图v18/21的[F5/保存提示](MapWorldSaveHud.md)已接入：当前16输入、新增所属3字段；原F/G、工具及世界/玩家存档格式保持。静态及用户人工通过限v18/revision21十二项，未触发独立用例UNKNOWN；旧通过限原版本/清单。

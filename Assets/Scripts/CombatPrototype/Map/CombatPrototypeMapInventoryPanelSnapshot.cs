@@ -17,12 +17,12 @@ namespace Code_01.CombatPrototype.Map
             public readonly int Quantity;
             public readonly string Text;
 
-            public Row(FixedString64Bytes name, string originalName, int quantity, string label)
+            public Row(FixedString64Bytes name, string originalName, int quantity, string label, int maximum)
             {
                 Name = name;
                 OriginalName = originalName;
                 Quantity = quantity;
-                Text = label + "  x" + quantity;
+                Text = maximum > 0 ? label + "  " + quantity + "/" + maximum : label + "  x" + quantity;
             }
         }
 
@@ -36,6 +36,12 @@ namespace Code_01.CombatPrototype.Map
         private string _stoneLabel;
         private string _appleLabel;
         private string _meatLabel;
+        private string _capacityLabel;
+        private string _unlimitedLabel;
+        private string _capacityText;
+        private int _woodMaximum, _stoneMaximum, _appleMaximum, _totalMaximum;
+        private bool _capacityEnabled;
+        private long _lastTotal = -1;
 
         public IReadOnlyList<Row> Items => _items;
         public int WoodQuantity { get; private set; }
@@ -43,14 +49,23 @@ namespace Code_01.CombatPrototype.Map
         public int AxeDurability { get; private set; } = -1;
         public int PickaxeDurability { get; private set; } = -1;
         public bool InventoryValid { get; private set; }
+        public string CapacityText => _capacityText;
 
-        public void Configure(CombatPrototypeMapInventoryPanelSettings settings)
+        public void Configure(CombatPrototypeMapInventoryPanelSettings settings,
+            CombatPrototypeMapInventoryCapacitySettings capacity, DynamicBuffer<CombatPrototypeMapInventoryCapacityDefinition> definitions)
         {
             Reset();
             _woodLabel = settings.WoodLabel.ToString();
             _stoneLabel = settings.StoneLabel.ToString();
             _appleLabel = settings.AppleLabel.ToString();
             _meatLabel = settings.MeatLabel.ToString();
+            _capacityLabel = settings.CapacityLabel.ToString();
+            _unlimitedLabel = settings.UnlimitedLabel.ToString();
+            _capacityEnabled = capacity.Enabled != 0;
+            _totalMaximum = capacity.MaxTotalQuantity;
+            _woodMaximum = CombatPrototypeMapInventoryCapacityUtility.RequireDefinition(definitions, Wood).MaxQuantity;
+            _stoneMaximum = CombatPrototypeMapInventoryCapacityUtility.RequireDefinition(definitions, Stone).MaxQuantity;
+            _appleMaximum = CombatPrototypeMapInventoryCapacityUtility.RequireDefinition(definitions, Apple).MaxQuantity;
         }
 
         public void Capture(DynamicBuffer<CombatPrototypeInventoryItem> inventory, int axeDurability,
@@ -62,6 +77,7 @@ namespace Code_01.CombatPrototype.Map
             InventoryValid = true;
             _names.Clear();
             var count = 0;
+            long total = 0;
             for (var index = 0; index < inventory.Length; index++)
             {
                 var item = inventory[index];
@@ -79,15 +95,31 @@ namespace Code_01.CombatPrototype.Map
                 if (item.Quantity == 0) continue;
                 if (item.ItemName.Equals(Wood)) WoodQuantity = item.Quantity;
                 if (item.ItemName.Equals(Stone)) StoneQuantity = item.Quantity;
+                var maximum = Maximum(item.ItemName);
+                if (maximum > 0) total += item.Quantity;
                 if (!cached || _items[count].Quantity != item.Quantity)
                 {
-                    var row = new Row(item.ItemName, originalName, item.Quantity, DisplayName(item.ItemName, originalName));
+                    var row = new Row(item.ItemName, originalName, item.Quantity, DisplayName(item.ItemName, originalName),
+                        _capacityEnabled ? maximum : 0);
                     if (count < _items.Count) _items[count] = row;
                     else _items.Add(row);
                 }
                 count++;
             }
             if (count < _items.Count) _items.RemoveRange(count, _items.Count - count);
+            if (total != _lastTotal)
+            {
+                _lastTotal = total;
+                _capacityText = _capacityLabel + "  " + total + "/" + (_capacityEnabled ? _totalMaximum.ToString() : _unlimitedLabel);
+            }
+        }
+
+        private int Maximum(FixedString64Bytes name)
+        {
+            if (name.Equals(Wood)) return _woodMaximum;
+            if (name.Equals(Stone)) return _stoneMaximum;
+            if (name.Equals(Apple)) return _appleMaximum;
+            return 0;
         }
 
         private static bool ValidName(string name)
@@ -114,6 +146,10 @@ namespace Code_01.CombatPrototype.Map
             WoodQuantity = StoneQuantity = 0;
             AxeDurability = PickaxeDurability = -1;
             InventoryValid = false;
+            _lastTotal = -1;
+            _capacityText = string.Empty;
+            _capacityEnabled = false;
+            _woodMaximum = _stoneMaximum = _appleMaximum = _totalMaximum = 0;
         }
     }
 }

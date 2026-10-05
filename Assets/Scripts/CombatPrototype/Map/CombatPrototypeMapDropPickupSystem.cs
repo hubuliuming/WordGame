@@ -37,6 +37,9 @@ namespace Code_01.CombatPrototype.Map
             Dependency.Complete();
             var map = SystemAPI.GetSingleton<CombatPrototypeMapData>();
             var settings = SystemAPI.GetSingleton<CombatPrototypeMapDropSettings>();
+            var source = SystemAPI.GetSingletonEntity<CombatPrototypeMapData>();
+            var capacity = EntityManager.GetComponentData<CombatPrototypeMapInventoryCapacitySettings>(source);
+            var capacityDefinitions = EntityManager.GetBuffer<CombatPrototypeMapInventoryCapacityDefinition>(source, true);
             var time = SystemAPI.Time.ElapsedTime;
             using var drops = _drops.ToEntityArray(Allocator.Temp);
             var players = new NativeList<OnlinePlayer>(Allocator.Temp);
@@ -105,6 +108,15 @@ namespace Code_01.CombatPrototype.Map
                         var itemName = CombatPrototypeMapYieldItemResolver.Resolve(itemId.ToString());
                         var playerId = identities[player.Entity].PlayerId;
                         var inventory = inventories[player.Entity];
+                        stage = "CheckCapacity";
+                        var capacityReason = CombatPrototypeMapInventoryCapacityUtility.GetRejection(capacity, capacityDefinitions,
+                            inventory, itemName, quantity);
+                        if (capacityReason != null)
+                        {
+                            Reject(map.MapDefinitionId, player, capacityReason + ", DropId=" + dropId + ", itemId=" + itemId);
+                            continue;
+                        }
+                        stage = "PrepareReward";
                         var itemIndex = -1;
                         for (var i = 0; i < inventory.Length; i++)
                             if (inventory[i].ItemName.Equals(itemName)) { itemIndex = i; break; }

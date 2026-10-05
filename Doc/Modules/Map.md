@@ -15,7 +15,7 @@
 
 ## 【FACT】当前默认配置
 
-v25/28；旧通过限原范围；[F失败](MapInteractionFailureHud.md)、[F结果](MapGatherOutcomeHud.md)已验收；[G结果](MapPickupFeedbackHud.md)待验收。
+v26/29；旧通过限原范围；F/G反馈已验收，范围见[G结果](MapPickupFeedbackHud.md)；[合并](MapDropMerge.md)待验收。
 
 | 配置字段 | 当前值与用途 |
 |---|---|

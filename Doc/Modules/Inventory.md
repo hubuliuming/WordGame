@@ -173,4 +173,8 @@ v24/revision27的[采集结果](MapGatherOutcomeHud.md)在植被候选保存及�
 
 ## 【FACT】实际拾取结果与库存提交
 
-v25/revision28的[拾取反馈](MapPickupFeedbackHud.md)在原候选保存、库存提交与掉落Consumed及原完成日志结束后发送PickedUp；数量为本次实际增量，不是累计库存。容量拒绝与准备/保存前失败沿原拒绝/异常显示，反馈不会追加保存、补发物品、部分领取或自动重试；保存后部分提交异常沿原日志/UNKNOWN。原玩家v4库存/Tools/容量等级、世界v2、G选择与同局DropId保持；F植被直接入包、木材/石材须G及B原反馈保持。新显示静态通过、人工待验收，旧通过保持原版本/清单。
+v25/revision28的[拾取反馈](MapPickupFeedbackHud.md)在原候选保存、库存提交与掉落Consumed及原完成日志结束后发送PickedUp；数量为本次实际增量，不是累计库存。容量拒绝与准备/保存前失败沿原拒绝/异常显示，反馈不会追加保存、补发物品、部分领取或自动重试；保存后部分提交异常沿原日志/UNKNOWN。原玩家v4库存/Tools/容量等级、世界v2、G选择与同局DropId保持；F植被直接入包、木材/石材须G及B原反馈保持。新显示静态及用户人工通过限v25/revision28十六项，未触发独立用例UNKNOWN，旧通过保持原版本/清单。
+
+## 【FACT】地面合并与库存边界
+
+v26/revision29的[合并](MapDropMerge.md)不入包、不扣材料/工具或发奖励，地面保留目标的新数量与最早期限；实际G继续整堆PrepareReward→SavePrepared→库存/Consumed，容量不足不部分领取。合并可能使原可领取小份变为NoSpace，新上限99与库存总量/单种容量独立。原F直接入包、B操作/反馈及玩家v4保存格式保持；新链静态通过、人工待验收，旧G反馈通过仍限v25/revision28十六项。

@@ -1,6 +1,6 @@
 # 掉落物拾取成功与失败反馈
 
-返回[地图](Map.md)、[掉落与拾取](MapDrops.md)、[G目标及寿命](MapPickupHud.md)与[运行入口](Runtime.md)。入口CombatPrototypeNetCode；Forest/Grassland Json与BuiltIn当前schemaVersion=25/configRevision=28。本专题负责实际G请求结果的所属快照与原G面板显示。静态验收通过，人工GamePlayer待验收；旧F完成/中断通过限v24/revision27十六项，其他旧通过保持原版本/清单。
+返回[地图](Map.md)、[掉落与拾取](MapDrops.md)、[G目标及寿命](MapPickupHud.md)与[运行入口](Runtime.md)。入口CombatPrototypeNetCode；Forest/Grassland Json与BuiltIn当前schemaVersion=26/configRevision=29。本专题负责实际G请求结果的所属快照与原G面板显示。静态及用户人工GamePlayer通过；范围限v25/revision28十六项，详见下述人工边界；旧F完成/中断通过限v24/revision27十六项，其他旧通过保持原版本/清单。
 
 ## 【FACT】文件与接入
 
@@ -35,7 +35,7 @@
 | noTargetLabel | No available drop | 同上 |
 | failedLabel | Pickup failed | 同上 |
 
-三物品名称与NoSpace直接复用pickupHud.appleLabel/woodLabel/stoneLabel/noSpaceLabel，没有第二份定义。原严格JsonReader沿DTO检查UTF-8、形状、缺失/null/未知/重复键及标量类型；语义复用Positive/HighlightColor/HudLabel。旧地图v1～v24明确拒绝，不迁移、不补默认段、不回退来源；正常导入/烘焙后生效，没有运行热重载。
+三物品名称与NoSpace直接复用pickupHud.appleLabel/woodLabel/stoneLabel/noSpaceLabel，没有第二份定义。原严格JsonReader沿DTO检查UTF-8、形状、缺失/null/未知/重复键及标量类型；语义复用Positive/HighlightColor/HudLabel。旧地图v1～v25明确拒绝，不迁移、不补默认段、不回退来源；正常导入/烘焙后生效，没有运行热重载。
 
 原地图根Baker写九字段Settings：Enabled(byte)、FeedbackSeconds(float)、SuccessColor/FailureColor(float3 RGB)及五个FixedString64Bytes。它不是Ghost；绑定在地图源/本地玩家变化时传给原G客户端。普通缓存只保存配置、物品标签、观察序号、结果、文字、颜色与期限，不跨帧持有DynamicBuffer。英文为默认值，可配置中文，实际字体/字形与排版UNKNOWN。
 
@@ -91,6 +91,10 @@ pickupFeedbackHud.enabled=false仅隐藏新结果；pickupHud.enabled=false隐�
 
 Bake前后Console均[0,7,53]，未新增烘焙错误/警告/日志；主场景干净、未Play，结束时一场景三根对象。临时TextAsset/克隆对象/Editor场景/World/BlobAssetStore释放，原SubScene只读使用后恢复。原339项人工内容/编号逐字保留，本阶段追加16项后共355项，归[运行入口](Runtime.md)。
 
-主线程静态验收通过，本阶段v25/revision28十六项人工GamePlayer待验收。未实际触发的独立成功/拒绝/准备与保存失败、反馈写入隔离、容量/优先级、显示/字形/排版、多人争抢/晚加入/重连、序号覆盖/回绕/预测回放及生命周期用例仍UNKNOWN。旧通过保持原版本/清单，不扩大为本阶段通过。
+用户已确认本阶段人工GamePlayer验收通过，主线程结合既有静态核对与用户反馈判定通过，限CombatPrototypeNetCode、v25/revision28及[运行入口](Runtime.md)十六项清单，结论来自用户反馈。清单涵盖实际拾取物品/增量及拒绝/失败反馈、写入隔离、G目标/寿命与NoSpace优先级、F/B独立显示、配置开关、所属同步和生命周期回归；原355项内容/编号逐字保留。未实际触发的独立成功/拒绝/准备与保存失败、反馈写入隔离、容量/优先级、显示/字形/排版、多人争抢/晚加入/重连、序号覆盖/回绕/预测回放及生命周期用例仍UNKNOWN。旧通过保持原版本/清单，本结论不扩展到性能、平台或线上联调。
 
 AI未执行GamePlayer/PlayMode、游戏/显示系统或GUI回调、逻辑单元测试、真实存档业务I/O、命令行构建/发布、性能/带宽采样或图片检查，未创建子Agent/提交Git。保存后意外ECS恢复、玩家/世界跨文件事务、同槽并发及性能/平台/线上结论仍沿原UNKNOWN边界。
+
+## 【FACT】地面合并与实际拾取结果
+
+当前v26/revision29的[合并](MapDropMerge.md)仅改变原地面Quantity/ExpiresAt及来源Consumed，不写本组件或发布PickedUp；实际G仍在原保存/库存/Consumed完整提交后才发成功，携带合并后的本次真实增量。整堆放不下沿原NoSpace，移动/攻击/无目标/失败及面板优先级、开关/绑定保持。新合并静态通过、人工待验收；本专题用户通过仍限v25/revision28十六项，不扩展到新合并行为。

@@ -287,4 +287,4 @@ v13/16的[资源状态](MapResourceStatusHud.md)由Player Baker追加所属Mode/
 
 ## 【FACT】实际G拾取的所属结果
 
-原Player Baker为[拾取反馈](MapPickupFeedbackHud.md)追加Sequence(uint)=0、Result(byte枚举)=None、ItemId(FixedString64Bytes)为空、Quantity(int)=0四GhostField，仅SendToOwner。成功携带原物品ID与本次正增量，其他结果空ItemId/0；写入核实GhostOwner/NetworkId与存活，归属错误/死亡不写新结果，错误独立隔离。客户端首次仅观察序号，死亡/断线/源或玩家失效Reset清缓存，只有最新结果无事件队列。Player Ghost布局追加组件，须各端同版重新烘焙；原输入19、Tools3、F4/G6/资源4/世界保存3/F失败2/F结果3、生命/体力/R、Prefab及玩家v4存档保持。v25/revision28静态通过、人工待验收；F完成/中断通过仍限v24/revision27十六项，旧通过保持原版本/清单。
+原Player Baker为[拾取反馈](MapPickupFeedbackHud.md)追加Sequence(uint)=0、Result(byte枚举)=None、ItemId(FixedString64Bytes)为空、Quantity(int)=0四GhostField，仅SendToOwner。成功携带原物品ID与本次正增量，其他结果空ItemId/0；写入核实GhostOwner/NetworkId与存活，归属错误/死亡不写新结果，错误独立隔离。客户端首次仅观察序号，死亡/断线/源或玩家失效Reset清缓存，只有最新结果无事件队列。Player Ghost布局追加组件，须各端同版重新烘焙；原输入19、Tools3、F4/G6/资源4/世界保存3/F失败2/F结果3、生命/体力/R、Prefab及玩家v4存档保持。v25/revision28静态及用户人工通过限十六项，未触发独立用例UNKNOWN；F完成/中断通过仍限v24/revision27十六项，旧通过保持原版本/清单。

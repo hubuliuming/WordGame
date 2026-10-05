@@ -19,7 +19,7 @@
 
 ## 【FACT】JSON 契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 当前一致为 schemaVersion=25/configRevision=28。必填 inventoryPanel 共30字段，沿原严格UTF-8、完整字段/类型及未知/重复键检查；即使关闭面板也校验全部字段。旧地图v1～v24明确失败，不补段/默认值或回退来源；正常导入/烘焙后生效，无运行热重载。Lv1配方/定义仍从gatherTools读取，当前级上限/倍率归[gatherToolUpgrade](MapGatherToolUpgrade.md)，面板不复制配置真值。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 当前一致为 schemaVersion=26/configRevision=29。必填 inventoryPanel 共30字段，沿原严格UTF-8、完整字段/类型及未知/重复键检查；即使关闭面板也校验全部字段。旧地图v1～v25明确失败，不补段/默认值或回退来源；正常导入/烘焙后生效，无运行热重载。Lv1配方/定义仍从gatherTools读取，当前级上限/倍率归[gatherToolUpgrade](MapGatherToolUpgrade.md)，面板不复制配置真值。
 
 | 字段 | 默认值 | 契约 |
 |---|---|---|
@@ -114,4 +114,8 @@ v14/17修理阶段的[工具修理](MapToolRepair.md)在制作区后追加11滚�
 
 ## 【FACT】G拾取结果与B面板边界
 
-当前v25/revision28的[拾取反馈](MapPickupFeedbackHud.md)独立显示在原G面板，不进入B页脚或原displayFeedback；本面板列表、按钮、制作/修理/丢弃/升级请求及鼠标隔离保持。关闭本面板仍可显示G结果，G文字或新结果关闭隐藏新消息；原绑定全部显示关闭时仍退出，新开关不强制维持HUD。新四字段所属结果不修改本面板快照或输入19字段；新显示静态通过、人工待验收，旧B通过仍限原版本/清单。
+v25/revision28阶段的[拾取反馈](MapPickupFeedbackHud.md)独立显示在原G面板，不进入B页脚或原displayFeedback；本面板列表、按钮、制作/修理/丢弃/升级请求及鼠标隔离保持。关闭本面板仍可显示G结果，G文字或新结果关闭隐藏新消息；原绑定全部显示关闭时仍退出，新开关不强制维持HUD。新四字段所属结果不修改本面板快照或输入19字段；新显示静态及用户人工通过限v25/revision28十六项，未触发独立用例UNKNOWN，旧B通过仍限原版本/清单。
+
+## 【FACT】丢弃后合并与面板边界
+
+v26/revision29的[地面合并](MapDropMerge.md)在已保存激活的丢弃物落地后执行，不改变B列表、Drop/All按钮、原请求/数量或丢弃反馈；原All可产生超99大堆，新链不拆分或钳制它。合并本身不修改库存/工具/等级或追加玩家保存；之后G按当前整堆数量检查容量。原面板尺寸/滚动/鼠标隔离及制作/修理/升级保持；新链静态通过、人工待验收，旧B通过保持原版本/清单。

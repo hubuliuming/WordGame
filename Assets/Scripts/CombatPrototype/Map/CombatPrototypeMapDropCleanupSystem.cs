@@ -37,7 +37,7 @@ namespace Code_01.CombatPrototype.Map
                     drop.ValueRW.Phase = CombatPrototypeMapDropPhase.Consumed;
                     Debug.Log("[CombatPrototype.Map] Drop cleanup queued; map=" + map.MapDefinitionId +
                         ", DropId=" + drop.ValueRO.DropId + ", itemId=" + drop.ValueRO.ItemId +
-                        ", reason=" + (expired ? "Expired" : "PickedUp") + ".");
+                        ", reason=" + (expired ? "Expired" : "Consumed") + ".");
                 }
                 catch (Exception exception)
                 {

@@ -17,7 +17,7 @@ namespace Code_01.CombatPrototype.Map
             {
                 map = new MapDefinitionConfig
                 {
-                    schemaVersion = 25, configRevision = 28,
+                    schemaVersion = 26, configRevision = 29,
                     mapDefinitionId = mapDefinitionId, defaultSeed = 12345,
                     resourcePersistence = new MapResourcePersistenceConfig
                     {
@@ -47,6 +47,10 @@ namespace Code_01.CombatPrototype.Map
                         quantity = 1, visualResourceKey = "drop_apple", pickupDistanceMeters = 2f,
                         flightDurationSeconds = 0.4f, scatterRadiusMeters = 0.6f, arcHeightMeters = 0.6f,
                         groundOffsetMeters = 0.05f, visualScale = 0.5f, lifetimeSeconds = 600f
+                    },
+                    dropMerge = new MapDropMergeConfig
+                    {
+                        enabled = true, mergeDistanceMeters = 0.8f, maxStackQuantity = 99, scanIntervalSeconds = 0.2f
                     },
                     treeHarvest = new MapTreeHarvestConfig
                     {

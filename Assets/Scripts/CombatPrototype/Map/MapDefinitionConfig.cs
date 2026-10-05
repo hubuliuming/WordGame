@@ -14,6 +14,7 @@ namespace Code_01.CombatPrototype.Map
         public MapLayoutConfig layout;
         public MapMovementConfig movement;
         public MapDropConfig drops;
+        public MapDropMergeConfig dropMerge;
         public MapTreeHarvestConfig treeHarvest;
         public MapMiningConfig mining;
         public MapGatherToolsConfig gatherTools;

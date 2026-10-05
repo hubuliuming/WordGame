@@ -21,7 +21,7 @@ v11/14阶段五个新脚本及meta、v17/20寿命接入两个普通助手及meta
 
 ## 【FACT】当前 JSON 契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为 schemaVersion=25/configRevision=28，pickupHud段及全部18字段必填，[interactionHighlight](MapInteractionHighlight.md)亦为必填地图段。沿原严格 UTF-8/缺失/未知/重复字段/类型和语义校验；旧 v1～v24 明确失败，不迁移、补默认段或回退来源。正常导入/烘焙后生效，没有运行热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为 schemaVersion=26/configRevision=29，pickupHud段及全部18字段必填，[interactionHighlight](MapInteractionHighlight.md)亦为必填地图段。沿原严格 UTF-8/缺失/未知/重复字段/类型和语义校验；旧 v1～v25 明确失败，不迁移、补默认段或回退来源。正常导入/烘焙后生效，没有运行热重载。
 
 | 字段 | 当前默认值 | 契约 |
 |---|---|---|
@@ -110,4 +110,8 @@ v17/revision20寿命链正常Unity编译无C# Error；实际Assembly与生成Ser
 
 ## 【FACT】实际G结果的独立接入
 
-当前v25/revision28必填[拾取反馈](MapPickupFeedbackHud.md)九字段Settings，Player Baker另加Sequence/Result/ItemId/Quantity四字段SendToOwner；原六字段目标/寿命与服务端StateSystem、选择器保持。原G保存/库存/Consumed完整提交后才显示成功，实际拒绝或保存前失败显示原因；写入独立隔离，保存后部分提交异常沿原日志/UNKNOWN。原NoSpace目标优先并保留数量/寿命，有效新NoSpace窗口内该行标红；其他结果复用原面板单行，暂时隐藏目标/寿命，到期恢复当前快照，原G高亮继续使用实际DropId。关闭新显示/G文字及原全部显示退出、首次不重播/Reset沿原绑定，新开关不强制HUD。静态通过、人工待验收；旧G文字/寿命通过保持原版本/清单。
+v25/revision28阶段接入必填[拾取反馈](MapPickupFeedbackHud.md)九字段Settings，Player Baker另加Sequence/Result/ItemId/Quantity四字段SendToOwner；原六字段目标/寿命与服务端StateSystem、选择器保持。原G保存/库存/Consumed完整提交后才显示成功，实际拒绝或保存前失败显示原因；写入独立隔离，保存后部分提交异常沿原日志/UNKNOWN。原NoSpace目标优先并保留数量/寿命，有效新NoSpace窗口内该行标红；其他结果复用原面板单行，暂时隐藏目标/寿命，到期恢复当前快照，原G高亮继续使用实际DropId。关闭新显示/G文字及原全部显示退出、首次不重播/Reset沿原绑定，新开关不强制HUD。静态及用户人工通过限v25/revision28十六项，未触发独立用例UNKNOWN；旧G文字/寿命通过保持原版本/清单。
+
+## 【FACT】合并后的真实G目标
+
+v26/revision29的[合并](MapDropMerge.md)在G前更新原掉落数量/期限并Consumed来源，服务端六字段采样继续读取当前真实目标及最早余时；来源不再可选，编号/位置保留的目标沿原高亮解析。G仍整堆容量检查，放不下保留原NoSpace数量/寿命；没有新客户端控制或Ghost字段。新链静态通过、人工待验收，旧G提示/寿命及v25拾取反馈通过限原版本/清单。

@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 25,
-  "configRevision": 28,
+  "schemaVersion": 26,
+  "configRevision": 29,
   "mapDefinitionId": "battle_grassland_01",
   "defaultSeed": 12345,
   "resourcePersistence": {
@@ -45,6 +45,12 @@
     "groundOffsetMeters": 0.05,
     "visualScale": 0.5,
     "lifetimeSeconds": 600.0
+  },
+  "dropMerge": {
+    "enabled": true,
+    "mergeDistanceMeters": 0.8,
+    "maxStackQuantity": 99,
+    "scanIntervalSeconds": 0.2
   },
   "treeHarvest": {
     "enabled": true,

@@ -20,7 +20,7 @@
 
 ## 【FACT】JSON 契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为 schemaVersion=23/configRevision=26。新增必填 inventoryCapacity：
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为 schemaVersion=26/configRevision=29。新增必填 inventoryCapacity：
 
 ```json
 "inventoryCapacity": {
@@ -45,7 +45,7 @@
 | pickupHud.noSpaceLabel | 新增必填 Not enough space；G 配置/Settings 各18字段 |
 | inventoryPanel.capacityLabel / unlimitedLabel | 新增必填 Capacity / Unlimited；面板配置/Settings 各30字段，其中22文案 |
 
-沿原严格 UTF-8、完整对象形状、字段/类型与未知/缺失/重复键校验；文案非空白、无控制字符、最多61个 UTF-8 字节。enabled=false 或显示关闭仍校验全部配置；旧地图 v1～v22 明确失败，没有补字段、来源回退或运行热重载。各端使用同版代码、配置并重新烘焙。
+沿原严格 UTF-8、完整对象形状、字段/类型与未知/缺失/重复键校验；文案非空白、无控制字符、最多61个 UTF-8 字节。enabled=false 或显示关闭仍校验全部配置；旧地图 v1～v25 明确失败，没有补字段、来源回退或运行热重载。各端使用同版代码、配置并重新烘焙。
 
 原地图根追加 CapacitySettings 的 Enabled(byte)/MaxTotalQuantity(int)，Definition 缓冲含 ItemId/ItemName(FixedString64Bytes)/MaxQuantity(int)，三条按原产出映射写入。配置通过正常 JSON/BuiltIn → 校验 → Map Baker 接入，不写玩家或世界档案。
 
@@ -88,3 +88,7 @@ F/G/B 显示开关仍独立。无本地玩家、死亡、断线、玩家/地图�
 用户已确认本阶段人工 GamePlayer 通过，主线程结合既有静态核对与用户反馈判定通过，限 CombatPrototypeNetCode、v19/revision22 及[运行入口](Runtime.md)材料容量十六项清单；人工结论来自用户反馈。旧 v18/revision21 的 F5/保存提示与其余历史237项保持各自版本/清单。未实际触发的精确容量/整批/同 tick/G并发采集中满包、旧超限恢复、异常库存/保存失败、多玩家/晚加入/生命周期、实际排版/字体仍为 UNKNOWN；性能/带宽、平台与线上未验证。
 
 v19容量阶段玩家/世界格式保持；当前玩家v4/两类等级规则归[工具升级](MapGatherToolUpgrade.md)，世界格式/路径、资源/掉落寿命/再生及原保存事务保持；跨文件原子一致、防重复、同槽并发和保存成功后意外 ECS 故障恢复仍为原 UNKNOWN。AI只执行编译、配置/元数据检查与隔离 Editor Bake，未执行 GamePlayer/PlayMode、游戏/显示系统或GUI回调、逻辑单元测试、命令行构建、发布、采样、图片检查或真实存档读写，未创建子Agent或提交Git。
+
+## 【FACT】合并后的整堆接收
+
+v26/revision29的[地面合并](MapDropMerge.md)只改原地面数量/期限；G继续对当前最近堆的完整实际Quantity执行原容量判定，放不下NoSpace，不部分领取或改选较远物。原小份可领取的材料合并后可能无法整堆入包。地面合并上限99不改inventoryCapacity/等级定义，也不拒绝、钳制或拆分已有大堆；合并本身不修改库存、容量Level或保存玩家。新链静态通过、人工待验收；旧容量/升级通过保持原版本/清单。

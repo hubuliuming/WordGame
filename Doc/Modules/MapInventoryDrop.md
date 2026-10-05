@@ -21,7 +21,7 @@
 
 ## 【FACT】JSON契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=23/configRevision=26。inventoryDrop全部字段必填，沿原严格UTF-8/缺失/未知/重复字段及类型检查；旧v1～v22明确失败，不补段或回退来源。disabled仍校验全部字段与资源绑定；正常导入/烘焙后生效，没有运行热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=26/configRevision=29。inventoryDrop全部字段必填，沿原严格UTF-8/缺失/未知/重复字段及类型检查；旧v1～v25明确失败，不补段或回退来源。disabled仍校验全部字段与资源绑定；正常导入/烘焙后生效，没有运行热重载。
 
 | 字段 | 默认值 | 契约 |
 |---|---|---|
@@ -37,7 +37,7 @@
 
 ## 【CURRENT STRATEGY】按钮、命令与反馈
 
-B沿原规则打开380×640面板；每个正数量材料行下面增加操作行。配置支持的条目显示Drop x1（数量随配置）和All，单次数量不足或All关闭时对应按钮禁用；不支持或丢弃关闭时显示Unavailable。库存快照异常时禁用所有可丢弃按钮，原工具制作按钮资格保持。单个All创建一份承载全部数量的Ghost，不按99拆分，不做地面合并。
+B沿原规则打开380×640面板；每个正数量材料行下面增加操作行。配置支持的条目显示Drop x1（数量随配置）和All，单次数量不足或All关闭时对应按钮禁用；不支持或丢弃关闭时显示Unavailable。库存快照异常时禁用所有可丢弃按钮，原工具制作按钮资格保持。单个All创建一份承载全部数量的Ghost，不按99拆分；落地后参与[地面合并](MapDropMerge.md)，超合并上限的大堆仍独立保留。
 
 客户端仅缓存一个未提交Kind/Mode请求，不扣库存或创建掉落。按钮沿原鼠标按下来源检查，面板内左键/滚轮仍隔离攻击/镜头；下一输入采样重新核对World、地图、当前所属存活玩家和Connected/InGame连接，再消费并清空请求。原IInputComponentData新增DropInventory InputEvent、InventoryDropItem byte、InventoryDropMode byte，稳定物品码None/Apple/Wood/Stone=0/1/2/3，模式None/Single/All=0/1/2；不传库存索引、数量、位置或客户端目标。没有新增RPC。
 
@@ -91,3 +91,7 @@ v13/16的[资源状态](MapResourceStatusHud.md)新增玩家所属四字段，�
 ## 【FACT】容量等级接入边界
 
 [升级](MapInventoryCapacityUpgrade.md)：升级请求不改变原丢弃资格；同tick丢弃优先、升级拒绝，当前19输入，丢弃候选携带实际Level。新链静态及用户人工通过限v20/revision23升级十六项，未触发用例UNKNOWN；旧通过保持原版本/清单。
+
+## 【FACT】落地后合并边界
+
+v26/revision29的[地面合并](MapDropMerge.md)只处理已登记Landed物，原Prepared半成品不参与，丢弃仍先保存扣料/激活及原Drop/All数量。落地后同ItemId整份合入较小编号的最近合格堆，默认上限99，不拆分原All大堆或追加玩家保存；有限寿命取最早期限，有限/永久不混合。丢弃开关不关闭已有地面物合并，合并开关不改变丢弃按钮/输入/所属反馈。新链静态通过、人工待验收；旧丢弃用户通过保持原版本/清单。

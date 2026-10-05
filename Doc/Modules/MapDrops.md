@@ -21,7 +21,7 @@
 
 ## 【FACT】JSON 契约与当前默认值
 
-[battle_forest_01.json](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[battle_grassland_01.json](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn来源](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)均为schemaVersion=23/configRevision=26，drops必填，工具配置归[采集工具](MapGatherTools.md)。原空间、移动、出生及drops/grounds值保持；mining与生态矿点字段归采矿专题，tree_normal/gather_apple/mine_rock均默认600秒再生。配置只在烘焙时读取，不支持热重载；各端须相同版本、输入布局与资源，未新增一致性协议。
+[battle_forest_01.json](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[battle_grassland_01.json](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn来源](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)均为schemaVersion=26/configRevision=29，drops必填，工具配置归[采集工具](MapGatherTools.md)。原空间、移动、出生及drops/grounds值保持；mining与生态矿点字段归采矿专题，tree_normal/gather_apple/mine_rock均默认600秒再生。配置只在烘焙时读取，不支持热重载；各端须相同版本、输入布局与资源，未新增一致性协议。
 
 | 字段 | 默认值 | 校验/行为 |
 |---|---|---|
@@ -37,7 +37,7 @@
 | visualScale | 0.5 | 有限正数，实例 LocalTransform 的统一缩放 |
 | lifetimeSeconds | 600 | 有限非负数；从生成时刻计时，0 关闭自动到期 |
 
-全部字段显式填写。字符串遵循原小写ASCII/数字/下划线及最长61字符；缺失/未知/重复字段、错类型或非法值沿严格UTF-8 JSON边界报错。旧地图v1～v16不迁移或补字段，Json失败不回退BuiltIn。资源键由原MapAuthoring.DecorationPrefabs解析，不查找或临时创建兜底。
+全部字段显式填写。字符串遵循原小写ASCII/数字/下划线及最长61字符；缺失/未知/重复字段、错类型或非法值沿严格UTF-8 JSON边界报错。旧地图v1～v25不迁移或补字段，Json失败不回退BuiltIn。资源键由原MapAuthoring.DecorationPrefabs解析，不查找或临时创建兜底。
 
 ## 【CURRENT STRATEGY】死亡、生成与飞行
 
@@ -135,4 +135,8 @@ v13/16的[资源状态](MapResourceStatusHud.md)只显示三类地图资源，�
 
 ## 【FACT】G拾取结果反馈边界
 
-当前v25/revision28的[拾取反馈](MapPickupFeedbackHud.md)仅发布原G实际结果；requested在原Pickup事件确认后设置，未读到请求的输入异常只保留原日志。SavePrepared正常返回后的rewardSaved仅用于禁止部分提交异常发布成功或失败；原PrepareReward→SavePrepared→库存→Consumed及完成日志结束后才写PickedUp，携带本次实际ItemId/Quantity增量。移动/攻击/无落地目标/容量拒绝及准备或保存前失败沿原原因映射，所有权不匹配/死亡不写另一玩家结果，反馈写入错误独立隔离且不撤销业务；保存后的恢复仍UNKNOWN。原资格、NetworkId升序、最近/同距小DropId、产出/运动/寿命/清理、容量与玩家v4/世界v2保存链保持；无目标不细分争抢/到期/飞行/超范围。静态编译/256份非法配置拒绝与44次隔离Bake通过，人工待验收，旧通过仍限原版本/清单。
+v25/revision28阶段的[拾取反馈](MapPickupFeedbackHud.md)仅发布原G实际结果；requested在原Pickup事件确认后设置，未读到请求的输入异常只保留原日志。SavePrepared正常返回后的rewardSaved仅用于禁止部分提交异常发布成功或失败；原PrepareReward→SavePrepared→库存→Consumed及完成日志结束后才写PickedUp，携带本次实际ItemId/Quantity增量。移动/攻击/无落地目标/容量拒绝及准备或保存前失败沿原原因映射，所有权不匹配/死亡不写另一玩家结果，反馈写入错误独立隔离且不撤销业务；保存后的恢复仍UNKNOWN。原资格、NetworkId升序、最近/同距小DropId、产出/运动/寿命/清理、容量与玩家v4/世界v2保存链保持；无目标不细分争抢/到期/飞行/超范围。静态编译/256份非法配置拒绝与44次隔离Bake通过；用户人工通过限v25/revision28十六项，未触发独立用例UNKNOWN，旧通过仍限原版本/清单。
+
+## 【FACT】同类地面合并接入
+
+当前v26/revision29必填[合并](MapDropMerge.md)四字段，默认开启/0.8米/99份/0.2秒；服务端在Motion后、G前只扫描当前源已登记Landed未到期物，按编号升序合入较小编号的最近合格同物品堆。保留目标编号/位置，整份数量相加，超限不拆分，有限寿命取最早到期、永久仅与永久合并；新物可能更早到期。来源Consumed沿原Cleanup释放，非到期清理日志为Consumed，实际G日志保持。G整堆容量/保存、原四GhostField、世界v2快照/编号上限及客户端原数量/寿命/高亮保持；合并不入包或发布拾取结果。编译/194份非法配置拒绝/28组合法读取/64次隔离Bake静态通过，人工待验收；旧G结果通过仍限v25/revision28十六项。

@@ -8,7 +8,7 @@ namespace Code_01.CombatPrototype.Map
         public static void Validate(CombatMapConfigSet config)
         {
             if (config == null || config.map == null || config.map.geometry == null ||
-                config.map.resourcePersistence == null || config.map.layout == null || config.map.movement == null || config.map.drops == null || config.map.treeHarvest == null ||
+                config.map.resourcePersistence == null || config.map.layout == null || config.map.movement == null || config.map.drops == null || config.map.dropMerge == null || config.map.treeHarvest == null ||
                 config.map.mining == null || config.map.gatherTools == null || config.map.gatherTools.tools == null ||
                 config.map.gatherToolUpgrade == null || config.map.gatherToolUpgrade.levels == null || config.map.gatherToolDurabilityHud == null ||
                 config.map.interactionHud == null || config.map.interactionFailureHud == null || config.map.gatherOutcomeHud == null || config.map.pickupHud == null || config.map.pickupFeedbackHud == null || config.map.interactionHighlight == null || config.map.resourceStatusHud == null || config.map.inventoryPanel == null || config.map.inventoryDrop == null || config.map.inventoryDrop.items == null ||
@@ -54,8 +54,8 @@ namespace Code_01.CombatPrototype.Map
             ValidateInventoryCapacityUpgrade(map.inventoryCapacityUpgrade, map.inventoryCapacity);
             ValidateInventoryDrop(map.inventoryDrop);
             Id(map.mapDefinitionId, "mapDefinitionId");
-            if (map.schemaVersion != 25 || map.configRevision < 1 || map.defaultSeed < 1)
-                throw new InvalidOperationException("Map requires schemaVersion=25, positive revision and seed.");
+            if (map.schemaVersion != 26 || map.configRevision < 1 || map.defaultSeed < 1)
+                throw new InvalidOperationException("Map requires schemaVersion=26, positive revision and seed.");
             var drops = map.drops;
             Id(drops.itemId, "drops.itemId");
             Id(drops.visualResourceKey, "drops.visualResourceKey");
@@ -69,6 +69,7 @@ namespace Code_01.CombatPrototype.Map
             Nonnegative(drops.groundOffsetMeters, "drops.groundOffsetMeters");
             Positive(drops.visualScale, "drops.visualScale");
             Nonnegative(drops.lifetimeSeconds, "drops.lifetimeSeconds");
+            ValidateDropMerge(map.dropMerge);
             var treeHarvest = map.treeHarvest;
             Id(treeHarvest.treeObjectId, "treeHarvest.treeObjectId");
             Id(treeHarvest.visualResourceKey, "treeHarvest.visualResourceKey");
@@ -378,6 +379,14 @@ namespace Code_01.CombatPrototype.Map
                 if (!(c >= '0' && c <= '9') && !(c >= 'a' && c <= 'f') && !(c >= 'A' && c <= 'F'))
                     throw new InvalidOperationException(field + " requires #RRGGBB.");
             }
+        }
+
+        private static void ValidateDropMerge(MapDropMergeConfig merge)
+        {
+            Positive(merge.mergeDistanceMeters, "dropMerge.mergeDistanceMeters");
+            Positive(merge.scanIntervalSeconds, "dropMerge.scanIntervalSeconds");
+            if (merge.maxStackQuantity <= 0)
+                throw new InvalidOperationException("dropMerge.maxStackQuantity must be a positive integer.");
         }
 
         private static void ValidatePickupFeedbackHud(MapPickupFeedbackHudConfig hud)

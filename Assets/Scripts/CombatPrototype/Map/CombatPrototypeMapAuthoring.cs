@@ -483,6 +483,12 @@ namespace Code_01.CombatPrototype.Map
                     ArcHeight = drops.arcHeightMeters, GroundOffset = drops.groundOffsetMeters,
                     VisualScale = drops.visualScale, Lifetime = drops.lifetimeSeconds
                 });
+                var merge = config.map.dropMerge;
+                AddComponent(entity, new CombatPrototypeMapDropMergeSettings
+                {
+                    Enabled = (byte)(merge.enabled ? 1 : 0), MergeDistance = merge.mergeDistanceMeters,
+                    MaxStackQuantity = merge.maxStackQuantity, ScanInterval = merge.scanIntervalSeconds
+                });
             }
 
             private static GameObject ReadGhostPrefab(Dictionary<string, GameObject> prefabs, string key, Type component)

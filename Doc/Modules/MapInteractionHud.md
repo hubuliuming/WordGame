@@ -20,7 +20,7 @@
 
 ## 【FACT】当前 JSON 契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 为 schemaVersion=25/configRevision=28，interactionHud、[高亮](MapInteractionHighlight.md)、[G提示](MapPickupHud.md)、[工具配置](MapGatherTools.md)与[面板配置](MapInventoryPanel.md)均必填；interactionHud全部十个字段必填，沿原严格 UTF-8/字段/类型/重复键检查。旧 v1～v24 明确失败，不补默认段或回退来源；JSON 只在正常导入和烘焙后生效，无运行热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 为 schemaVersion=26/configRevision=29，interactionHud、[高亮](MapInteractionHighlight.md)、[G提示](MapPickupHud.md)、[工具配置](MapGatherTools.md)与[面板配置](MapInventoryPanel.md)均必填；interactionHud全部十个字段必填，沿原严格 UTF-8/字段/类型/重复键检查。旧 v1～v25 明确失败，不补默认段或回退来源；JSON 只在正常导入和烘焙后生效，无运行热重载。
 
 | 字段 | 默认值 | 契约 |
 |---|---|---|
@@ -72,7 +72,7 @@ NoSpace第一行显示noSpaceLabel、第二行显示F目标，不画进度；Rea
 
 v9/revision12阶段复用原Main Camera宿主接入[材料背包与制作面板](MapInventoryPanel.md)，两个显示开关独立。关闭F HUD仍保留本地面板/制作反馈，关闭面板仍保留F HUD；绑定先核对所属Connected/InGame连接，v9时两者关闭或生命周期失效时清空；当前显示开关见末段。原服务端四字段不变，本次编译/十四次隔离烘焙静态通过；用户确认面板人工通过限v9/revision12及[运行入口](Runtime.md)十二项，未触发的独立失败/时序用例仍UNKNOWN。
 
-当前地图v25/28必填[背包丢弃](MapInventoryDrop.md)，复用原掉落资源及保存链；本专题原交互/工具/产出/再生行为保持。新增丢弃静态及用户人工通过限[运行入口](Runtime.md)v10/13十二项，未触发用例UNKNOWN；旧通过仍限原版本/清单。
+当前地图v26/29必填[背包丢弃](MapInventoryDrop.md)，复用原掉落资源及保存链；本专题原交互/工具/产出/再生行为保持。新增丢弃静态及用户人工通过限[运行入口](Runtime.md)v10/13十二项，未触发用例UNKNOWN；旧通过仍限原版本/清单。
 
 v11/14阶段复用原宿主/绑定接入[G提示](MapPickupHud.md)：pickupHud、interactionHud及inventoryPanel独立，三者全关闭或生命周期失效才收起整体绑定；F/G可同时显示，F四字段和进度/工具/反馈规则保持。G新增所属四字段、五职责脚本/meta及显示Settings，未改Scene/Prefab/Animator结构。编译/十次隔离烘焙静态通过，用户确认G显示人工通过，限v11/14十项，未触发用例UNKNOWN，旧通过保持原范围。
 
@@ -112,4 +112,8 @@ v24/revision27新增[完成/中断](MapGatherOutcomeHud.md)十三字段固定Set
 
 ## 【FACT】原G面板的实际结果显示
 
-v25/revision28的[拾取反馈](MapPickupFeedbackHud.md)经原绑定/宿主传九Settings及四字段所属结果给PickupHudClient，G缓存与F/B反馈独立。原NoSpace目标优先保留物品/数量/寿命，有效新NoSpace窗口内第一行标红；其他结果居中单行暂替原G目标/寿命，到期恢复，布局/高亮目标保持。Clear逐帧仅隐藏、Reset清新增缓存；G关闭或新结果关闭不显示消息，原全部显示关闭仍退出绑定。F完成/失败优先级、B原displayFeedback及原OnGUI委托顺序保持；新显示静态通过、人工待验收，F完成/中断通过仍限v24/revision27十六项。
+v25/revision28的[拾取反馈](MapPickupFeedbackHud.md)经原绑定/宿主传九Settings及四字段所属结果给PickupHudClient，G缓存与F/B反馈独立。原NoSpace目标优先保留物品/数量/寿命，有效新NoSpace窗口内第一行标红；其他结果居中单行暂替原G目标/寿命，到期恢复，布局/高亮目标保持。Clear逐帧仅隐藏、Reset清新增缓存；G关闭或新结果关闭不显示消息，原全部显示关闭仍退出绑定。F完成/失败优先级、B原displayFeedback及原OnGUI委托顺序保持；新显示静态及用户人工通过限v25/revision28十六项，未触发独立用例UNKNOWN，F完成/中断通过仍限v24/revision27十六项。
+
+## 【FACT】合并与原F/G显示边界
+
+v26/revision29的[地面合并](MapDropMerge.md)通过原掉落Quantity/Phase及服务端期限改变G真实目标/数量/余时，不接入本宿主、绑定或新增显示通道。原G目标/NoSpace/高亮及实际拾取结果读取原快照，F完成/失败优先级、B反馈/输入、布局和原全部显示关闭条件保持；合并开关不会强制HUD。新链静态通过、人工待验收，旧显示通过保持各自原版本/清单。

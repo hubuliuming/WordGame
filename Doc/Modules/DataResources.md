@@ -278,7 +278,7 @@ v10/13接入的[背包丢弃](MapInventoryDrop.md)复用原PrepareItemConsumptio
 
 ## 【FACT】工具等级、有效定义与v4候选
 
-[工具升级](MapGatherToolUpgrade.md)新增必填gatherToolUpgrade根11字段、四条6字段定义；地图当前v23/26。原ToolId/Durability缓冲追加Level，三GhostField所属同步，升级反馈另有Sequence/Kind/Result三字段；输入新增6/7至19字段。原准入严格校验旧工具二字段/v4三字段后恢复等级；ForLevel按实际级取上限/倍率，修理与HUD共用有效最大值，升级保留绝对耐久、重做显式满Lv1。所有ProjectTools分支及完整候选保存工具Level和实际容量Level，世界v2/资源签名与路径保持。编译/生成Serializer、136份非法配置拒绝及22次隔离Editor Bake静态通过；用户确认人工GamePlayer通过限v21/revision24二十二项，未触发独立用例UNKNOWN；原269项及旧用户通过保持，完整当前契约与人工边界归[专题](MapGatherToolUpgrade.md)/[运行入口](Runtime.md)。
+[工具升级](MapGatherToolUpgrade.md)新增必填gatherToolUpgrade根11字段、四条6字段定义；地图当前v26/29。原ToolId/Durability缓冲追加Level，三GhostField所属同步，升级反馈另有Sequence/Kind/Result三字段；输入新增6/7至19字段。原准入严格校验旧工具二字段/v4三字段后恢复等级；ForLevel按实际级取上限/倍率，修理与HUD共用有效最大值，升级保留绝对耐久、重做显式满Lv1。所有ProjectTools分支及完整候选保存工具Level和实际容量Level，世界v2/资源签名与路径保持。编译/生成Serializer、136份非法配置拒绝及22次隔离Editor Bake静态通过；用户确认人工GamePlayer通过限v21/revision24二十二项，未触发独立用例UNKNOWN；原269项及旧用户通过保持，完整当前契约与人工边界归[专题](MapGatherToolUpgrade.md)/[运行入口](Runtime.md)。
 
 ## 【FACT】采集工具耐久预警配置
 
@@ -290,8 +290,12 @@ v10/13接入的[背包丢弃](MapInventoryDrop.md)复用原PrepareItemConsumptio
 
 ## 【FACT】采集完成与中断配置及所属同步
 
-当前地图v25/revision28必填[采集结果](MapGatherOutcomeHud.md)gatherOutcomeHud十三字段，Json/BuiltIn默认2秒、完成绿/中断橙/失败红及八文案；NoSpace沿原F容量文案。原严格读取与固定Settings映射保持，关闭仍验证，旧地图v1～v24拒绝，无补齐/回退/热重载。原Player Baker追加Sequence0/Kind0/ResultNone三字段SendToOwner最新反馈；各端须同版重新烘焙。五新普通脚本/meta，原资源引用/布局/兼容签名、输入及玩家v4/世界v2存档保持。静态及用户人工通过，限v24/revision27十六项，未触发独立用例UNKNOWN；旧v23启动失败通过保持原清单。
+当前地图v26/revision29必填[采集结果](MapGatherOutcomeHud.md)gatherOutcomeHud十三字段，Json/BuiltIn默认2秒、完成绿/中断橙/失败红及八文案；NoSpace沿原F容量文案。原严格读取与固定Settings映射保持，关闭仍验证，旧地图v1～v25拒绝，无补齐/回退/热重载。原Player Baker追加Sequence0/Kind0/ResultNone三字段SendToOwner最新反馈；各端须同版重新烘焙。五新普通脚本/meta，原资源引用/布局/兼容签名、输入及玩家v4/世界v2存档保持。静态及用户人工通过，限v24/revision27十六项，未触发独立用例UNKNOWN；旧v23启动失败通过保持原清单。
 
 ## 【FACT】拾取结果配置与所属快照
 
-当前地图v25/revision28必填[拾取反馈](MapPickupFeedbackHud.md)pickupFeedbackHud九字段，Json/BuiltIn默认true/2秒、绿#6ED88A/红#FF6B6B及五文案；原pickupHud提供物品/容量文案。严格形状/完整字段/类型/UTF-8与正有限时长/#RRGGBB/61字节文案校验，关闭仍校验，旧v1～v24拒绝，无补齐/回退/热重载。根Baker写九固定Settings，不是Ghost；原Player Baker初始化四字段Sequence0/ResultNone/空ItemId/Quantity0，SendToOwner最新快照，各端同版重新烘焙。五普通脚本及Unity生成meta，原资源/布局/引用/签名、输入19、原反馈和玩家v4/世界v2存档字段保持。256份非法配置拒绝、18组合法读取及44次隔离Bake静态通过，实际Serializer四字段/4 mask bits/76字节Snapshot；Editor网络函数指针未初始化，不作为收发验收。人工待验收，旧F完成/中断通过限v24/revision27十六项。
+当前地图v26/revision29必填[拾取反馈](MapPickupFeedbackHud.md)pickupFeedbackHud九字段，Json/BuiltIn默认true/2秒、绿#6ED88A/红#FF6B6B及五文案；原pickupHud提供物品/容量文案。严格形状/完整字段/类型/UTF-8与正有限时长/#RRGGBB/61字节文案校验，关闭仍校验，旧v1～v25拒绝，无补齐/回退/热重载。根Baker写九固定Settings，不是Ghost；原Player Baker初始化四字段Sequence0/ResultNone/空ItemId/Quantity0，SendToOwner最新快照，各端同版重新烘焙。五普通脚本及Unity生成meta，原资源/布局/引用/签名、输入19、原反馈和玩家v4/世界v2存档字段保持。256份非法配置拒绝、18组合法读取及44次隔离Bake静态通过，实际Serializer四字段/4 mask bits/76字节Snapshot；Editor网络函数指针未初始化，不作为收发验收。用户人工通过限v25/revision28十六项，未触发独立用例UNKNOWN；旧F完成/中断通过限v24/revision27十六项。
+
+## 【FACT】地面合并配置与原快照
+
+当前v26/revision29根新增必填[dropMerge](MapDropMerge.md)四字段，Json/BuiltIn默认true/0.8米/99份/0.2秒；原严格UTF-8/形状/完整字段/类型与语义检查保持，距离/间隔有限正float、上限正int，关闭仍校验，旧v1～v25拒绝，无补齐/回退/热重载。根Baker写四字段仅Server的Settings、0 GhostField；原掉落四同步字段、输入19、Tools3及所有所属反馈、玩家v4/世界v2路径/字段和资源布局/签名保持。世界快照沿原数量/期限/条目比较保存合并结果，来源Consumed排除、LastDropId不回退；Ready后的恢复物可参与，合法大堆不拒绝/拆分。编译/元数据、194份非法配置拒绝、28组合法读取与64次隔离Bake静态通过，人工待验收；旧通过保持原范围。

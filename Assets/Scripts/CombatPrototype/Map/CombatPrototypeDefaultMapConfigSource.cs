@@ -17,7 +17,7 @@ namespace Code_01.CombatPrototype.Map
             {
                 map = new MapDefinitionConfig
                 {
-                    schemaVersion = 22, configRevision = 25,
+                    schemaVersion = 23, configRevision = 26,
                     mapDefinitionId = mapDefinitionId, defaultSeed = 12345,
                     resourcePersistence = new MapResourcePersistenceConfig
                     {
@@ -104,6 +104,13 @@ namespace Code_01.CombatPrototype.Map
                         warningColorHex = "#FFD166", criticalColorHex = "#FF9F43", brokenColorHex = "#FF6B6B",
                         warningLabel = "Low", criticalLabel = "Critical", brokenLabel = "Broken",
                         remainingUsesLabel = "Uses", repairHintLabel = "Repair"
+                    },
+                    interactionFailureHud = new MapInteractionFailureHudConfig
+                    {
+                        enabled = true, feedbackSeconds = 2f, errorColorHex = "#FF6B6B",
+                        alreadyInteractingLabel = "Already interacting", movingLabel = "Stop moving first",
+                        attackingLabel = "Finish attack first", noTargetLabel = "No available resource",
+                        targetUnavailableLabel = "Target unavailable", failedLabel = "Interaction failed"
                     },
                     interactionHud = new MapInteractionHudConfig
                     {

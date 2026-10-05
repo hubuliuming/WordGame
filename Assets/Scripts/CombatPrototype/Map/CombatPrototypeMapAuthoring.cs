@@ -156,6 +156,18 @@ namespace Code_01.CombatPrototype.Map
                     TreeLabel = new FixedString64Bytes(hud.treeLabel),
                     MineLabel = new FixedString64Bytes(hud.mineLabel), NoSpaceLabel = new FixedString64Bytes(hud.noSpaceLabel)
                 });
+                var failureHud = config.map.interactionFailureHud;
+                AddComponent(entity, new CombatPrototypeMapInteractionFailureHudSettings
+                {
+                    Enabled = (byte)(failureHud.enabled ? 1 : 0), FeedbackSeconds = failureHud.feedbackSeconds,
+                    ErrorColor = CombatPrototypeMapInteractionHighlightSettings.ColorFromHex(failureHud.errorColorHex),
+                    AlreadyInteractingLabel = new FixedString64Bytes(failureHud.alreadyInteractingLabel),
+                    MovingLabel = new FixedString64Bytes(failureHud.movingLabel),
+                    AttackingLabel = new FixedString64Bytes(failureHud.attackingLabel),
+                    NoTargetLabel = new FixedString64Bytes(failureHud.noTargetLabel),
+                    TargetUnavailableLabel = new FixedString64Bytes(failureHud.targetUnavailableLabel),
+                    FailedLabel = new FixedString64Bytes(failureHud.failedLabel)
+                });
                 var pickupHud = config.map.pickupHud;
                 AddComponent(entity, new CombatPrototypeMapPickupHudSettings
                 {

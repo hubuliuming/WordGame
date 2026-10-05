@@ -21,7 +21,7 @@
 
 ## 【FACT】配置与文件
 
-Forest/Grassland Json与BuiltIn当前schemaVersion=22/configRevision=25。resourcePersistence六字段必填：enabled=true、saveSlotId=default_world、saveIntervalSeconds=10、saveGroundDrops=true、manualSaveEnabled=true及manualSaveCooldownSeconds=5；手动规则归[F5](MapWorldSaveHud.md)。saveGroundDrops严格布尔，旧地图v1～v21拒绝；关闭仍完整校验，正常导入/烘焙后生效，无热重载。Map Baker写七字段Settings：Enabled/SaveGroundDrops/SaveSlotId/SaveIntervalSeconds/LayoutSignature/ManualSaveEnabled/ManualSaveCooldownSeconds，恢复状态仍一字段Pending/Ready/Failed；当前输入19、Drop Ghost4、F4/G6/资源状态4及原反馈保持。
+Forest/Grassland Json与BuiltIn当前schemaVersion=23/configRevision=26。resourcePersistence六字段必填：enabled=true、saveSlotId=default_world、saveIntervalSeconds=10、saveGroundDrops=true、manualSaveEnabled=true及manualSaveCooldownSeconds=5；手动规则归[F5](MapWorldSaveHud.md)。saveGroundDrops严格布尔，旧地图v1～v22拒绝；关闭仍完整校验，正常导入/烘焙后生效，无热重载。Map Baker写七字段Settings：Enabled/SaveGroundDrops/SaveSlotId/SaveIntervalSeconds/LayoutSignature/ManualSaveEnabled/ManualSaveCooldownSeconds，恢复状态仍一字段Pending/Ready/Failed；当前输入19、Drop Ghost4、F4/G6/资源状态4及原反馈保持。
 
 两个开关同时开启才恢复/保存掉落。仅saveGroundDrops=false时，资源照常恢复，地面物沿旧规则重启清空；下一成功世界快照写Drops=[]/LastDropId=0，会替换旧地面快照。enabled=false时不读写任何世界档、保留原文件。drops.enabled只控制敌人新掉落，inventoryDrop.enabled只控制新丢弃，不决定已有地面物的持久化；关闭这两功能仍保留原绑定。
 

@@ -26,7 +26,9 @@ namespace Code_01.CombatPrototype.Map
         private string _noSpaceLabel;
         private string _text;
         private string _toolText;
+        private Color _textColor = Color.white;
         private Color _toolTextColor = Color.white;
+        private readonly CombatPrototypeMapInteractionFailureHudClient _interactionFailure = new CombatPrototypeMapInteractionFailureHudClient();
         private readonly CombatPrototypeMapGatherToolDurabilityHudClient _durabilityHud = new CombatPrototypeMapGatherToolDurabilityHudClient();
         private string _feedbackText;
         private string _axeName;
@@ -111,7 +113,8 @@ namespace Code_01.CombatPrototype.Map
             DynamicBuffer<CombatPrototypeMapInventoryCapacityUpgradeDefinition> upgradeDefinitions,
             CombatPrototypeMapGatherToolUpgradeSettings toolUpgradeSettings,
             DynamicBuffer<CombatPrototypeMapGatherToolUpgradeDefinition> toolUpgradeDefinitions,
-            CombatPrototypeMapGatherToolDurabilityHudSettings durabilitySettings, float treeDuration, float mineDuration, string mapId)
+            CombatPrototypeMapGatherToolDurabilityHudSettings durabilitySettings,
+            CombatPrototypeMapInteractionFailureHudSettings failureSettings, float treeDuration, float mineDuration, string mapId)
         {
             Reset();
             _settings = settings;
@@ -129,6 +132,7 @@ namespace Code_01.CombatPrototype.Map
             _treeLabel = settings.TreeLabel.ToString();
             _mineLabel = settings.MineLabel.ToString();
             _noSpaceLabel = settings.NoSpaceLabel.ToString();
+            _interactionFailure.Configure(failureSettings, _noSpaceLabel, mapId);
             _durabilityHud.Configure(durabilitySettings, toolSettings, inventorySettings.NotOwnedLabel.ToString(), _recraftLabel);
             _inventoryPanel.Configure(inventorySettings, toolSettings, axe, pickaxe, dropSettings, dropDefinitions, capacity, capacityDefinitions, upgradeSettings, upgradeDefinitions, toolUpgradeSettings, toolUpgradeDefinitions, _durabilityHud.Enabled, treeDuration, mineDuration, mapId);
             _pickupHud.Configure(pickupSettings);
@@ -143,9 +147,12 @@ namespace Code_01.CombatPrototype.Map
             CombatPrototypeMapInventoryDropFeedback dropFeedback, int capacityLevel,
             CombatPrototypeMapInventoryCapacityUpgradeFeedback upgradeFeedback, CombatPrototypeMapToolUpgradeFeedback toolUpgradeFeedback,
             DynamicBuffer<CombatPrototypeInventoryItem> inventory,
-            Entity source, Entity player, CombatPrototypeMapPickupHudState pickupState)
+            Entity source, Entity player, CombatPrototypeMapPickupHudState pickupState,
+            CombatPrototypeMapInteractionFailureFeedback failureFeedback)
         {
+            _textColor = Color.white;
             _toolTextColor = Color.white;
+            _interactionFailure.Observe(failureFeedback);
             _pickupHud.Show(pickupState);
             RefreshToolStatus(tools);
             ObserveFeedback(feedback);
@@ -161,16 +168,19 @@ namespace Code_01.CombatPrototype.Map
                 _durabilityHud.Axe, _durabilityHud.Pickaxe,
                 displayFeedback, dropFeedback, capacityLevel, upgradeFeedback, toolUpgradeFeedback, source, player);
             if (_settings.Enabled == 0) { _visible = false; return; }
+            var failureText = _interactionFailure.Feedback;
+            var hasFailure = !string.IsNullOrEmpty(failureText);
             if (state.Mode == CombatPrototypeMapInteractionHudMode.Hidden)
             {
                 _mode = state.Mode;
                 _kind = 0;
                 _percent = -1;
                 _progress = 0f;
-                _visible = hasFeedback;
-                _text = displayFeedback;
-                _toolText = hasFeedback ? ToolStatus(feedbackKind) : string.Empty;
-                _toolTextColor = hasFeedback ? _durabilityHud.ForKind(feedbackKind).TextColor : Color.white;
+                _visible = hasFailure || hasFeedback;
+                _text = hasFailure ? failureText : displayFeedback;
+                _textColor = hasFailure ? _interactionFailure.TextColor : Color.white;
+                _toolText = !hasFailure && hasFeedback ? ToolStatus(feedbackKind) : string.Empty;
+                _toolTextColor = !hasFailure && hasFeedback ? _durabilityHud.ForKind(feedbackKind).TextColor : Color.white;
                 return;
             }
             if ((state.Mode != CombatPrototypeMapInteractionHudMode.Ready && state.Mode != CombatPrototypeMapInteractionHudMode.Working &&
@@ -192,11 +202,14 @@ namespace Code_01.CombatPrototype.Map
                 _percent = percent;
             }
             _progress = state.ProgressPermille / 1000f;
-            _toolText = state.Mode == CombatPrototypeMapInteractionHudMode.NoSpace ? "F  " + _gatherLabel : hasFeedback ? displayFeedback :
+            _toolText = state.Mode == CombatPrototypeMapInteractionHudMode.NoSpace ? "F  " + _gatherLabel :
+                hasFailure ? failureText : hasFeedback ? displayFeedback :
                 state.Kind == (byte)CombatPrototypeMapInteractionKind.Gather ? "Hands" :
                 ToolStatus(state.Kind == (byte)CombatPrototypeMapInteractionKind.Tree ?
                     CombatPrototypeMapGatherToolKind.Axe : CombatPrototypeMapGatherToolKind.Pickaxe);
-            if (!hasFeedback && state.Kind != (byte)CombatPrototypeMapInteractionKind.Gather)
+            if (state.Mode != CombatPrototypeMapInteractionHudMode.NoSpace && hasFailure)
+                _toolTextColor = _interactionFailure.TextColor;
+            else if (!hasFeedback && state.Kind != (byte)CombatPrototypeMapInteractionKind.Gather)
                 _toolTextColor = _durabilityHud.ForKind(state.Kind == (byte)CombatPrototypeMapInteractionKind.Tree ?
                     CombatPrototypeMapGatherToolKind.Axe : CombatPrototypeMapGatherToolKind.Pickaxe).TextColor;
             _visible = true;
@@ -329,6 +342,8 @@ namespace Code_01.CombatPrototype.Map
             _repairFeedback.Reset();
             _worldSaveHud.Reset();
             _durabilityHud.Reset();
+            _interactionFailure.Reset();
+            _textColor = Color.white;
             _toolTextColor = Color.white;
             _labelStyle = null;
             _text = _toolText = _feedbackText = string.Empty;
@@ -373,7 +388,7 @@ namespace Code_01.CombatPrototype.Map
                 GUI.matrix = Matrix4x4.TRS(Vector3.zero, Quaternion.identity, new Vector3(scale, scale, 1f));
                 GUI.color = new Color(0f, 0f, 0f, 0.7f);
                 GUI.DrawTexture(panel, Texture2D.whiteTexture);
-                GUI.color = Color.white;
+                GUI.color = _textColor;
                 GUI.Label(new Rect(panel.x + 12f, panel.y + 12f, panel.width - 24f, _settings.FontSize + 8f), _text, _labelStyle);
                 GUI.color = _toolTextColor;
                 GUI.Label(new Rect(panel.x + 12f, panel.y + 20f + _settings.FontSize, panel.width - 24f, _settings.FontSize + 8f),

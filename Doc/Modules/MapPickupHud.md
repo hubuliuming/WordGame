@@ -21,7 +21,7 @@ v11/14阶段五个新脚本及meta、v17/20寿命接入两个普通助手及meta
 
 ## 【FACT】当前 JSON 契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为 schemaVersion=22/configRevision=25，pickupHud段及全部18字段必填，[interactionHighlight](MapInteractionHighlight.md)亦为必填地图段。沿原严格 UTF-8/缺失/未知/重复字段/类型和语义校验；旧 v1～v21 明确失败，不迁移、补默认段或回退来源。正常导入/烘焙后生效，没有运行热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为 schemaVersion=23/configRevision=26，pickupHud段及全部18字段必填，[interactionHighlight](MapInteractionHighlight.md)亦为必填地图段。沿原严格 UTF-8/缺失/未知/重复字段/类型和语义校验；旧 v1～v22 明确失败，不迁移、补默认段或回退来源。正常导入/烘焙后生效，没有运行热重载。
 
 | 字段 | 当前默认值 | 契约 |
 |---|---|---|
@@ -90,7 +90,7 @@ v12/15的[高亮](MapInteractionHighlight.md)按原DropId解析同一客户端La
 
 v13/16的[资源状态](MapResourceStatusHud.md)在G面板上方增加一行；G的开关、采样资格、四字段、DropId与拾取规则保持。资源状态不显示掉落期限，也不改变G蓝圈；仅状态开启仍保留整体绑定。新显示静态及用户人工通过，限v13/16十项，未触发用例UNKNOWN，旧G/高亮通过保持原版本/清单。
 
-当前v22/25的[工具修理](MapToolRepair.md)新增两个输入和所属结果，遇同tick G请求时修理拒绝；G目标/资格/入包/保存/显示均保持原链，新增修理静态及用户人工通过，限v14/17十二项，未触发用例UNKNOWN。
+当前v23/26的[工具修理](MapToolRepair.md)新增两个输入和所属结果，遇同tick G请求时修理拒绝；G目标/资格/入包/保存/显示均保持原链，新增修理静态及用户人工通过，限v14/17十二项，未触发用例UNKNOWN。
 
 ## 【FACT】地图资源存档接入边界
 

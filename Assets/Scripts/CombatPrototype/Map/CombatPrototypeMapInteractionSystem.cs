@@ -195,6 +195,7 @@ namespace Code_01.CombatPrototype.Map
                         Debug.Log("[CombatPrototype.Map] Interaction selected; map=" + map.MapDefinitionId +
                             ", NetworkId=" + request.NetworkId + ", player=" + request.Player + ", type=" + target.Kind +
                             ", placement=" + target.PlacementIndex + ", distance=" + math.sqrt(target.DistanceSquared) + ".");
+                        WriteFeedback(map.MapDefinitionId, request, CombatPrototypeMapInteractionFailureResult.None);
                     }
                     catch (Exception exception)
                     {
@@ -202,6 +203,7 @@ namespace Code_01.CombatPrototype.Map
                             map.MapDefinitionId + ", NetworkId=" + request.NetworkId + ", player=" + request.Player +
                             ", type=" + target.Kind + ", placement=" + target.PlacementIndex +
                             ", target=" + target.Entity + ". " + exception);
+                        WriteFeedback(map.MapDefinitionId, request, CombatPrototypeMapInteractionFailureResult.Failed);
                         if (target.Entity == Entity.Null) continue;
                         try
                         {
@@ -248,10 +250,45 @@ namespace Code_01.CombatPrototype.Map
             return null;
         }
 
-        private static void Reject(FixedString64Bytes mapId, Request request, string reason)
+        private void Reject(FixedString64Bytes mapId, Request request, string reason)
         {
             Debug.Log("[CombatPrototype.Map] Interaction rejected; map=" + mapId + ", NetworkId=" +
                 request.NetworkId + ", player=" + request.Player + ", reason=" + reason + ".");
+            if (reason == "CommandTargetOwnerMismatch" || reason == "PlayerDead") return;
+            CombatPrototypeMapInteractionFailureResult result;
+            switch (reason)
+            {
+                case "AlreadyInteracting": result = CombatPrototypeMapInteractionFailureResult.AlreadyInteracting; break;
+                case "AttackInProgress": result = CombatPrototypeMapInteractionFailureResult.AttackInProgress; break;
+                case "PlayerMoving": result = CombatPrototypeMapInteractionFailureResult.PlayerMoving; break;
+                case "NoAvailableTarget": result = CombatPrototypeMapInteractionFailureResult.NoAvailableTarget; break;
+                case "InventoryAlreadyOverCapacity":
+                case "MaterialTotalCapacityExceeded":
+                case "MaterialItemCapacityExceeded": result = CombatPrototypeMapInteractionFailureResult.NoSpace; break;
+                case "TargetUnavailable": result = CombatPrototypeMapInteractionFailureResult.TargetUnavailable; break;
+                default: result = CombatPrototypeMapInteractionFailureResult.Failed; break;
+            }
+            WriteFeedback(mapId, request, result);
+        }
+
+        private void WriteFeedback(FixedString64Bytes mapId, Request request, CombatPrototypeMapInteractionFailureResult result)
+        {
+            // Isolate presentation feedback from reservation cleanup; a failed write must not cancel successful work.
+            try
+            {
+                if (EntityManager.GetComponentData<GhostOwner>(request.Player).NetworkId != request.NetworkId ||
+                    EntityManager.GetComponentData<CombatPrototypePlayerHealth>(request.Player).IsDead != 0) return;
+                var feedback = EntityManager.GetComponentData<CombatPrototypeMapInteractionFailureFeedback>(request.Player);
+                if (result == CombatPrototypeMapInteractionFailureResult.None && feedback.Result == result) return;
+                unchecked { feedback.Sequence++; }
+                feedback.Result = result;
+                EntityManager.SetComponentData(request.Player, feedback);
+            }
+            catch (Exception exception)
+            {
+                Debug.LogError("[CombatPrototype.Map] Interaction feedback failed; stage=WriteFeedback, map=" + mapId +
+                    ", NetworkId=" + request.NetworkId + ", player=" + request.Player + ", result=" + result + ". " + exception);
+            }
         }
     }
 }

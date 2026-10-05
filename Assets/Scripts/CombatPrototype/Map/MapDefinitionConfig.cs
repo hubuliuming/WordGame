@@ -20,6 +20,7 @@ namespace Code_01.CombatPrototype.Map
         public MapGatherToolUpgradeConfig gatherToolUpgrade;
         public MapGatherToolDurabilityHudConfig gatherToolDurabilityHud;
         public MapInteractionHudConfig interactionHud;
+        public MapInteractionFailureHudConfig interactionFailureHud;
         public MapPickupHudConfig pickupHud;
         public MapInteractionHighlightConfig interactionHighlight;
         public MapResourceStatusHudConfig resourceStatusHud;

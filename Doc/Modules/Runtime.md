@@ -858,7 +858,7 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 
 ## 【KNOWN ISSUES】采集工具耐久预警与损坏提示的人工验收
 
-入口CombatPrototypeNetCode；当前Forest/Grassland Json/BuiltIn schemaVersion=22/configRevision=25，各端同版重新烘焙，沿原SinglePlayer/Online启动。gatherToolDurabilityHud默认开启：warningRatio=0.25、criticalRatio=0.10、Low/#FFD166、Critical/#FF9F43、Broken/#FF6B6B、Uses/Repair。正常Unity编译、11字段配置/Settings与所属工具/19输入/存档元数据、240份非法配置拒绝及28次隔离Editor Bake静态通过；旧布局/签名保持，Bake Console[0,7,53]前后一致、主场景干净。以下16项人工GamePlayer均为UNKNOWN，旧291项内容/编号和旧通过范围保持：
+入口CombatPrototypeNetCode；本阶段Forest/Grassland Json/BuiltIn schemaVersion=22/configRevision=25，各端同版重新烘焙，沿原SinglePlayer/Online启动。gatherToolDurabilityHud默认开启：warningRatio=0.25、criticalRatio=0.10、Low/#FFD166、Critical/#FF9F43、Broken/#FF6B6B、Uses/Repair。正常Unity编译、11字段配置/Settings与所属工具/19输入/存档元数据、240份非法配置拒绝及28次隔离Editor Bake静态通过；旧布局/签名保持，Bake Console[0,7,53]前后一致、主场景干净。用户已确认本节人工GamePlayer通过，主线程结合既有静态核对判定通过，限v22/revision25及以下十六项清单，结论来自用户反馈；未实际触发的独立用例仍UNKNOWN，旧307项内容/编号和旧通过范围保持：
 
 1. Forest/Grassland、Json/BuiltIn使用v22/revision25正常导入/重新烘焙后进入。新玩家未持有两工具时，F沿原Hands与1/2制作提示，B沿原Not owned，新增详情不显示Low/Critical/Broken；不赠工具或改变存档。
 2. 制作满耐久Lv1斧头60/镐子40，B状态行白色、Uses分别60/40（默认单次成本1）；每把工具下一行详情，共两新增滚动行。F对应工具第二行白色，原名称/Lv等级/当前和本级最大耐久保留。
@@ -877,4 +877,27 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 15. 核对死亡/R、断线、源/玩家/World/Scene失效及重新进入：原隐藏/Reset清新增文字、颜色和缓存，重新绑定显示当前工具快照；逐帧Clear不重复重建投影，不残留上一玩家/地图警告。R沿原工具保留规则，不清永久等级/耐久。
 16. 回归F/G、1～7/B、E/R/F5及资源产出/范围/600秒再生、保存顺序和服务器资格。确认新功能仅显示，输入19、工具三字段所属同步、玩家v4/世界v2及原保存字段保持；本次不把人工清单通过扩大为性能/带宽/平台/线上或跨文件一致性通过。
 
-完整事实与边界归[耐久预警](MapToolDurabilityHud.md)，配置/存储归[资源与数据](DataResources.md)。原291项逐字保留，新增16项后共307项；人工验收待用户反馈，当前静态通过不代表运行颜色、排版/字形、延迟/生命周期通过。AI未执行GamePlayer/PlayMode、游戏/显示系统或GUI回调、逻辑单元测试、真实玩家/世界存档业务I/O、命令行构建、发布、采样或图片检查，未创建子Agent/提交Git。
+完整事实与边界归[耐久预警](MapToolDurabilityHud.md)，配置/存储归[资源与数据](DataResources.md)。原291项逐字保留，新增16项后共307项；用户已确认本阶段人工验收通过，主线程结合既有静态核对判定通过，限本节v22/revision25十六项，结论来自用户反馈；未实际触发的独立边界、颜色/排版/字形、联网/预测回放与生命周期分支仍UNKNOWN。AI未执行GamePlayer/PlayMode、游戏/显示系统或GUI回调、逻辑单元测试、真实玩家/世界存档业务I/O、命令行构建、发布、采样或图片检查，未创建子Agent/提交Git。
+
+## 【KNOWN ISSUES】资源交互失败原因提示的人工验收
+
+入口CombatPrototypeNetCode；Forest/Grassland Json/BuiltIn当前schemaVersion=23/configRevision=26，各端同版重新烘焙，沿原SinglePlayer/Online启动。interactionFailureHud默认true/2秒/#FF6B6B及六英文文案，NoSpace复用原F文案。正常Unity编译、九字段DTO/Settings、二字段SendToOwner实际Serializer、224份非法配置拒绝与32次隔离Editor Bake静态通过；原布局/资源签名/输入19/存储保持，实际Bake Console[0,7,53]前后一致，原主场景干净且未Play。以下16项人工GamePlayer均为UNKNOWN，旧307项内容/编号及通过范围保持：
+
+1. 两张地图、Json/BuiltIn正常导入/重新烘焙后进入v23/revision26。原Player Baker反馈0/None，首次绑定不弹出旧失败；原F/G、B和资源显示按原开关工作，原Camera/Scene/Prefab结构保持。
+2. 移动时按F，确认服务器仍拒绝启动，显示Stop moving first红色#FF6B6B；原HUD资格导致Hidden时第一行临时提示、第二行空。停止后不自动采集，必须新F；默认2秒到期恢复原显示。
+3. 攻击输入同tick按F或近战未Ready时按F，显示Finish attack first；攻击及原F准入优先保持，攻击结束不自动开始采集。非有限Move输入实际触发时使用Interaction failed并保留原拒绝日志，未触发仍UNKNOWN。
+4. 已Collecting/Chopping/Mining时再次按F，显示Already interacting；目标、FinishAt、耗时与进度不重置、不切换。当前tick开始前的忙状态仍优先，即使本tick完成/取消也不再启动，必须新F。
+5. 范围内无可用目标时按F，显示No available resource。分别覆盖无附近资源、原占用/耗尽或关闭类型被选择器排除的情况；提示不宣称Too far、Occupied或Depleted，不增扫描或改变最近/同距小PlacementIndex规则。
+6. 植物F实际触发总量满、单种满及旧合法超限拒绝时使用原noSpaceLabel；原NoSpace两行仍第一行容量/第二行F目标、无进度，优先于临时失败。树木/矿点地面产出和G容量路径保持。
+7. 在失败2秒窗口内恢复原资格且HUD为Ready，第一行仍白色F目标，第二行红色失败；目标/最近切换仍读原F状态，失败反馈不附加目标类型或更改选择。
+8. Working时重复F反馈只替换第二行，第一行百分比与原进度条颜色/填充保持；到期后第二行恢复对应工具/Hands，Critical/Low/Broken颜色重新按原快照显示。
+9. 原TryBegin真实返回false时显示Target unavailable，不转选其他资源；单项启动异常实际触发时显示Interaction failed，原map/玩家/类型/布置/阶段/异常日志与CancelBegin清理保留。未实际触发的拒绝/异常分支保持UNKNOWN，不用静态核对代替。
+10. 必需反馈组件缺失或写入异常实际触发时，确认stage=WriteFeedback日志含map/NetworkId/player/result/异常；已成功预约不因提示写入失败撤销，不动态补组件/默认值，后续独立请求继续。ReadInput/共用服务前提失败仍原日志，不编造反馈；未触发仍UNKNOWN。
+11. 同时存在NoSpace/F失败/修理/制作窗口时核对F优先级NoSpace>F失败>修理>制作>工具；B页脚继续原修理优先制作，不接收新F失败、不改变按钮/配方/按键资格，G/高亮/资源状态/世界保存显示保持。
+12. 失败后在2秒内以新F成功启动，Result清为None并更新Sequence，旧失败立即消失，原工作显示继续；没有旧失败时成功仍None。每次拒绝更新最新序号，连续结果可被最新快照覆盖，无历史弹窗队列。
+13. 单独关闭interactionFailureHud恢复原F显示；关闭interactionHud隐藏新F提示但B原反馈保持。全部原显示关闭时新开关不强制创建或绑定HUD，F业务与反馈仍沿服务端原链；重新导入/烘焙和绑定后按新配置显示。
+14. 自定义3.5秒、#1234Ab与六中文文案，NoSpace改原interactionHud.noSpaceLabel，正常导入/烘焙后核对。缺段/字段、null/未知/重复/错类型、时长非正/非有限/溢出、坏颜色/文案与旧v1～v22明确拒绝，关闭仍校验，无热重载/默认补齐/来源回退；恢复默认23/26。
+15. 双玩家各自触发不同失败，仅本人F显示；归属不匹配请求包括已忙分支不写另一玩家反馈。晚加入、重连和玩家/源重新绑定只观察当前Sequence，不重播已有结果；网络延迟/覆盖/预测回放和未触发独立分支保持UNKNOWN。
+16. 核对死亡/R、断线、源/玩家/World/Scene失效与重新进入：原Reset清序号/观察标记/期限/文字/颜色，逐帧Clear仅隐藏；不残留旧地图/玩家提示。回归F/G、1～7/B、E/R/F5、原产出/中断/600秒再生与保存顺序；未持有/损坏仍Hands，输入19、Tools3、原F4/G6与玩家v4/世界v2保持。
+
+完整事实与边界归[F失败提示](MapInteractionFailureHud.md)。原307项逐字保留，新增16项后共323项；主线程静态核对通过，新人工GamePlayer仍UNKNOWN。AI未执行GamePlayer/PlayMode、游戏/显示系统或GUI回调、逻辑单元测试、真实存档业务I/O、命令行构建/发布、性能采样或图片检查，未创建子Agent/提交Git；字形/排版、反馈错误隔离、联网/生命周期及性能/平台/线上结论不扩大，旧验收仍限各自原版本/清单。

@@ -21,7 +21,7 @@
 
 ## 【FACT】JSON契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=22/configRevision=25。inventoryDrop全部字段必填，沿原严格UTF-8/缺失/未知/重复字段及类型检查；旧v1～v21明确失败，不补段或回退来源。disabled仍校验全部字段与资源绑定；正常导入/烘焙后生效，没有运行热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=23/configRevision=26。inventoryDrop全部字段必填，沿原严格UTF-8/缺失/未知/重复字段及类型检查；旧v1～v22明确失败，不补段或回退来源。disabled仍校验全部字段与资源绑定；正常导入/烘焙后生效，没有运行热重载。
 
 | 字段 | 默认值 | 契约 |
 |---|---|---|
@@ -78,7 +78,7 @@ v12/15的[资源高亮](MapInteractionHighlight.md)只读取原F/G目标快照�
 
 v13/16的[资源状态](MapResourceStatusHud.md)新增玩家所属四字段，只读采集物/树/矿，不读取掉落到期或改Drop/All请求、反馈、保存/扣料。原13输入与F/G各四字段保持，玩家烘焙布局新增状态组件，各端须同版重新烘焙。新显示静态及用户人工通过，限v13/16十项，未触发用例UNKNOWN，旧通过保持原范围。
 
-当前v22/25的[修理](MapToolRepair.md)两个请求加入原HasPriorOperation：同tick有修理时Drop拒绝，即使修理被拒绝也不改为丢弃。RepairSystem位于Craft之后、Drop之前；原F/G/E/R/1/2互相规则、Drop/All事务、输入物品/模式及所属反馈保持，当前总输入19字段。新链静态及用户人工通过，限v14/17十二项，未触发用例UNKNOWN。
+当前v23/26的[修理](MapToolRepair.md)两个请求加入原HasPriorOperation：同tick有修理时Drop拒绝，即使修理被拒绝也不改为丢弃。RepairSystem位于Craft之后、Drop之前；原F/G/E/R/1/2互相规则、Drop/All事务、输入物品/模式及所属反馈保持，当前总输入19字段。新链静态及用户人工通过，限v14/17十二项，未触发用例UNKNOWN。
 
 ## 【FACT】地图资源存档接入边界
 

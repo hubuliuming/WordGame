@@ -799,3 +799,17 @@
 - 地图schema22/revision25新增必填gatherToolDurabilityHud根11字段，Json/BuiltIn一致；严格阈值/颜色/文案及关闭仍校验、旧v1～v21拒绝。新增三个普通脚本及Unity正常生成meta，原工具唯一状态/所属三字段、输入19、F4/G6/资源状态4/世界保存3、玩家v4与世界v2/保存链保持，原Scene/SubScene/Prefab/Animator/旧meta/资源/包/构建保持。
 - 正常Unity编译0 Error，配置/Settings11及网络/存储元数据、240份非法配置拒绝和28次隔离Editor Bake静态通过；新11Settings/custom值正确，原布局/资源签名保持。Bake Console[0,7,53]前后一致，编译重报两条已有PEListener/DOTween警告，主场景干净、临时对象释放。
 - 增量同步耐久预警专题、当前契约/调用链、导航与策划模板；保留前阶段验收状态及原291项逐字编号/内容，新增16项后307项，人工GamePlayer UNKNOWN。未执行游戏/显示或GUI回调、PlayMode、逻辑单元测试、真实存档业务I/O、构建/发布、采样/图片、子Agent或Git提交。
+
+## 2026-10-05 采集工具耐久预警与损坏提示人工验收
+
+- 用户反馈“我已验收通过，接下来下一阶段”；主线程结合既有Unity编译、配置/Settings与网络/存储元数据核对、240份非法配置拒绝及28次隔离Editor Bake，判定本阶段通过，限CombatPrototypeNetCode、schemaVersion22/configRevision25及Runtime十六项清单；人工结论来自用户反馈，AI未执行GamePlayer/PlayMode。
+- 增量同步预警专题、相关调用链文档、导航和策划模板的验收状态；保留307项内容/编号、旧阶段通过范围及未实际触发的独立边界/颜色/排版/字形、联网/预测回放/生命周期用例UNKNOWN。
+- 本次只更新13份仓库文档与策划模板，代码、JSON和Scene/SubScene/Prefab/Animator/meta/资源/包/构建保持；未执行游戏/显示或GUI回调、真实存档业务I/O、逻辑单元测试、命令行构建、发布、性能采样或图片检查，未创建子Agent/提交Git。
+
+## 2026-10-05 资源交互失败原因提示
+
+- 按用户确认方案由主线程接入统一F请求启动失败的所属反馈，复用原拒绝/异常，不修改选目标、三类采集/完成/中断/徒手或保存规则。原Player Baker新增Sequence0/ResultNone二字段SendToOwner；写入独立隔离，失败不撤销成功预约，归属不匹配不写他人。
+- 原F HUD新增默认2秒/#FF6B6B提示，有Ready/Working目标时第二行显示、Hidden时第一行临时显示且第二行空；优先NoSpace>F失败>修理>制作>工具。成功启动清旧失败，首次绑定不重播、到期/Reset恢复颜色；B继续原反馈。
+- 两地图Json/BuiltIn升schema23/revision26，必填interactionFailureHud九字段、原根固定九Settings；六文案和时长/颜色完整校验，NoSpace复用原字段。新增四普通脚本及Unity正常生成meta，原输入19/Tools3/F4/G6/资源4/世界提示3、玩家v4/世界v2存储和资源结构保持。
+- 正常Unity编译0 Error，实际Serializer二快照字段/SendToOwner/2 mask bits/8字节Snapshot元数据正确；224非法配置全部拒绝，10合法配置读取通过，32次隔离Editor Bake通过。原布置/签名/反馈初值保持，实际Console[0,7,53]前后一致，主场景干净、临时资源释放。
+- 增量同步地图专题/导航/资源数据/玩家/Runtime与策划模板，新增MapInteractionFailureHud专题；原307项人工内容编号逐字保留，新16项后323项。主线程静态核对通过，本阶段人工GamePlayerUNKNOWN，旧耐久预警通过仍限v22/revision25十六项。未执行游戏/显示/GUI、逻辑单元测试、真实存档业务I/O、PlayMode、命令行构建/发布、采样/图片、子Agent或Git提交。

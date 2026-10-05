@@ -20,7 +20,7 @@
 
 ## 【FACT】JSON 契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为 schemaVersion=22/configRevision=25。新增必填 inventoryCapacity：
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为 schemaVersion=23/configRevision=26。新增必填 inventoryCapacity：
 
 ```json
 "inventoryCapacity": {
@@ -45,7 +45,7 @@
 | pickupHud.noSpaceLabel | 新增必填 Not enough space；G 配置/Settings 各18字段 |
 | inventoryPanel.capacityLabel / unlimitedLabel | 新增必填 Capacity / Unlimited；面板配置/Settings 各30字段，其中22文案 |
 
-沿原严格 UTF-8、完整对象形状、字段/类型与未知/缺失/重复键校验；文案非空白、无控制字符、最多61个 UTF-8 字节。enabled=false 或显示关闭仍校验全部配置；旧地图 v1～v21 明确失败，没有补字段、来源回退或运行热重载。各端使用同版代码、配置并重新烘焙。
+沿原严格 UTF-8、完整对象形状、字段/类型与未知/缺失/重复键校验；文案非空白、无控制字符、最多61个 UTF-8 字节。enabled=false 或显示关闭仍校验全部配置；旧地图 v1～v22 明确失败，没有补字段、来源回退或运行热重载。各端使用同版代码、配置并重新烘焙。
 
 原地图根追加 CapacitySettings 的 Enabled(byte)/MaxTotalQuantity(int)，Definition 缓冲含 ItemId/ItemName(FixedString64Bytes)/MaxQuantity(int)，三条按原产出映射写入。配置通过正常 JSON/BuiltIn → 校验 → Map Baker 接入，不写玩家或世界档案。
 

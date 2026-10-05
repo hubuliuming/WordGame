@@ -1,6 +1,6 @@
 # 采集工具耐久预警与损坏提示
 
-返回[地图](Map.md)、[采集工具](MapGatherTools.md)与[材料面板](MapInventoryPanel.md)。本专题负责CombatPrototypeNetCode原F/B中的耐久状态颜色、文案、剩余次数和修理入口提示；工具升级/有效等级归[工具升级](MapGatherToolUpgrade.md)，真实修理归[工具修理](MapToolRepair.md)，存储契约归[资源与数据](DataResources.md)。当前地图schemaVersion=22/configRevision=25；静态核对通过，16项人工GamePlayer待验收，仍UNKNOWN。旧工具升级用户通过限v21/revision24二十二项，其他通过保持原版本/清单。
+返回[地图](Map.md)、[采集工具](MapGatherTools.md)与[材料面板](MapInventoryPanel.md)。本专题负责CombatPrototypeNetCode原F/B中的耐久状态颜色、文案、剩余次数和修理入口提示；工具升级/有效等级归[工具升级](MapGatherToolUpgrade.md)，真实修理归[工具修理](MapToolRepair.md)，存储契约归[资源与数据](DataResources.md)。当前地图schemaVersion=23/configRevision=26；用户已确认本阶段人工GamePlayer通过，主线程结合既有静态核对判定通过，限v22/revision25及[运行入口](Runtime.md)十六项清单，人工结论来自用户反馈；未实际触发的独立用例仍UNKNOWN。旧工具升级用户通过限v21/revision24二十二项，其他通过保持原版本/清单。
 
 ## 【FACT】文件与接入链
 
@@ -21,7 +21,7 @@ JSON/BuiltIn→原严格读取/语义校验→原地图Baker→地图固定Setti
 
 ## 【FACT】配置字段与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)和BuiltIn均为schema22/revision25。必填gatherToolDurabilityHud恰11字段，全部显式配置：
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)和BuiltIn当前均为schema23/revision26。必填gatherToolDurabilityHud恰11字段，全部显式配置：
 
 | JSON字段 | 默认值 | 约束与用途 |
 |---|---|---|
@@ -37,7 +37,7 @@ JSON/BuiltIn→原严格读取/语义校验→原地图Baker→地图固定Setti
 | remainingUsesLabel | Uses | B详情剩余次数前缀 |
 | repairHintLabel | Repair | F损坏/B预警详情的原3/4修理入口提示 |
 
-五文案均非空白、无控制字符且最多61个UTF-8字节，烘焙为FixedString64Bytes；Settings为Enabled字节、两float比例、三float3 RGB和五FixedString，共11字段。严格JSON沿原完整形状、缺失/null/未知/重复键、字段类型及UTF-8读取检查；新开关、工具或各显示关闭仍完整校验。旧地图v1～v21明确拒绝，没有迁移、默认补齐或来源回退；正常Unity导入/烘焙后生效，无运行热重载。
+五文案均非空白、无控制字符且最多61个UTF-8字节，烘焙为FixedString64Bytes；Settings为Enabled字节、两float比例、三float3 RGB和五FixedString，共11字段。严格JSON沿原完整形状、缺失/null/未知/重复键、字段类型及UTF-8读取检查；新开关、工具或各显示关闭仍完整校验。旧地图v1～v22明确拒绝，没有迁移、默认补齐或来源回退；正常Unity导入/烘焙后生效，无运行热重载。
 
 ## 【FACT】状态优先与等级
 
@@ -60,7 +60,7 @@ JSON/BuiltIn→原严格读取/语义校验→原地图Baker→地图固定Setti
 
 未持有工具保留Hands与1/2制作提示，植物保留Hands。损坏且新显示/工具/修理开启时，斧头提示3: Repair、镐子4: Repair；关闭修理则沿原1/2 Recraft at Lv1。新显示关闭恢复原F文字/白色。提示仅说明现有入口，不保证材料充足或通过服务端资格。
 
-NoSpace第一行/第二行目标、未到期修理优先于制作等原反馈优先保持，旧反馈占第二行时仍白色；无F目标仍仅原制作/修理反馈临时显示，此时第二行对应工具状态可着色。没有独立耐久弹窗、提示Sequence、警告计时器或新的反馈事件。原制作/修理反馈仍复用已有客户端时间，采集完成仍由服务端锁定耗时决定。
+NoSpace两行目标优先，[F失败](MapInteractionFailureHud.md)次之，再依次原修理、制作和工具；原制作/修理占第二行仍白色，新F失败用配置红色。无F目标原制作/修理结果的第二行工具状态可着色，新F失败临时第一行且第二行空；失败到期恢复原工具颜色。耐久预警本身没有独立弹窗、Sequence或计时器。原制作/修理反馈仍复用已有客户端时间，采集完成仍由服务端锁定耗时决定。
 
 ## 【CURRENT STRATEGY】B详情与开关
 
@@ -82,7 +82,7 @@ Configure先Reset再保存固定只读设置；每帧Clear只隐藏原显示，�
 
 玩家写Version4、根7/Tools项3，合法旧档迁移和所有候选保存沿原契约；世界v2、根9/掉落项8、路径/资源布局签名保持，没有新存档字段或业务读写调用。本次显示不影响等级、耐久、材料、工作完成或已保存状态。
 
-## 【FACT】已完成的静态核对
+## 【FACT】v22/revision25已完成的静态核对
 
 正常Unity导入/编译完成且实际Console为0 Error；元数据确认新Config/Settings各11字段、无新GhostField/MonoBehaviour、输入19/工具三字段所属同步/玩家Version4/世界根9保持。两默认JSON与BuiltIn新值一致，其他配置数值保持。
 
@@ -94,6 +94,6 @@ Bake前后实际Console均[0 Error,7 Warning,53 Log]，没有新增Bake警告/�
 
 ## 【KNOWN ISSUES】人工验收与未验证范围
 
-本阶段[运行入口](Runtime.md)16项人工GamePlayer仍UNKNOWN，包括阈值边界/正耐久损坏、等级变化但耐久未变时刷新、修理仍低耐久、F反馈优先、B两行与GUI颜色恢复、开关/绑定、晚加入/联网/生命周期、原玩法回归。原291项编号/内容逐字保留，新增后307项；工具升级用户通过仍限v21/revision24二十二项，旧结论不覆盖新颜色和提示。
+用户已确认本阶段人工GamePlayer验收通过，主线程结合既有静态核对判定通过，限CombatPrototypeNetCode、v22/revision25及[运行入口](Runtime.md)十六项清单，结论来自用户反馈。清单涵盖阈值边界/正耐久损坏、等级变化但耐久未变时刷新、修理仍低耐久、F反馈优先、B两行与GUI颜色恢复、开关/绑定、晚加入/联网/生命周期、原玩法回归。原307项内容/编号逐字保留；未实际触发的独立边界、颜色/排版/字形、生命周期/联网/预测回放仍UNKNOWN。工具升级用户通过仍限v21/revision24二十二项，旧结论不覆盖新颜色和提示。
 
 AI未执行GamePlayer/PlayMode、游戏/显示系统或GUI回调、逻辑单元测试、真实玩家/世界存档业务I/O、命令行构建、发布、性能采样或图片检查，未创建子Agent或提交Git。中文字形/排版、网络延迟/预测回放及未触发独立边界、性能/带宽/平台/线上仍UNKNOWN；跨文件原子一致/防重复、同槽并发和保存后意外ECS故障恢复仍沿原未知边界。

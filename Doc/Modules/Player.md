@@ -255,7 +255,7 @@ v12/15的[高亮](MapInteractionHighlight.md)沿原本地所属存活玩家/Conn
 
 v13/16的[资源状态](MapResourceStatusHud.md)由Player Baker追加所属Mode/Kind/PlacementIndex/RemainingSeconds四字段，初始Hidden/0/-1/0；原13输入、F/G各四字段、生命/体力/工具/存档保持。仅Connected/InGame、所有权匹配、启用Simulate且存活者获得状态，死亡/断线与World/Scene变化清显示。新布局/编译/烘焙静态及用户人工通过，限v13/16十项，未触发用例UNKNOWN，旧通过保持原范围。
 
-当前v22/25的[工具修理](MapToolRepair.md)：Player Baker追加零修理反馈Sequence/Kind/Result，仅SendToOwner；修理阶段新增RepairAxe/RepairPickaxe；当前含SaveWorld/背包升级/工具升级共19输入字段。复用原所属资格/唯一Tools，玩家v4保存携带工具/容量等级，生命/体力/R及资源显示快照保持；各端同版重新烘焙。新链静态及用户人工通过，限v14/17十二项，未触发用例UNKNOWN，旧玩家用户通过保持原版本/清单。
+当前v23/26的[工具修理](MapToolRepair.md)：Player Baker追加零修理反馈Sequence/Kind/Result，仅SendToOwner；修理阶段新增RepairAxe/RepairPickaxe；当前含SaveWorld/背包升级/工具升级共19输入字段。复用原所属资格/唯一Tools，玩家v4保存携带工具/容量等级，生命/体力/R及资源显示快照保持；各端同版重新烘焙。新链静态及用户人工通过，限v14/17十二项，未触发用例UNKNOWN，旧玩家用户通过保持原版本/清单。
 
 ## 【FACT】地图资源存档接入边界
 
@@ -275,4 +275,8 @@ v13/16的[资源状态](MapResourceStatusHud.md)由Player Baker追加所属Mode/
 
 ## 【FACT】工具耐久的客户端预警
 
-[耐久预警](MapToolDurabilityHud.md)只读原本地所属Tools快照与有效本级上限，新增固定地图Settings不含Ghost字段；原HUD已完成ID/唯一槽/等级/耐久范围验证后计算25%/10%和不足单次成本的优先损坏状态。没有新输入、玩家组件、反馈事件或存档字段，19输入、工具三字段SendToOwner与v4保存契约保持；等级/耐久只读缓存、每帧隐藏沿Clear，死亡/断线/源/玩家/World/Scene失效沿原Reset清颜色及状态。静态核对通过，新人工显示/联网/生命周期UNKNOWN；用户工具升级通过仍限v21/revision24二十二项。
+[耐久预警](MapToolDurabilityHud.md)只读原本地所属Tools快照与有效本级上限，新增固定地图Settings不含Ghost字段；原HUD已完成ID/唯一槽/等级/耐久范围验证后计算25%/10%和不足单次成本的优先损坏状态。没有新输入、玩家组件、反馈事件或存档字段，19输入、工具三字段SendToOwner与v4保存契约保持；等级/耐久只读缓存、每帧隐藏沿Clear，死亡/断线/源/玩家/World/Scene失效沿原Reset清颜色及状态。静态及用户人工通过，限v22/revision25十六项，未触发显示/联网/生命周期分支UNKNOWN；用户工具升级通过仍限v21/revision24二十二项。
+
+## 【FACT】统一F失败所属快照
+
+原Player Baker为[F失败提示](MapInteractionFailureHud.md)追加Sequence(uint)=0、Result(byte枚举)=None，两GhostField均SendToOwner；输入仍19，Tools/F/G/资源状态/世界保存原字段、生命/体力/R、Prefab与v4存档保持。服务端复用原F拒绝原因并在写入边界核实GhostOwner/存活；归属不匹配不写另一玩家，反馈错误独立记录且不取消成功预约。成功启动清旧失败，客户端初次观察不重播、原死亡/断线/绑定失效Reset清新增状态；仅最新快照，无事件队列或存档。编译/实际Serializer/32次隔离Bake静态通过，初值0/None正确；新提示16项人工及联网/生命周期UNKNOWN。

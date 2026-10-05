@@ -22,7 +22,7 @@
 
 ## 【FACT】当前 JSON 契约与数值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 BuiltIn 一致为 schemaVersion=22/configRevision=25，必填 gatherTools及[面板配置](MapInventoryPanel.md)。沿原严格 UTF-8、完整字段、类型、未知/重复键校验；旧地图 v1～v21 明确失败，不补默认段或回退来源。配置仅在正常导入/烘焙后生效，无运行热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 BuiltIn 一致为 schemaVersion=23/configRevision=26，必填 gatherTools及[面板配置](MapInventoryPanel.md)。沿原严格 UTF-8、完整字段、类型、未知/重复键校验；旧地图 v1～v22 明确失败，不补默认段或回退来源。配置仅在正常导入/烘焙后生效，无运行热重载。
 
 gatherTools 的 enabled=true、craftFeedbackSeconds=2.0、tools 为恰好两条不重复定义；enabled=false 仍校验所有字段，停止制作、修理、升级和工具加速，但保留已拥有工具/耐久/等级，F 沿原徒手耗时。
 
@@ -79,7 +79,7 @@ CombatPrototypeMapGatherTool 是唯一可变工具状态，内部容量 2，每�
 
 v9/revision12阶段增加本地材料背包/配方与按钮，独立开关和人工边界归[制作面板](MapInventoryPanel.md)。工具资格/事务/反馈及v2保存链保持，旧工具十二项通过仍限v8/revision11。
 
-当前地图v22/25必填[背包丢弃](MapInventoryDrop.md)，复用原掉落资源及保存链；本专题原交互/工具/产出/再生行为保持。新增丢弃静态及用户人工通过限[运行入口](Runtime.md)v10/13十二项，未触发用例UNKNOWN；旧通过仍限原版本/清单。
+当前地图v23/26必填[背包丢弃](MapInventoryDrop.md)，复用原掉落资源及保存链；本专题原交互/工具/产出/再生行为保持。新增丢弃静态及用户人工通过限[运行入口](Runtime.md)v10/13十二项，未触发用例UNKNOWN；旧通过仍限原版本/清单。
 
 v11/14阶段的[G提示](MapPickupHud.md)只读共用掉落目标，与原F目标/工具进度独立；不修改本专题资源状态、产出、工具耐久、再生或保存。新显示编译/十次隔离烘焙静态通过；用户确认人工通过限v11/14十项，未触发用例UNKNOWN，旧用户通过保持各自版本/清单。
 
@@ -87,7 +87,7 @@ v12/15的[资源高亮](MapInteractionHighlight.md)复用原F四字段，Working
 
 v13/16的[资源状态](MapResourceStatusHud.md)显示资源阶段及服务端再生秒数；本人采集中优先原F锁定身份，不更改工具锁定耗时、耐久、制作或保存。移动/攻击时状态可显示，但F及制作资格保持。新显示静态及用户人工通过，限v13/16十项，未触发用例UNKNOWN，旧工具通过保持原范围。
 
-当前v22/25的[工具修理](MapToolRepair.md)新增3/4和B按钮、所属三字段反馈；复用原唯一工具槽和候选保存，先保存再扣完整配方/提交封顶耐久，损坏0可修复。制作1/2资格与原F工具锁定/耗时/消耗保持。静态及用户人工通过，限v14/17十二项，未触发用例UNKNOWN；旧工具及资源状态通过保持原版本/清单。
+当前v23/26的[工具修理](MapToolRepair.md)新增3/4和B按钮、所属三字段反馈；复用原唯一工具槽和候选保存，先保存再扣完整配方/提交封顶耐久，损坏0可修复。制作1/2资格与原F工具锁定/耗时/消耗保持。静态及用户人工通过，限v14/17十二项，未触发用例UNKNOWN；旧工具及资源状态通过保持原版本/清单。
 
 ## 【FACT】地图资源存档接入边界
 
@@ -103,4 +103,8 @@ v13/16的[资源状态](MapResourceStatusHud.md)显示资源阶段及服务端�
 
 ## 【FACT】耐久预警的只读显示
 
-[gatherToolDurabilityHud](MapToolDurabilityHud.md)必填11字段，默认25% Low黄、10% Critical橙；不足一次成本优先Broken红。F原工具第二行着色，B各工具追加一行剩余次数/操作提示，共两行；未持有保留原制作提示。原唯一Tools、使用/扣耐久/产出、修理、升级和先保存后提交链保持，输入19/玩家v4/工具三字段所属同步保持。编译、240份非法配置拒绝与28次隔离Bake静态通过；本阶段16项人工GamePlayer仍UNKNOWN，旧工具升级通过限v21/revision24二十二项。
+[gatherToolDurabilityHud](MapToolDurabilityHud.md)必填11字段，默认25% Low黄、10% Critical橙；不足一次成本优先Broken红。F原工具第二行着色，B各工具追加一行剩余次数/操作提示，共两行；未持有保留原制作提示。原唯一Tools、使用/扣耐久/产出、修理、升级和先保存后提交链保持，输入19/玩家v4/工具三字段所属同步保持。编译、240份非法配置拒绝与28次隔离Bake静态通过；用户确认本阶段人工GamePlayer通过限v22/revision25十六项，未触发独立用例UNKNOWN；旧工具升级通过限v21/revision24二十二项。
+
+## 【FACT】请求失败与徒手边界
+
+新[F失败提示](MapInteractionFailureHud.md)只投影原统一F的启动拒绝/异常；未持有或耐久不足仍原Hands，不增加缺工具失败。原采集耗时、扣耐久、修理/升级、存储与B反馈保持，新提示16项人工UNKNOWN；耐久预警用户通过仍限v22/revision25十六项。

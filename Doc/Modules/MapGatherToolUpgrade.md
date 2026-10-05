@@ -1,6 +1,6 @@
 # 采集工具升级与效率提升
 
-返回[采集工具](MapGatherTools.md)、[工具修理](MapToolRepair.md)与[材料面板](MapInventoryPanel.md)。本专题负责 CombatPrototypeNetCode 的工具 Lv1～Lv3、B/6/7 升级、有效耐久上限与采集耗时；玩家文件完整契约归[资源与数据](DataResources.md)，人工清单归[运行入口](Runtime.md)。当前地图 schemaVersion=22/configRevision=25，玩家存档 Version=4；用户已确认本阶段人工 GamePlayer 通过，主线程结合既有静态核对判定通过，限 v21/revision24 及[运行入口](Runtime.md)二十二项清单，结论来自用户反馈。未实际触发的独立边界仍为 UNKNOWN。背包升级及更早用户通过仍限各自原版本/清单。
+返回[采集工具](MapGatherTools.md)、[工具修理](MapToolRepair.md)与[材料面板](MapInventoryPanel.md)。本专题负责 CombatPrototypeNetCode 的工具 Lv1～Lv3、B/6/7 升级、有效耐久上限与采集耗时；玩家文件完整契约归[资源与数据](DataResources.md)，人工清单归[运行入口](Runtime.md)。当前地图 schemaVersion=23/configRevision=26，玩家存档 Version=4；用户已确认本阶段人工 GamePlayer 通过，主线程结合既有静态核对判定通过，限 v21/revision24 及[运行入口](Runtime.md)二十二项清单，结论来自用户反馈。未实际触发的独立边界仍为 UNKNOWN。背包升级及更早用户通过仍限各自原版本/清单。
 
 ## 【FACT】入口与职责
 
@@ -43,7 +43,7 @@ Forest、Grassland JSON 与 BuiltIn 默认一致。新必填 gatherToolUpgrade �
 
 每条 levels 字段为 toolId、level、maxDurability、durationMultiplier、woodQuantity、stoneQuantity。ID 仅 stone_axe/stone_pickaxe；level 仅整数2/3，不重复或缺级。maxDurability 相比前一级严格增大；倍率有限、正数、<=1且逐级严格减小，乘对应 treeHarvest/mining 基础耗时后仍为有限正数；木/石成本均为正整数。feedbackSeconds 有限正数；八个文案均非空白、无控制字符且最多61 UTF-8字节。
 
-新段沿原严格 UTF-8、全部字段、类型、未知/重复键与数组条目校验，任意相关开关关闭也须完整合法。旧地图 v1～v21 明确拒绝，不补默认段或回退来源；配置仅在正常导入/烘焙后生效，无热重载。关闭 gatherToolUpgrade.enabled 只拒绝新升级，已获等级的有效上限/倍率仍使用。关闭 gatherTools.enabled 则沿原徒手路径并禁用制作、修理、升级，等级保留；重新开启按已持有等级与当前配置使用。
+新段沿原严格 UTF-8、全部字段、类型、未知/重复键与数组条目校验，任意相关开关关闭也须完整合法。旧地图 v1～v22 明确拒绝，不补默认段或回退来源；配置仅在正常导入/烘焙后生效，无热重载。关闭 gatherToolUpgrade.enabled 只拒绝新升级，已获等级的有效上限/倍率仍使用。关闭 gatherTools.enabled 则沿原徒手路径并禁用制作、修理、升级，等级保留；重新开启按已持有等级与当前配置使用。
 
 ## 【CURRENT STRATEGY】工具等级与原操作
 
@@ -100,4 +100,4 @@ HUD统一校验所属工具ID/重复/Level/本级耐久上限，只读缓存四�
 
 ## 【FACT】等级变化与耐久预警
 
-[耐久预警](MapToolDurabilityHud.md)读取原有效本级上限，斧头60/90/120、镐子40/60/80；升级保持绝对耐久，因此相同耐久可能跨预警阈值，缓存同时比较Durability/Level。显示不恢复耐久、不扣材料或改变耗时/等级/保存链。地图当前22/25的预警静态核对通过、人工16项UNKNOWN；本专题既有编译/136配置拒绝/22次Bake及用户人工通过仍限工具升级v21/revision24二十二项。
+[耐久预警](MapToolDurabilityHud.md)读取原有效本级上限，斧头60/90/120、镐子40/60/80；升级保持绝对耐久，因此相同耐久可能跨预警阈值，缓存同时比较Durability/Level。显示不恢复耐久、不扣材料或改变耗时/等级/保存链。预警阶段v22/25静态及用户人工通过，限v22/revision25十六项，未触发用例UNKNOWN；本专题既有编译/136配置拒绝/22次Bake及用户人工通过仍限工具升级v21/revision24二十二项。

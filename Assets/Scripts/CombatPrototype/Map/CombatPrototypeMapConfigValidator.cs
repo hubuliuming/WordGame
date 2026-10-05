@@ -11,7 +11,7 @@ namespace Code_01.CombatPrototype.Map
                 config.map.resourcePersistence == null || config.map.layout == null || config.map.movement == null || config.map.drops == null || config.map.treeHarvest == null ||
                 config.map.mining == null || config.map.gatherTools == null || config.map.gatherTools.tools == null ||
                 config.map.gatherToolUpgrade == null || config.map.gatherToolUpgrade.levels == null || config.map.gatherToolDurabilityHud == null ||
-                config.map.interactionHud == null || config.map.pickupHud == null || config.map.interactionHighlight == null || config.map.resourceStatusHud == null || config.map.inventoryPanel == null || config.map.inventoryDrop == null || config.map.inventoryDrop.items == null ||
+                config.map.interactionHud == null || config.map.interactionFailureHud == null || config.map.pickupHud == null || config.map.interactionHighlight == null || config.map.resourceStatusHud == null || config.map.inventoryPanel == null || config.map.inventoryDrop == null || config.map.inventoryDrop.items == null ||
                 config.map.worldSaveHud == null || config.map.inventoryCapacity == null || config.map.inventoryCapacity.items == null ||
                 config.map.inventoryCapacityUpgrade == null || config.map.inventoryCapacityUpgrade.levels == null ||
                 config.map.population == null || config.map.spawn == null ||
@@ -42,6 +42,7 @@ namespace Code_01.CombatPrototype.Map
             HudLabel(hud.treeLabel, "interactionHud.treeLabel");
             HudLabel(hud.mineLabel, "interactionHud.mineLabel");
             HudLabel(hud.noSpaceLabel, "interactionHud.noSpaceLabel");
+            ValidateInteractionFailureHud(map.interactionFailureHud);
             ValidatePickupHud(map.pickupHud, hud);
             ValidateInteractionHighlight(map.interactionHighlight);
             ValidateResourceStatusHud(map.resourceStatusHud, map.pickupHud);
@@ -51,8 +52,8 @@ namespace Code_01.CombatPrototype.Map
             ValidateInventoryCapacityUpgrade(map.inventoryCapacityUpgrade, map.inventoryCapacity);
             ValidateInventoryDrop(map.inventoryDrop);
             Id(map.mapDefinitionId, "mapDefinitionId");
-            if (map.schemaVersion != 22 || map.configRevision < 1 || map.defaultSeed < 1)
-                throw new InvalidOperationException("Map requires schemaVersion=22, positive revision and seed.");
+            if (map.schemaVersion != 23 || map.configRevision < 1 || map.defaultSeed < 1)
+                throw new InvalidOperationException("Map requires schemaVersion=23, positive revision and seed.");
             var drops = map.drops;
             Id(drops.itemId, "drops.itemId");
             Id(drops.visualResourceKey, "drops.visualResourceKey");
@@ -335,6 +336,18 @@ namespace Code_01.CombatPrototype.Map
             HudLabel(hud.brokenLabel, "gatherToolDurabilityHud.brokenLabel");
             HudLabel(hud.remainingUsesLabel, "gatherToolDurabilityHud.remainingUsesLabel");
             HudLabel(hud.repairHintLabel, "gatherToolDurabilityHud.repairHintLabel");
+        }
+
+        private static void ValidateInteractionFailureHud(MapInteractionFailureHudConfig hud)
+        {
+            Positive(hud.feedbackSeconds, "interactionFailureHud.feedbackSeconds");
+            HighlightColor(hud.errorColorHex, "interactionFailureHud.errorColorHex");
+            HudLabel(hud.alreadyInteractingLabel, "interactionFailureHud.alreadyInteractingLabel");
+            HudLabel(hud.movingLabel, "interactionFailureHud.movingLabel");
+            HudLabel(hud.attackingLabel, "interactionFailureHud.attackingLabel");
+            HudLabel(hud.noTargetLabel, "interactionFailureHud.noTargetLabel");
+            HudLabel(hud.targetUnavailableLabel, "interactionFailureHud.targetUnavailableLabel");
+            HudLabel(hud.failedLabel, "interactionFailureHud.failedLabel");
         }
 
         private static void HighlightColor(string value, string field)

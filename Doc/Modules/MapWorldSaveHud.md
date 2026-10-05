@@ -21,7 +21,7 @@
 
 ## 【FACT】配置与建议值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=22/configRevision=25。resourcePersistence由4变6字段，Settings由5变7，新增ManualSaveEnabled/ManualSaveCooldownSeconds；worldSaveHud段及16字段必填。原严格UTF-8、形状、缺失/未知/重复字段、标量类型和语义检查保持；旧地图v1～v21明确拒绝，不补默认或回退来源，关闭仍校验。正常导入/烘焙后生效。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=23/configRevision=26。resourcePersistence由4变6字段，Settings由5变7，新增ManualSaveEnabled/ManualSaveCooldownSeconds；worldSaveHud段及16字段必填。原严格UTF-8、形状、缺失/未知/重复字段、标量类型和语义检查保持；旧地图v1～v22明确拒绝，不补默认或回退来源，关闭仍校验。正常导入/烘焙后生效。
 
 | 字段 | 默认值 | 校验/行为 |
 |---|---|---|

@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 22,
-  "configRevision": 25,
+  "schemaVersion": 23,
+  "configRevision": 26,
   "mapDefinitionId": "battle_grassland_01",
   "defaultSeed": 12345,
   "resourcePersistence": {
@@ -168,6 +168,17 @@
     "treeLabel": "Chop Tree",
     "mineLabel": "Mine Rock",
     "noSpaceLabel": "Not enough space"
+  },
+  "interactionFailureHud": {
+    "enabled": true,
+    "feedbackSeconds": 2,
+    "errorColorHex": "#FF6B6B",
+    "alreadyInteractingLabel": "Already interacting",
+    "movingLabel": "Stop moving first",
+    "attackingLabel": "Finish attack first",
+    "noTargetLabel": "No available resource",
+    "targetUnavailableLabel": "Target unavailable",
+    "failedLabel": "Interaction failed"
   },
   "pickupHud": {
     "enabled": true,

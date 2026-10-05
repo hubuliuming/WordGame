@@ -132,3 +132,7 @@ v13/16的[资源状态](MapResourceStatusHud.md)只显示三类地图资源，�
 ## 【FACT】容量等级接入边界
 
 [升级](MapInventoryCapacityUpgrade.md)：G按本人实际Level取容量定义，拾取候选保留Level并写v4（Tools保留Level）；原生成/最近目标/寿命及保存先于入包规则保持。新链静态及用户人工通过限v20/revision23升级十六项，未触发用例UNKNOWN；旧通过保持原版本/清单。
+
+## 【FACT】G拾取结果反馈边界
+
+当前v25/revision28的[拾取反馈](MapPickupFeedbackHud.md)仅发布原G实际结果；requested在原Pickup事件确认后设置，未读到请求的输入异常只保留原日志。SavePrepared正常返回后的rewardSaved仅用于禁止部分提交异常发布成功或失败；原PrepareReward→SavePrepared→库存→Consumed及完成日志结束后才写PickedUp，携带本次实际ItemId/Quantity增量。移动/攻击/无落地目标/容量拒绝及准备或保存前失败沿原原因映射，所有权不匹配/死亡不写另一玩家结果，反馈写入错误独立隔离且不撤销业务；保存后的恢复仍UNKNOWN。原资格、NetworkId升序、最近/同距小DropId、产出/运动/寿命/清理、容量与玩家v4/世界v2保存链保持；无目标不细分争抢/到期/飞行/超范围。静态编译/256份非法配置拒绝与44次隔离Bake通过，人工待验收，旧通过仍限原版本/清单。

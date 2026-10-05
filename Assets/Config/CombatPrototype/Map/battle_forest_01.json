@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 24,
-  "configRevision": 27,
+  "schemaVersion": 25,
+  "configRevision": 28,
   "mapDefinitionId": "battle_forest_01",
   "defaultSeed": 12345,
   "resourcePersistence": {
@@ -214,6 +214,17 @@
     "expiringSoonLabel": "Expiring soon",
     "secondsLabel": "s",
     "expiryWarningColorHex": "#FFB454"
+  },
+  "pickupFeedbackHud": {
+    "enabled": true,
+    "feedbackSeconds": 2,
+    "successColorHex": "#6ED88A",
+    "failureColorHex": "#FF6B6B",
+    "successLabel": "Picked up",
+    "movingLabel": "Stop moving first",
+    "attackingLabel": "Finish attack first",
+    "noTargetLabel": "No available drop",
+    "failedLabel": "Pickup failed"
   },
   "interactionHighlight": {
     "enabled": true,

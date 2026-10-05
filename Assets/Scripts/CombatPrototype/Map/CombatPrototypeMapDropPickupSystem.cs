@@ -80,15 +80,20 @@ namespace Code_01.CombatPrototype.Map
                     var stage = "ReadInput";
                     var dropId = 0;
                     FixedString64Bytes itemId = default;
+                    var requested = false;
+                    var rewardSaved = false;
                     try
                     {
                         var input = inputs[player.Entity];
                         if (!input.Pickup.IsSet) continue;
+                        requested = true;
                         stage = "ValidatePlayer";
                         var reason = GetPickupHintRejection(player.Entity, player.NetworkId, input, owners, healths, melees);
                         if (reason != null)
                         {
                             Reject(map.MapDefinitionId, player, reason);
+                            CombatPrototypeMapPickupFeedbackUtility.WriteRejection(EntityManager, map.MapDefinitionId,
+                                player.Entity, player.NetworkId, dropId, itemId, reason);
                             continue;
                         }
 
@@ -98,6 +103,8 @@ namespace Code_01.CombatPrototype.Map
                         if (target == Entity.Null)
                         {
                             Reject(map.MapDefinitionId, player, "NoLandedTarget");
+                            CombatPrototypeMapPickupFeedbackUtility.WriteRejection(EntityManager, map.MapDefinitionId,
+                                player.Entity, player.NetworkId, dropId, itemId, "NoLandedTarget");
                             continue;
                         }
 
@@ -116,6 +123,8 @@ namespace Code_01.CombatPrototype.Map
                         if (capacityReason != null)
                         {
                             Reject(map.MapDefinitionId, player, capacityReason + ", DropId=" + dropId + ", itemId=" + itemId);
+                            CombatPrototypeMapPickupFeedbackUtility.WriteRejection(EntityManager, map.MapDefinitionId,
+                                player.Entity, player.NetworkId, dropId, itemId, capacityReason);
                             continue;
                         }
                         stage = "PrepareReward";
@@ -131,6 +140,7 @@ namespace Code_01.CombatPrototype.Map
 
                         stage = "SavePrepared";
                         CombatPrototypePlayerSaveStore.SavePrepared(candidate);
+                        rewardSaved = true;
 
                         // References and capacity were acquired before saving; commit makes no structural change or allocation.
                         stage = "CommitPickup";
@@ -141,12 +151,17 @@ namespace Code_01.CombatPrototype.Map
                             ", DropId=" + dropId + ", NetworkId=" + player.NetworkId + ", PlayerId=" + playerId +
                             ", item=" + itemName + ", quantity=+" + quantity +
                             ", totalItemQuantity=" + next.Quantity + ".");
+                        CombatPrototypeMapPickupFeedbackUtility.WriteSuccess(EntityManager, map.MapDefinitionId,
+                            player.Entity, player.NetworkId, dropId, itemId, quantity);
                     }
                     catch (Exception exception)
                     {
                         Debug.LogError("[CombatPrototype.Map] Pickup settlement or save failed; map=" + map.MapDefinitionId +
                             ", DropId=" + dropId + ", NetworkId=" + player.NetworkId + ", player=" + player.Entity +
                             ", itemId=" + itemId + ", stage=" + stage + ". " + exception);
+                        if (requested && !rewardSaved)
+                            CombatPrototypeMapPickupFeedbackUtility.WriteFailure(EntityManager, map.MapDefinitionId,
+                                player.Entity, player.NetworkId, dropId, itemId);
                     }
                 }
             }

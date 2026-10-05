@@ -15,11 +15,11 @@
 
 ## 【FACT】当前默认配置
 
-v24/27；旧验收范围保持；[F失败](MapInteractionFailureHud.md)已验收；[完成/中断](MapGatherOutcomeHud.md)静态通过、人工待验收。
+v25/28；旧通过限原范围；[F失败](MapInteractionFailureHud.md)、[F结果](MapGatherOutcomeHud.md)已验收；[G结果](MapPickupFeedbackHud.md)待验收。
 
 | 配置字段 | 当前值与用途 |
 |---|---|
-| schemaVersion / configRevision | 24 / 27 |
+| schemaVersion / configRevision | 25 / 28 |
 | inventoryCapacity | 默认总量300、单种200，完整契约归[容量](MapInventoryCapacity.md) |
 | defaultSeed | 12345，用于确定性布置 |
 | geometry.cellSizeMeters | 2 米 |
@@ -54,7 +54,7 @@ gather_apple 的 footprintRadiusMeters=0.3、minimumSameTypeSpacingMeters=1.5、
 
 ## 【FACT】JSON 文件与配置入口
 
-五份UTF-8无BOM JSON，地图v23/26；[存档](MapResourcePersistence.md)含[掉落](MapDropPersistence.md)；v15/18、v16/19各通过十二项。生态含treeObjectId/gatherObjectId/mineObjectId、mineDensityPer100m2，物体含mine_rock；原地表、空间、种子和出生保持。
+五份UTF-8无BOM JSON，地图v25/28；[存档](MapResourcePersistence.md)含[掉落](MapDropPersistence.md)；v15/18、v16/19各通过十二项。生态含treeObjectId/gatherObjectId/mineObjectId、mineDensityPer100m2，物体含mine_rock；原地表、空间、种子和出生保持。
 
 | MapAuthoring 字段 | 显式绑定文件 | JSON 根类型 |
 |---|---|---|
@@ -64,7 +64,7 @@ gather_apple 的 footprintRadiusMeters=0.3、minimumSameTypeSpacingMeters=1.5、
 | GroundsJson | [grounds.json](../../Assets/Config/CombatPrototype/Map/grounds.json) | GroundDefinitionConfig 数组 |
 | ObjectsJson | [objects.json](../../Assets/Config/CombatPrototype/Map/objects.json) | MapObjectDefinitionConfig 数组 |
 
-SourceMode=BuiltIn 时明确使用内置来源，SourceMode=Json 时使用选中地图 JSON 和三份共享 JSON；Json 来源失败不自动回退 BuiltIn。Preset=Grassland 要求地图 ID 为 battle_grassland_01，Preset=Forest 要求 battle_forest_01。schemaVersion=24为契约版本，configRevision须为正整数；旧v1～v23或缺少必填字段明确失败，不补字段或回退来源。
+SourceMode=BuiltIn 时明确使用内置来源，SourceMode=Json 时使用选中地图 JSON 和三份共享 JSON；Json 来源失败不自动回退 BuiltIn。Preset=Grassland 要求地图 ID 为 battle_grassland_01，Preset=Forest 要求 battle_forest_01。schemaVersion=25为契约版本，configRevision须为正整数；旧v1～v24或缺少必填字段明确失败，不补字段或回退来源。
 
 [MapMovementConfig.cs](../../Assets/Scripts/CombatPrototype/Map/MapMovementConfig.cs) 是地图定义的必填 movement 段：
 

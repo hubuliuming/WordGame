@@ -148,4 +148,4 @@ v13/16的[资源状态](MapResourceStatusHud.md)只读Available/Mining/Depleted�
 
 ## 【FACT】完成与中断所属反馈
 
-当前v24/revision27接入[采集结果](MapGatherOutcomeHud.md)：原Complete完整提交后返回，才发送本类型Completed；原Cancel成功后按实际原因发送中断/失败，Collector实体在清空前保留。启动回滚、离线、所有权不匹配及死亡不写新结果；耐久保存后的异常保持原日志/UNKNOWN，不显示成功。共享反馈写入独立隔离，原地面产出、阻挡、耐久保存顺序及原点再生保持。静态通过、人工待验收；旧人工通过保持原版本/清单。
+当前v24/revision27接入[采集结果](MapGatherOutcomeHud.md)：原Complete完整提交后返回，才发送本类型Completed；原Cancel成功后按实际原因发送中断/失败，Collector实体在清空前保留。启动回滚、离线、所有权不匹配及死亡不写新结果；耐久保存后的异常保持原日志/UNKNOWN，不显示成功。共享反馈写入独立隔离，原地面产出、阻挡、耐久保存顺序及原点再生保持。静态及用户人工通过，限v24/revision27十六项，未触发独立用例UNKNOWN；旧通过保持原范围。

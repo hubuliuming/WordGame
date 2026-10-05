@@ -23,6 +23,7 @@ namespace Code_01.CombatPrototype.Map
         public MapInteractionFailureHudConfig interactionFailureHud;
         public MapGatherOutcomeHudConfig gatherOutcomeHud;
         public MapPickupHudConfig pickupHud;
+        public MapPickupFeedbackHudConfig pickupFeedbackHud;
         public MapInteractionHighlightConfig interactionHighlight;
         public MapResourceStatusHudConfig resourceStatusHud;
         public MapWorldSaveHudConfig worldSaveHud;

@@ -904,7 +904,7 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 
 ## 【KNOWN ISSUES】采集完成与中断反馈验收边界
 
-入口CombatPrototypeNetCode，当前Forest/Grassland Json/BuiltIn为v24/revision27。正常编译、336份非法配置拒绝/14组合法读取、36次隔离Editor Bake及实际所属Serializer元数据静态通过。以下十六项为本阶段人工GamePlayer清单，尚未执行/获得用户通过反馈；原323项内容/编号逐字保留，旧清单仍限各自原版本。当前回归按v24契约执行，旧v1～v23配置拒绝，不按旧清单恢复已失效的schema。
+入口CombatPrototypeNetCode，本阶段Forest/Grassland Json/BuiltIn为v24/revision27。正常编译、336份非法配置拒绝/14组合法读取、36次隔离Editor Bake及实际所属Serializer元数据静态通过。用户已确认本阶段人工GamePlayer验收通过，主线程结合既有静态核对与用户反馈判定通过，范围限以下十六项清单，结论来自用户反馈；原339项内容/编号逐字保留，旧清单仍限各自原版本。本阶段回归按v24契约执行，旧v1～v23配置拒绝，不按旧清单恢复已失效的schema。
 
 1. 默认两地图Json/BuiltIn均v24/revision27，十三Settings完整，Player新反馈初值0/0/None；正常导入/烘焙后进入，F原目标、进度及原工具显示保持，不在首次观察时显示旧结果。
 2. 完成一次植被采集，实际候选保存及库存/Depleted/RegrowAt提交成功后显示绿色Gathering completed；默认2秒，保持原产量/耗时/600秒再生。进度到期但结算失败不显示完成，不由客户端百分比推断成功。
@@ -923,4 +923,27 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 15. 新提示关闭、F关闭及全部原显示关闭分别核对，不强制绑定HUD，B原反馈保持；自定义3.5秒/三颜色/八中文文案沿正常导入/烘焙生效。缺段/字段/null/未知/重复/错类型、坏时间/颜色/文案及旧v1～v23明确拒绝，关闭仍验证，无补默认/回退/热重载；恢复24/27。未覆盖字形/排版UNKNOWN。
 16. 双玩家不同完成/中断只显示本人，所有权不匹配/离线不写另一玩家结果；死亡/R、断线、源/玩家/World/Scene失效及重新进入清新增观察序号/类型/结果/期限/文字/颜色，Clear逐帧只隐藏。回归F/G、1～7/B、E/R/F5、原产出/容量/升级/600秒再生与保存顺序，输入19、Tools3、旧反馈/F/G字段与玩家v4/世界v2保持；未触发联网/生命周期分支UNKNOWN。
 
-完整事实归[采集结果](MapGatherOutcomeHud.md)，配置/存储归[资源与数据](DataResources.md)。追加后共339项，主线程静态验收通过，人工待验收；旧启动失败用户通过保持v23/revision26十六项，其余旧通过仍限各自原版本/清单。AI未执行GamePlayer/PlayMode、游戏/显示系统或GUI回调、逻辑单元测试、真实存档业务I/O、构建/发布、采样/图片，未创建子Agent/提交Git。未实际触发用例、保存后意外ECS恢复、跨文件事务、同槽并发及性能/平台/线上结论仍UNKNOWN。
+完整事实归[采集结果](MapGatherOutcomeHud.md)，配置/存储归[资源与数据](DataResources.md)。共339项，主线程静态及用户人工验收通过，限本阶段v24/revision27十六项；旧启动失败用户通过保持v23/revision26十六项，其余旧通过仍限各自原版本/清单。AI未执行GamePlayer/PlayMode、游戏/显示系统或GUI回调、逻辑单元测试、真实存档业务I/O、构建/发布、采样/图片，未创建子Agent/提交Git。未实际触发用例、保存后意外ECS恢复、跨文件事务、同槽并发及性能/平台/线上结论仍UNKNOWN。
+
+## 【KNOWN ISSUES】掉落物拾取成功与失败反馈验收边界
+
+入口CombatPrototypeNetCode，当前Forest/Grassland Json/BuiltIn为v25/revision28。正常Unity编译、256份非法配置拒绝/18组合法读取、44次隔离Editor Bake及四字段所属Serializer静态通过。以下十六项为本阶段人工GamePlayer清单，尚未执行/获得用户通过反馈；原339项内容/编号逐字保留，旧通过仍限原版本。各端同版重新烘焙，旧v1～v24明确拒绝，回归使用当前v25契约。
+
+1. 默认两地图Json/BuiltIn均v25/revision28，九Settings完整，Player新反馈0/None/空/0；正常导入/烘焙后进入，首次观察现有Sequence不显示旧结果，原G目标/寿命、F及B保持。
+2. 分别拾取活力苹果、木材和石材，实际SavePrepared、库存与Consumed完整提交后显示绿色Picked up及实际物品/本次增量；默认2秒，数量不是累计库存，同名合并、固定ID保存恢复保持。
+3. 单次G只提交原最近合格掉落，精确同距取较小DropId，多人请求仍按NetworkId升序；已Consumed不可重复领取。争抢失败后若另有合格目标按原选择器处理，否则No available drop，不虚构已被别人取走原因。未触发临界/同tick用例UNKNOWN。
+4. 移动输入时按G显示红色Stop moving first，即使被树木挡住仍按原非零Move拒绝；不入包、不Consume、不自动重试，停止后仍须新G。
+5. 攻击请求或近战非Ready时按G显示红色Finish attack first，原移动/攻击判定顺序保持；死亡沿原隐藏/Reset，无死亡新消息，R及原库存/工具保留保持。
+6. 无Landed未到期范围内目标时按G显示No available drop，涵盖原飞行/Consumed/到期/超范围排除；不将界面旧DropId当实际请求目标，不延长或重置ExpiresAt。
+7. 实际触发总量、单种或旧合法超限拒绝时使用原pickupHud.noSpaceLabel，原NoSpace目标优先保留物品/实际数量与寿命，新NoSpace窗口内第一行红色，到期恢复原白色；不部分领取、不改选较远目标、不保存/消耗。未触发独立分支UNKNOWN。
+8. 实际触发物品解析/准备/checked合并或SavePrepared失败时，已确认G请求显示Pickup failed，原日志含map/DropId/NetworkId/player/itemId/stage/异常；原库存和未到期物保持，继续其他请求，恢复后须新G，原寿命继续。未触发失败分支UNKNOWN。
+9. 实际触发SavePrepared正常返回后的部分ECS提交异常时只保留原错误，不发布成功或宣称拾取失败/回滚成功；没有额外保存、重发或恢复逻辑。保存后意外ECS恢复和玩家/世界跨文件一致性仍UNKNOWN。
+10. 实际触发新反馈组件缺失/写入异常，stage=WriteFeedback含map/NetworkId/player/DropId/itemId/quantity/result/reason/异常，原成功或拒绝结果保持，不进入原结算异常，不补组件或阻断后续玩家；无请求的输入读取异常不发布G结果，未知原因独立报错。未触发UNKNOWN。
+11. Ready或Hidden有结果时原G面板居中单行显示，目标/寿命文字暂隐藏，2秒后恢复当前目标及余时；没有目标时到期收起。期间G高亮仍按原六字段DropId解析当前目标，继续按G由服务端重新选择，不由反馈物品ID选目标。
+12. NoSpace目标优先于普通成功/失败结果，保留原目标两行；仅有效新NoSpace窗口将第一行用失败色，原寿命预警颜色保持。到期/切目标/重新进入恢复白色，无消息颜色残留；寿命关闭52高仍按原单行布局显示结果。
+13. F启动失败/完成中断、制作/修理、背包丢弃/升级与G结果同窗口核对，G只显示自己的结果，F/B仍原优先级及displayFeedback，不改按钮资格或原G/F处理顺序；资源状态、F5、掉落寿命/世界保存链保持。
+14. 新显示关闭、G文字关闭、关闭F/B而保留G及全部原显示关闭分别核对；新开关不强制HUD，实际G/高亮沿原独立规则。自定义3.5秒/两颜色/五中文文案与原三物品/容量文案沿正常导入/烘焙生效，字形/排版未覆盖UNKNOWN；关闭寿命可保持52高。
+15. 缺段/九字段缺失或null/未知或重复键/错类型、非有限或非正时间、坏颜色/控制字符或超61字节文案和旧v1～v24明确拒绝，关闭仍完整校验，无补齐/回退/热重载；恢复25/28。非法所属结果只清结果通道且记录ReadSnapshot，原有效G目标/寿命保持，非法目标沿原隐藏；未触发UNKNOWN。
+16. 双玩家不同成功/失败仅显示本人，归属不匹配/离线/死亡不写另一玩家；首次绑定、晚加入、重连不重播，连续请求只取最新快照，序号回绕/覆盖/预测回放未触发UNKNOWN。死亡/R、断线、源/玩家/World/Scene失效及重新进入清新序号/观察/结果/期限/文案/颜色，Clear逐帧仅隐藏；回归原F/G、1～7/B、E/R/F5、产出/容量/升级/600秒再生与保存顺序，输入19、Tools3及玩家v4/世界v2保持。
+
+完整事实归[拾取反馈](MapPickupFeedbackHud.md)，目标/寿命归[G提示](MapPickupHud.md)，配置/存储归[资源与数据](DataResources.md)。共355项，主线程静态通过，本阶段人工待验收；旧F结果用户通过保持v24/revision27十六项，其余旧通过保持原版本/清单。AI未执行GamePlayer/PlayMode、游戏/显示系统或GUI回调、逻辑单元测试、真实存档业务I/O、命令行构建/发布、性能/图片，未创建子Agent/提交Git。未实际触发的独立用例、保存后ECS恢复、跨文件事务、同槽并发及性能/平台/线上结论仍UNKNOWN。

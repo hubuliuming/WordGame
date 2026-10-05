@@ -827,3 +827,17 @@
 - 原F复用第二行或Hidden两行结果/工具，NoSpace>启动失败>完成/中断>修理>制作>工具；B原反馈、开关/绑定/生命周期及Scene/Prefab/Animator结构保持。
 - 正常Unity编译0 Error；336份非法配置拒绝、14组合法读取、36次隔离Editor Bake通过；实际Serializer三字段/3 mask bits/12字节Snapshot/SendToOwner，Editor网络函数指针未初始化。Bake Console[0,6,53]前后一致，原布局/签名/资源引用及输入/保存字段保持，主场景干净、未Play。
 - 同步相关模块/导航/策划模板，原323项人工内容/编号逐字保留，追加16项共339项；主线程静态通过，v24/revision27人工待验收。旧验收保持原范围，未执行GamePlayer、逻辑单元测试、真实存档业务I/O、构建/发布、性能/图片、子Agent或Git提交；未触发运行、错误隔离、联网/生命周期及性能/平台/线上UNKNOWN。
+
+## 2026-10-05：采集完成与中断反馈人工验收通过
+
+- 用户反馈“我已验收通过，接下来下一阶段”；主线程结合既有正常Unity编译、336份非法配置拒绝/14组合法读取、36次隔离Editor Bake及所属Serializer静态核对判定本阶段通过，限CombatPrototypeNetCode、schemaVersion24/configRevision27及Runtime十六项清单，人工结论来自用户反馈。
+- 增量同步采集结果专题、地图/工具/HUD/树木/矿点/背包、资源数据、玩家、导航、Runtime和策划模板的验收状态；原339项内容/编号逐字保留，旧阶段通过保持原版本/清单。未实际触发的独立结算/取消/异常/反馈写入隔离、容量/优先级、显示/字形/排版、联网/序号覆盖/预测回放及生命周期用例仍UNKNOWN。
+- 本次仅更新十二份仓库文档与策划模板，代码、JSON及Scene/SubScene/Prefab/Animator/meta/资源/包/构建配置保持；未运行Unity、GamePlayer/PlayMode、游戏/显示系统或GUI回调、逻辑单元测试、真实存档业务I/O、命令行构建/发布、采样或图片检查，未创建子Agent或提交Git。结论不扩大到保存后意外ECS恢复、跨文件事务、同槽并发、性能/带宽、平台或线上联调。
+
+## 2026-10-05：掉落物拾取成功与失败反馈落地
+
+- 按用户确认由主线程接入CombatPrototypeNetCode原G请求结果；原SavePrepared/库存/Consumed与完成日志结束后才发布成功，携带实际物品/增量；移动/攻击/无目标/容量拒绝及已确认请求的准备或保存前异常映射原因，所有权不匹配/死亡不写他人。反馈写入独立隔离，原资格/选择/NetworkId顺序和保存链保持，保存后部分提交异常只沿原错误/UNKNOWN。
+- 两地图Json/BuiltIn升级schema25/revision28，新增必填pickupFeedbackHud九字段，默认true/2秒/绿红及五文案，物品和容量文案沿原pickupHud。五个普通新脚本及Unity生成meta，地图根九Settings与Player Sequence/Result/ItemId/Quantity四字段SendToOwner初值0/None/空/0；输入19、原反馈、玩家v4/世界v2存档与资源结构保持。
+- 原G面板按NoSpace目标>结果>普通目标/寿命显示；容量目标保留物品/数量/寿命，新NoSpace窗口标红，其他结果居中单行暂替目标/寿命，到期恢复。原高亮目标、F/B、布局/字体/纹理、绑定退出与生命周期保持；首次不重播，Reset清新缓存。
+- 正常Unity编译0 Error；256份非法配置拒绝、18组合法读取、44次隔离Editor Bake通过；实际Serializer四字段/4 mask bits/76字节Snapshot/SendToOwner，Editor网络函数指针未初始化。Bake Console[0,7,53]前后一致，原布局/签名/资源引用与字段保持，主场景干净、一场景三根对象且未Play，临时资源释放。检查脚本超过工具50000字符上限而未执行，拆分元数据核对后成功完成烘焙。
+- 增量同步拾取结果专题、相关文档/导航及策划模板；原339项人工内容/编号逐字保留，新16项后共355项，静态通过、本阶段人工GamePlayer待验收。旧F结果通过仍限v24/revision27十六项，旧通过保持原范围；未执行GamePlayer/PlayMode、游戏/显示/GUI、逻辑单元测试、真实存档业务I/O、构建/发布、采样/图片、子Agent或Git提交。未触发失败/隔离/显示/字形/排版、联网/生命周期及性能/平台/线上UNKNOWN。

@@ -1,6 +1,6 @@
 # 资源交互失败原因提示
 
-返回[地图](Map.md)、[统一F显示](MapInteractionHud.md)与[运行入口](Runtime.md)。入口CombatPrototypeNetCode，当前Forest/Grassland Json/BuiltIn为schemaVersion=24/configRevision=27。本专题负责单次F请求未能开始资源交互时的所属反馈；选目标、[完成/中断](MapGatherOutcomeHud.md)、工具使用、G拾取与存储归各自专题。静态及用户人工通过，限v23/revision26十六项，未触发独立用例UNKNOWN；耐久预警用户通过仍限v22/revision25十六项，旧通过保持原版本和清单。
+返回[地图](Map.md)、[统一F显示](MapInteractionHud.md)与[运行入口](Runtime.md)。入口CombatPrototypeNetCode，当前Forest/Grassland Json/BuiltIn为schemaVersion=25/configRevision=28。本专题负责单次F请求未能开始资源交互时的所属反馈；选目标、[完成/中断](MapGatherOutcomeHud.md)、工具使用、G拾取与存储归各自专题。静态及用户人工通过，限v23/revision26十六项，未触发独立用例UNKNOWN；耐久预警用户通过仍限v22/revision25十六项，旧通过保持原版本和清单。
 
 ## 【FACT】入口与文件
 
@@ -35,7 +35,7 @@
 | targetUnavailableLabel | Target unavailable | 同上 |
 | failedLabel | Interaction failed | 同上 |
 
-NoSpace直接复用interactionHud.noSpaceLabel，没有第二份容量文案。原严格JsonReader通过DTO字段完整检查对象形状、缺失/null/未知/重复键/标量类型及UTF-8；语义校验复用Positive、HighlightColor、HudLabel。旧地图v1～v23明确拒绝，不迁移、不补默认段、不回退来源；正常导入/烘焙后生效，无运行热重载。英文为默认文案；可配置中文，实际字形与排版仍UNKNOWN。
+NoSpace直接复用interactionHud.noSpaceLabel，没有第二份容量文案。原严格JsonReader通过DTO字段完整检查对象形状、缺失/null/未知/重复键/标量类型及UTF-8；语义校验复用Positive、HighlightColor、HudLabel。旧地图v1～v24明确拒绝，不迁移、不补默认段、不回退来源；正常导入/烘焙后生效，无运行热重载。英文为默认文案；可配置中文，实际字形与排版仍UNKNOWN。
 
 原Map Baker在唯一地图根写九字段Settings：Enabled(byte)、FeedbackSeconds(float)、ErrorColor(float3 RGB)及六个FixedString64Bytes。它不是Ghost；绑定在地图源/玩家变化时传给原HUD，普通缓存保存固定配置、文字、观察序号、期限和颜色，不跨帧持有DynamicBuffer。
 

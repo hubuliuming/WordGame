@@ -1,6 +1,6 @@
 # 采集完成与中断反馈
 
-返回[地图](Map.md)、[F显示](MapInteractionHud.md)、[启动失败](MapInteractionFailureHud.md)与[运行入口](Runtime.md)。入口CombatPrototypeNetCode；Forest/Grassland Json与BuiltIn当前schemaVersion=24/configRevision=27。本专题负责植被采集、砍树和采矿的服务端结算/取消结果及现有F提示区显示。静态验收通过，人工GamePlayer待验收；旧启动失败人工通过仍限v23/revision26十六项，旧通过保持原版本/清单。
+返回[地图](Map.md)、[F显示](MapInteractionHud.md)、[启动失败](MapInteractionFailureHud.md)与[运行入口](Runtime.md)。入口CombatPrototypeNetCode；Forest/Grassland Json与BuiltIn当前schemaVersion=25/configRevision=28。本专题负责植被采集、砍树和采矿的服务端结算/取消结果及现有F提示区显示。静态及用户人工验收通过，限本阶段十六项；旧启动失败人工通过仍限v23/revision26十六项，旧通过保持原版本/清单。
 
 ## 【FACT】文件与接入
 
@@ -39,7 +39,7 @@
 | outOfRangeLabel | Interrupted: out of range | 同上 |
 | failedLabel | Resource work failed | 同上 |
 
-NoSpace复用interactionHud.noSpaceLabel，没有第二份容量文案。原JsonReader沿DTO完整检查UTF-8、形状、缺失/null/未知/重复键及标量类型，语义复用Positive/HighlightColor/HudLabel；旧地图v1～v23明确拒绝，不迁移、不补默认段、不回退来源。正常导入和烘焙后生效，无热重载；英文为默认值，中文可配置，实际字形与排版UNKNOWN。
+NoSpace复用interactionHud.noSpaceLabel，没有第二份容量文案。原JsonReader沿DTO完整检查UTF-8、形状、缺失/null/未知/重复键及标量类型，语义复用Positive/HighlightColor/HudLabel；旧地图v1～v24明确拒绝，不迁移、不补默认段、不回退来源。正常导入和烘焙后生效，无热重载；英文为默认值，中文可配置，实际字形与排版UNKNOWN。
 
 原Map Baker在唯一地图根写十三字段Settings：Enabled(byte)、FeedbackSeconds(float)、CompletedColor/InterruptedColor/FailedColor(float3 RGB)与八个FixedString64Bytes。Settings不是Ghost；原绑定在地图源/本地玩家变化时传入HUD。新普通缓存只持有配置、文字、Kind/Result、观察序号、期限和颜色，不跨帧持有DynamicBuffer。
 
@@ -80,7 +80,7 @@ CombatPrototypeMapGatherOutcomeFeedback恰Sequence(uint)、Kind(byte)、Result(b
 
 默认绿色完成、橙色中断、红色失败，各2秒。Ready/Working只替换第二行，第一行目标/百分比和进度条保持；Hidden第一行显示结果，第二行Gather为Hands、Tree为当前斧头、Mine为当前镐头状态，工具颜色沿原耐久预警。启动失败的Hidden第二行仍空。
 
-F优先级为NoSpace > 原启动失败 > 完成/中断 > 修理 > 制作 > 工具。原NoSpace目标两行最高；新结果NoSpace也优先于普通启动失败。B继续接收原displayFeedback（修理优先制作），新结果不进入B页脚。G、高亮、资源状态、世界保存及原面板位置/尺寸保持；每帧恢复两行白色，到期重新使用原反馈/工具颜色，绘制仍仅Repaint且沿原finally恢复GUI.matrix/color。
+F优先级为NoSpace > 原启动失败 > 完成/中断 > 修理 > 制作 > 工具。原NoSpace目标两行最高；新结果NoSpace也优先于普通启动失败。B继续接收原displayFeedback（修理优先制作），新结果不进入B页脚。G面板位置/尺寸、高亮、资源状态和世界保存保持，G结果归[拾取反馈](MapPickupFeedbackHud.md)；每帧恢复两行白色，到期重新使用原反馈/工具颜色，绘制仍仅Repaint且沿原finally恢复GUI.matrix/color。
 
 首次观察只记录Sequence，不回放初始结果；后续变化投影文案/Kind/Result与unscaledTimeAsDouble期限，None清文字/类型/结果/颜色和期限。非法网络结果或类型只清本通道并记录stage=ReadSnapshot、map/sequence/kind/result/异常。Clear逐帧只隐藏，Configure/Reset及死亡、断线、源/玩家/World/Scene失效清观察标记、序号、文字、类型、结果、颜色和期限。
 
@@ -98,6 +98,6 @@ Bake前后实际Console均[0 Error,6 Warning,53 Log]，没有新增Bake错误/�
 
 ## 【KNOWN ISSUES】人工边界
 
-主线程静态验收通过；本阶段v24/revision27十六项人工GamePlayer待验收，尚未获得用户通过反馈。未实际触发的完成/取消/异常与反馈写入隔离、容量/优先级、显示/字形/排版、身份/多玩家/晚加入/重连、序号覆盖/预测回放及生命周期用例均UNKNOWN。旧人工通过只覆盖原版本/清单，不能扩大为本阶段通过。
+用户已确认本阶段人工GamePlayer验收通过，主线程结合既有静态核对与用户反馈判定通过，限CombatPrototypeNetCode、v24/revision27及[运行入口](Runtime.md)十六项清单，结论来自用户反馈。清单涵盖三类资源完成/移动/攻击/受击/距离中断、容量与保存前失败、反馈写入隔离、F优先级与B原反馈、成功清除/到期/颜色、开关/绑定、所属同步和生命周期回归。原339项人工内容/编号逐字保留；未实际触发的独立完成/取消/异常与反馈写入隔离、容量/优先级、显示/字形/排版、身份/多玩家/晚加入/重连、序号覆盖/预测回放及生命周期用例仍UNKNOWN。旧通过保持各自原版本/清单，本结论不扩展到性能、平台或线上联调。
 
 AI未执行GamePlayer/PlayMode、游戏或显示系统、GUI回调、逻辑单元测试、真实存档业务I/O、命令行构建/发布、性能/带宽采样或图片检查，未创建子Agent/提交Git。保存后意外ECS故障恢复、跨文件事务、同槽并发及性能/平台/线上结论仍沿原UNKNOWN边界。

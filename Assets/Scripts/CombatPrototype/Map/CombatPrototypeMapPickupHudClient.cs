@@ -11,6 +11,7 @@ namespace Code_01.CombatPrototype.Map
         private readonly FixedString64Bytes _woodId = new FixedString64Bytes(CombatPrototypeMapYieldItemResolver.WoodId);
         private readonly FixedString64Bytes _stoneId = new FixedString64Bytes(CombatPrototypeMapYieldItemResolver.StoneId);
         private readonly CombatPrototypeMapPickupLifetimeHudClient _lifetimeHud = new CombatPrototypeMapPickupLifetimeHudClient();
+        private readonly CombatPrototypeMapPickupFeedbackHudClient _feedbackHud = new CombatPrototypeMapPickupFeedbackHudClient();
         private CombatPrototypeMapPickupHudSettings _settings;
         private CombatPrototypeMapPickupHudState _state;
         private GUIStyle _labelStyle;
@@ -21,8 +22,12 @@ namespace Code_01.CombatPrototype.Map
         private string _noSpaceLabel;
         private string _text;
         private bool _visible;
+        private bool _showFeedback;
+        private string _feedbackText;
+        private Color _textColor = Color.white;
 
-        internal void Configure(CombatPrototypeMapPickupHudSettings settings)
+        internal void Configure(CombatPrototypeMapPickupHudSettings settings,
+            CombatPrototypeMapPickupFeedbackHudSettings feedbackSettings, string mapId)
         {
             Reset();
             _settings = settings;
@@ -32,18 +37,28 @@ namespace Code_01.CombatPrototype.Map
             _stoneLabel = settings.StoneLabel.ToString();
             _noSpaceLabel = settings.NoSpaceLabel.ToString();
             _lifetimeHud.Configure(settings);
+            _feedbackHud.Configure(feedbackSettings, settings, mapId);
         }
 
-        internal void Show(CombatPrototypeMapPickupHudState state)
+        internal void Show(CombatPrototypeMapPickupHudState state, CombatPrototypeMapPickupFeedback feedback)
         {
             Clear();
+            _feedbackHud.Observe(feedback);
             if (_settings.Enabled == 0) return;
+            var feedbackText = _feedbackHud.Feedback;
+            var hasFeedback = !string.IsNullOrEmpty(feedbackText);
             try
             {
                 if (state.Mode == CombatPrototypeMapPickupHudMode.Hidden)
                 {
                     if (state.DropId != 0 || state.Quantity != 0 || state.ItemId.Length != 0) InvalidSnapshot(state);
                     _lifetimeHud.Show(state);
+                    if (hasFeedback)
+                    {
+                        _visible = _showFeedback = true;
+                        _feedbackText = feedbackText;
+                        _textColor = _feedbackHud.TextColor;
+                    }
                     return;
                 }
                 if ((state.Mode != CombatPrototypeMapPickupHudMode.Ready && state.Mode != CombatPrototypeMapPickupHudMode.NoSpace) ||
@@ -60,6 +75,17 @@ namespace Code_01.CombatPrototype.Map
                         "  " + label + " ×" + state.Quantity.ToString(CultureInfo.InvariantCulture);
                 _state = state;
                 _visible = true;
+                if (state.Mode == CombatPrototypeMapPickupHudMode.NoSpace)
+                {
+                    if (hasFeedback && _feedbackHud.Result == CombatPrototypeMapPickupResult.NoSpace)
+                        _textColor = _feedbackHud.TextColor;
+                }
+                else if (hasFeedback)
+                {
+                    _showFeedback = true;
+                    _feedbackText = feedbackText;
+                    _textColor = _feedbackHud.TextColor;
+                }
             }
             catch (Exception exception)
             {
@@ -77,7 +103,9 @@ namespace Code_01.CombatPrototype.Map
 
         internal void Clear()
         {
-            _visible = false;
+            _visible = _showFeedback = false;
+            _feedbackText = string.Empty;
+            _textColor = Color.white;
             _lifetimeHud.Clear();
         }
 
@@ -85,6 +113,7 @@ namespace Code_01.CombatPrototype.Map
         {
             Clear();
             _lifetimeHud.Reset();
+            _feedbackHud.Reset();
             _settings = default;
             _state = CombatPrototypeMapPickupHudState.Hidden;
             _labelStyle = null;
@@ -114,7 +143,10 @@ namespace Code_01.CombatPrototype.Map
                 GUI.color = new Color(0f, 0f, 0f, 0.7f);
                 GUI.DrawTexture(panel, Texture2D.whiteTexture);
                 GUI.color = Color.white;
-                if (_lifetimeHud.Visible)
+                _labelStyle.normal.textColor = _textColor;
+                if (_showFeedback)
+                    GUI.Label(new Rect(panel.x + 12f, panel.y + 12f, panel.width - 24f, panel.height - 24f), _feedbackText, _labelStyle);
+                else if (_lifetimeHud.Visible)
                 {
                     var rowHeight = _settings.FontSize + 4f;
                     var top = panel.y + (panel.height - 2f * rowHeight - 8f) * 0.5f;
@@ -126,6 +158,7 @@ namespace Code_01.CombatPrototype.Map
             }
             finally
             {
+                _labelStyle.normal.textColor = Color.white;
                 GUI.matrix = oldMatrix;
                 GUI.color = oldColor;
             }

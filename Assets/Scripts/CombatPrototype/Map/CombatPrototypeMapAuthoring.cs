@@ -204,6 +204,18 @@ namespace Code_01.CombatPrototype.Map
                     SecondsLabel = new FixedString64Bytes(pickupHud.secondsLabel),
                     ExpiryWarningColor = CombatPrototypeMapInteractionHighlightSettings.ColorFromHex(pickupHud.expiryWarningColorHex)
                 });
+                var pickupFeedbackHud = config.map.pickupFeedbackHud;
+                AddComponent(entity, new CombatPrototypeMapPickupFeedbackHudSettings
+                {
+                    Enabled = (byte)(pickupFeedbackHud.enabled ? 1 : 0), FeedbackSeconds = pickupFeedbackHud.feedbackSeconds,
+                    SuccessColor = CombatPrototypeMapInteractionHighlightSettings.ColorFromHex(pickupFeedbackHud.successColorHex),
+                    FailureColor = CombatPrototypeMapInteractionHighlightSettings.ColorFromHex(pickupFeedbackHud.failureColorHex),
+                    SuccessLabel = new FixedString64Bytes(pickupFeedbackHud.successLabel),
+                    MovingLabel = new FixedString64Bytes(pickupFeedbackHud.movingLabel),
+                    AttackingLabel = new FixedString64Bytes(pickupFeedbackHud.attackingLabel),
+                    NoTargetLabel = new FixedString64Bytes(pickupFeedbackHud.noTargetLabel),
+                    FailedLabel = new FixedString64Bytes(pickupFeedbackHud.failedLabel)
+                });
                 var highlight = config.map.interactionHighlight;
                 AddComponent(entity, new CombatPrototypeMapInteractionHighlightSettings
                 {

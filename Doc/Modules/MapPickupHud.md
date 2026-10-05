@@ -21,7 +21,7 @@ v11/14阶段五个新脚本及meta、v17/20寿命接入两个普通助手及meta
 
 ## 【FACT】当前 JSON 契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为 schemaVersion=23/configRevision=26，pickupHud段及全部18字段必填，[interactionHighlight](MapInteractionHighlight.md)亦为必填地图段。沿原严格 UTF-8/缺失/未知/重复字段/类型和语义校验；旧 v1～v22 明确失败，不迁移、补默认段或回退来源。正常导入/烘焙后生效，没有运行热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为 schemaVersion=25/configRevision=28，pickupHud段及全部18字段必填，[interactionHighlight](MapInteractionHighlight.md)亦为必填地图段。沿原严格 UTF-8/缺失/未知/重复字段/类型和语义校验；旧 v1～v24 明确失败，不迁移、补默认段或回退来源。正常导入/烘焙后生效，没有运行热重载。
 
 | 字段 | 当前默认值 | 契约 |
 |---|---|---|
@@ -51,7 +51,7 @@ DropTargetSelector 沿原算法遍历 Landed 且未到期掉落，按本人 X/Z 
 
 PickupHudStateSystem 在服务端 PredictedSimulation、PlayerRespawn 后执行，读取本 tick 原掉落运动/拾取/到期处理后的状态及服务端模拟时间。每 tick 重建所属玩家显示帧，只有字段变化才写入；无目标、资格拒绝、G文字与G高亮均关闭、连接失效、未采样和系统停止时清为Hidden；采样条件为pickupHud.enabled或interactionHighlight.enabled且gTargetsEnabled。单个玩家采样异常记录地图、NetworkId、玩家、DropId、阶段和原异常，继续其他玩家，未形成有效帧者清空。必需组件/配置缺失明确暴露，不创建默认数据或替代服务。
 
-提示只写 PickupHudState；不修改 DropPhase/Quantity/进度、库存、Tools、奖励、资源预约、输入或存档，不控制运动、到期和释放。保存失败后的未到期目标仍可显示；提示不是保存成功标志，也没有新增拾取成功/失败反馈、动画或自动拾取。
+提示只写 PickupHudState；不修改 DropPhase/Quantity/进度、库存、Tools、奖励、资源预约、输入或存档，不控制运动、到期和释放。保存失败后的未到期目标仍可显示；目标提示不是保存成功标志；实际G结果由[拾取反馈](MapPickupFeedbackHud.md)独立投影到原面板，拾取动画和自动拾取未接入。
 
 ## 【FACT】所属 Ghost 快照
 
@@ -74,9 +74,9 @@ CombatPrototypeMapPickupHudState使用OwnerSendType=SendToOwner，六个GhostFie
 
 NoSpace第一行将Pick up替换为noSpaceLabel，保留原物品/实际数量与寿命第二行；Ready第一行继续显示“G  Pick up  物品文案 ×实际数量”，寿命开启时第二行显示“Expires in 120s”；真实余时≤30秒且预警开启时显示橙色“Expiring soon 30s”；ExpiresAt=0显示白色“Permanent”。服务端按当前目标的实际ExpiresAt减模拟时间、向上取整投影秒数，预警使用未取整余时；不从drops.lifetimeSeconds重新计算、不在客户端用墙钟递减。到期仍由原G选择/清理链处理，合法未到期物不提前显示0秒；保存恢复后显示原恢复期限，离线暂停规则保持。状态变化才写六字段，平稳同秒不因时间推进重复改快照；网络延迟可使文字滞后，实际到期/拾取以服务端为准。
 
-默认G为400×84、底距168、字号20；资源状态行400×52的底距由236改268，保持与G间隔16像素，F仍320×104/底48。两行各字号+4高、间隔8，整体垂直居中；寿命关闭沿单行G路径，默认配置高度仍84，可显式配置52并同步状态底距236。Hidden收起两行。沿1920×1080参考像素等比缩放、黑底alpha0.7、普通白字、内置GUI字体和Texture2D.whiteTexture、richText=false；只在父G面板的Repaint委托绘制，缓存稳定文案/样式并恢复GUI.matrix/color，不消费键鼠事件。
+默认G为400×84、底距168、字号20；资源状态行400×52的底距由236改268，保持与G间隔16像素，F仍320×104/底48。两行各字号+4高、间隔8，整体垂直居中；寿命关闭沿单行G路径，默认配置高度仍84，可显式配置52并同步状态底距236。Hidden收起原目标与寿命；有效[拾取反馈](MapPickupFeedbackHud.md)仍按其期限显示。沿1920×1080参考像素等比缩放、黑底alpha0.7、普通白字、内置GUI字体和Texture2D.whiteTexture、richText=false；只在父G面板的Repaint委托绘制，缓存稳定文案/样式并恢复GUI.matrix/color，不消费键鼠事件。
 
-pickupHud.enabled、interactionHud.enabled、inventoryPanel.enabled与interactionHighlight的主开关/F/G通道独立。关闭G文字仍可显示G高亮和实际拾取；关闭F HUD和背包面板仍可只显示G。三文字全关、无高亮通道且资源状态/存档HUD均关闭时原绑定收起，键盘原玩法继续。死亡/断线、无本地玩家或地图、玩家/地图源变化、World/Scene停止及释放沿原Clear/Reset清掉可见状态和缓存，不保留上一局目标。非法网络快照明确报错并保持 G 隐藏，不以默认标签伪装有效目标。
+pickupHud.enabled、interactionHud.enabled、inventoryPanel.enabled与interactionHighlight的主开关/F/G通道独立。关闭G文字仍可显示G高亮和实际拾取；关闭F HUD和背包面板仍可只显示G。三文字全关、无高亮通道且资源状态/存档HUD均关闭时原绑定收起，键盘原玩法继续。死亡/断线、无本地玩家或地图、玩家/地图源变化、World/Scene停止及释放沿原Clear/Reset清掉可见状态和缓存，不保留上一局目标。非法目标快照明确报错并保持G隐藏，不以默认标签伪装有效目标；非法[拾取结果](MapPickupFeedbackHud.md)只清结果通道，原有效目标/寿命保持。Clear逐帧隐藏，Reset清目标与新增结果观察/期限。
 
 ## 【KNOWN ISSUES】静态证据与人工边界
 
@@ -107,3 +107,7 @@ v17/revision20寿命链正常Unity编译无C# Error；实际Assembly与生成Ser
 ## 【FACT】容量等级接入边界
 
 [升级](MapInventoryCapacityUpgrade.md)：G采样按实际Level选择容量，NoSpace仍保留原目标与寿命；原六所属字段和目标/到期规则保持。新链静态及用户人工通过限v20/revision23升级十六项，未触发用例UNKNOWN；旧通过保持原版本/清单。
+
+## 【FACT】实际G结果的独立接入
+
+当前v25/revision28必填[拾取反馈](MapPickupFeedbackHud.md)九字段Settings，Player Baker另加Sequence/Result/ItemId/Quantity四字段SendToOwner；原六字段目标/寿命与服务端StateSystem、选择器保持。原G保存/库存/Consumed完整提交后才显示成功，实际拒绝或保存前失败显示原因；写入独立隔离，保存后部分提交异常沿原日志/UNKNOWN。原NoSpace目标优先并保留数量/寿命，有效新NoSpace窗口内该行标红；其他结果复用原面板单行，暂时隐藏目标/寿命，到期恢复当前快照，原G高亮继续使用实际DropId。关闭新显示/G文字及原全部显示退出、首次不重播/Reset沿原绑定，新开关不强制HUD。静态通过、人工待验收；旧G文字/寿命通过保持原版本/清单。

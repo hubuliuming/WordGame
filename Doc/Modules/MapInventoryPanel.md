@@ -19,7 +19,7 @@
 
 ## 【FACT】JSON 契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 当前一致为 schemaVersion=23/configRevision=26。必填 inventoryPanel 共30字段，沿原严格UTF-8、完整字段/类型及未知/重复键检查；即使关闭面板也校验全部字段。旧地图v1～v22明确失败，不补段/默认值或回退来源；正常导入/烘焙后生效，无运行热重载。Lv1配方/定义仍从gatherTools读取，当前级上限/倍率归[gatherToolUpgrade](MapGatherToolUpgrade.md)，面板不复制配置真值。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 当前一致为 schemaVersion=25/configRevision=28。必填 inventoryPanel 共30字段，沿原严格UTF-8、完整字段/类型及未知/重复键检查；即使关闭面板也校验全部字段。旧地图v1～v24明确失败，不补段/默认值或回退来源；正常导入/烘焙后生效，无运行热重载。Lv1配方/定义仍从gatherTools读取，当前级上限/倍率归[gatherToolUpgrade](MapGatherToolUpgrade.md)，面板不复制配置真值。
 
 | 字段 | 默认值 | 契约 |
 |---|---|---|
@@ -111,3 +111,7 @@ v14/17修理阶段的[工具修理](MapToolRepair.md)在制作区后追加11滚�
 ## 【FACT】耐久预警与剩余次数
 
 沿[gatherToolDurabilityHud](MapToolDurabilityHud.md)的只读两工具帧，状态行显示Low/Critical/Broken并单行着色；各工具下一行显示Uses及整除后的剩余次数，预警/损坏且修理开启提示3/4，损坏且关闭修理提示原1/2 Recraft at Lv1。缺少工具仍Not owned；新开关与gatherTools均开启才追加两滚动行，关闭新开关恢复旧损坏文字/白色且不追加行，工具关闭沿原Disabled。原380×640、字号18/行32、配方/修理/升级/丢弃/反馈及按钮资格保持；ToolLabel绘制后恢复GUI.color，详情行沿原白色。提示仅说明入口，不保证材料或服务器资格。Configure/Reset释放新帧；Durability/Level变化刷新且无跨帧DynamicBuffer。编译/配置/隔离Bake静态通过；用户确认预警人工通过限v22/revision25十六项，未触发的独立排版/字形/命中及生命周期分支仍UNKNOWN。
+
+## 【FACT】G拾取结果与B面板边界
+
+当前v25/revision28的[拾取反馈](MapPickupFeedbackHud.md)独立显示在原G面板，不进入B页脚或原displayFeedback；本面板列表、按钮、制作/修理/丢弃/升级请求及鼠标隔离保持。关闭本面板仍可显示G结果，G文字或新结果关闭隐藏新消息；原绑定全部显示关闭时仍退出，新开关不强制维持HUD。新四字段所属结果不修改本面板快照或输入19字段；新显示静态通过、人工待验收，旧B通过仍限原版本/清单。

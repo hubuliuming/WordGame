@@ -283,4 +283,8 @@ v13/16的[资源状态](MapResourceStatusHud.md)由Player Baker追加所属Mode/
 
 ## 【FACT】采集完成与中断所属快照
 
-原Player Baker为[采集结果](MapGatherOutcomeHud.md)追加Sequence(uint)=0、Kind(byte)=0、Result(byte枚举)=None三GhostField，SendToOwner；原启动失败二字段保持。实际结算/Cancel成功后向原Collector写最新结果，核实GhostOwner/NetworkId及存活，写入失败独立记录、不撤销业务。成功新F清旧结果；客户端初次不回放，原死亡/断线/绑定失效Reset清缓存。Player Ghost布局追加组件，各端须同版重新烘焙；输入19、Tools3、生命/体力/R、Prefab及v4存档字段保持。v24/revision27静态通过，人工待验收；原人工通过范围不扩大。
+原Player Baker为[采集结果](MapGatherOutcomeHud.md)追加Sequence(uint)=0、Kind(byte)=0、Result(byte枚举)=None三GhostField，SendToOwner；原启动失败二字段保持。实际结算/Cancel成功后向原Collector写最新结果，核实GhostOwner/NetworkId及存活，写入失败独立记录、不撤销业务。成功新F清旧结果；客户端初次不回放，原死亡/断线/绑定失效Reset清缓存。Player Ghost布局追加组件，各端须同版重新烘焙；输入19、Tools3、生命/体力/R、Prefab及v4存档字段保持。v24/revision27静态及用户人工通过，限十六项清单，未触发独立用例UNKNOWN；原通过范围保持。
+
+## 【FACT】实际G拾取的所属结果
+
+原Player Baker为[拾取反馈](MapPickupFeedbackHud.md)追加Sequence(uint)=0、Result(byte枚举)=None、ItemId(FixedString64Bytes)为空、Quantity(int)=0四GhostField，仅SendToOwner。成功携带原物品ID与本次正增量，其他结果空ItemId/0；写入核实GhostOwner/NetworkId与存活，归属错误/死亡不写新结果，错误独立隔离。客户端首次仅观察序号，死亡/断线/源或玩家失效Reset清缓存，只有最新结果无事件队列。Player Ghost布局追加组件，须各端同版重新烘焙；原输入19、Tools3、F4/G6/资源4/世界保存3/F失败2/F结果3、生命/体力/R、Prefab及玩家v4存档保持。v25/revision28静态通过、人工待验收；F完成/中断通过仍限v24/revision27十六项，旧通过保持原版本/清单。

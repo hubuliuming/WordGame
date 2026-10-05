@@ -17,7 +17,7 @@ namespace Code_01.CombatPrototype.Map
             {
                 map = new MapDefinitionConfig
                 {
-                    schemaVersion = 24, configRevision = 27,
+                    schemaVersion = 25, configRevision = 28,
                     mapDefinitionId = mapDefinitionId, defaultSeed = 12345,
                     resourcePersistence = new MapResourcePersistenceConfig
                     {
@@ -126,6 +126,12 @@ namespace Code_01.CombatPrototype.Map
                         enabled = true, panelWidthPixels = 320f, panelHeightPixels = 104f,
                         bottomMarginPixels = 48f, fontSize = 20, progressBarHeightPixels = 10f,
                         gatherLabel = "Gather Apple", treeLabel = "Chop Tree", mineLabel = "Mine Rock", noSpaceLabel = "Not enough space"
+                    },
+                    pickupFeedbackHud = new MapPickupFeedbackHudConfig
+                    {
+                        enabled = true, feedbackSeconds = 2f, successColorHex = "#6ED88A", failureColorHex = "#FF6B6B",
+                        successLabel = "Picked up", movingLabel = "Stop moving first", attackingLabel = "Finish attack first",
+                        noTargetLabel = "No available drop", failedLabel = "Pickup failed"
                     },
                     pickupHud = new MapPickupHudConfig
                     {

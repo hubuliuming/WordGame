@@ -116,6 +116,7 @@ namespace Code_01.CombatPrototype.Map
             DynamicBuffer<CombatPrototypeMapGatherToolUpgradeDefinition> toolUpgradeDefinitions,
             CombatPrototypeMapGatherToolDurabilityHudSettings durabilitySettings,
             CombatPrototypeMapInteractionFailureHudSettings failureSettings, CombatPrototypeMapGatherOutcomeHudSettings outcomeSettings,
+            CombatPrototypeMapPickupFeedbackHudSettings pickupFeedbackSettings,
             float treeDuration, float mineDuration, string mapId)
         {
             Reset();
@@ -138,7 +139,7 @@ namespace Code_01.CombatPrototype.Map
             _gatherOutcome.Configure(outcomeSettings, _noSpaceLabel, mapId);
             _durabilityHud.Configure(durabilitySettings, toolSettings, inventorySettings.NotOwnedLabel.ToString(), _recraftLabel);
             _inventoryPanel.Configure(inventorySettings, toolSettings, axe, pickaxe, dropSettings, dropDefinitions, capacity, capacityDefinitions, upgradeSettings, upgradeDefinitions, toolUpgradeSettings, toolUpgradeDefinitions, _durabilityHud.Enabled, treeDuration, mineDuration, mapId);
-            _pickupHud.Configure(pickupSettings);
+            _pickupHud.Configure(pickupSettings, pickupFeedbackSettings, mapId);
             _highlight.Configure(highlightSettings, mapId, _highlightCamera);
             _resourceStatus.Configure(resourceStatusSettings, settings, mapId);
             _repairFeedback.Configure(toolSettings, inventorySettings, axe, pickaxe, mapId);
@@ -151,13 +152,14 @@ namespace Code_01.CombatPrototype.Map
             CombatPrototypeMapInventoryCapacityUpgradeFeedback upgradeFeedback, CombatPrototypeMapToolUpgradeFeedback toolUpgradeFeedback,
             DynamicBuffer<CombatPrototypeInventoryItem> inventory,
             Entity source, Entity player, CombatPrototypeMapPickupHudState pickupState,
-            CombatPrototypeMapInteractionFailureFeedback failureFeedback, CombatPrototypeMapGatherOutcomeFeedback outcomeFeedback)
+            CombatPrototypeMapInteractionFailureFeedback failureFeedback, CombatPrototypeMapGatherOutcomeFeedback outcomeFeedback,
+            CombatPrototypeMapPickupFeedback pickupFeedback)
         {
             _textColor = Color.white;
             _toolTextColor = Color.white;
             _interactionFailure.Observe(failureFeedback);
             _gatherOutcome.Observe(outcomeFeedback);
-            _pickupHud.Show(pickupState);
+            _pickupHud.Show(pickupState, pickupFeedback);
             RefreshToolStatus(tools);
             ObserveFeedback(feedback);
             _repairFeedback.Observe(repairFeedback);

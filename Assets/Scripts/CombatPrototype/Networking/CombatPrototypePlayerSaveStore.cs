@@ -14,7 +14,7 @@ namespace Code_01.CombatPrototype.Networking
 {
     public static class CombatPrototypePlayerSaveStore
     {
-        public const int CurrentVersion = 2;
+        public const int CurrentVersion = 3;
         private static readonly UTF8Encoding WriteEncoding = new UTF8Encoding(false, true);
         private static readonly ProfilerMarker LoadMarker = new ProfilerMarker("CombatPrototype.PlayerSave.Load");
         private static readonly ProfilerMarker SaveMarker = new ProfilerMarker("CombatPrototype.PlayerSave.SavePrepared");
@@ -53,8 +53,8 @@ namespace Code_01.CombatPrototype.Networking
                     DuplicatePropertyNameHandling = DuplicatePropertyNameHandling.Error
                 });
                 var version = ReadInteger(root, "Version", 1, CurrentVersion);
-                if (root.Count != (version == 1 ? 5 : 6))
-                    throw new InvalidDataException("Save v1 requires five original fields; v2 additionally requires Tools.");
+                if (root.Count != (version == 1 ? 5 : version == 2 ? 6 : 7))
+                    throw new InvalidDataException("Save v1 requires five original fields; v2 adds Tools; v3 also requires InventoryCapacityLevel.");
                 var identity = root["PlayerId"];
                 if (identity == null || identity.Type != JTokenType.String ||
                     !string.Equals(identity.Value<string>(), playerId, StringComparison.Ordinal))
@@ -84,8 +84,9 @@ namespace Code_01.CombatPrototype.Networking
                         Quantity = ReadInteger(item, "Quantity", 1, int.MaxValue)
                     };
                 }
+                var capacityLevel = version == 3 ? ReadInteger(root, "InventoryCapacityLevel", 1, CombatPrototypeMapInventoryCapacityUtility.MaximumLevel) : 1;
                 var loadedTools = Array.Empty<CombatPrototypePlayerSaveTool>();
-                if (version == 2)
+                if (version >= 2)
                 {
                     if (!(root["Tools"] is JArray tools) || tools.Count > 2)
                         throw new InvalidDataException("Save Tools must be an array of at most two unique tools.");
@@ -114,14 +115,15 @@ namespace Code_01.CombatPrototype.Networking
                     Coin = coin,
                     Experience = experience,
                     Items = loadedItems,
-                    Tools = loadedTools
+                    Tools = loadedTools,
+                    InventoryCapacityLevel = capacityLevel
                 };
             }
         }
 
         public static CombatPrototypePlayerSaveData PrepareReward(FixedString64Bytes playerId,
             CombatPrototypePlayerReward reward, DynamicBuffer<CombatPrototypeInventoryItem> inventory,
-            DynamicBuffer<CombatPrototypeMapGatherTool> tools,
+            DynamicBuffer<CombatPrototypeMapGatherTool> tools, int inventoryCapacityLevel,
             int itemIndex, CombatPrototypeInventoryItem nextItem)
         {
             // This projection is the serialized candidate, not a second mutable ECS inventory.
@@ -141,13 +143,13 @@ namespace Code_01.CombatPrototype.Networking
                 Coin = reward.Coin,
                 Experience = reward.Experience,
                 Items = items,
-                Tools = ProjectTools(tools)
+                Tools = ProjectTools(tools), InventoryCapacityLevel = inventoryCapacityLevel
             };
         }
 
         public static CombatPrototypePlayerSaveData PrepareItemConsumption(FixedString64Bytes playerId,
             CombatPrototypePlayerReward reward, DynamicBuffer<CombatPrototypeInventoryItem> inventory,
-            DynamicBuffer<CombatPrototypeMapGatherTool> tools,
+            DynamicBuffer<CombatPrototypeMapGatherTool> tools, int inventoryCapacityLevel,
             int itemIndex, CombatPrototypeInventoryItem nextItem)
         {
             var removeItem = nextItem.Quantity == 0;
@@ -171,13 +173,13 @@ namespace Code_01.CombatPrototype.Networking
                 Coin = reward.Coin,
                 Experience = reward.Experience,
                 Items = items,
-                Tools = ProjectTools(tools)
+                Tools = ProjectTools(tools), InventoryCapacityLevel = inventoryCapacityLevel
             };
         }
 
         public static CombatPrototypePlayerSaveData PrepareToolCraft(FixedString64Bytes playerId,
             CombatPrototypePlayerReward reward, DynamicBuffer<CombatPrototypeInventoryItem> inventory,
-            DynamicBuffer<CombatPrototypeMapGatherTool> tools, int woodIndex, int nextWood,
+            DynamicBuffer<CombatPrototypeMapGatherTool> tools, int inventoryCapacityLevel, int woodIndex, int nextWood,
             int stoneIndex, int nextStone, int toolIndex, CombatPrototypeMapGatherTool nextTool)
         {
             var count = inventory.Length - (woodIndex >= 0 && nextWood == 0 ? 1 : 0) -
@@ -195,13 +197,13 @@ namespace Code_01.CombatPrototype.Networking
             return new CombatPrototypePlayerSaveData
             {
                 Version = CurrentVersion, PlayerId = playerId.ToString(), Coin = reward.Coin, Experience = reward.Experience,
-                Items = items, Tools = ProjectTools(tools, toolIndex, nextTool)
+                Items = items, Tools = ProjectTools(tools, toolIndex, nextTool), InventoryCapacityLevel = inventoryCapacityLevel
             };
         }
 
         public static CombatPrototypePlayerSaveData PrepareToolUse(FixedString64Bytes playerId,
             CombatPrototypePlayerReward reward, DynamicBuffer<CombatPrototypeInventoryItem> inventory,
-            DynamicBuffer<CombatPrototypeMapGatherTool> tools, int toolIndex, CombatPrototypeMapGatherTool nextTool)
+            DynamicBuffer<CombatPrototypeMapGatherTool> tools, int inventoryCapacityLevel, int toolIndex, CombatPrototypeMapGatherTool nextTool)
         {
             var items = new CombatPrototypePlayerSaveItem[inventory.Length];
             for (var index = 0; index < inventory.Length; index++)
@@ -212,7 +214,31 @@ namespace Code_01.CombatPrototype.Networking
             return new CombatPrototypePlayerSaveData
             {
                 Version = CurrentVersion, PlayerId = playerId.ToString(), Coin = reward.Coin, Experience = reward.Experience,
-                Items = items, Tools = ProjectTools(tools, toolIndex, nextTool)
+                Items = items, Tools = ProjectTools(tools, toolIndex, nextTool), InventoryCapacityLevel = inventoryCapacityLevel
+            };
+        }
+
+        public static CombatPrototypePlayerSaveData PrepareCapacityUpgrade(FixedString64Bytes playerId,
+            CombatPrototypePlayerReward reward, DynamicBuffer<CombatPrototypeInventoryItem> inventory,
+            DynamicBuffer<CombatPrototypeMapGatherTool> tools, int woodIndex, int nextWood,
+            int stoneIndex, int nextStone, int nextLevel)
+        {
+            var count = inventory.Length - (woodIndex >= 0 && nextWood == 0 ? 1 : 0) -
+                        (stoneIndex >= 0 && nextStone == 0 ? 1 : 0);
+            var items = new CombatPrototypePlayerSaveItem[count];
+            var targetIndex = 0;
+            for (var index = 0; index < inventory.Length; index++)
+            {
+                var item = inventory[index];
+                if (index == woodIndex) item.Quantity = nextWood;
+                if (index == stoneIndex) item.Quantity = nextStone;
+                if (item.Quantity == 0) continue;
+                items[targetIndex++] = new CombatPrototypePlayerSaveItem { ItemName = item.ItemName.ToString(), Quantity = item.Quantity };
+            }
+            return new CombatPrototypePlayerSaveData
+            {
+                Version = CurrentVersion, PlayerId = playerId.ToString(), Coin = reward.Coin, Experience = reward.Experience,
+                Items = items, Tools = ProjectTools(tools), InventoryCapacityLevel = nextLevel
             };
         }
 
@@ -267,7 +293,7 @@ namespace Code_01.CombatPrototype.Networking
                 Coin = 0,
                 Experience = 0,
                 Items = Array.Empty<CombatPrototypePlayerSaveItem>(),
-                Tools = Array.Empty<CombatPrototypePlayerSaveTool>()
+                Tools = Array.Empty<CombatPrototypePlayerSaveTool>(), InventoryCapacityLevel = 1
             };
         }
 

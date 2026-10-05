@@ -17,7 +17,7 @@ namespace Code_01.CombatPrototype.Map
             {
                 map = new MapDefinitionConfig
                 {
-                    schemaVersion = 19, configRevision = 22,
+                    schemaVersion = 20, configRevision = 23,
                     mapDefinitionId = mapDefinitionId, defaultSeed = 12345,
                     resourcePersistence = new MapResourcePersistenceConfig
                     {
@@ -159,6 +159,35 @@ namespace Code_01.CombatPrototype.Map
                             new MapInventoryCapacityItemConfig { itemId = CombatPrototypeMapYieldItemResolver.VitalityAppleId, maxQuantity = 200 },
                             new MapInventoryCapacityItemConfig { itemId = CombatPrototypeMapYieldItemResolver.WoodId, maxQuantity = 200 },
                             new MapInventoryCapacityItemConfig { itemId = CombatPrototypeMapYieldItemResolver.StoneId, maxQuantity = 200 }
+                        }
+                    },
+                    inventoryCapacityUpgrade = new MapInventoryCapacityUpgradeConfig
+                    {
+                        enabled = true, feedbackSeconds = 2f, upgradeLabel = "Backpack upgrade", upgradeButtonLabel = "Upgrade",
+                        levelLabel = "Lv", maxLevelLabel = "Max level", successLabel = "Backpack upgraded",
+                        rejectedLabel = "Upgrade rejected", failureLabel = "Upgrade failed",
+                        levels = new[]
+                        {
+                            new MapInventoryCapacityUpgradeLevelConfig
+                            {
+                                level = 2, maxTotalQuantity = 450, woodQuantity = 20, stoneQuantity = 10,
+                                items = new[]
+                                {
+                                    new MapInventoryCapacityItemConfig { itemId = "vitality_apple", maxQuantity = 300 },
+                                    new MapInventoryCapacityItemConfig { itemId = "wood", maxQuantity = 300 },
+                                    new MapInventoryCapacityItemConfig { itemId = "stone", maxQuantity = 300 }
+                                }
+                            },
+                            new MapInventoryCapacityUpgradeLevelConfig
+                            {
+                                level = 3, maxTotalQuantity = 600, woodQuantity = 40, stoneQuantity = 20,
+                                items = new[]
+                                {
+                                    new MapInventoryCapacityItemConfig { itemId = "vitality_apple", maxQuantity = 400 },
+                                    new MapInventoryCapacityItemConfig { itemId = "wood", maxQuantity = 400 },
+                                    new MapInventoryCapacityItemConfig { itemId = "stone", maxQuantity = 400 }
+                                }
+                            }
                         }
                     },
                     inventoryDrop = new MapInventoryDropConfig

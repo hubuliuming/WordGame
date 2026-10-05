@@ -23,7 +23,7 @@
 
 ## 【FACT】JSON 契约与当前默认值
 
-当前两份地图定义与 BuiltIn 均为 schemaVersion=19、configRevision=22，treeHarvest 段及全部字段必填。树木基础配置仍为2米/徒手2秒/wood×3；[斧头](MapGatherTools.md)可用时1.5秒，再生复用 objects.tree_normal 的 true/600 秒；原空间、种子、树木/采集物密度、出生及 movement/drops/grounds 数值保持。新增 mining 段与生态矿点字段归[采矿](MapMining.md)，树木规则独立。配置在 SubScene 烘焙时读取，Json 失败不回退 BuiltIn，不支持热重载或新的联网配置校验协议。
+当前两份地图定义与 BuiltIn 均为 schemaVersion=20、configRevision=23，treeHarvest 段及全部字段必填。树木基础配置仍为2米/徒手2秒/wood×3；[斧头](MapGatherTools.md)可用时1.5秒，再生复用 objects.tree_normal 的 true/600 秒；原空间、种子、树木/采集物密度、出生及 movement/drops/grounds 数值保持。新增 mining 段与生态矿点字段归[采矿](MapMining.md)，树木规则独立。配置在 SubScene 烘焙时读取，Json 失败不回退 BuiltIn，不支持热重载或新的联网配置校验协议。
 
 | 字段 | 当前默认值 | 校验与作用 |
 |---|---|---|
@@ -81,7 +81,7 @@ TreeObstacle 在 Client/Server 预测组、玩家与敌人移动之前执行，�
 
 MapMovementUtility 跳过 Disabled 记录，玩家预测与服务端敌人继续复用原扫掠/滑动算法。TreeRender 在客户端 Presentation、EntitiesGraphics 前按 Felled 禁用 MaterialMeshInfo；树木没有物理倒伏、Collider、Rigidbody、树桩、Animator 或砍伐动画。
 
-[资源存档](MapResourcePersistence.md)开启时恢复砍倒状态/剩余秒数并重建本局阻挡基态，关闭时按原布局Standing重置。工作进度、预约和全部旧历史不保存；未拾取木材归[掉落存档](MapDropPersistence.md)开关；已入包木材沿玩家v2存档恢复，读取v1迁移；原F采集物600秒再生保持，全部保存候选保留Tools。
+[资源存档](MapResourcePersistence.md)开启时恢复砍倒状态/剩余秒数并重建本局阻挡基态，关闭时按原布局Standing重置。工作进度、预约和全部旧历史不保存；未拾取木材归[掉落存档](MapDropPersistence.md)开关；已入包木材沿玩家v3恢复，合法v1/v2内存迁移Lv1；原F采集物600秒再生保持，全部保存候选保留Tools与Level。
 
 ## 【FACT】资源与 Editor 边界
 
@@ -112,7 +112,7 @@ Tools/CombatPrototype/地图 下“生成第七阶段砍伐资源”预检原目
 
 v9/revision12阶段的[材料面板](MapInventoryPanel.md)只展示木材库存/斧头耐久和原配方，按钮沿原制作链；砍伐/木材/阻挡/再生逻辑保持，用户确认面板人工通过限[运行入口](Runtime.md)v9/revision12十二项，未触发的独立显示/输入失败仍UNKNOWN。
 
-当前地图v19/22必填[背包丢弃](MapInventoryDrop.md)，复用原掉落资源及保存链；本专题原交互/工具/产出/再生行为保持。新增丢弃静态及用户人工通过限[运行入口](Runtime.md)v10/13十二项，未触发用例UNKNOWN；旧通过仍限原版本/清单。
+当前地图v20/23必填[背包丢弃](MapInventoryDrop.md)，复用原掉落资源及保存链；本专题原交互/工具/产出/再生行为保持。新增丢弃静态及用户人工通过限[运行入口](Runtime.md)v10/13十二项，未触发用例UNKNOWN；旧通过仍限原版本/清单。
 
 v11/14阶段的[G提示](MapPickupHud.md)只读共用掉落目标，与原F目标/工具进度独立；不修改本专题资源状态、产出、工具耐久、再生或保存。新显示编译/十次隔离烘焙静态通过；用户确认人工通过限v11/14十项，未触发用例UNKNOWN，旧用户通过保持各自版本/清单。
 
@@ -120,8 +120,8 @@ v12/15的[高亮](MapInteractionHighlight.md)按原Kind/PlacementIndex解析树�
 
 v13/16的[资源状态](MapResourceStatusHud.md)只读Standing/Chopping/Felled与原服务端RegrowAt；到期仍Felled显示等待再生，不由倒计时恢复树木或推断占位原因。无新树桩/世界标记、期限写盘或资源Ghost字段；原砍伐/掉落/占位/阻挡历史保持。新显示静态及用户人工通过，限v13/16十项，未触发用例UNKNOWN，旧通过保持原范围。
 
-当前v19/22的[工具修理](MapToolRepair.md)：Busy期间拒绝修理；原已锁定斧头、ActualDuration/FinishAt、成功扣耐久、地面wood×3、600秒再生/占位/阻挡与保存链保持。新链静态及用户人工通过，限v14/17十二项，未触发用例UNKNOWN，旧树木用户通过保持原版本/清单。
+当前v20/23的[工具修理](MapToolRepair.md)：Busy期间拒绝修理；原已锁定斧头、ActualDuration/FinishAt、成功扣耐久、地面wood×3、600秒再生/占位/阻挡与保存链保持。新链静态及用户人工通过，限v14/17十二项，未触发用例UNKNOWN，旧树木用户通过保持原版本/清单。
 
 寿命提示v17/20归[G提示](MapPickupHud.md)：所属G六字段，原目标/拾取/期限/保存保持；静态及用户人工通过限十二项，未触发独立用例UNKNOWN；旧用户通过仍限原版本/清单。
 
-地图v18/21的[F5/保存提示](MapWorldSaveHud.md)已接入：当前16输入、新增所属3字段；原F/G、工具及世界/玩家存档格式保持。静态及用户人工通过限v18/revision21十二项，未触发独立用例UNKNOWN；旧通过限原版本/清单。
+地图v18/21的[F5/保存提示](MapWorldSaveHud.md)已接入：当前17输入、新增所属3字段；原F/G、工具及世界/玩家存档格式保持。静态及用户人工通过限v18/revision21十二项，未触发独立用例UNKNOWN；旧通过限原版本/清单。

@@ -24,6 +24,7 @@ namespace Code_01.CombatPrototype.Map
         public MapWorldSaveHudConfig worldSaveHud;
         public MapInventoryPanelConfig inventoryPanel;
         public MapInventoryCapacityConfig inventoryCapacity;
+        public MapInventoryCapacityUpgradeConfig inventoryCapacityUpgrade;
         public MapInventoryDropConfig inventoryDrop;
         public MapPopulationConfig population;
         public MapSpawnConfig spawn;

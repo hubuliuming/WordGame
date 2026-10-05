@@ -141,6 +141,7 @@ namespace Code_01.CombatPrototype.Networking
                     var tools = ecb.SetBuffer<CombatPrototypeMapGatherTool>(createdPlayer);
                     tools.EnsureCapacity(restoredTools.Length);
                     foreach (var tool in restoredTools) tools.Add(tool);
+                    ecb.SetComponent(createdPlayer, new CombatPrototypeMapInventoryCapacityLevel { Level = data.InventoryCapacityLevel });
                     ecb.SetComponent(createdPlayer, new GhostOwner { NetworkId = networkId });
                     ecb.SetComponent(createdPlayer, new AutoCommandTarget { Enabled = true });
                     ecb.SetComponent(createdPlayer, LocalTransform.FromPosition(CombatPrototypeMapSpawnUtility.PlayerPosition(map, networkId)));

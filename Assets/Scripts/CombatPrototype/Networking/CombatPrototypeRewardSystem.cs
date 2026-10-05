@@ -1,3 +1,4 @@
+using Code_01.CombatPrototype.Map;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.NetCode;
@@ -92,7 +93,7 @@ namespace Code_01.CombatPrototype.Networking
                             inventory.EnsureCapacity(checked(inventory.Length + 1));
 
                         var tools = ownedTools[player];
-                        var candidate = CombatPrototypePlayerSaveStore.PrepareReward(playerId, next, inventory, tools, itemIndex, nextItem);
+                        var candidate = CombatPrototypePlayerSaveStore.PrepareReward(playerId, next, inventory, tools, SystemAPI.GetComponent<CombatPrototypeMapInventoryCapacityLevel>(player).Level, itemIndex, nextItem);
                         CombatPrototypePlayerSaveStore.SavePrepared(candidate);
 
                         // No structural changes or allocations occur between these writes.

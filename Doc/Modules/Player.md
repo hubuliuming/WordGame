@@ -255,11 +255,11 @@ v12/15的[高亮](MapInteractionHighlight.md)沿原本地所属存活玩家/Conn
 
 v13/16的[资源状态](MapResourceStatusHud.md)由Player Baker追加所属Mode/Kind/PlacementIndex/RemainingSeconds四字段，初始Hidden/0/-1/0；原13输入、F/G各四字段、生命/体力/工具/存档保持。仅Connected/InGame、所有权匹配、启用Simulate且存活者获得状态，死亡/断线与World/Scene变化清显示。新布局/编译/烘焙静态及用户人工通过，限v13/16十项，未触发用例UNKNOWN，旧通过保持原范围。
 
-当前v19/22的[工具修理](MapToolRepair.md)：Player Baker追加零修理反馈Sequence/Kind/Result，仅SendToOwner；修理阶段新增RepairAxe/RepairPickaxe；当前含SaveWorld共16输入字段。复用原所属资格/唯一Tools与v2保存，生命/体力/R及资源显示快照保持；各端同版重新烘焙。新链静态及用户人工通过，限v14/17十二项，未触发用例UNKNOWN，旧玩家用户通过保持原版本/清单。
+当前v20/23的[工具修理](MapToolRepair.md)：Player Baker追加零修理反馈Sequence/Kind/Result，仅SendToOwner；修理阶段新增RepairAxe/RepairPickaxe；当前含SaveWorld/UpgradeInventoryCapacity共17输入字段。复用原所属资格/唯一Tools，玩家v3保存携带等级，生命/体力/R及资源显示快照保持；各端同版重新烘焙。新链静态及用户人工通过，限v14/17十二项，未触发用例UNKNOWN，旧玩家用户通过保持原版本/清单。
 
 ## 【FACT】地图资源存档接入边界
 
-地图资源恢复为Pending时原准入等待，Failed时断开，Ready才沿原身份/玩家v2恢复；新门位于三类资源生成之后。原生命/体力/R与玩家保存保持，当前16输入及新增所属显示归[F5](MapWorldSaveHud.md)，完整边界归[资源存档](MapResourcePersistence.md)，资源存档人工通过限v15/18十二项，未触发用例UNKNOWN。 掉落恢复及同文件快照归[掉落存档](MapDropPersistence.md)，人工通过限v16/19十二项，未触发用例UNKNOWN。
+地图资源恢复为Pending时原准入等待，Failed时断开，Ready才沿原身份/玩家v3及合法v1/v2恢复；新门位于三类资源生成之后。原生命/体力/R与玩家保存保持，当前17输入及新增所属显示归[F5](MapWorldSaveHud.md)，完整边界归[资源存档](MapResourcePersistence.md)，资源存档人工通过限v15/18十二项，未触发用例UNKNOWN。 掉落恢复及同文件快照归[掉落存档](MapDropPersistence.md)，人工通过限v16/19十二项，未触发用例UNKNOWN。
 
 寿命提示v17/20归[G提示](MapPickupHud.md)：所属G六字段，原目标/拾取/期限/保存保持；静态及用户人工通过限十二项，未触发独立用例UNKNOWN；旧用户通过仍限原版本/清单。
 
@@ -267,4 +267,4 @@ v13/16的[资源状态](MapResourceStatusHud.md)由Player Baker追加所属Mode/
 
 ## 【FACT】材料容量与玩家恢复
 
-[容量](MapInventoryCapacity.md)复用原所属库存，玩家Prefab、16输入/原显示字段数及v2/v1存储保持。固定ID准入不按300/200拒绝合法旧库存；超限仅阻止受管材料新入包，原制作/修理/E/丢弃沿原资格继续。容量阶段编译/18次Bake静态通过，人工十六项UNKNOWN；旧玩家用户通过保持原版本/清单。
+[容量](MapInventoryCapacity.md)沿原所属库存与超限恢复规则，用户人工通过限v19/revision22十六项；[升级](MapInventoryCapacityUpgrade.md)由原Player Baker追加Level=1及Sequence0/ResultNone，三个新GhostField均SendToOwner，数字5事件使当前输入17。准入完整校验v3/合法v1/v2后恢复等级；死亡/R保留。Prefab/Animator结构、生命/体力/位置保持，旧九保存入口携带Level。新链编译/22次Bake静态通过，升级人工十六项UNKNOWN；旧通过仍限原版本/清单。

@@ -11,6 +11,7 @@ namespace Code_01.CombatPrototype.Networking
         public int Experience;
         public CombatPrototypePlayerSaveItem[] Items;
         public CombatPrototypePlayerSaveTool[] Tools;
+        public int InventoryCapacityLevel;
     }
 
     [Serializable]

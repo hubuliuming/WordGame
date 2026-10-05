@@ -251,7 +251,8 @@ namespace Code_01.CombatPrototype.Map
                     var identity = EntityManager.GetComponentData<CombatPrototypePlayerIdentity>(player.Entity).PlayerId;
                     var reward = EntityManager.GetComponentData<CombatPrototypePlayerReward>(player.Entity);
                     var inventory = EntityManager.GetBuffer<CombatPrototypeInventoryItem>(player.Entity, true);
-                    var candidate = CombatPrototypePlayerSaveStore.PrepareToolUse(identity, reward, inventory, tools, toolIndex, nextTool);
+                    var candidate = CombatPrototypePlayerSaveStore.PrepareToolUse(identity, reward, inventory, tools,
+                        EntityManager.GetComponentData<CombatPrototypeMapInventoryCapacityLevel>(player.Entity).Level, toolIndex, nextTool);
                     stage = "SaveDurability";
                     CombatPrototypePlayerSaveStore.SavePrepared(candidate);
                     durabilitySaved = true;

@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 19,
-  "configRevision": 22,
+  "schemaVersion": 20,
+  "configRevision": 23,
   "mapDefinitionId": "battle_forest_01",
   "defaultSeed": 12345,
   "resourcePersistence": {
@@ -213,9 +213,71 @@
     "enabled": true,
     "maxTotalQuantity": 300,
     "items": [
-      { "itemId": "vitality_apple", "maxQuantity": 200 },
-      { "itemId": "wood", "maxQuantity": 200 },
-      { "itemId": "stone", "maxQuantity": 200 }
+      {
+        "itemId": "vitality_apple",
+        "maxQuantity": 200
+      },
+      {
+        "itemId": "wood",
+        "maxQuantity": 200
+      },
+      {
+        "itemId": "stone",
+        "maxQuantity": 200
+      }
+    ]
+  },
+  "inventoryCapacityUpgrade": {
+    "enabled": true,
+    "feedbackSeconds": 2.0,
+    "upgradeLabel": "Backpack upgrade",
+    "upgradeButtonLabel": "Upgrade",
+    "levelLabel": "Lv",
+    "maxLevelLabel": "Max level",
+    "successLabel": "Backpack upgraded",
+    "rejectedLabel": "Upgrade rejected",
+    "failureLabel": "Upgrade failed",
+    "levels": [
+      {
+        "level": 2,
+        "maxTotalQuantity": 450,
+        "items": [
+          {
+            "itemId": "vitality_apple",
+            "maxQuantity": 300
+          },
+          {
+            "itemId": "wood",
+            "maxQuantity": 300
+          },
+          {
+            "itemId": "stone",
+            "maxQuantity": 300
+          }
+        ],
+        "woodQuantity": 20,
+        "stoneQuantity": 10
+      },
+      {
+        "level": 3,
+        "maxTotalQuantity": 600,
+        "items": [
+          {
+            "itemId": "vitality_apple",
+            "maxQuantity": 400
+          },
+          {
+            "itemId": "wood",
+            "maxQuantity": 400
+          },
+          {
+            "itemId": "stone",
+            "maxQuantity": 400
+          }
+        ],
+        "woodQuantity": 40,
+        "stoneQuantity": 20
+      }
     ]
   },
   "inventoryDrop": {

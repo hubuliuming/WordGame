@@ -759,3 +759,17 @@
 - F四字段追加NoSpace=3、G六字段追加NoSpace=2，保留目标/寿命，适配原高亮/资源状态；B追加总量滚动行/单种上限，显示关闭不关闭权威容量。16输入、保存所属3字段、资源/掉落Ghost、存档格式/路径与原Scene/Prefab/Animator及旧meta保持。
 - 正常Unity编译无C# Error；最终辅助方法、所属生成Snapshot4/6字段与SendToOwner已反射。Forest/Grassland各9种配置，共18次隔离Editor Bake：默认Json/BuiltIn、关闭容量、自定义上限/顺序/文案、F/G/B独立关闭及全显示关闭组合；新值/初值及旧参数符合，原区块/格子/布置/障碍/资源签名逐项保持。Bake Console前后[0,8,74]，无新增Bake警告；两条未修改PEListener/DOTween编译警告和六条既有运行警告按当时快照记录，末次反射Console[0,6,74]；临时World/Scene释放，主场景干净。
 - 已增量同步地图/背包/显示/数据/玩家等受影响文档、导航与策划模板，新增MapInventoryCapacity主专题及Runtime十六项人工清单；旧237项保留，合计253项。本阶段静态通过，人工GamePlayer UNKNOWN；旧用户通过保持原版本/清单。未执行逻辑单元测试、GamePlayer/PlayMode、游戏/显示系统/GUI回调、真实存档I/O、命令行构建、发布、性能/图片检查、子Agent或Git提交。
+
+
+## 2026-10-05 材料背包容量与拾取限制人工验收通过
+
+- 用户反馈“我已验收通过，接下来下一阶段”；主线程结合既有正常Unity编译、所属Snapshot/SendToOwner反射及18次隔离Editor Bake静态核对，判定本阶段通过，限CombatPrototypeNetCode、schemaVersion=19/configRevision=22及Runtime材料容量十六项清单。人工结论来自用户反馈，AI未运行GamePlayer/PlayMode。
+- 增量同步容量专题、Runtime、地图/背包/数据、导航与策划模板的验收状态；原253项编号/内容及旧阶段通过范围保持，模板F5通过版本校正为其已验收v18/revision21。未实际触发的独立边界/并发/保存失败、显示/字体/生命周期仍UNKNOWN，性能/平台及跨文件原子一致/意外ECS恢复不在通过范围。
+- 本次只更新验收文档，代码、JSON、Scene/SubScene/Prefab/Animator、meta/资源引用、包和构建配置保持。未执行逻辑单元测试、构建、发布、游戏/GUI回调、真实存档读写、性能采样或图片检查，未创建子Agent或提交Git。
+
+## 2026-10-05 背包容量扩展与升级
+
+- 按用户确认范围接入个人Lv1/2/3、B/数字5一次请求、完整配方先保存后扣料/提交及所属反馈；F/G/B按实际等级选容量，关闭升级保留已有上限。
+- 地图schema20/revision23新增必填inventoryCapacityUpgrade；玩家Version3新增InventoryCapacityLevel，合法v1/v2仅内存迁移Lv1，原九保存入口保留当前等级。六个普通脚本及Unity正常生成meta；原Scene/SubScene/Prefab/Animator、旧meta/资源/包/构建配置保持。
+- Unity编译0 Error，新输入17/生成所属Serializer与配置元数据核对、两地图共96份非法配置拒绝、22次隔离Editor Bake通过；原布局/签名保持，Bake Console[0,8,113]前后一致、主场景干净。
+- 同步容量升级专题、调用链文档、导航、运行清单及策划模板；旧253项逐字保留，新增16项后269项，升级人工GamePlayer UNKNOWN。AI未运行游戏/显示回调、PlayMode、逻辑单元测试、真实存档I/O、构建/发布、采样、图片、子Agent或Git提交。

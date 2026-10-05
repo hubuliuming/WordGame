@@ -21,7 +21,7 @@
 
 ## 【FACT】配置与文件
 
-Forest/Grassland Json与BuiltIn当前schemaVersion=19/configRevision=22。resourcePersistence六字段必填：enabled=true、saveSlotId=default_world、saveIntervalSeconds=10、saveGroundDrops=true、manualSaveEnabled=true及manualSaveCooldownSeconds=5；手动规则归[F5](MapWorldSaveHud.md)。saveGroundDrops严格布尔，旧地图v1～v18拒绝；关闭仍完整校验，正常导入/烘焙后生效，无热重载。Map Baker写七字段Settings：Enabled/SaveGroundDrops/SaveSlotId/SaveIntervalSeconds/LayoutSignature/ManualSaveEnabled/ManualSaveCooldownSeconds，恢复状态仍一字段Pending/Ready/Failed；当前输入16、Drop Ghost4、F4/G6/资源状态4及原反馈保持。
+Forest/Grassland Json与BuiltIn当前schemaVersion=20/configRevision=23。resourcePersistence六字段必填：enabled=true、saveSlotId=default_world、saveIntervalSeconds=10、saveGroundDrops=true、manualSaveEnabled=true及manualSaveCooldownSeconds=5；手动规则归[F5](MapWorldSaveHud.md)。saveGroundDrops严格布尔，旧地图v1～v19拒绝；关闭仍完整校验，正常导入/烘焙后生效，无热重载。Map Baker写七字段Settings：Enabled/SaveGroundDrops/SaveSlotId/SaveIntervalSeconds/LayoutSignature/ManualSaveEnabled/ManualSaveCooldownSeconds，恢复状态仍一字段Pending/Ready/Failed；当前输入17、Drop Ghost4、F4/G6/资源状态4及原反馈保持。
 
 两个开关同时开启才恢复/保存掉落。仅saveGroundDrops=false时，资源照常恢复，地面物沿旧规则重启清空；下一成功世界快照写Drops=[]/LastDropId=0，会替换旧地面快照。enabled=false时不读写任何世界档、保留原文件。drops.enabled只控制敌人新掉落，inventoryDrop.enabled只控制新丢弃，不决定已有地面物的持久化；关闭这两功能仍保留原绑定。
 
@@ -37,7 +37,7 @@ Forest/Grassland Json与BuiltIn当前schemaVersion=19/configRevision=22。resour
 
 每项恰含表中八字段。严格UTF-8支持BOM、写无BOM；缺失/未知/重复字段、错误类型、非有限值、不支持版本、错槽/地图/seed/资源签名、坏编号/物品/数量/位置/期限均整档失败，不跳过坏项或回退初始图/.tmp。开启恢复时各ItemId必须匹配当前inventoryDrop.items显式Prefab，核对原Prefab/GhostType/LocalTransform/DropState/DropProgress及Prepared初态；缺失/坏绑定明确失败，不查找或创建兜底资源。关闭新开关仍严格校验v2字段与物品白名单，但不要求被忽略掉落的运行绑定。
 
-合法世界v1严格读取原七根字段及原资源条目，保持耗尽/余时与签名校验；仅在内存补Drops=[]、LastDropId=0，读取不直接写盘。下一原状态变化/检查点/正常关闭保存写v2；不批量迁移、修正坏档或凭v1补造旧地面物。玩家文件仍沿原写v2/读v1迁移，格式/路径/Tools保持。
+合法世界v1严格读取原七根字段及原资源条目，保持耗尽/余时与签名校验；仅在内存补Drops=[]、LastDropId=0，读取不直接写盘。下一原状态变化/检查点/正常关闭保存写v2；不批量迁移、修正坏档或凭v1补造旧地面物。玩家文件写v3，合法v1/v2只在内存迁移Lv1，路径/Tools保持；原候选保留当前Level。
 
 ## 【CURRENT STRATEGY】快照与恢复
 
@@ -59,4 +59,4 @@ Restore仍在三类资源生成后、玩家准入前等待有效ServerTick。先
 
 寿命提示v17/20归[G提示](MapPickupHud.md)：所属G六字段，原目标/拾取/期限/保存保持；静态及用户人工通过限十二项，未触发独立用例UNKNOWN；旧用户通过仍限原版本/清单。
 
-地图v18/21的[F5/保存提示](MapWorldSaveHud.md)已接入：当前16输入、新增所属3字段；原F/G、工具及世界/玩家存档格式保持。静态及用户人工通过限v18/revision21十二项，未触发独立用例UNKNOWN；旧通过限原版本/清单。
+地图v18/21的[F5/保存提示](MapWorldSaveHud.md)已接入：当前17输入、新增所属3字段；原F/G、工具及世界/玩家存档格式保持。静态及用户人工通过限v18/revision21十二项，未触发独立用例UNKNOWN；旧通过限原版本/清单。

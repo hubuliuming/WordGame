@@ -33,6 +33,7 @@ namespace Code_01.CombatPrototype.Map
             public ComponentLookup<CombatPrototypePlayerReward> Rewards;
             public BufferLookup<CombatPrototypeInventoryItem> Inventories;
             public BufferLookup<CombatPrototypeMapGatherTool> Tools;
+            public ComponentLookup<CombatPrototypeMapInventoryCapacityLevel> CapacityLevels;
         }
 
         private EntityQuery _points;
@@ -53,6 +54,7 @@ namespace Code_01.CombatPrototype.Map
             var map = EntityManager.GetComponentData<CombatPrototypeMapData>(source);
             var capacity = EntityManager.GetComponentData<CombatPrototypeMapInventoryCapacitySettings>(source);
             var capacityDefinitions = EntityManager.GetBuffer<CombatPrototypeMapInventoryCapacityDefinition>(source, true);
+            var upgradeDefinitions = EntityManager.GetBuffer<CombatPrototypeMapInventoryCapacityUpgradeDefinition>(source, true);
             var time = SystemAPI.Time.ElapsedTime;
             using var points = _points.ToEntityArray(Allocator.Temp);
             var players = new NativeList<OnlinePlayer>(Allocator.Temp);
@@ -89,7 +91,8 @@ namespace Code_01.CombatPrototype.Map
                     Identities = SystemAPI.GetComponentLookup<CombatPrototypePlayerIdentity>(true),
                     Rewards = SystemAPI.GetComponentLookup<CombatPrototypePlayerReward>(true),
                     Inventories = SystemAPI.GetBufferLookup<CombatPrototypeInventoryItem>(),
-                    Tools = SystemAPI.GetBufferLookup<CombatPrototypeMapGatherTool>(true)
+                    Tools = SystemAPI.GetBufferLookup<CombatPrototypeMapGatherTool>(true),
+                    CapacityLevels = SystemAPI.GetComponentLookup<CombatPrototypeMapInventoryCapacityLevel>(true)
                 };
                 var states = SystemAPI.GetComponentLookup<CombatPrototypeMapGatherState>();
                 var progresses = SystemAPI.GetComponentLookup<CombatPrototypeMapGatherProgress>();
@@ -124,7 +127,7 @@ namespace Code_01.CombatPrototype.Map
                             continue;
                         }
                         if (time >= progress.ValueRO.FinishAt)
-                            Complete(current, progress, config, player, access, map.MapDefinitionId, point, time, capacity, capacityDefinitions);
+                            Complete(current, progress, config, player, access, map.MapDefinitionId, point, time, capacity, capacityDefinitions, upgradeDefinitions);
                     }
                     catch (Exception exception)
                     {
@@ -208,7 +211,8 @@ namespace Code_01.CombatPrototype.Map
         private static void Complete(RefRW<CombatPrototypeMapGatherState> state,
             RefRW<CombatPrototypeMapGatherProgress> progress, CombatPrototypeMapGatherConfig config,
             OnlinePlayer player, PlayerLookups access, FixedString64Bytes mapId, Entity point, double time,
-            CombatPrototypeMapInventoryCapacitySettings capacity, DynamicBuffer<CombatPrototypeMapInventoryCapacityDefinition> capacityDefinitions)
+            CombatPrototypeMapInventoryCapacitySettings capacity, DynamicBuffer<CombatPrototypeMapInventoryCapacityDefinition> capacityDefinitions,
+            DynamicBuffer<CombatPrototypeMapInventoryCapacityUpgradeDefinition> upgradeDefinitions)
         {
             var stage = "CheckCapacity";
             var placement = state.ValueRO.PlacementIndex;
@@ -218,6 +222,7 @@ namespace Code_01.CombatPrototype.Map
                 var reward = access.Rewards[player.Entity];
                 var inventory = access.Inventories[player.Entity];
                 var rejection = CombatPrototypeMapInventoryCapacityUtility.GetRejection(capacity, capacityDefinitions,
+                    upgradeDefinitions, access.CapacityLevels[player.Entity].Level,
                     inventory, config.YieldItemName, config.YieldQuantity);
                 if (rejection != null)
                 {
@@ -231,7 +236,8 @@ namespace Code_01.CombatPrototype.Map
                 var next = new CombatPrototypeInventoryItem { ItemName = config.YieldItemName, Quantity = config.YieldQuantity };
                 if (itemIndex >= 0) next.Quantity = checked(inventory[itemIndex].Quantity + config.YieldQuantity);
                 else inventory.EnsureCapacity(checked(inventory.Length + 1));
-                var candidate = CombatPrototypePlayerSaveStore.PrepareReward(playerId, reward, inventory, access.Tools[player.Entity], itemIndex, next);
+                var candidate = CombatPrototypePlayerSaveStore.PrepareReward(playerId, reward, inventory, access.Tools[player.Entity],
+                    access.CapacityLevels[player.Entity].Level, itemIndex, next);
                 var regrowAt = config.RegrowEnabled != 0 ? time + config.RegrowSeconds : 0d;
 
                 stage = "SavePrepared";

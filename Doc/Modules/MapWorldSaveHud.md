@@ -6,7 +6,7 @@
 
 | 文件 | 当前职责 |
 |---|---|
-| [输入](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypePlayerInput.cs) | 原所属输入增加SaveWorld，F5单次按下；当前共16字段 |
+| [输入](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypePlayerInput.cs) | 原所属输入增加SaveWorld，F5单次按下；当前共17字段 |
 | [Player Baker](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypePlayerNetCodeAuthoring.cs) | 追加世界保存所属显示状态，Hidden/0/None初值 |
 | [手动请求](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapWorldSaveManualRequests.cs) | 资格、全局冷却、同tick合并、本人结果序号与连接缓存释放 |
 | [原保存服务](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapResourceSaveSystem.cs) | 当前tick完整捕获、手动/原自动触发合并、真实写盘结果及会话状态 |
@@ -21,7 +21,7 @@
 
 ## 【FACT】配置与建议值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=19/configRevision=22。resourcePersistence由4变6字段，Settings由5变7，新增ManualSaveEnabled/ManualSaveCooldownSeconds；worldSaveHud段及16字段必填。原严格UTF-8、形状、缺失/未知/重复字段、标量类型和语义检查保持；旧地图v1～v18明确拒绝，不补默认或回退来源，关闭仍校验。正常导入/烘焙后生效。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=20/configRevision=23。resourcePersistence由4变6字段，Settings由5变7，新增ManualSaveEnabled/ManualSaveCooldownSeconds；worldSaveHud段及16字段必填。原严格UTF-8、形状、缺失/未知/重复字段、标量类型和语义检查保持；旧地图v1～v19明确拒绝，不补默认或回退来源，关闭仍校验。正常导入/烘焙后生效。
 
 | 字段 | 默认值 | 校验/行为 |
 |---|---|---|
@@ -75,3 +75,7 @@ worldSaveHud.enabled=false只关闭本显示，F5继续按服务端开关处理�
 烘焙Console前后均[2 Error,1 Warning,0 Log]，没有新增错误；2条为接入中提前刷新旧Forest配置缺manualSaveEnabled的历史烘焙错误，JSON补齐并升级后上述26次重新烘焙全部成功；1条为MCP WebSocket未初始化警告。AI未清Console，主场景干净，临时Scene/World/TextAsset释放。
 
 主线程代码/配置静态验收通过；用户已确认本阶段人工GamePlayer验收通过，主线程结合既有正常Unity编译、实际字段/序列化、26次隔离Editor烘焙与用户反馈判定通过，限CombatPrototypeNetCode、schemaVersion=18/configRevision=21及[运行入口](Runtime.md)十二项清单，人工结论来自用户反馈。原237项编号/内容及v17/20寿命等旧用户通过保持原版本/清单。未实际触发的独立资格/同tick/多Client/延迟/晚加入、捕获/保存/关闭失败、原子替换及恢复、显示/字形/布局/颜色和生命周期仍UNKNOWN；跨文件原子一致/防重复、意外ECS故障恢复、同槽并发与性能/带宽/平台/线上仍UNKNOWN。AI未运行真实玩家/世界存档读写、游戏/显示系统/GUI回调、GamePlayer/PlayMode、逻辑单元测试、命令行构建、发布、采样或图片检查，未创建子Agent或提交Git。
+
+## 【FACT】容量等级接入边界
+
+[升级](MapInventoryCapacityUpgrade.md)：当前17输入含数字5升级与F5世界保存，各入口沿自身资格；世界格式/原F5冷却保持，玩家v3等级保存由升级及原九入口处理。新链静态通过、人工UNKNOWN；旧通过保持原版本/清单。

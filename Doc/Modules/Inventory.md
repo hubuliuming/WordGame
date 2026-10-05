@@ -1,6 +1,6 @@
 # 背包展示与道具使用
 
-返回[导航](../AI_Understanding.md)。材料容量归[容量](MapInventoryCapacity.md)，其余背包/存档规则归下述专题。
+返回[导航](../AI_Understanding.md)。[容量](MapInventoryCapacity.md)已验收；[升级](MapInventoryCapacityUpgrade.md)人工UNKNOWN。
 
 ## 入口文件
 

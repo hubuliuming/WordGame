@@ -50,6 +50,8 @@ namespace Code_01.CombatPrototype.Networking
                 AddComponent<CombatPrototypeMapToolCraftFeedback>(entity);
                 AddComponent<CombatPrototypeMapToolRepairFeedback>(entity);
                 AddComponent<CombatPrototypeMapInventoryDropFeedback>(entity);
+                AddComponent(entity, new CombatPrototypeMapInventoryCapacityLevel { Level = 1 });
+                AddComponent<CombatPrototypeMapInventoryCapacityUpgradeFeedback>(entity);
                 AddComponent(entity, new CombatPrototypePlayerResource
                 {
                     CurrentPower = authoring.InitialPower,

@@ -43,6 +43,7 @@ namespace Code_01.CombatPrototype.Map
             var dropSettings = EntityManager.GetComponentData<CombatPrototypeMapDropSettings>(source);
             var capacity = EntityManager.GetComponentData<CombatPrototypeMapInventoryCapacitySettings>(source);
             var capacityDefinitions = EntityManager.GetBuffer<CombatPrototypeMapInventoryCapacityDefinition>(source, true);
+            var upgradeDefinitions = EntityManager.GetBuffer<CombatPrototypeMapInventoryCapacityUpgradeDefinition>(source, true);
             var time = SystemAPI.Time.ElapsedTime;
             using var drops = _drops.ToEntityArray(Allocator.Temp);
             var inputs = SystemAPI.GetComponentLookup<CombatPrototypePlayerInput>(true);
@@ -86,6 +87,7 @@ namespace Code_01.CombatPrototype.Map
                             };
                             stage = "CheckCapacity";
                             if (CombatPrototypeMapInventoryCapacityUtility.GetRejection(capacity, capacityDefinitions,
+                                upgradeDefinitions, EntityManager.GetComponentData<CombatPrototypeMapInventoryCapacityLevel>(player).Level,
                                 EntityManager.GetBuffer<CombatPrototypeInventoryItem>(player, true),
                                 CombatPrototypeMapInventoryCapacityUtility.RequireItemDefinition(capacityDefinitions, drop.ItemId).ItemName,
                                 drop.Quantity) != null)

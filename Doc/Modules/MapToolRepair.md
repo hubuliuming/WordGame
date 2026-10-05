@@ -21,7 +21,7 @@
 
 ## 【FACT】当前配置契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=19/configRevision=22。resourcePersistence/geometry/layout/movement/drops/treeHarvest/mining/gatherTools/interactionHud/pickupHud/interactionHighlight/resourceStatusHud/worldSaveHud/inventoryPanel/inventoryDrop/population/spawn均必填；新增字段沿原严格UTF-8、对象形状、缺失/未知/重复字段与标量类型校验。旧v1～v18明确拒绝，不迁移、补默认或回退来源；正常导入/烘焙后生效，无热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=20/configRevision=23。resourcePersistence/geometry/layout/movement/drops/treeHarvest/mining/gatherTools/interactionHud/pickupHud/interactionHighlight/resourceStatusHud/worldSaveHud/inventoryPanel/inventoryDrop/population/spawn均必填；新增字段沿原严格UTF-8、对象形状、缺失/未知/重复字段与标量类型校验。旧v1～v19明确拒绝，不迁移、补默认或回退来源；正常导入/烘焙后生效，无热重载。
 
 | 配置位置/字段 | 默认值 | 校验或行为 |
 |---|---|---|
@@ -57,7 +57,7 @@ CombatPrototypePlayerInput新增RepairAxe/RepairPickaxe两个InputEvent，共15�
 
 Result依次为None、Success、Disabled、NotOwned、AlreadyFull、InsufficientMaterials、Busy、ExistingOperationHasPriority、PlayerUnavailable、Failed。原工具缓冲仍唯一同步ToolId/Durability，原制作/丢弃反馈、F/资源状态各四字段及G六字段保持；无新RPC或协商协议。输入和玩家Ghost烘焙布局变化，各端必须同版代码/配置并重新烘焙。
 
-玩家存档仍写v2、读v1迁移，路径、UTF-8、原子文件替换与Tools[ToolId/Durability]契约保持；修理只保存原材料/工具字段，不保存反馈、面板或输入。重连/重启沿原加载恢复修理后的Tools，死亡/R不补满。
+玩家存档写v3、合法v1/v2内存迁移Lv1，路径、UTF-8、原子替换与Tools契约保持；修理候选保留实际Level，不保存反馈、面板或输入。重连/重启沿原加载恢复修理后的Tools，死亡/R不补满。
 
 ## 【CURRENT STRATEGY】面板、反馈与生命周期
 
@@ -77,8 +77,8 @@ Result依次为None、Success、Disabled、NotOwned、AlreadyFull、Insufficient
 
 ## 【FACT】地图资源存档接入边界
 
-当前地图另接[资源存档](MapResourcePersistence.md)，原修理先保存后扣料/耐久及所属结果保持，当前16输入的SaveWorld归[F5](MapWorldSaveHud.md)；世界档不保存Tools或修理反馈。修理用户通过限v14/17十二项，资源存档人工通过限v15/18十二项，未触发用例UNKNOWN。 掉落恢复及同文件快照归[掉落存档](MapDropPersistence.md)，人工通过限v16/19十二项，未触发用例UNKNOWN。
+当前地图另接[资源存档](MapResourcePersistence.md)，原修理先保存后扣料/耐久及所属结果保持，当前17输入的SaveWorld归[F5](MapWorldSaveHud.md)；世界档不保存Tools或修理反馈。修理用户通过限v14/17十二项，资源存档人工通过限v15/18十二项，未触发用例UNKNOWN。 掉落恢复及同文件快照归[掉落存档](MapDropPersistence.md)，人工通过限v16/19十二项，未触发用例UNKNOWN。
 
 寿命提示v17/20归[G提示](MapPickupHud.md)：所属G六字段，原目标/拾取/期限/保存保持；静态及用户人工通过限十二项，未触发独立用例UNKNOWN；旧用户通过仍限原版本/清单。
 
-地图v18/21的[F5/保存提示](MapWorldSaveHud.md)已接入：当前16输入、新增所属3字段；原F/G、工具及世界/玩家存档格式保持。静态及用户人工通过限v18/revision21十二项，未触发独立用例UNKNOWN；旧通过限原版本/清单。
+地图v18/21的[F5/保存提示](MapWorldSaveHud.md)已接入：当前17输入、新增所属3字段；原F/G、工具及世界/玩家存档格式保持。静态及用户人工通过限v18/revision21十二项，未触发独立用例UNKNOWN；旧通过限原版本/清单。

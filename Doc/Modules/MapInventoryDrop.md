@@ -21,7 +21,7 @@
 
 ## 【FACT】JSON契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=19/configRevision=22。inventoryDrop全部字段必填，沿原严格UTF-8/缺失/未知/重复字段及类型检查；旧v1～v18明确失败，不补段或回退来源。disabled仍校验全部字段与资源绑定；正常导入/烘焙后生效，没有运行热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=20/configRevision=23。inventoryDrop全部字段必填，沿原严格UTF-8/缺失/未知/重复字段及类型检查；旧v1～v19明确失败，不补段或回退来源。disabled仍校验全部字段与资源绑定；正常导入/烘焙后生效，没有运行热重载。
 
 | 字段 | 默认值 | 契约 |
 |---|---|---|
@@ -53,7 +53,7 @@ InventoryDropSystem仅在ServerSimulation的PredictedSimulationSystemGroup执行
 
 服务端再校验启用开关、已配置物品、合法模式、All开关和实际库存。Single取当前配置数量；All取该项当前总量；缺项/非正或不足数量拒绝。同名重复条目、必需组件或服务缺失明确暴露错误，不创建兜底资源或修正库存。独立连接请求复制后逐项处理、记录阶段和原异常，一个失败不阻止其他请求。
 
-1. 用现有PrepareItemConsumption生成扣减后的完整v2候选，保留其余库存顺序、金币/经验和当前Tools。
+1. 用现有PrepareItemConsumption生成扣减后的完整v3候选，保留其余库存顺序、金币/经验、当前Tools与Level。
 2. 验证既有掉落Ghost/Transform/State/Progress及Prepared初值，经SpawnOwnedDrop创建并登记本次Prepared实例；地图定义先复制，避免批次中的结构变更使引用失效。
 3. Instantiate之后重新取得库存、掉落状态和本人反馈引用，再调用SavePrepared。
 4. 保存成功才写原库存缓冲（零数量移除），把本次状态改为Airborne并报告成功；提交阶段只有非结构性写入。
@@ -78,7 +78,7 @@ v12/15的[资源高亮](MapInteractionHighlight.md)只读取原F/G目标快照�
 
 v13/16的[资源状态](MapResourceStatusHud.md)新增玩家所属四字段，只读采集物/树/矿，不读取掉落到期或改Drop/All请求、反馈、保存/扣料。原13输入与F/G各四字段保持，玩家烘焙布局新增状态组件，各端须同版重新烘焙。新显示静态及用户人工通过，限v13/16十项，未触发用例UNKNOWN，旧通过保持原范围。
 
-当前v19/22的[修理](MapToolRepair.md)两个请求加入原HasPriorOperation：同tick有修理时Drop拒绝，即使修理被拒绝也不改为丢弃。RepairSystem位于Craft之后、Drop之前；原F/G/E/R/1/2互相规则、Drop/All事务、输入物品/模式及所属反馈保持，当前总输入16字段。新链静态及用户人工通过，限v14/17十二项，未触发用例UNKNOWN。
+当前v20/23的[修理](MapToolRepair.md)两个请求加入原HasPriorOperation：同tick有修理时Drop拒绝，即使修理被拒绝也不改为丢弃。RepairSystem位于Craft之后、Drop之前；原F/G/E/R/1/2互相规则、Drop/All事务、输入物品/模式及所属反馈保持，当前总输入17字段。新链静态及用户人工通过，限v14/17十二项，未触发用例UNKNOWN。
 
 ## 【FACT】地图资源存档接入边界
 
@@ -86,4 +86,8 @@ v13/16的[资源状态](MapResourceStatusHud.md)新增玩家所属四字段，�
 
 寿命提示v17/20归[G提示](MapPickupHud.md)：所属G六字段，原目标/拾取/期限/保存保持；静态及用户人工通过限十二项，未触发独立用例UNKNOWN；旧用户通过仍限原版本/清单。
 
-地图v18/21的[F5/保存提示](MapWorldSaveHud.md)已接入：当前16输入、新增所属3字段；原F/G、工具及世界/玩家存档格式保持。静态及用户人工通过限v18/revision21十二项，未触发独立用例UNKNOWN；旧通过限原版本/清单。
+地图v18/21的[F5/保存提示](MapWorldSaveHud.md)已接入：当前17输入、新增所属3字段；原F/G、工具及世界/玩家存档格式保持。静态及用户人工通过限v18/revision21十二项，未触发独立用例UNKNOWN；旧通过限原版本/清单。
+
+## 【FACT】容量等级接入边界
+
+[升级](MapInventoryCapacityUpgrade.md)：升级请求不改变原丢弃资格；同tick丢弃优先、升级拒绝，当前17输入，丢弃候选携带实际Level。新链静态通过、人工UNKNOWN；旧通过保持原版本/清单。

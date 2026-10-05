@@ -102,7 +102,8 @@ namespace Code_01.CombatPrototype.Map
             CombatPrototypeMapResourceStatusHudSettings resourceStatusSettings, CombatPrototypeMapWorldSaveHudSettings worldSaveSettings,
             CombatPrototypeMapResourcePersistenceSettings persistenceSettings,
             CombatPrototypeMapInventoryCapacitySettings capacity, DynamicBuffer<CombatPrototypeMapInventoryCapacityDefinition> capacityDefinitions,
-            string mapId)
+            CombatPrototypeMapInventoryCapacityUpgradeSettings upgradeSettings,
+            DynamicBuffer<CombatPrototypeMapInventoryCapacityUpgradeDefinition> upgradeDefinitions, string mapId)
         {
             Reset();
             _settings = settings;
@@ -115,7 +116,7 @@ namespace Code_01.CombatPrototype.Map
             _treeLabel = settings.TreeLabel.ToString();
             _mineLabel = settings.MineLabel.ToString();
             _noSpaceLabel = settings.NoSpaceLabel.ToString();
-            _inventoryPanel.Configure(inventorySettings, toolSettings, axe, pickaxe, dropSettings, dropDefinitions, capacity, capacityDefinitions);
+            _inventoryPanel.Configure(inventorySettings, toolSettings, axe, pickaxe, dropSettings, dropDefinitions, capacity, capacityDefinitions, upgradeSettings, upgradeDefinitions, mapId);
             _pickupHud.Configure(pickupSettings);
             _highlight.Configure(highlightSettings, mapId, _highlightCamera);
             _resourceStatus.Configure(resourceStatusSettings, settings, mapId);
@@ -125,7 +126,8 @@ namespace Code_01.CombatPrototype.Map
 
         internal void Show(CombatPrototypeMapInteractionHudState state, DynamicBuffer<CombatPrototypeMapGatherTool> tools,
             CombatPrototypeMapToolCraftFeedback feedback, CombatPrototypeMapToolRepairFeedback repairFeedback,
-            CombatPrototypeMapInventoryDropFeedback dropFeedback,
+            CombatPrototypeMapInventoryDropFeedback dropFeedback, int capacityLevel,
+            CombatPrototypeMapInventoryCapacityUpgradeFeedback upgradeFeedback,
             DynamicBuffer<CombatPrototypeInventoryItem> inventory,
             Entity source, Entity player, CombatPrototypeMapPickupHudState pickupState)
         {
@@ -140,7 +142,7 @@ namespace Code_01.CombatPrototype.Map
             var displayFeedback = hasRepairFeedback ? repairText : hasCraftFeedback ? _feedbackText : string.Empty;
             var feedbackKind = hasRepairFeedback ? _repairFeedback.Kind : _feedbackKind;
             _inventoryPanel.Show(inventory, _axeDurability, _pickaxeDurability,
-                displayFeedback, dropFeedback, source, player);
+                displayFeedback, dropFeedback, capacityLevel, upgradeFeedback, source, player);
             if (_settings.Enabled == 0) { _visible = false; return; }
             if (state.Mode == CombatPrototypeMapInteractionHudMode.Hidden)
             {
@@ -268,8 +270,8 @@ namespace Code_01.CombatPrototype.Map
         }
 
         internal bool ReadPanelInput(Keyboard keyboard, Mouse mouse, out bool craftAxe, out bool craftPickaxe, out bool repairAxe, out bool repairPickaxe,
-            out CombatPrototypeMapInventoryDropRequest dropRequest) =>
-            _inventoryPanel.ReadInput(keyboard, mouse, out craftAxe, out craftPickaxe, out repairAxe, out repairPickaxe, out dropRequest);
+            out CombatPrototypeMapInventoryDropRequest dropRequest, out bool upgrade) =>
+            _inventoryPanel.ReadInput(keyboard, mouse, out craftAxe, out craftPickaxe, out repairAxe, out repairPickaxe, out dropRequest, out upgrade);
 
         internal void Clear()
         {

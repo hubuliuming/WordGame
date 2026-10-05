@@ -12,6 +12,7 @@ namespace Code_01.CombatPrototype.Map
                 config.map.mining == null || config.map.gatherTools == null || config.map.gatherTools.tools == null ||
                 config.map.interactionHud == null || config.map.pickupHud == null || config.map.interactionHighlight == null || config.map.resourceStatusHud == null || config.map.inventoryPanel == null || config.map.inventoryDrop == null || config.map.inventoryDrop.items == null ||
                 config.map.worldSaveHud == null || config.map.inventoryCapacity == null || config.map.inventoryCapacity.items == null ||
+                config.map.inventoryCapacityUpgrade == null || config.map.inventoryCapacityUpgrade.levels == null ||
                 config.map.population == null || config.map.spawn == null ||
                 config.biomes == null || config.grounds == null || config.objects == null ||
                 config.map.biomeIds == null || config.map.biomeRegions == null)
@@ -46,10 +47,11 @@ namespace Code_01.CombatPrototype.Map
             ValidateWorldSaveHud(map.worldSaveHud, map.resourceStatusHud);
             ValidateInventoryPanel(map.inventoryPanel);
             ValidateInventoryCapacity(map.inventoryCapacity);
+            ValidateInventoryCapacityUpgrade(map.inventoryCapacityUpgrade, map.inventoryCapacity);
             ValidateInventoryDrop(map.inventoryDrop);
             Id(map.mapDefinitionId, "mapDefinitionId");
-            if (map.schemaVersion != 19 || map.configRevision < 1 || map.defaultSeed < 1)
-                throw new InvalidOperationException("Map requires schemaVersion=19, positive revision and seed.");
+            if (map.schemaVersion != 20 || map.configRevision < 1 || map.defaultSeed < 1)
+                throw new InvalidOperationException("Map requires schemaVersion=20, positive revision and seed.");
             var drops = map.drops;
             Id(drops.itemId, "drops.itemId");
             Id(drops.visualResourceKey, "drops.visualResourceKey");
@@ -388,6 +390,46 @@ namespace Code_01.CombatPrototype.Map
                 CombatPrototypeMapYieldItemResolver.Resolve(item.itemId);
                 if (item.maxQuantity <= 0)
                     throw new InvalidOperationException("inventoryCapacity.items.maxQuantity must be positive for " + item.itemId);
+            }
+        }
+
+        private static void ValidateInventoryCapacityUpgrade(MapInventoryCapacityUpgradeConfig upgrade, MapInventoryCapacityConfig capacity)
+        {
+            Positive(upgrade.feedbackSeconds, "inventoryCapacityUpgrade.feedbackSeconds");
+            HudLabel(upgrade.upgradeLabel, "inventoryCapacityUpgrade.upgradeLabel");
+            HudLabel(upgrade.upgradeButtonLabel, "inventoryCapacityUpgrade.upgradeButtonLabel");
+            HudLabel(upgrade.levelLabel, "inventoryCapacityUpgrade.levelLabel");
+            HudLabel(upgrade.maxLevelLabel, "inventoryCapacityUpgrade.maxLevelLabel");
+            HudLabel(upgrade.successLabel, "inventoryCapacityUpgrade.successLabel");
+            HudLabel(upgrade.rejectedLabel, "inventoryCapacityUpgrade.rejectedLabel");
+            HudLabel(upgrade.failureLabel, "inventoryCapacityUpgrade.failureLabel");
+            if (upgrade.levels.Length != 2)
+                throw new InvalidOperationException("inventoryCapacityUpgrade requires exactly levels 2 and 3.");
+            var levels = new HashSet<int>();
+            foreach (var level in upgrade.levels)
+                if (level == null || level.level < 2 || level.level > 3 || !levels.Add(level.level) || level.items == null)
+                    throw new InvalidOperationException("inventoryCapacityUpgrade requires unique nonnull levels 2 and 3 with items.");
+            var previousTotal = capacity.maxTotalQuantity;
+            var previousItems = capacity.items;
+            for (var number = 2; number <= 3; number++)
+            {
+                MapInventoryCapacityUpgradeLevelConfig level = null;
+                foreach (var entry in upgrade.levels) if (entry.level == number) { level = entry; break; }
+                if (level == null) throw new InvalidOperationException("Missing capacity upgrade level=" + number);
+                if (level.maxTotalQuantity <= previousTotal || level.woodQuantity <= 0 || level.stoneQuantity <= 0 || level.items.Length != 3)
+                    throw new InvalidOperationException("Capacity upgrade level=" + number + " requires increasing total, positive wood/stone and exactly three materials.");
+                var ids = new HashSet<string>(StringComparer.Ordinal);
+                foreach (var item in level.items)
+                {
+                    if (item == null) throw new InvalidOperationException("Null capacity upgrade material at level=" + number);
+                    Unique(ids, item.itemId, "inventoryCapacityUpgrade.levels.items.itemId");
+                    CombatPrototypeMapYieldItemResolver.Resolve(item.itemId);
+                    foreach (var previous in previousItems)
+                        if (previous.itemId == item.itemId && item.maxQuantity <= previous.maxQuantity)
+                            throw new InvalidOperationException("Capacity upgrade material must increase; level=" + number + ", item=" + item.itemId);
+                }
+                previousTotal = level.maxTotalQuantity;
+                previousItems = level.items;
             }
         }
 

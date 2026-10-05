@@ -16,11 +16,11 @@
 | [材料面板](MapInventoryPanel.md) / [F 提示](MapInteractionHud.md) / [G 提示](MapPickupHud.md) | 只读容量投影、总量/单种上限与空间不足提示 |
 | [目标高亮](MapInteractionHighlight.md) / [资源状态](MapResourceStatusHud.md) | 兼容 NoSpace，继续识别原目标与可用资源状态 |
 
-新增四个普通 C# 脚本及其 Unity 正常导入生成的 meta。没有新增 MonoBehaviour 挂载或可变背包；Scene/SubScene、Prefab、Animator、旧 meta、资源引用、包与构建设置保持。正式 Map 的 QFramework 背包/99 拆格仍属原链。
+容量v19阶段接入四个普通 C# 脚本及正常导入 meta；等级接入归[升级](MapInventoryCapacityUpgrade.md)。没有新增 MonoBehaviour 挂载或可变背包；Scene/SubScene、Prefab、Animator、旧 meta、资源引用、包与构建设置保持。正式 Map 的 QFramework 背包/99 拆格仍属原链。
 
 ## 【FACT】JSON 契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为 schemaVersion=19/configRevision=22。新增必填 inventoryCapacity：
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为 schemaVersion=20/configRevision=23。新增必填 inventoryCapacity：
 
 ```json
 "inventoryCapacity": {
@@ -45,7 +45,7 @@
 | pickupHud.noSpaceLabel | 新增必填 Not enough space；G 配置/Settings 各18字段 |
 | inventoryPanel.capacityLabel / unlimitedLabel | 新增必填 Capacity / Unlimited；面板配置/Settings 各30字段，其中22文案 |
 
-沿原严格 UTF-8、完整对象形状、字段/类型与未知/缺失/重复键校验；文案非空白、无控制字符、最多61个 UTF-8 字节。enabled=false 或显示关闭仍校验全部配置；旧地图 v1～v18 明确失败，没有补字段、来源回退或运行热重载。各端使用同版代码、配置并重新烘焙。
+沿原严格 UTF-8、完整对象形状、字段/类型与未知/缺失/重复键校验；文案非空白、无控制字符、最多61个 UTF-8 字节。enabled=false 或显示关闭仍校验全部配置；旧地图 v1～v19 明确失败，没有补字段、来源回退或运行热重载。各端使用同版代码、配置并重新烘焙。
 
 原地图根追加 CapacitySettings 的 Enabled(byte)/MaxTotalQuantity(int)，Definition 缓冲含 ItemId/ItemName(FixedString64Bytes)/MaxQuantity(int)，三条按原产出映射写入。配置通过正常 JSON/BuiltIn → 校验 → Map Baker 接入，不写玩家或世界档案。
 
@@ -55,7 +55,7 @@
 
 只允许整批接收或整批拒绝。剩余总容量2而最近目标 wood×3 时，拒绝本次 G；不部分接收、不修改该物数量、不自动选择较远的可装下目标。单种上限同样适用于实际整份产出。容量不足记录普通拒绝，原因分别为 InventoryAlreadyOverCapacity、MaterialTotalCapacityExceeded 或 MaterialItemCapacityExceeded。
 
-已有任一材料或总量超过当前配置上限时，全部受管材料的新入包均拒绝。固定 ID 加入/恢复不增加容量校验，不截断、不删除、不拒绝合法旧库存；已超限存档仍按原完整 v2 写入/合法 v1 读取迁移规则保存。降低配置上限并重新烘焙也按此规则处理。制作、修理、使用、Single/All 丢弃仍沿原资格与事务，容量不单独阻止这些操作；库存恢复到总量和所有单种均不超限后，新 F/G 可重新尝试。
+已有任一材料或总量超过当前配置上限时，全部受管材料的新入包均拒绝。固定 ID 加入/恢复不增加容量校验，不截断、不删除、不拒绝合法旧库存；已超限玩家档仍按完整 v3 写入/合法 v1/v2 内存迁移规则保存，等级保留。降低配置上限并重新烘焙也按此规则处理。制作、修理、使用、Single/All 丢弃仍沿原资格与事务，容量不单独阻止这些操作；库存恢复到总量和所有单种均不超限后，新 F/G 可重新尝试。
 
 ## 【CURRENT STRATEGY】服务端检查与提交顺序
 
@@ -73,11 +73,11 @@ F 原四字段保持，Mode(byte)在 Hidden=0/Ready=1/Working=2 后追加 NoSpac
 
 G 原六字段保持，Mode在 Hidden=0/Ready=1 后追加 NoSpace=2；保留 DropId/ItemId/Quantity 与实际寿命投影。第一行显示 G Not enough space 物品×数量，第二行继续原到期/预警/永久提示。空间不足不延长寿命、不改变寿命色或追加拾取成功反馈。
 
-NoSpace 的 F/G 圆环仍按原身份解析，分别沿 Ready 黄色与 G 蓝色；不换较远目标或依据客户端距离重选。资源状态优先识别原 F NoSpace 身份，并要求资源仍 Available；背包满不把植物标记为耗尽或占用。资源/工具/掉落 Ghost、资源状态四字段、保存所属三字段、16输入字段保持。
+NoSpace 的 F/G 圆环仍按原身份解析，分别沿 Ready 黄色与 G 蓝色；不换较远目标或依据客户端距离重选。资源状态优先识别原 F NoSpace 身份，并要求资源仍 Available；背包满不把植物标记为耗尽或占用。资源/工具/掉落 Ghost、资源状态四字段、保存所属三字段保持；当前17输入及等级/反馈归[升级](MapInventoryCapacityUpgrade.md)。
 
-B 材料标题下追加一行 Capacity 当前总量/300，受管材料行显示 Wood 120/200 等，未受管行保持原 x数量。关闭容量后总量行显示 当前总量/Unlimited，材料行沿原数量显示。原只读 Snapshot 缓存三种上限及稳定文字；非法条目仍逐项记录/跳过并禁用原按钮，不通过展示修正库存。增加一行滚动内容，原380×640、字号18/行高32、Drop/All/制作/修理与鼠标隔离保持。
+B 材料标题下显示 Capacity 当前总量/当前等级总上限，受管行显示数量/对应等级单种上限；Lv1为300/各200，Lv2为450/各300，Lv3为600/各400，未受管行保持原x数量。关闭容量后总量行显示 当前总量/Unlimited，材料行沿原数量显示。原只读 Snapshot 缓存等级与定义，上限在等级变化时刷新，即使数量未变也更新文字；非法条目仍逐项记录/跳过并禁用原按钮，不通过展示修正库存。增加一行滚动内容，原380×640、字号18/行高32、Drop/All/制作/修理与鼠标隔离保持。
 
-F/G/B 显示开关仍独立。无本地玩家、死亡、断线、玩家/地图源变化、World/Scene停止时沿原绑定清显示、投影和未提交按钮请求；没有新监听、客户端计时器或保存入口。提示仅代表最近所属快照，延迟或同 tick 其他入包可使显示与实际按键结果不同，服务端完成检查为准。
+F/G/B 显示开关仍独立。无本地玩家、死亡、断线、玩家/地图源变化、World/Scene停止时沿原绑定清显示、投影和未提交按钮请求；没有新监听、客户端计时器或保存入口。提示仅代表最近所属快照，延迟或同 tick 其他入包可使显示与实际按键结果不同，服务端完成检查为准。F预约/完成、G及F/G采样均读取个人CapacityLevel；升级关闭保留已有等级上限，容量关闭显示Unlimited并禁用付费升级，永久等级仍保留。
 
 ## 【KNOWN ISSUES】静态核对与人工边界
 
@@ -85,6 +85,6 @@ F/G/B 显示开关仍独立。无本地玩家、死亡、断线、玩家/地图�
 
 与本阶段修改前快照比较，所有区块/格子/装饰位置朝向/障碍与资源布局签名保持，默认森林/草原矿点20/18、树木89/53、采集点36/38、阻挡109/71保持。Bake Console前后均[0 Error,8 Warning,74 Log]，无新增Bake警告；当时含六条既有运行警告和未修改PEListener/DOTween的两条编译警告，末次元数据核对Console为[0,6,74]。主场景干净，临时World/Scene已释放。
 
-主线程静态验收通过；本阶段人工 GamePlayer 尚未执行，结果 UNKNOWN，范围为[运行入口](Runtime.md)材料容量十六项清单及 v19/revision22。旧 v18/revision21 的 F5/保存提示用户通过与其余历史237项保持各自版本/清单，不扩展为容量通过。精确容量/整批/同 tick/G并发采集中满包、旧超限恢复、异常库存/保存失败、多玩家/晚加入/生命周期、实际排版/字体仍待人工核对；性能/带宽、平台与线上未验证。
+用户已确认本阶段人工 GamePlayer 通过，主线程结合既有静态核对与用户反馈判定通过，限 CombatPrototypeNetCode、v19/revision22 及[运行入口](Runtime.md)材料容量十六项清单；人工结论来自用户反馈。旧 v18/revision21 的 F5/保存提示与其余历史237项保持各自版本/清单。未实际触发的精确容量/整批/同 tick/G并发采集中满包、旧超限恢复、异常库存/保存失败、多玩家/晚加入/生命周期、实际排版/字体仍为 UNKNOWN；性能/带宽、平台与线上未验证。
 
-玩家/世界存档格式和路径、资源/掉落寿命/再生及原保存事务保持；跨文件原子一致、防重复、同槽并发和保存成功后意外 ECS 故障恢复仍为原 UNKNOWN。AI只执行编译、配置/元数据检查与隔离 Editor Bake，未执行 GamePlayer/PlayMode、游戏/显示系统或GUI回调、逻辑单元测试、命令行构建、发布、采样、图片检查或真实存档读写，未创建子Agent或提交Git。
+v19容量阶段玩家/世界格式保持；当前玩家v3/等级规则归[升级](MapInventoryCapacityUpgrade.md)，世界格式/路径、资源/掉落寿命/再生及原保存事务保持；跨文件原子一致、防重复、同槽并发和保存成功后意外 ECS 故障恢复仍为原 UNKNOWN。AI只执行编译、配置/元数据检查与隔离 Editor Bake，未执行 GamePlayer/PlayMode、游戏/显示系统或GUI回调、逻辑单元测试、命令行构建、发布、采样、图片检查或真实存档读写，未创建子Agent或提交Git。

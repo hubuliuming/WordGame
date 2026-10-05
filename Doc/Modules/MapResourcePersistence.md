@@ -1,6 +1,6 @@
 # 地图资源状态存档
 
-返回[地图](Map.md)、[数据](DataResources.md)与[运行入口](Runtime.md)。本专题负责CombatPrototypeNetCode的服务端资源快照、恢复及准入门；玩家材料/Tools仍归原v2存档，地面玩法归[掉落](MapDrops.md)，持久化归[掉落存档](MapDropPersistence.md)。
+返回[地图](Map.md)、[数据](DataResources.md)与[运行入口](Runtime.md)。本专题负责CombatPrototypeNetCode的服务端资源快照、恢复及准入门；玩家材料/Tools/等级归[玩家档](DataResources.md)，地面玩法归[掉落](MapDrops.md)，持久化归[掉落存档](MapDropPersistence.md)。
 
 ## 【FACT】入口与职责
 
@@ -20,7 +20,7 @@
 
 ## 【FACT】配置与建议值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与BuiltIn当前schemaVersion=19/configRevision=22；resourcePersistence段必填，当前寿命显示归[G提示](MapPickupHud.md)。沿原严格字段、对象形状、标量类型与UTF-8校验，旧v1～v18拒绝，不迁移、补默认或回退来源；正常导入和烘焙后生效，无热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与BuiltIn当前schemaVersion=20/configRevision=23；resourcePersistence段必填，当前寿命显示归[G提示](MapPickupHud.md)。沿原严格字段、对象形状、标量类型与UTF-8校验，旧v1～v19拒绝，不迁移、补默认或回退来源；正常导入和烘焙后生效，无热重载。
 
 | 字段 | 默认值 | 校验 |
 |---|---|---|
@@ -31,7 +31,7 @@
 | resourcePersistence.manualSaveEnabled | true | 必填布尔；F5开关，不关闭原自动保存 |
 | resourcePersistence.manualSaveCooldownSeconds | 5 | 有限正数秒，服务端全局冷却，接受失败也占用；规则归[F5](MapWorldSaveHud.md) |
 
-关闭存档仍校验全部字段。Map Baker写入Enabled/SaveGroundDrops/SaveSlotId/SaveIntervalSeconds/LayoutSignature/ManualSaveEnabled/ManualSaveCooldownSeconds七字段，签名为64个小写十六进制字符，使用FixedString128Bytes；另写一字段恢复状态，开启为Pending、关闭为Ready。地图根仍不是Ghost；存档数据由服务端系统消费，资源存档原阶段未新增Ghost或输入；当前F5新增SaveWorld及所属三字段归[保存提示](MapWorldSaveHud.md)。当前输入16、F4/G6/资源状态4及原反馈/资源字段保持，各端同版代码/配置重新烘焙。
+关闭存档仍校验全部字段。Map Baker写入Enabled/SaveGroundDrops/SaveSlotId/SaveIntervalSeconds/LayoutSignature/ManualSaveEnabled/ManualSaveCooldownSeconds七字段，签名为64个小写十六进制字符，使用FixedString128Bytes；另写一字段恢复状态，开启为Pending、关闭为Ready。地图根仍不是Ghost；存档数据由服务端系统消费，资源存档原阶段未新增Ghost或输入；当前F5新增SaveWorld及所属三字段归[保存提示](MapWorldSaveHud.md)。当前输入17、F4/G6/资源状态4及原反馈/资源字段保持，各端同版代码/配置重新烘焙。
 
 ## 【FACT】文件与身份
 
@@ -73,7 +73,7 @@ SaveSystem仅ServerSimulation，位于预测组的三类Regrow之后、PlayerRes
 
 源变化、OnStopRunning或OnDestroy尝试最后保存并释放缓存；只使用已持有完整缓存及最后采样时间，不读取已由原Spawn释放的实体，停止后清标记避免重复关闭写入。异常终止或未完成最后写盘只能恢复最近成功检查点。原Spawn继续拥有/销毁资源实例，原DropSpawn/DropCleanup继续拥有地面掉落，没有新增共享资源释放。
 
-saveGroundDrops开启时同文件保存地面苹果/木材/石材、DropId及剩余寿命；关闭时Drops为空、LastDropId=0，下一成功世界保存替换旧掉落快照。敌人/玩家位置与战斗、工作进度/预约、工具锁定及旧World全部阻挡历史不进入本档。恢复资源不生成补偿掉落，不调用玩家存档或奖励。玩家材料与Tools仍按原写v2/读v1迁移恢复；死亡/R、F/G/1/2/3/4/B及原工具修理优先级保持。
+saveGroundDrops开启时同文件保存地面苹果/木材/石材、DropId及剩余寿命；关闭时Drops为空、LastDropId=0，下一成功世界保存替换旧掉落快照。敌人/玩家位置与战斗、工作进度/预约、工具锁定及旧World全部阻挡历史不进入本档。恢复资源不生成补偿掉落，不调用玩家存档或奖励。玩家材料/Tools/等级按v3及合法v1/v2内存迁移恢复；死亡/R、F/G/1/2/3/4/B及原工具修理优先级保持。
 
 ## 【KNOWN ISSUES】静态证据与人工边界
 
@@ -85,4 +85,4 @@ saveGroundDrops开启时同文件保存地面苹果/木材/石材、DropId及剩
 
 寿命提示v17/20归[G提示](MapPickupHud.md)：所属G六字段，原目标/拾取/期限/保存保持；静态及用户人工通过限十二项，未触发独立用例UNKNOWN；旧用户通过仍限原版本/清单。
 
-地图v18/21的[F5/保存提示](MapWorldSaveHud.md)已接入：当前16输入、新增所属3字段；原F/G、工具及世界/玩家存档格式保持。静态及用户人工通过限v18/revision21十二项，未触发独立用例UNKNOWN；旧通过限原版本/清单。
+地图v18/21的[F5/保存提示](MapWorldSaveHud.md)已接入：当前17输入、新增所属3字段；原F/G、工具及世界/玩家存档格式保持。静态及用户人工通过限v18/revision21十二项，未触发独立用例UNKNOWN；旧通过限原版本/清单。

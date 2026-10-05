@@ -133,6 +133,7 @@ namespace Code_01.CombatPrototype.Map
                     var reward = EntityManager.GetComponentData<CombatPrototypePlayerReward>(request.Player);
                     // The existing projection replaces one owned tool and the two material quantities.
                     var candidate = CombatPrototypePlayerSaveStore.PrepareToolCraft(identity, reward, inventory, tools,
+                        EntityManager.GetComponentData<CombatPrototypeMapInventoryCapacityLevel>(request.Player).Level,
                         woodIndex, nextWood, stoneIndex, nextStone, toolIndex, nextTool);
                     stage = "SavePrepared";
                     CombatPrototypePlayerSaveStore.SavePrepared(candidate);

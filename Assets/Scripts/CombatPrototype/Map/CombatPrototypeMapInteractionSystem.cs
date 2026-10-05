@@ -97,6 +97,7 @@ namespace Code_01.CombatPrototype.Map
                 var mineSettings = EntityManager.GetComponentData<CombatPrototypeMapMineSettings>(source);
                 var capacity = EntityManager.GetComponentData<CombatPrototypeMapInventoryCapacitySettings>(source);
                 var capacityDefinitions = EntityManager.GetBuffer<CombatPrototypeMapInventoryCapacityDefinition>(source, true);
+            var upgradeDefinitions = EntityManager.GetBuffer<CombatPrototypeMapInventoryCapacityUpgradeDefinition>(source, true);
                 if ((treeSettings.Enabled != 0 || mineSettings.Enabled != 0) &&
                     (World.GetExistingSystemManaged<CombatPrototypeMapDropSpawnSystem>() == null ||
                      !SystemAPI.GetSingleton<NetworkTime>().ServerTick.IsValid))
@@ -157,6 +158,7 @@ namespace Code_01.CombatPrototype.Map
                             stage = "CheckCapacity";
                             var config = EntityManager.GetComponentData<CombatPrototypeMapGatherConfig>(target.Entity);
                             var capacityReason = CombatPrototypeMapInventoryCapacityUtility.GetRejection(capacity, capacityDefinitions,
+                                upgradeDefinitions, EntityManager.GetComponentData<CombatPrototypeMapInventoryCapacityLevel>(request.Player).Level,
                                 EntityManager.GetBuffer<CombatPrototypeInventoryItem>(request.Player, true), config.YieldItemName, config.YieldQuantity);
                             if (capacityReason != null)
                             {

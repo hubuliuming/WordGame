@@ -121,6 +121,30 @@ namespace Code_01.CombatPrototype.Map
                         ItemId = item.itemId, ItemName = CombatPrototypeMapYieldItemResolver.Resolve(item.itemId),
                         MaxQuantity = item.maxQuantity
                     });
+                var upgrade = config.map.inventoryCapacityUpgrade;
+                AddComponent(entity, new CombatPrototypeMapInventoryCapacityUpgradeSettings
+                {
+                    Enabled = (byte)(upgrade.enabled ? 1 : 0), FeedbackSeconds = upgrade.feedbackSeconds,
+                    UpgradeLabel = upgrade.upgradeLabel, UpgradeButtonLabel = upgrade.upgradeButtonLabel,
+                    LevelLabel = upgrade.levelLabel, MaxLevelLabel = upgrade.maxLevelLabel,
+                    SuccessLabel = upgrade.successLabel, RejectedLabel = upgrade.rejectedLabel, FailureLabel = upgrade.failureLabel
+                });
+                var upgradeDefinitions = AddBuffer<CombatPrototypeMapInventoryCapacityUpgradeDefinition>(entity);
+                foreach (var level in upgrade.levels)
+                {
+                    var definition = new CombatPrototypeMapInventoryCapacityUpgradeDefinition
+                    {
+                        Level = level.level, MaxTotalQuantity = level.maxTotalQuantity,
+                        WoodQuantity = level.woodQuantity, StoneQuantity = level.stoneQuantity
+                    };
+                    foreach (var item in level.items)
+                    {
+                        if (item.itemId == CombatPrototypeMapYieldItemResolver.VitalityAppleId) definition.AppleMaxQuantity = item.maxQuantity;
+                        else if (item.itemId == CombatPrototypeMapYieldItemResolver.WoodId) definition.WoodMaxQuantity = item.maxQuantity;
+                        else if (item.itemId == CombatPrototypeMapYieldItemResolver.StoneId) definition.StoneMaxQuantity = item.maxQuantity;
+                    }
+                    upgradeDefinitions.Add(definition);
+                }
                 var hud = config.map.interactionHud;
                 AddComponent(entity, new CombatPrototypeMapInteractionHudSettings
                 {

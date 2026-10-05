@@ -41,6 +41,8 @@ namespace Code_01.CombatPrototype.Map
         private string _capacityText;
         private int _woodMaximum, _stoneMaximum, _appleMaximum, _totalMaximum;
         private bool _capacityEnabled;
+        private int _capacityLevel, _baseTotal, _baseApple, _baseWood, _baseStone;
+        private CombatPrototypeMapInventoryCapacityUpgradeDefinition _second, _third;
         private long _lastTotal = -1;
 
         public IReadOnlyList<Row> Items => _items;
@@ -50,9 +52,14 @@ namespace Code_01.CombatPrototype.Map
         public int PickaxeDurability { get; private set; } = -1;
         public bool InventoryValid { get; private set; }
         public string CapacityText => _capacityText;
+        public int TotalMaximum => _totalMaximum;
+        public int AppleMaximum => _appleMaximum;
+        public int WoodMaximum => _woodMaximum;
+        public int StoneMaximum => _stoneMaximum;
 
         public void Configure(CombatPrototypeMapInventoryPanelSettings settings,
-            CombatPrototypeMapInventoryCapacitySettings capacity, DynamicBuffer<CombatPrototypeMapInventoryCapacityDefinition> definitions)
+            CombatPrototypeMapInventoryCapacitySettings capacity, DynamicBuffer<CombatPrototypeMapInventoryCapacityDefinition> definitions,
+            DynamicBuffer<CombatPrototypeMapInventoryCapacityUpgradeDefinition> upgradeDefinitions)
         {
             Reset();
             _woodLabel = settings.WoodLabel.ToString();
@@ -66,11 +73,16 @@ namespace Code_01.CombatPrototype.Map
             _woodMaximum = CombatPrototypeMapInventoryCapacityUtility.RequireDefinition(definitions, Wood).MaxQuantity;
             _stoneMaximum = CombatPrototypeMapInventoryCapacityUtility.RequireDefinition(definitions, Stone).MaxQuantity;
             _appleMaximum = CombatPrototypeMapInventoryCapacityUtility.RequireDefinition(definitions, Apple).MaxQuantity;
+            _baseTotal = _totalMaximum; _baseApple = _appleMaximum; _baseWood = _woodMaximum; _baseStone = _stoneMaximum;
+            _second = CombatPrototypeMapInventoryCapacityUtility.RequireUpgradeDefinition(upgradeDefinitions, 2);
+            _third = CombatPrototypeMapInventoryCapacityUtility.RequireUpgradeDefinition(upgradeDefinitions, 3);
+            _capacityLevel = 1;
         }
 
         public void Capture(DynamicBuffer<CombatPrototypeInventoryItem> inventory, int axeDurability,
-            int pickaxeDurability, Entity source, Entity player)
+            int pickaxeDurability, Entity source, Entity player, int capacityLevel)
         {
+            ApplyLevel(capacityLevel);
             WoodQuantity = StoneQuantity = 0;
             AxeDurability = axeDurability;
             PickaxeDurability = pickaxeDurability;
@@ -114,6 +126,20 @@ namespace Code_01.CombatPrototype.Map
             }
         }
 
+        private void ApplyLevel(int level)
+        {
+            if (_capacityLevel == level) return;
+            CombatPrototypeMapInventoryCapacityUtility.ValidateLevel(level);
+            var upgrade = level == 2 ? _second : _third;
+            _totalMaximum = level == 1 ? _baseTotal : upgrade.MaxTotalQuantity;
+            _appleMaximum = level == 1 ? _baseApple : upgrade.AppleMaxQuantity;
+            _woodMaximum = level == 1 ? _baseWood : upgrade.WoodMaxQuantity;
+            _stoneMaximum = level == 1 ? _baseStone : upgrade.StoneMaxQuantity;
+            _capacityLevel = level;
+            _items.Clear();
+            _lastTotal = -1;
+        }
+
         private int Maximum(FixedString64Bytes name)
         {
             if (name.Equals(Wood)) return _woodMaximum;
@@ -150,6 +176,8 @@ namespace Code_01.CombatPrototype.Map
             _capacityText = string.Empty;
             _capacityEnabled = false;
             _woodMaximum = _stoneMaximum = _appleMaximum = _totalMaximum = 0;
+            _capacityLevel = _baseTotal = _baseApple = _baseWood = _baseStone = 0;
+            _second = _third = default;
         }
     }
 }

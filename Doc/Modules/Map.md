@@ -15,7 +15,7 @@
 
 ## 【FACT】当前默认配置
 
-Json/BuiltIn v19/22，三类资源600秒再生；材料数量容量归[容量](MapInventoryCapacity.md)，资源/工具/显示及原验收归下述专题。
+Json/BuiltIn v20/23，资源600秒再生；[容量](MapInventoryCapacity.md)已验收，[升级](MapInventoryCapacityUpgrade.md)人工UNKNOWN。
 
 | 配置字段 | 当前值与用途 |
 |---|---|

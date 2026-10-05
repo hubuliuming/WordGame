@@ -1,3 +1,4 @@
+using Code_01.CombatPrototype.Map;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.NetCode;
@@ -98,7 +99,7 @@ namespace Code_01.CombatPrototype.Networking
                         resource.ValueRO.UpperPower - resource.ValueRO.CurrentPower);
                     var nextPower = resource.ValueRO.CurrentPower + recoveredPower;
                     var candidate = CombatPrototypePlayerSaveStore.PrepareItemConsumption(
-                        playerId, reward, inventory, ownedTools[player], itemIndex, nextItem);
+                        playerId, reward, inventory, ownedTools[player], SystemAPI.GetComponent<CombatPrototypeMapInventoryCapacityLevel>(player).Level, itemIndex, nextItem);
 
                     stage = "SavePrepared";
                     CombatPrototypePlayerSaveStore.SavePrepared(candidate);

@@ -19,7 +19,7 @@
 | 网络敌人反击、玩家受伤、死亡停动与手动复活 | [战斗](Modules/Combat.md) | [玩家](Modules/Player.md)、[运行验收](Modules/Runtime.md) |
 | 玩家/敌人美术动画 | [玩家](PlayerArt.md)、[敌人](EnemyArt.md) | — |
 | AI 出图、末世玄幻 | [模板](CombatImagePromptTemplate.md) | — |
-| 背包、容量、制作、丢弃 | [背包](Modules/Inventory.md) | [容量](Modules/MapInventoryCapacity.md) |
+| 背包升级/容量 | [背包](Modules/Inventory.md) | [升级](Modules/MapInventoryCapacityUpgrade.md)人工UNKNOWN |
 | JSON、streamingAssets、Resources、对象池、重写数据菜单 | [资源与数据](Modules/DataResources.md) | 对应业务模块 |
 | 固定玩家 ID、服务端存档、重连恢复、坏档、保存失败 | [资源与数据](Modules/DataResources.md) | [玩家准入](Modules/Player.md)、[奖励提交](Modules/Combat.md)、[运行验收](Modules/Runtime.md) |
 | 规模、性能基线、Tick、帧耗时、GC、RTT、快照、预测误差、存档耗时 | [性能基线](Modules/Performance.md) | [运行入口](Modules/Runtime.md)、[资源与数据](Modules/DataResources.md) |

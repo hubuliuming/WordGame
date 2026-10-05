@@ -18,7 +18,7 @@
 
 ## 【FACT】当前JSON契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=19/configRevision=22。原geometry/layout/movement/drops/treeHarvest/mining/gatherTools/interactionHud/pickupHud/interactionHighlight/inventoryPanel/inventoryDrop/population/spawn及新增resourceStatusHud均必填。新段全部11字段沿原严格UTF-8、对象形状、未知/缺失/重复字段与标量类型校验；旧v1～v18拒绝，不迁移、补字段或回退来源。仅正常导入/烘焙后生效，没有热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=20/configRevision=23。原geometry/layout/movement/drops/treeHarvest/mining/gatherTools/interactionHud/pickupHud/interactionHighlight/inventoryPanel/inventoryDrop/population/spawn及新增resourceStatusHud均必填。新段全部11字段沿原严格UTF-8、对象形状、未知/缺失/重复字段与标量类型校验；旧v1～v19拒绝，不迁移、补字段或回退来源。仅正常导入/烘焙后生效，没有热重载。
 
 | 字段 | 当前默认值 | 校验 |
 |---|---|---|
@@ -54,7 +54,7 @@ disabled仍校验全部字段。名称复用interactionHud.gatherLabel/treeLabel
 
 Regrowing秒数为ceil(max(RegrowAt-服务端模拟时间,0))；以整秒桶变化写入，模式/身份变化不等待下一秒。服务端继续按原期限、占位检查及恢复链判断，倒计时不恢复资源。树/矿到期被原点角色占位或原恢复尚未成功时保持Waiting；原系统恢复后才显示Available。植物再生不新增占位规则；取消/保存失败不另设再生期限。禁用再生不显示倒计时。
 
-玩家CombatPrototypeMapResourceStatusHudState仅SendToOwner同步Mode(byte枚举)、Kind(byte，1 Gather/2 Tree/3 Mine)、PlacementIndex(int)、RemainingSeconds(float，GhostField Quantization=0)。Hidden为0/0/-1/0；非Regrowing秒数为0，Regrowing为有限正整数秒。当前16输入（SaveWorld归[F5](MapWorldSaveHud.md)，修理归[专题](MapToolRepair.md)）、F四字段/G六字段、资源Ghost字段、工具/制作/丢弃反馈与v2写盘/v1读取迁移保持。Collector实体、绝对RegrowAt、工作计时、库存/资源/掉落状态和期限仍只属于原权威链；不新增世界状态存档。
+玩家CombatPrototypeMapResourceStatusHudState仅SendToOwner同步Mode(byte枚举)、Kind(byte，1 Gather/2 Tree/3 Mine)、PlacementIndex(int)、RemainingSeconds(float，GhostField Quantization=0)。Hidden为0/0/-1/0；非Regrowing秒数为0，Regrowing为有限正整数秒。当前17输入（SaveWorld归[F5](MapWorldSaveHud.md)，修理归[专题](MapToolRepair.md)）、F四字段/G六字段、资源Ghost字段、工具/制作/丢弃反馈与v2写盘/v1读取迁移保持。Collector实体、绝对RegrowAt、工作计时、库存/资源/掉落状态和期限仍只属于原权威链；不新增世界状态存档。
 
 ## 【CURRENT STRATEGY】显示开关、生命周期与失败
 
@@ -72,7 +72,7 @@ v13/16资源状态阶段正常Unity编译无C# Error，所属Ghost Serializer已
 
 用户已确认本阶段人工GamePlayer验收通过，主线程结合既有静态核对与用户反馈判定阶段通过，范围限CombatPrototypeNetCode、schemaVersion=13/configRevision=16及[运行入口](Runtime.md)资源状态十项清单，人工结论来自用户反馈。旧高亮v12/15十项、G文字v11/14十项、丢弃v10/13十二项、面板v9/12十二项、工具v8/11十二项、F HUD v7/10八项及更早用户通过保持各自版本/清单。未实际触发的倒计时/到期等待/再生关闭精确边界、后备最近目标/原F锁定时序、移动攻击显示、多玩家/晚加入/断线及独立配置/快照/绘制/保存失败仍UNKNOWN；性能/带宽、平台/线上与旧保存成功后意外ECS恢复未验证。AI未执行GamePlayer/PlayMode、游戏模拟/显示系统/GUI回调、逻辑单元测试、命令行构建、发布、性能采样或图片检查，未创建子Agent或提交Git。
 
-当前v19/22的[工具修理](MapToolRepair.md)不修改本专题四字段、目标优先级或资源/再生期限；绑定增加修理反馈与按钮输入交接，原状态/倒计时仍只读权威链。修理静态及用户人工通过，限v14/17十二项，未触发用例UNKNOWN；资源状态用户通过仍限v13/16十项。
+当前v20/23的[工具修理](MapToolRepair.md)不修改本专题四字段、目标优先级或资源/再生期限；绑定增加修理反馈与按钮输入交接，原状态/倒计时仍只读权威链。修理静态及用户人工通过，限v14/17十二项，未触发用例UNKNOWN；资源状态用户通过仍限v13/16十项。
 
 ## 【FACT】地图资源存档接入边界
 
@@ -80,4 +80,8 @@ v13/16资源状态阶段正常Unity编译无C# Error，所属Ghost Serializer已
 
 寿命提示v17/20归[G提示](MapPickupHud.md)：所属G六字段，原目标/拾取/期限/保存保持；静态及用户人工通过限十二项，未触发独立用例UNKNOWN；旧用户通过仍限原版本/清单。
 
-地图v18/21的[F5/保存提示](MapWorldSaveHud.md)已接入：当前16输入、新增所属3字段；原F/G、工具及世界/玩家存档格式保持。静态及用户人工通过限v18/revision21十二项，未触发独立用例UNKNOWN；旧通过限原版本/清单。
+地图v18/21的[F5/保存提示](MapWorldSaveHud.md)已接入：当前17输入、新增所属3字段；原F/G、工具及世界/玩家存档格式保持。静态及用户人工通过限v18/revision21十二项，未触发独立用例UNKNOWN；旧通过限原版本/清单。
+
+## 【FACT】容量等级接入边界
+
+[升级](MapInventoryCapacityUpgrade.md)：个人等级改变容量，资源状态仍沿原目标/Available与再生投影；四所属字段、期限和预约规则保持。新链静态通过、人工UNKNOWN；旧通过保持原版本/清单。

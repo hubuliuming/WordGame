@@ -123,7 +123,8 @@ namespace Code_01.CombatPrototype.Map
                 var identity = EntityManager.GetComponentData<CombatPrototypePlayerIdentity>(request.Player).PlayerId;
                 var reward = EntityManager.GetComponentData<CombatPrototypePlayerReward>(request.Player);
                 var candidate = CombatPrototypePlayerSaveStore.PrepareItemConsumption(identity, reward, inventory,
-                    EntityManager.GetBuffer<CombatPrototypeMapGatherTool>(request.Player), itemIndex, next);
+                    EntityManager.GetBuffer<CombatPrototypeMapGatherTool>(request.Player),
+                    EntityManager.GetComponentData<CombatPrototypeMapInventoryCapacityLevel>(request.Player).Level, itemIndex, next);
                 stage = "ValidatePrefab";
                 ValidatePrefab(definition.Prefab);
                 var start = EntityManager.GetComponentData<LocalTransform>(request.Player).Position;

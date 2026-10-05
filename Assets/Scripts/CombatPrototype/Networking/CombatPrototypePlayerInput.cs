@@ -16,6 +16,7 @@ namespace Code_01.CombatPrototype.Networking
         public InputEvent Gather; // Unified F resource interaction reuses the original event.
         public InputEvent Pickup;
         public InputEvent SaveWorld;
+        public InputEvent UpgradeInventoryCapacity;
         public InputEvent CraftAxe;
         public InputEvent CraftPickaxe;
         public InputEvent RepairAxe;
@@ -48,7 +49,7 @@ namespace Code_01.CombatPrototype.Networking
             if (panelBinding == null)
                 throw new InvalidOperationException("Client input requires CombatPrototypeMapInteractionHudBindingSystem.");
             var blocksMouse = panelBinding.ReadPanelInput(keyboard, mouse, out var panelCraftAxe, out var panelCraftPickaxe,
-                out var panelRepairAxe, out var panelRepairPickaxe, out var panelDrop);
+                out var panelRepairAxe, out var panelRepairPickaxe, out var panelDrop, out var panelUpgrade);
             var cameraBinding = state.World.GetExistingSystemManaged<CombatPrototypeCameraBindingSystem>();
             move = cameraBinding.ReadMove(move, keyboard, blocksMouse ? null : mouse);
             var attack = (keyboard != null && keyboard.spaceKey.wasPressedThisFrame) ||
@@ -58,6 +59,7 @@ namespace Code_01.CombatPrototype.Networking
             var gather = keyboard != null && keyboard.fKey.wasPressedThisFrame;
             var pickup = keyboard != null && keyboard.gKey.wasPressedThisFrame;
             var saveWorld = keyboard != null && keyboard.f5Key.wasPressedThisFrame;
+            var upgrade = panelUpgrade || (keyboard != null && keyboard.digit5Key.wasPressedThisFrame);
             var craftAxe = panelCraftAxe || (keyboard != null && keyboard.digit1Key.wasPressedThisFrame);
             var craftPickaxe = panelCraftPickaxe || (keyboard != null && keyboard.digit2Key.wasPressedThisFrame);
             var repairAxe = panelRepairAxe || (keyboard != null && keyboard.digit3Key.wasPressedThisFrame);
@@ -77,6 +79,7 @@ namespace Code_01.CombatPrototype.Networking
                 if (pickup)
                     input.ValueRW.Pickup.Set();
                 if (saveWorld) input.ValueRW.SaveWorld.Set();
+                if (upgrade) input.ValueRW.UpgradeInventoryCapacity.Set();
                 if (craftAxe) input.ValueRW.CraftAxe.Set();
                 if (craftPickaxe) input.ValueRW.CraftPickaxe.Set();
                 if (repairAxe) input.ValueRW.RepairAxe.Set();

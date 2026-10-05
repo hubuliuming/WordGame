@@ -88,7 +88,9 @@ namespace Code_01.CombatPrototype.Map
                     highlightSettings, resourceStatusSettings, worldSaveSettings,
                     EntityManager.GetComponentData<CombatPrototypeMapResourcePersistenceSettings>(source),
                     EntityManager.GetComponentData<CombatPrototypeMapInventoryCapacitySettings>(source),
-                    EntityManager.GetBuffer<CombatPrototypeMapInventoryCapacityDefinition>(source, true), map.MapDefinitionId.ToString());
+                    EntityManager.GetBuffer<CombatPrototypeMapInventoryCapacityDefinition>(source, true),
+                    EntityManager.GetComponentData<CombatPrototypeMapInventoryCapacityUpgradeSettings>(source),
+                    EntityManager.GetBuffer<CombatPrototypeMapInventoryCapacityUpgradeDefinition>(source, true), map.MapDefinitionId.ToString());
                 _source = source;
                 _player = player;
             }
@@ -99,6 +101,8 @@ namespace Code_01.CombatPrototype.Map
                 EntityManager.GetComponentData<CombatPrototypeMapToolCraftFeedback>(player),
                 EntityManager.GetComponentData<CombatPrototypeMapToolRepairFeedback>(player),
                 EntityManager.GetComponentData<CombatPrototypeMapInventoryDropFeedback>(player),
+                EntityManager.GetComponentData<CombatPrototypeMapInventoryCapacityLevel>(player).Level,
+                EntityManager.GetComponentData<CombatPrototypeMapInventoryCapacityUpgradeFeedback>(player),
                 EntityManager.GetBuffer<CombatPrototypeInventoryItem>(player, true), source, player,
                 pickup);
             _highlightTargets.Resolve(EntityManager, World.Name, map, highlightSettings,
@@ -109,10 +113,11 @@ namespace Code_01.CombatPrototype.Map
         }
 
         internal bool ReadPanelInput(Keyboard keyboard, Mouse mouse, out bool craftAxe, out bool craftPickaxe, out bool repairAxe, out bool repairPickaxe,
-            out CombatPrototypeMapInventoryDropRequest dropRequest)
+            out CombatPrototypeMapInventoryDropRequest dropRequest, out bool upgrade)
         {
             craftAxe = craftPickaxe = repairAxe = repairPickaxe = false;
             dropRequest = default;
+            upgrade = false;
             Dependency.Complete();
             if (_map.IsEmptyIgnoreFilter) { ResetBinding(); return false; }
             var source = _map.GetSingletonEntity();
@@ -127,7 +132,7 @@ namespace Code_01.CombatPrototype.Map
             if (_hud == null)
                 throw new InvalidOperationException("[CombatPrototype.Map] World=" + World.Name +
                     ", player=" + player + " requires the Main Camera HUD for panel input.");
-            return _hud.ReadPanelInput(keyboard, mouse, out craftAxe, out craftPickaxe, out repairAxe, out repairPickaxe, out dropRequest);
+            return _hud.ReadPanelInput(keyboard, mouse, out craftAxe, out craftPickaxe, out repairAxe, out repairPickaxe, out dropRequest, out upgrade);
         }
 
         private bool HasInGameConnection(Entity player)

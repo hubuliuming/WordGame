@@ -40,6 +40,7 @@ namespace Code_01.CombatPrototype.Map
             var source = SystemAPI.GetSingletonEntity<CombatPrototypeMapData>();
             var capacity = EntityManager.GetComponentData<CombatPrototypeMapInventoryCapacitySettings>(source);
             var capacityDefinitions = EntityManager.GetBuffer<CombatPrototypeMapInventoryCapacityDefinition>(source, true);
+            var upgradeDefinitions = EntityManager.GetBuffer<CombatPrototypeMapInventoryCapacityUpgradeDefinition>(source, true);
             var time = SystemAPI.Time.ElapsedTime;
             using var drops = _drops.ToEntityArray(Allocator.Temp);
             var players = new NativeList<OnlinePlayer>(Allocator.Temp);
@@ -110,6 +111,7 @@ namespace Code_01.CombatPrototype.Map
                         var inventory = inventories[player.Entity];
                         stage = "CheckCapacity";
                         var capacityReason = CombatPrototypeMapInventoryCapacityUtility.GetRejection(capacity, capacityDefinitions,
+                                upgradeDefinitions, EntityManager.GetComponentData<CombatPrototypeMapInventoryCapacityLevel>(player.Entity).Level,
                             inventory, itemName, quantity);
                         if (capacityReason != null)
                         {
@@ -124,7 +126,8 @@ namespace Code_01.CombatPrototype.Map
                         if (itemIndex >= 0) next.Quantity = checked(inventory[itemIndex].Quantity + quantity);
                         else inventory.EnsureCapacity(checked(inventory.Length + 1));
                         var candidate = CombatPrototypePlayerSaveStore.PrepareReward(
-                            playerId, rewards[player.Entity], inventory, EntityManager.GetBuffer<CombatPrototypeMapGatherTool>(player.Entity, true), itemIndex, next);
+                            playerId, rewards[player.Entity], inventory, EntityManager.GetBuffer<CombatPrototypeMapGatherTool>(player.Entity, true),
+                            EntityManager.GetComponentData<CombatPrototypeMapInventoryCapacityLevel>(player.Entity).Level, itemIndex, next);
 
                         stage = "SavePrepared";
                         CombatPrototypePlayerSaveStore.SavePrepared(candidate);

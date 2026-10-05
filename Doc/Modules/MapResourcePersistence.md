@@ -20,7 +20,7 @@
 
 ## 【FACT】配置与建议值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与BuiltIn当前schemaVersion=21/configRevision=24；resourcePersistence段必填，当前寿命显示归[G提示](MapPickupHud.md)。沿原严格字段、对象形状、标量类型与UTF-8校验，旧v1～v20拒绝，不迁移、补默认或回退来源；正常导入和烘焙后生效，无热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与BuiltIn当前schemaVersion=22/configRevision=25；resourcePersistence段必填，当前寿命显示归[G提示](MapPickupHud.md)。沿原严格字段、对象形状、标量类型与UTF-8校验，旧v1～v21拒绝，不迁移、补默认或回退来源；正常导入和烘焙后生效，无热重载。
 
 | 字段 | 默认值 | 校验 |
 |---|---|---|

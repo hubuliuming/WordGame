@@ -1,6 +1,6 @@
 # 采集工具升级与效率提升
 
-返回[采集工具](MapGatherTools.md)、[工具修理](MapToolRepair.md)与[材料面板](MapInventoryPanel.md)。本专题负责 CombatPrototypeNetCode 的工具 Lv1～Lv3、B/6/7 升级、有效耐久上限与采集耗时；玩家文件完整契约归[资源与数据](DataResources.md)，人工清单归[运行入口](Runtime.md)。当前地图 schemaVersion=21/configRevision=24，玩家存档 Version=4；主线程静态核对通过，人工 GamePlayer 为 UNKNOWN。背包升级及更早用户通过仍限各自原版本/清单。
+返回[采集工具](MapGatherTools.md)、[工具修理](MapToolRepair.md)与[材料面板](MapInventoryPanel.md)。本专题负责 CombatPrototypeNetCode 的工具 Lv1～Lv3、B/6/7 升级、有效耐久上限与采集耗时；玩家文件完整契约归[资源与数据](DataResources.md)，人工清单归[运行入口](Runtime.md)。当前地图 schemaVersion=22/configRevision=25，玩家存档 Version=4；用户已确认本阶段人工 GamePlayer 通过，主线程结合既有静态核对判定通过，限 v21/revision24 及[运行入口](Runtime.md)二十二项清单，结论来自用户反馈。未实际触发的独立边界仍为 UNKNOWN。背包升级及更早用户通过仍限各自原版本/清单。
 
 ## 【FACT】入口与职责
 
@@ -43,7 +43,7 @@ Forest、Grassland JSON 与 BuiltIn 默认一致。新必填 gatherToolUpgrade �
 
 每条 levels 字段为 toolId、level、maxDurability、durationMultiplier、woodQuantity、stoneQuantity。ID 仅 stone_axe/stone_pickaxe；level 仅整数2/3，不重复或缺级。maxDurability 相比前一级严格增大；倍率有限、正数、<=1且逐级严格减小，乘对应 treeHarvest/mining 基础耗时后仍为有限正数；木/石成本均为正整数。feedbackSeconds 有限正数；八个文案均非空白、无控制字符且最多61 UTF-8字节。
 
-新段沿原严格 UTF-8、全部字段、类型、未知/重复键与数组条目校验，任意相关开关关闭也须完整合法。旧地图 v1～v20 明确拒绝，不补默认段或回退来源；配置仅在正常导入/烘焙后生效，无热重载。关闭 gatherToolUpgrade.enabled 只拒绝新升级，已获等级的有效上限/倍率仍使用。关闭 gatherTools.enabled 则沿原徒手路径并禁用制作、修理、升级，等级保留；重新开启按已持有等级与当前配置使用。
+新段沿原严格 UTF-8、全部字段、类型、未知/重复键与数组条目校验，任意相关开关关闭也须完整合法。旧地图 v1～v21 明确拒绝，不补默认段或回退来源；配置仅在正常导入/烘焙后生效，无热重载。关闭 gatherToolUpgrade.enabled 只拒绝新升级，已获等级的有效上限/倍率仍使用。关闭 gatherTools.enabled 则沿原徒手路径并禁用制作、修理、升级，等级保留；重新开启按已持有等级与当前配置使用。
 
 ## 【CURRENT STRATEGY】工具等级与原操作
 
@@ -96,4 +96,8 @@ HUD统一校验所属工具ID/重复/Level/本级耐久上限，只读缓存四�
 
 与修改前v20快照比较，区块/格子/布置位置朝向/障碍及资源签名保持，森林/草地树89/53、采集36/38、矿20/18、阻挡109/71。Bake Console前后[0 Error,8 Warning,113 Log]，无新增Bake警告；主场景干净，临时World/Scene/TextAsset释放。git差异范围/UTF-8/链接与原269项内容保留检查通过。
 
-主线程静态核对通过；本阶段人工GamePlayer的22项清单为 UNKNOWN，旧用户通过保持各自版本/清单。实际扣料/单次与同tick、修理/重做/有效耗时、保存失败/迁移/坏档/保级、多人/晚加入/生命周期、字形/滚动与反馈未由AI验证；性能/带宽/平台/线上、跨文件原子一致/防重复、同槽并发及保存后意外ECS恢复仍UNKNOWN。AI未运行GamePlayer/PlayMode、游戏/显示系统/GUI回调、逻辑单元测试、真实玩家/世界存档I/O、命令行构建、发布、采样或图片检查，未创建子Agent/提交Git。
+用户已确认本阶段人工GamePlayer验收通过，主线程结合既有编译、配置/所属Serializer与隔离Editor Bake静态核对判定通过，范围限CombatPrototypeNetCode、v21/revision24及[运行入口](Runtime.md)二十二项清单，人工结论来自用户反馈。原291项内容/编号和旧通过范围保持；未实际触发的精确同tick、独立准备/保存/提交失败、旧档/坏档边界、网络延迟/预测回放及显示/生命周期用例仍UNKNOWN，AI未验证上述运行行为；性能/带宽/平台/线上、跨文件原子一致/防重复、同槽并发及保存后意外ECS恢复仍UNKNOWN。AI未运行GamePlayer/PlayMode、游戏/显示系统/GUI回调、逻辑单元测试、真实玩家/世界存档I/O、命令行构建、发布、采样或图片检查，未创建子Agent/提交Git。
+
+## 【FACT】等级变化与耐久预警
+
+[耐久预警](MapToolDurabilityHud.md)读取原有效本级上限，斧头60/90/120、镐子40/60/80；升级保持绝对耐久，因此相同耐久可能跨预警阈值，缓存同时比较Durability/Level。显示不恢复耐久、不扣材料或改变耗时/等级/保存链。地图当前22/25的预警静态核对通过、人工16项UNKNOWN；本专题既有编译/136配置拒绝/22次Bake及用户人工通过仍限工具升级v21/revision24二十二项。

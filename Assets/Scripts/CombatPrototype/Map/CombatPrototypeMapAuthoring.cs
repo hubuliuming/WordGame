@@ -314,6 +314,18 @@ namespace Code_01.CombatPrototype.Map
                         ToolId = tier.toolId, Level = tier.level, MaxDurability = tier.maxDurability,
                         DurationMultiplier = tier.durationMultiplier, WoodQuantity = tier.woodQuantity, StoneQuantity = tier.stoneQuantity
                     });
+                var durabilityHud = config.map.gatherToolDurabilityHud;
+                AddComponent(entity, new CombatPrototypeMapGatherToolDurabilityHudSettings
+                {
+                    Enabled = (byte)(durabilityHud.enabled ? 1 : 0), WarningRatio = durabilityHud.warningRatio,
+                    CriticalRatio = durabilityHud.criticalRatio,
+                    WarningColor = CombatPrototypeMapInteractionHighlightSettings.ColorFromHex(durabilityHud.warningColorHex),
+                    CriticalColor = CombatPrototypeMapInteractionHighlightSettings.ColorFromHex(durabilityHud.criticalColorHex),
+                    BrokenColor = CombatPrototypeMapInteractionHighlightSettings.ColorFromHex(durabilityHud.brokenColorHex),
+                    WarningLabel = durabilityHud.warningLabel, CriticalLabel = durabilityHud.criticalLabel,
+                    BrokenLabel = durabilityHud.brokenLabel, RemainingUsesLabel = durabilityHud.remainingUsesLabel,
+                    RepairHintLabel = durabilityHud.repairHintLabel
+                });
                 var chunks = AddBuffer<CombatPrototypeMapChunk>(entity);
                 foreach (var chunk in layout.Chunks) chunks.Add(chunk);
                 var cells = AddBuffer<CombatPrototypeMapCell>(entity);

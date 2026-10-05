@@ -255,7 +255,7 @@ v12/15的[高亮](MapInteractionHighlight.md)沿原本地所属存活玩家/Conn
 
 v13/16的[资源状态](MapResourceStatusHud.md)由Player Baker追加所属Mode/Kind/PlacementIndex/RemainingSeconds四字段，初始Hidden/0/-1/0；原13输入、F/G各四字段、生命/体力/工具/存档保持。仅Connected/InGame、所有权匹配、启用Simulate且存活者获得状态，死亡/断线与World/Scene变化清显示。新布局/编译/烘焙静态及用户人工通过，限v13/16十项，未触发用例UNKNOWN，旧通过保持原范围。
 
-当前v21/24的[工具修理](MapToolRepair.md)：Player Baker追加零修理反馈Sequence/Kind/Result，仅SendToOwner；修理阶段新增RepairAxe/RepairPickaxe；当前含SaveWorld/背包升级/工具升级共19输入字段。复用原所属资格/唯一Tools，玩家v4保存携带工具/容量等级，生命/体力/R及资源显示快照保持；各端同版重新烘焙。新链静态及用户人工通过，限v14/17十二项，未触发用例UNKNOWN，旧玩家用户通过保持原版本/清单。
+当前v22/25的[工具修理](MapToolRepair.md)：Player Baker追加零修理反馈Sequence/Kind/Result，仅SendToOwner；修理阶段新增RepairAxe/RepairPickaxe；当前含SaveWorld/背包升级/工具升级共19输入字段。复用原所属资格/唯一Tools，玩家v4保存携带工具/容量等级，生命/体力/R及资源显示快照保持；各端同版重新烘焙。新链静态及用户人工通过，限v14/17十二项，未触发用例UNKNOWN，旧玩家用户通过保持原版本/清单。
 
 ## 【FACT】地图资源存档接入边界
 
@@ -271,4 +271,8 @@ v13/16的[资源状态](MapResourceStatusHud.md)由Player Baker追加所属Mode/
 
 ## 【FACT】工具等级与升级所属数据
 
-[工具升级](MapGatherToolUpgrade.md)沿原工具缓冲追加Level(int)，ToolId/Durability/Level均SendToOwner；原Player Baker追加Sequence0/KindNone/ResultNone升级反馈，三GhostField所属。当前输入19，6/7只给本地启用GhostOwnerIsLocal写一次事件。服务器复用F资格、在背包升级后/F与R前检查旧请求/资源忙并保存后提交；死亡/R不清Tools，重连恢复v4实际等级。v2/v3工具补Lv1，v3原容量级保留，读取不写盘；完整迁移归[资源与数据](DataResources.md)。生命/体力/战斗/Prefab/Animator保持。新链静态通过、人工UNKNOWN，旧通过不扩展。
+[工具升级](MapGatherToolUpgrade.md)沿原工具缓冲追加Level(int)，ToolId/Durability/Level均SendToOwner；原Player Baker追加Sequence0/KindNone/ResultNone升级反馈，三GhostField所属。当前输入19，6/7只给本地启用GhostOwnerIsLocal写一次事件。服务器复用F资格、在背包升级后/F与R前检查旧请求/资源忙并保存后提交；死亡/R不清Tools，重连恢复v4实际等级。v2/v3工具补Lv1，v3原容量级保留，读取不写盘；完整迁移归[资源与数据](DataResources.md)。生命/体力/战斗/Prefab/Animator保持。新链静态及用户人工通过限v21/revision24二十二项，未触发用例UNKNOWN；旧通过不扩展。
+
+## 【FACT】工具耐久的客户端预警
+
+[耐久预警](MapToolDurabilityHud.md)只读原本地所属Tools快照与有效本级上限，新增固定地图Settings不含Ghost字段；原HUD已完成ID/唯一槽/等级/耐久范围验证后计算25%/10%和不足单次成本的优先损坏状态。没有新输入、玩家组件、反馈事件或存档字段，19输入、工具三字段SendToOwner与v4保存契约保持；等级/耐久只读缓存、每帧隐藏沿Clear，死亡/断线/源/玩家/World/Scene失效沿原Reset清颜色及状态。静态核对通过，新人工显示/联网/生命周期UNKNOWN；用户工具升级通过仍限v21/revision24二十二项。

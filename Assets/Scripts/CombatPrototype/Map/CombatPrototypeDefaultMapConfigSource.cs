@@ -17,7 +17,7 @@ namespace Code_01.CombatPrototype.Map
             {
                 map = new MapDefinitionConfig
                 {
-                    schemaVersion = 21, configRevision = 24,
+                    schemaVersion = 22, configRevision = 25,
                     mapDefinitionId = mapDefinitionId, defaultSeed = 12345,
                     resourcePersistence = new MapResourcePersistenceConfig
                     {
@@ -97,6 +97,13 @@ namespace Code_01.CombatPrototype.Map
                             new MapGatherToolUpgradeLevelConfig
                             { toolId = "stone_pickaxe", level = 3, maxDurability = 80, durationMultiplier = 0.50f, woodQuantity = 16, stoneQuantity = 24 }
                         }
+                    },
+                    gatherToolDurabilityHud = new MapGatherToolDurabilityHudConfig
+                    {
+                        enabled = true, warningRatio = 0.25f, criticalRatio = 0.10f,
+                        warningColorHex = "#FFD166", criticalColorHex = "#FF9F43", brokenColorHex = "#FF6B6B",
+                        warningLabel = "Low", criticalLabel = "Critical", brokenLabel = "Broken",
+                        remainingUsesLabel = "Uses", repairHintLabel = "Repair"
                     },
                     interactionHud = new MapInteractionHudConfig
                     {

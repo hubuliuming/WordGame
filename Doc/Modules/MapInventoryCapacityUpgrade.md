@@ -1,6 +1,6 @@
 # 背包容量扩展与升级
 
-返回[背包](Inventory.md)、[地图](Map.md)与[材料容量](MapInventoryCapacity.md)。本专题负责 CombatPrototypeNetCode 的个人永久容量等级、升级配方、所属反馈和 B/5 输入。玩家文件的唯一契约归[资源与数据](DataResources.md)，人工清单归[运行入口](Runtime.md)。当前地图 schemaVersion=21/configRevision=24；用户已确认人工GamePlayer通过，限v20/revision23升级十六项。
+返回[背包](Inventory.md)、[地图](Map.md)与[材料容量](MapInventoryCapacity.md)。本专题负责 CombatPrototypeNetCode 的个人永久容量等级、升级配方、所属反馈和 B/5 输入。玩家文件的唯一契约归[资源与数据](DataResources.md)，人工清单归[运行入口](Runtime.md)。当前地图 schemaVersion=22/configRevision=25；用户已确认人工GamePlayer通过，限v20/revision23升级十六项。
 
 ## 【FACT】入口与职责
 
@@ -44,7 +44,7 @@ Lv1 继续由 inventoryCapacity 定义；inventoryCapacityUpgrade.levels 只配�
 | levels[].items[].maxQuantity | 必填 int，按 itemId 严格大于前一级同种上限 |
 | levels[].woodQuantity / stoneQuantity | 必填正整数；相应等级的完整升级配方 |
 
-根10字段、每级5字段、每种材料2字段。七个文案均非空白、无控制字符、最多61个 UTF-8 字节。沿原严格 UTF-8、完整对象形状、缺失/未知/重复字段、标量类型和语义检查；关闭容量、升级或显示也完整校验。旧地图 v1～v20 明确拒绝，没有补字段、来源回退或自动迁移。
+根10字段、每级5字段、每种材料2字段。七个文案均非空白、无控制字符、最多61个 UTF-8 字节。沿原严格 UTF-8、完整对象形状、缺失/未知/重复字段、标量类型和语义检查；关闭容量、升级或显示也完整校验。旧地图 v1～v21 明确拒绝，没有补字段、来源回退或自动迁移。
 
 原地图根追加 UpgradeSettings 九字段：Enabled、FeedbackSeconds及七文案；两条 UpgradeDefinition 各七字段：Level、MaxTotalQuantity、AppleMaxQuantity、WoodMaxQuantity、StoneMaxQuantity、WoodQuantity、StoneQuantity。Baker 按已验证的 itemId 映射数值，未改变原容量2字段 Settings/三条3字段 Definition。
 

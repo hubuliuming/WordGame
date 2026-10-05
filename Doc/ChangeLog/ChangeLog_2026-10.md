@@ -786,3 +786,16 @@
 - 地图schema21/revision24新增必填gatherToolUpgrade根11字段/四条6字段定义；工具缓冲三字段、输入19，玩家Version4/根7/Tools项3。合法v2/v3工具只内存补Lv1，v3容量等级保持；所有候选保存两类等级，读取不写盘。六新普通脚本及Unity自动meta，原Scene/SubScene/Prefab/Animator、旧meta/资源/包/构建保持。
 - Unity编译0 Error，生成所属Serializer/字段、136份非法配置拒绝及22次隔离Editor Bake通过；原布局/资源签名保持、Bake Console[0,8,113]前后一致、主场景干净，临时对象释放。
 - 增量同步专题/调用链、导航、策划模板和Runtime22项人工清单；原269项逐字保留，共291项。静态核对通过，人工GamePlayer UNKNOWN；旧用户通过限原版本/清单。未执行逻辑单元测试、PlayMode、游戏/GUI回调、真实存档I/O、构建/发布、采样/图片、子Agent或Git提交。
+
+## 2026-10-05 采集工具升级与效率提升人工验收
+
+- 用户反馈“我已验收通过，接下来下一阶段”；主线程结合既有编译、所属Serializer/配置核对、136份非法配置拒绝及22次隔离Editor Bake，判定通过，限CombatPrototypeNetCode、schemaVersion21/configRevision24与Runtime二十二项清单；人工结论来自用户反馈，AI未执行GamePlayer/PlayMode。
+- 增量同步工具升级专题、调用链摘要、导航和策划模板的验收状态；保留291项内容/编号、旧通过范围以及未实际触发的独立边界/并发/保存失败、延迟/预测及显示/生命周期用例UNKNOWN。
+- 本次仅更新验收文档，代码、JSON与Scene/SubScene/Prefab/Animator/meta/资源/包/构建配置保持；未执行游戏/GUI回调、真实存档I/O、逻辑单元测试、构建/发布、采样或图片检查，未创建子Agent或提交Git。
+
+## 2026-10-05 采集工具耐久预警与损坏提示
+
+- 按已确认范围接入原F/B只读耐久投影：25% Low黄、10% Critical橙，不足一次成本优先Broken红；按实际工具等级上限计算，Durability/Level变化刷新。F工具状态着色与损坏3/4修理提示，B状态标签/颜色及两详情滚动行，Uses整除剩余次数；关闭修理损坏沿原1/2重做，关闭新显示或工具沿原显示/开关边界。
+- 地图schema22/revision25新增必填gatherToolDurabilityHud根11字段，Json/BuiltIn一致；严格阈值/颜色/文案及关闭仍校验、旧v1～v21拒绝。新增三个普通脚本及Unity正常生成meta，原工具唯一状态/所属三字段、输入19、F4/G6/资源状态4/世界保存3、玩家v4与世界v2/保存链保持，原Scene/SubScene/Prefab/Animator/旧meta/资源/包/构建保持。
+- 正常Unity编译0 Error，配置/Settings11及网络/存储元数据、240份非法配置拒绝和28次隔离Editor Bake静态通过；新11Settings/custom值正确，原布局/资源签名保持。Bake Console[0,7,53]前后一致，编译重报两条已有PEListener/DOTween警告，主场景干净、临时对象释放。
+- 增量同步耐久预警专题、当前契约/调用链、导航与策划模板；保留前阶段验收状态及原291项逐字编号/内容，新增16项后307项，人工GamePlayer UNKNOWN。未执行游戏/显示或GUI回调、PlayMode、逻辑单元测试、真实存档业务I/O、构建/发布、采样/图片、子Agent或Git提交。

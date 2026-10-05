@@ -10,7 +10,7 @@ namespace Code_01.CombatPrototype.Map
             if (config == null || config.map == null || config.map.geometry == null ||
                 config.map.resourcePersistence == null || config.map.layout == null || config.map.movement == null || config.map.drops == null || config.map.treeHarvest == null ||
                 config.map.mining == null || config.map.gatherTools == null || config.map.gatherTools.tools == null ||
-                config.map.gatherToolUpgrade == null || config.map.gatherToolUpgrade.levels == null ||
+                config.map.gatherToolUpgrade == null || config.map.gatherToolUpgrade.levels == null || config.map.gatherToolDurabilityHud == null ||
                 config.map.interactionHud == null || config.map.pickupHud == null || config.map.interactionHighlight == null || config.map.resourceStatusHud == null || config.map.inventoryPanel == null || config.map.inventoryDrop == null || config.map.inventoryDrop.items == null ||
                 config.map.worldSaveHud == null || config.map.inventoryCapacity == null || config.map.inventoryCapacity.items == null ||
                 config.map.inventoryCapacityUpgrade == null || config.map.inventoryCapacityUpgrade.levels == null ||
@@ -51,8 +51,8 @@ namespace Code_01.CombatPrototype.Map
             ValidateInventoryCapacityUpgrade(map.inventoryCapacityUpgrade, map.inventoryCapacity);
             ValidateInventoryDrop(map.inventoryDrop);
             Id(map.mapDefinitionId, "mapDefinitionId");
-            if (map.schemaVersion != 21 || map.configRevision < 1 || map.defaultSeed < 1)
-                throw new InvalidOperationException("Map requires schemaVersion=21, positive revision and seed.");
+            if (map.schemaVersion != 22 || map.configRevision < 1 || map.defaultSeed < 1)
+                throw new InvalidOperationException("Map requires schemaVersion=22, positive revision and seed.");
             var drops = map.drops;
             Id(drops.itemId, "drops.itemId");
             Id(drops.visualResourceKey, "drops.visualResourceKey");
@@ -116,6 +116,7 @@ namespace Code_01.CombatPrototype.Map
                     throw new InvalidOperationException("gatherTools repair requires recovery in (0,maximum], nonnegative materials and a nonzero cost for " + tool.toolId);
             }
             ValidateGatherToolUpgrade(map.gatherToolUpgrade, gatheringTools, treeHarvest, mining);
+            ValidateGatherToolDurabilityHud(map.gatherToolDurabilityHud);
             var geometry = map.geometry;
             Positive(geometry.cellSizeMeters, "cellSizeMeters");
             Finite(geometry.baseHeightMeters, "baseHeightMeters");
@@ -318,6 +319,22 @@ namespace Code_01.CombatPrototype.Map
         {
             Positive(value, field);
             if (value > 5f) throw new InvalidOperationException(field + " must be in (0,5].");
+        }
+
+        private static void ValidateGatherToolDurabilityHud(MapGatherToolDurabilityHudConfig hud)
+        {
+            Positive(hud.warningRatio, "gatherToolDurabilityHud.warningRatio");
+            Positive(hud.criticalRatio, "gatherToolDurabilityHud.criticalRatio");
+            if (hud.warningRatio >= 1f || hud.criticalRatio >= hud.warningRatio)
+                throw new InvalidOperationException("gatherToolDurabilityHud requires 0 < criticalRatio < warningRatio < 1.");
+            HighlightColor(hud.warningColorHex, "gatherToolDurabilityHud.warningColorHex");
+            HighlightColor(hud.criticalColorHex, "gatherToolDurabilityHud.criticalColorHex");
+            HighlightColor(hud.brokenColorHex, "gatherToolDurabilityHud.brokenColorHex");
+            HudLabel(hud.warningLabel, "gatherToolDurabilityHud.warningLabel");
+            HudLabel(hud.criticalLabel, "gatherToolDurabilityHud.criticalLabel");
+            HudLabel(hud.brokenLabel, "gatherToolDurabilityHud.brokenLabel");
+            HudLabel(hud.remainingUsesLabel, "gatherToolDurabilityHud.remainingUsesLabel");
+            HudLabel(hud.repairHintLabel, "gatherToolDurabilityHud.repairHintLabel");
         }
 
         private static void HighlightColor(string value, string field)

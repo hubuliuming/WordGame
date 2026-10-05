@@ -18,6 +18,7 @@ namespace Code_01.CombatPrototype.Map
         public MapMiningConfig mining;
         public MapGatherToolsConfig gatherTools;
         public MapGatherToolUpgradeConfig gatherToolUpgrade;
+        public MapGatherToolDurabilityHudConfig gatherToolDurabilityHud;
         public MapInteractionHudConfig interactionHud;
         public MapPickupHudConfig pickupHud;
         public MapInteractionHighlightConfig interactionHighlight;

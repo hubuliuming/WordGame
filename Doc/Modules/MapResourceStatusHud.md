@@ -18,7 +18,7 @@
 
 ## 【FACT】当前JSON契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=21/configRevision=24。原geometry/layout/movement/drops/treeHarvest/mining/gatherTools/interactionHud/pickupHud/interactionHighlight/inventoryPanel/inventoryDrop/population/spawn及新增resourceStatusHud均必填。新段全部11字段沿原严格UTF-8、对象形状、未知/缺失/重复字段与标量类型校验；旧v1～v20拒绝，不迁移、补字段或回退来源。仅正常导入/烘焙后生效，没有热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=22/configRevision=25。原geometry/layout/movement/drops/treeHarvest/mining/gatherTools/interactionHud/pickupHud/interactionHighlight/inventoryPanel/inventoryDrop/population/spawn及新增resourceStatusHud均必填。新段全部11字段沿原严格UTF-8、对象形状、未知/缺失/重复字段与标量类型校验；旧v1～v21拒绝，不迁移、补字段或回退来源。仅正常导入/烘焙后生效，没有热重载。
 
 | 字段 | 当前默认值 | 校验 |
 |---|---|---|
@@ -72,7 +72,7 @@ v13/16资源状态阶段正常Unity编译无C# Error，所属Ghost Serializer已
 
 用户已确认本阶段人工GamePlayer验收通过，主线程结合既有静态核对与用户反馈判定阶段通过，范围限CombatPrototypeNetCode、schemaVersion=13/configRevision=16及[运行入口](Runtime.md)资源状态十项清单，人工结论来自用户反馈。旧高亮v12/15十项、G文字v11/14十项、丢弃v10/13十二项、面板v9/12十二项、工具v8/11十二项、F HUD v7/10八项及更早用户通过保持各自版本/清单。未实际触发的倒计时/到期等待/再生关闭精确边界、后备最近目标/原F锁定时序、移动攻击显示、多玩家/晚加入/断线及独立配置/快照/绘制/保存失败仍UNKNOWN；性能/带宽、平台/线上与旧保存成功后意外ECS恢复未验证。AI未执行GamePlayer/PlayMode、游戏模拟/显示系统/GUI回调、逻辑单元测试、命令行构建、发布、性能采样或图片检查，未创建子Agent或提交Git。
 
-当前v21/24的[工具修理](MapToolRepair.md)不修改本专题四字段、目标优先级或资源/再生期限；绑定增加修理反馈与按钮输入交接，原状态/倒计时仍只读权威链。修理静态及用户人工通过，限v14/17十二项，未触发用例UNKNOWN；资源状态用户通过仍限v13/16十项。
+当前v22/25的[工具修理](MapToolRepair.md)不修改本专题四字段、目标优先级或资源/再生期限；绑定增加修理反馈与按钮输入交接，原状态/倒计时仍只读权威链。修理静态及用户人工通过，限v14/17十二项，未触发用例UNKNOWN；资源状态用户通过仍限v13/16十项。
 
 ## 【FACT】地图资源存档接入边界
 

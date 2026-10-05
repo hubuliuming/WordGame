@@ -15,6 +15,8 @@ namespace Code_01.CombatPrototype.Map
         private readonly CombatPrototypeMapGatherToolUpgradePanel _toolUpgrade = new CombatPrototypeMapGatherToolUpgradePanel();
         private string _levelLabel, _recraftLabel;
         private int _axeLevel = -1, _pickaxeLevel = -1;
+        private bool _durabilityEnabled;
+        private CombatPrototypeMapGatherToolDurabilityHudClient.ToolStatus _axeDurabilityStatus, _pickaxeDurabilityStatus;
         private CombatPrototypeMapInventoryPanelSettings _settings;
         private CombatPrototypeMapGatherToolSettings _toolSettings;
         private CombatPrototypeMapGatherToolDefinition _axe;
@@ -38,11 +40,12 @@ namespace Code_01.CombatPrototype.Map
             CombatPrototypeMapInventoryCapacityUpgradeSettings upgradeSettings,
             DynamicBuffer<CombatPrototypeMapInventoryCapacityUpgradeDefinition> upgradeDefinitions,
             CombatPrototypeMapGatherToolUpgradeSettings toolUpgradeSettings,
-            DynamicBuffer<CombatPrototypeMapGatherToolUpgradeDefinition> toolUpgradeDefinitions, float treeDuration, float mineDuration, string mapId)
+            DynamicBuffer<CombatPrototypeMapGatherToolUpgradeDefinition> toolUpgradeDefinitions, bool durabilityEnabled, float treeDuration, float mineDuration, string mapId)
         {
             Reset();
             _settings = settings;
             _toolSettings = toolSettings;
+            _durabilityEnabled = durabilityEnabled;
             _axe = axe;
             _pickaxe = pickaxe;
             _levelLabel = toolUpgradeSettings.LevelLabel.ToString(); _recraftLabel = toolUpgradeSettings.RecraftLabel.ToString();
@@ -76,10 +79,12 @@ namespace Code_01.CombatPrototype.Map
 
         public void Show(DynamicBuffer<CombatPrototypeInventoryItem> inventory, int axeDurability, int pickaxeDurability,
             int axeLevel, int pickaxeLevel, CombatPrototypeMapGatherToolDefinition effectiveAxe, CombatPrototypeMapGatherToolDefinition effectivePickaxe,
+            CombatPrototypeMapGatherToolDurabilityHudClient.ToolStatus axeStatus, CombatPrototypeMapGatherToolDurabilityHudClient.ToolStatus pickaxeStatus,
             string feedback, CombatPrototypeMapInventoryDropFeedback dropFeedback, int capacityLevel,
             CombatPrototypeMapInventoryCapacityUpgradeFeedback upgradeFeedback, CombatPrototypeMapToolUpgradeFeedback toolUpgradeFeedback, Entity source, Entity player)
         {
             if (_settings.Enabled == 0) return;
+            _axeDurabilityStatus = axeStatus; _pickaxeDurabilityStatus = pickaxeStatus;
             _snapshot.Capture(inventory, axeDurability, pickaxeDurability, source, player, capacityLevel);
             _upgrade.Capture(_snapshot, capacityLevel, upgradeFeedback);
             _canCraftAxe = CanCraft(_axe, axeDurability);
@@ -97,8 +102,8 @@ namespace Code_01.CombatPrototype.Map
                 _pickaxeDurability = pickaxeDurability;
                 _lastInventoryValid = _snapshot.InventoryValid;
                 _axeLevel = axeLevel; _pickaxeLevel = pickaxeLevel;
-                _axeStatus = ToolStatus(effectiveAxe, _axeName, axeDurability, axeLevel);
-                _pickaxeStatus = ToolStatus(effectivePickaxe, _pickaxeName, pickaxeDurability, pickaxeLevel);
+                _axeStatus = ToolStatus(effectiveAxe, _axeName, axeDurability, axeLevel, axeStatus);
+                _pickaxeStatus = ToolStatus(effectivePickaxe, _pickaxeName, pickaxeDurability, pickaxeLevel, pickaxeStatus);
                 _axeRecipe = Recipe(_axe);
                 _pickaxeRecipe = Recipe(_pickaxe);
                 _axeMissing = Missing(_axe);
@@ -117,10 +122,12 @@ namespace Code_01.CombatPrototype.Map
             _toolSettings.Enabled != 0 && _snapshot.InventoryValid && durability < definition.DurabilityCostPerCompletion &&
             _snapshot.WoodQuantity >= definition.CraftWoodQuantity && _snapshot.StoneQuantity >= definition.CraftStoneQuantity;
 
-        private string ToolStatus(CombatPrototypeMapGatherToolDefinition definition, string name, int durability, int level)
+        private string ToolStatus(CombatPrototypeMapGatherToolDefinition definition, string name, int durability, int level,
+            CombatPrototypeMapGatherToolDurabilityHudClient.ToolStatus status)
         {
             var text = name + "  " + (durability < 0 ? _notOwned : _levelLabel + " " + level + " " + durability + "/" + definition.MaxDurability);
             if (_toolSettings.Enabled == 0) return text + "  " + _disabled;
+            if (_durabilityEnabled && status.WarningLabel.Length != 0) return text + "  " + status.WarningLabel;
             return durability >= 0 && durability < definition.DurabilityCostPerCompletion ? text + "  " + _broken : text;
         }
 
@@ -220,7 +227,7 @@ namespace Code_01.CombatPrototype.Map
                 GUI.Label(new Rect(panel.x + 12f, panel.y + 12f, panel.width - 24f, _settings.RowHeightPixels), _title, _labelStyle);
                 var viewport = new Rect(panel.x + 12f, panel.y + 12f + _settings.RowHeightPixels,
                     panel.width - 24f, panel.height - 3f * _settings.RowHeightPixels - 24f);
-                var rows = Mathf.Max(_snapshot.Items.Count * 2, 1) + 14 + CombatPrototypeMapGatherToolRepairPanel.RowCount + CombatPrototypeMapInventoryCapacityUpgradePanel.RowCount + CombatPrototypeMapGatherToolUpgradePanel.RowCount;
+                var rows = Mathf.Max(_snapshot.Items.Count * 2, 1) + 14 + CombatPrototypeMapGatherToolRepairPanel.RowCount + CombatPrototypeMapInventoryCapacityUpgradePanel.RowCount + CombatPrototypeMapGatherToolUpgradePanel.RowCount + (_durabilityEnabled ? 2 : 0);
                 var content = new Rect(0f, 0f, viewport.width - 18f, rows * _settings.RowHeightPixels);
                 _scroll = GUI.BeginScrollView(viewport, _scroll, content);
                 try { DrawBody(content.width); }
@@ -254,8 +261,10 @@ namespace Code_01.CombatPrototype.Map
             }
             _upgrade.Draw(width, ref y, _settings.RowHeightPixels, _labelStyle, _buttonStyle, _mousePressAccepted);
             Label(width, ref y, _tools);
-            Label(width, ref y, _axeStatus);
-            Label(width, ref y, _pickaxeStatus);
+            ToolLabel(width, ref y, _axeStatus, _axeDurabilityStatus.TextColor);
+            if (_durabilityEnabled) Label(width, ref y, _axeDurabilityStatus.Detail);
+            ToolLabel(width, ref y, _pickaxeStatus, _pickaxeDurabilityStatus.TextColor);
+            if (_durabilityEnabled) Label(width, ref y, _pickaxeDurabilityStatus.Detail);
             Label(width, ref y, _craft);
             DrawRecipe(width, ref y, _axeCraftTitle, _axeButton, _axeRecipe, _axeMissing, _canCraftAxe, true);
             DrawRecipe(width, ref y, _pickaxeCraftTitle, _pickaxeButton, _pickaxeRecipe, _pickaxeMissing, _canCraftPickaxe, false);
@@ -267,6 +276,13 @@ namespace Code_01.CombatPrototype.Map
         {
             GUI.Label(new Rect(0f, y, width, _settings.RowHeightPixels), text, _labelStyle);
             y += _settings.RowHeightPixels;
+        }
+
+        private void ToolLabel(float width, ref float y, string text, Color color)
+        {
+            var oldColor = GUI.color;
+            try { GUI.color = color; Label(width, ref y, text); }
+            finally { GUI.color = oldColor; }
         }
 
         private void DrawRecipe(float width, ref float y, string title, string button, string recipe, string missing,
@@ -305,7 +321,8 @@ namespace Code_01.CombatPrototype.Map
         public void Reset()
         {
             Close();
-            _configured = _ready = false;
+            _configured = _ready = _durabilityEnabled = false;
+            _axeDurabilityStatus = _pickaxeDurabilityStatus = CombatPrototypeMapGatherToolDurabilityHudClient.ToolStatus.Plain;
             _snapshot.Reset();
             _drop.Reset();
             _repair.Reset();

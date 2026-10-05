@@ -19,7 +19,7 @@
 
 ## 【FACT】JSON 契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 当前一致为 schemaVersion=21/configRevision=24。必填 inventoryPanel 共30字段，沿原严格UTF-8、完整字段/类型及未知/重复键检查；即使关闭面板也校验全部字段。旧地图v1～v20明确失败，不补段/默认值或回退来源；正常导入/烘焙后生效，无运行热重载。Lv1配方/定义仍从gatherTools读取，当前级上限/倍率归[gatherToolUpgrade](MapGatherToolUpgrade.md)，面板不复制配置真值。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 当前一致为 schemaVersion=22/configRevision=25。必填 inventoryPanel 共30字段，沿原严格UTF-8、完整字段/类型及未知/重复键检查；即使关闭面板也校验全部字段。旧地图v1～v21明确失败，不补段/默认值或回退来源；正常导入/烘焙后生效，无运行热重载。Lv1配方/定义仍从gatherTools读取，当前级上限/倍率归[gatherToolUpgrade](MapGatherToolUpgrade.md)，面板不复制配置真值。
 
 | 字段 | 默认值 | 契约 |
 |---|---|---|
@@ -58,7 +58,7 @@
 
 ## 【CURRENT STRATEGY】库存、工具与配方显示
 
-客户端仅枚举启用GhostOwnerIsLocal的一个玩家，并核对其GhostOwner对应Connected/InGame且无断线请求的连接；没有有效本地Ghost/连接时清空显示。展示原CombatPrototypeInventoryItem的正数量条目及原顺序，不设第二份可变库存，不按99拆格、不排序；零数量不列出。材料标题后增加一行总量/上限，受管材料行显示数量/单种上限，关闭限制显示Unlimited，规则归[容量](MapInventoryCapacity.md)。木材/石材/活力苹果/小块肉映射上述Wood/Stone/Apple/Meat文案，其余合法名称直接按原ItemName显示。ToolId/Durability仍来自原所属工具缓冲，工具独立于库存，两槽显示当前/最大耐久、未持有或损坏/功能关闭状态。
+客户端仅枚举启用GhostOwnerIsLocal的一个玩家，并核对其GhostOwner对应Connected/InGame且无断线请求的连接；没有有效本地Ghost/连接时清空显示。展示原CombatPrototypeInventoryItem的正数量条目及原顺序，不设第二份可变库存，不按99拆格、不排序；零数量不列出。材料标题后增加一行总量/上限，受管材料行显示数量/单种上限，关闭限制显示Unlimited，规则归[容量](MapInventoryCapacity.md)。木材/石材/活力苹果/小块肉映射上述Wood/Stone/Apple/Meat文案，其余合法名称直接按原ItemName显示。ToolId/Durability/Level来自原所属工具缓冲，工具独立于库存，两槽显示当前等级/本级最大耐久、未持有或功能关闭状态；预警开启时状态文字与颜色归[耐久预警](MapToolDurabilityHud.md)，关闭时沿原损坏显示。
 
 新Snapshot只缓存显示文本/数量；条目名称空白/控制字符、负数量或重复名称按索引/地图/玩家记录错误并跳过该项，其余独立条目继续，当前快照有错误时禁用制作、修理和丢弃按钮，不用展示数据修正库存。原工具网络数据仍由原HUD统一校验。必需地图配置、客户端绑定/宿主缺失明确暴露错误，不查找或创建组件兜底。
 
@@ -106,4 +106,8 @@ v14/17修理阶段的[工具修理](MapToolRepair.md)在制作区后追加11滚�
 
 ## 【FACT】工具升级面板与有效上限
 
-[工具升级](MapGatherToolUpgrade.md)在修理之后追加14滚动行，显示两工具当前/下级、保留耐久与新上限、当前→下一秒数、材料/缺口及6/7按钮、本人2秒反馈。HUD先校验ToolId/Durability/Level，原工具状态/修理预览以有效定义和Level变化刷新，耐久未变也更新最大值；缓存只读且不保存DynamicBuffer跨帧。输入19，B关闭/绑定失效清新增请求，全部显示关闭仍可6/7。当前v21/24编译/22次Bake静态通过，人工UNKNOWN；旧面板与背包升级用户通过保持各自原范围。
+[工具升级](MapGatherToolUpgrade.md)在修理之后追加14滚动行，显示两工具当前/下级、保留耐久与新上限、当前→下一秒数、材料/缺口及6/7按钮、本人2秒反馈。HUD先校验ToolId/Durability/Level，原工具状态/修理预览以有效定义和Level变化刷新，耐久未变也更新最大值；缓存只读且不保存DynamicBuffer跨帧。输入19，B关闭/绑定失效清新增请求，全部显示关闭仍可6/7。工具升级v21/24编译/22次Bake静态通过；用户确认工具升级人工通过限v21/revision24二十二项，未触发用例UNKNOWN；旧面板与背包升级用户通过保持各自原范围。
+
+## 【FACT】耐久预警与剩余次数
+
+沿[gatherToolDurabilityHud](MapToolDurabilityHud.md)的只读两工具帧，状态行显示Low/Critical/Broken并单行着色；各工具下一行显示Uses及整除后的剩余次数，预警/损坏且修理开启提示3/4，损坏且关闭修理提示原1/2 Recraft at Lv1。缺少工具仍Not owned；新开关与gatherTools均开启才追加两滚动行，关闭新开关恢复旧损坏文字/白色且不追加行，工具关闭沿原Disabled。原380×640、字号18/行32、配方/修理/升级/丢弃/反馈及按钮资格保持；ToolLabel绘制后恢复GUI.color，详情行沿原白色。提示仅说明入口，不保证材料或服务器资格。Configure/Reset释放新帧；Durability/Level变化刷新且无跨帧DynamicBuffer。编译/配置/隔离Bake静态通过，新增人工16项、排版/字形/命中及生命周期仍UNKNOWN。

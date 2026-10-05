@@ -20,7 +20,7 @@
 
 ## 【FACT】当前 JSON 契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 为 schemaVersion=21/configRevision=24，interactionHud、[高亮](MapInteractionHighlight.md)、[G提示](MapPickupHud.md)、[工具配置](MapGatherTools.md)与[面板配置](MapInventoryPanel.md)均必填；interactionHud全部十个字段必填，沿原严格 UTF-8/字段/类型/重复键检查。旧 v1～v20 明确失败，不补默认段或回退来源；JSON 只在正常导入和烘焙后生效，无运行热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 为 schemaVersion=22/configRevision=25，interactionHud、[高亮](MapInteractionHighlight.md)、[G提示](MapPickupHud.md)、[工具配置](MapGatherTools.md)与[面板配置](MapInventoryPanel.md)均必填；interactionHud全部十个字段必填，沿原严格 UTF-8/字段/类型/重复键检查。旧 v1～v21 明确失败，不补默认段或回退来源；JSON 只在正常导入和烘焙后生效，无运行热重载。
 
 | 字段 | 默认值 | 契约 |
 |---|---|---|
@@ -35,7 +35,7 @@
 | mineLabel | Mine Rock | 同上 |
 | noSpaceLabel | Not enough space | 同上；[容量](MapInventoryCapacity.md)拒绝时使用 |
 
-即使 enabled=false，其余字段仍按上述契约校验。显示按 1920×1080 参考像素，以 min(屏幕宽/1920,屏幕高/1080) 等比缩放，底部居中；面板黑色背景 alpha=0.7，文字白色，进度背景白色 alpha=0.2，填充 RGB=(0.85,0.65,0.3)。使用内置 GUI 样式字体与 Texture2D.whiteTexture，不导入新的字体/纹理；当前英文文案，中文文案字段可配置，但中文字体与实际字形覆盖未确认。
+即使 enabled=false，其余字段仍按上述契约校验。显示按 1920×1080 参考像素，以 min(屏幕宽/1920,屏幕高/1080) 等比缩放，底部居中；面板黑色背景 alpha=0.7，第一行/反馈白色，第二行工具状态颜色归[耐久预警](MapToolDurabilityHud.md)，进度背景白色 alpha=0.2，填充 RGB=(0.85,0.65,0.3)。使用内置 GUI 样式字体与 Texture2D.whiteTexture，不导入新的字体/纹理；当前英文文案，中文文案字段可配置，但中文字体与实际字形覆盖未确认。
 
 ## 【CURRENT STRATEGY】权威采样与本地显示
 
@@ -58,7 +58,7 @@ CombatPrototypeMapInteractionHudState 用 OwnerSendType=SendToOwner 同步给所
 
 客户端枚举启用的 GhostOwnerIsLocal，不在含该可启用组件的查询上调用单例 API；只显示本地所属玩家且死亡时收起，不显示远端玩家进度。F文字路径不读取PlayerView或世界位置；[高亮](MapInteractionHighlight.md)额外读取所选资源的客户端LocalToWorld，不替代官方Transform显示桥接。Main Camera 组件随 Client World 变更注册/解绑；无客户端、准入未完成、没有本地 Ghost 或地图停止时隐藏。World/Scene 释放清掉显示和引用，不保留上一局目标/进度/制作反馈；本地玩家或地图源变化也重置反馈序号观察。
 
-NoSpace第一行显示noSpaceLabel、第二行显示F目标，不画进度；Ready 显示“F  文案”；Working 显示“文案  百分比%”和按千分比填充的进度条，整数百分比为 ProgressPermille/10。第二行读取所属工具缓冲显示对应名称/Level/本级耐久上限、Hands或Lv1重做提示，制作/修理反馈默认各2秒；除NoSpace第二行优先目标外，未到期修理优先于制作，无F目标可临时显示结果，交互中只替换第二行；NoSpace时原反馈仍可在B页脚查看。初次绑定只观察现有Sequence，不重播旧结果；只有反馈显示使用客户端unscaledTime。F面板仍只在Repaint绘制，库存列表/按钮委托[制作面板](MapInventoryPanel.md)处理GUI事件；B由客户端输入系统读取。缓存文案与样式，绘制后恢复GUI.matrix/color/enabled。F文字面板不显示掉落拾取提示、世界标记或再生倒计时；独立G面板归[拾取提示](MapPickupHud.md)，宿主先绘制[投影圆环](MapInteractionHighlight.md)再绘制原面板。
+NoSpace第一行显示noSpaceLabel、第二行显示F目标，不画进度；Ready 显示“F  文案”；Working 显示“文案  百分比%”和按千分比填充的进度条，整数百分比为 ProgressPermille/10。第二行读取所属工具缓冲显示对应名称/Level/本级耐久上限、Hands、3/4修理或Lv1重做提示（依耐久预警/修理开关），制作/修理反馈默认各2秒；除NoSpace第二行优先目标外，未到期修理优先于制作，无F目标可临时显示结果，交互中只替换第二行；NoSpace时原反馈仍可在B页脚查看。初次绑定只观察现有Sequence，不重播旧结果；只有反馈显示使用客户端unscaledTime。F面板仍只在Repaint绘制，库存列表/按钮委托[制作面板](MapInventoryPanel.md)处理GUI事件；B由客户端输入系统读取。缓存文案与样式，绘制后恢复GUI.matrix/color/enabled。F文字面板不显示掉落拾取提示、世界标记或再生倒计时；独立G面板归[拾取提示](MapPickupHud.md)，宿主先绘制[投影圆环](MapInteractionHighlight.md)再绘制原面板。
 
 资源采样错误按单项暴露地图、类型、布置索引、实体和原异常并继续；玩家帧错误按连接隔离，未生成有效快照者清为 Hidden。必需服务、地图 Settings、HUD 挂载或本地 HUD 数据缺失明确报错，不查找节点、不创建替代组件或默认配置；非法非隐藏网络快照明确报错并保持隐藏。
 
@@ -72,7 +72,7 @@ NoSpace第一行显示noSpaceLabel、第二行显示F目标，不画进度；Rea
 
 v9/revision12阶段复用原Main Camera宿主接入[材料背包与制作面板](MapInventoryPanel.md)，两个显示开关独立。关闭F HUD仍保留本地面板/制作反馈，关闭面板仍保留F HUD；绑定先核对所属Connected/InGame连接，v9时两者关闭或生命周期失效时清空；当前显示开关见末段。原服务端四字段不变，本次编译/十四次隔离烘焙静态通过；用户确认面板人工通过限v9/revision12及[运行入口](Runtime.md)十二项，未触发的独立失败/时序用例仍UNKNOWN。
 
-当前地图v21/24必填[背包丢弃](MapInventoryDrop.md)，复用原掉落资源及保存链；本专题原交互/工具/产出/再生行为保持。新增丢弃静态及用户人工通过限[运行入口](Runtime.md)v10/13十二项，未触发用例UNKNOWN；旧通过仍限原版本/清单。
+当前地图v22/25必填[背包丢弃](MapInventoryDrop.md)，复用原掉落资源及保存链；本专题原交互/工具/产出/再生行为保持。新增丢弃静态及用户人工通过限[运行入口](Runtime.md)v10/13十二项，未触发用例UNKNOWN；旧通过仍限原版本/清单。
 
 v11/14阶段复用原宿主/绑定接入[G提示](MapPickupHud.md)：pickupHud、interactionHud及inventoryPanel独立，三者全关闭或生命周期失效才收起整体绑定；F/G可同时显示，F四字段和进度/工具/反馈规则保持。G新增所属四字段、五职责脚本/meta及显示Settings，未改Scene/Prefab/Animator结构。编译/十次隔离烘焙静态通过，用户确认G显示人工通过，限v11/14十项，未触发用例UNKNOWN，旧通过保持原范围。
 
@@ -80,7 +80,7 @@ v12/15高亮复用原F四字段与Working锁定目标接入[资源交互高亮](
 
 v13/16的[资源状态](MapResourceStatusHud.md)复用此宿主，独立显示三类资源状态与服务端剩余秒数，F文字面板本身保持。F采样增加状态开关作为身份消费者；仅状态开启时仍保留原F目标优先级。新显示静态及用户人工通过，限v13/16十项，未触发用例UNKNOWN；旧通过仍限各自版本/清单。
 
-当前v21/24的[修理反馈](MapToolRepair.md)由新普通缓存类读取所属Sequence/Kind/Result并委托原F第二行/B页脚显示，初次绑定不重播；无F目标显示结果及对应工具。非法修理反馈只清本通道并记录原异常，Configure/Reset清旧序号、期限/身份。原F进度、G、高亮/资源状态开关及计时保持；静态及用户人工通过，限v14/17十二项，未触发用例UNKNOWN。
+当前v22/25的[修理反馈](MapToolRepair.md)由新普通缓存类读取所属Sequence/Kind/Result并委托原F第二行/B页脚显示，初次绑定不重播；无F目标显示结果及对应工具。非法修理反馈只清本通道并记录原异常，Configure/Reset清旧序号、期限/身份。原F进度、G、高亮/资源状态开关及计时保持；静态及用户人工通过，限v14/17十二项，未触发用例UNKNOWN。
 
 ## 【FACT】地图资源存档接入边界
 
@@ -96,4 +96,8 @@ v13/16的[资源状态](MapResourceStatusHud.md)复用此宿主，独立显示�
 
 ## 【FACT】工具等级显示
 
-[升级](MapGatherToolUpgrade.md)增加所属工具Level和B专属结果；原F四字段、工作进度/目标、高亮/G/资源状态与制作/修理反馈优先保持。绑定读取四条固定升级定义及树/矿基础耗时，HUD校验本级上限、按等级变化刷新原第二行和B/修理预览。新结果仅在B工具升级通道显示，输入19，原生命周期Reset同步释放。编译/22次隔离Bake静态通过，人工UNKNOWN；旧HUD用户通过保持原版本/清单。
+[升级](MapGatherToolUpgrade.md)增加所属工具Level和B专属结果；原F四字段、工作进度/目标、高亮/G/资源状态与制作/修理反馈优先保持。绑定读取四条固定升级定义及树/矿基础耗时，HUD校验本级上限、按等级变化刷新原第二行和B/修理预览。新结果仅在B工具升级通道显示，输入19，原生命周期Reset同步释放。编译/22次隔离Bake静态通过；用户确认工具升级人工通过限v21/revision24二十二项，未触发用例UNKNOWN；旧HUD用户通过保持原版本/清单。
+
+## 【FACT】耐久预警显示接入
+
+地图schema22/revision25新增必填[gatherToolDurabilityHud](MapToolDurabilityHud.md)11字段/固定Settings；原绑定传给HUD普通只读助手。RefreshToolStatus沿原ID/唯一性/等级/本级上限校验，再按Durability与Level缓存计算颜色；等级变化且耐久未变仍刷新。F第一行、NoSpace、反馈优先及进度保持；只在对应工具状态第二行使用预警颜色，损坏且修理开启提示3/4，关闭修理仍1/2重做。无目标仍仅原反馈临时显示，没有独立耐久弹窗/计时器；B委托原面板显示两条新增详情。每帧Clear只收起，绑定失效等原Reset清新增状态/颜色。原F四字段/输入19、资源/存档/Camera组件与结构保持。静态核对通过；新增显示、排版/字形/生命周期和联网人工验收UNKNOWN，见[运行入口](Runtime.md)。

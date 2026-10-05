@@ -21,7 +21,7 @@
 
 ## 【FACT】当前配置契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=21/configRevision=24。resourcePersistence/geometry/layout/movement/drops/treeHarvest/mining/gatherTools/interactionHud/pickupHud/interactionHighlight/resourceStatusHud/worldSaveHud/inventoryPanel/inventoryDrop/population/spawn均必填；新增字段沿原严格UTF-8、对象形状、缺失/未知/重复字段与标量类型校验。旧v1～v20明确拒绝，不迁移、补默认或回退来源；正常导入/烘焙后生效，无热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=22/configRevision=25。resourcePersistence/geometry/layout/movement/drops/treeHarvest/mining/gatherTools/interactionHud/pickupHud/interactionHighlight/resourceStatusHud/worldSaveHud/inventoryPanel/inventoryDrop/population/spawn均必填；新增字段沿原严格UTF-8、对象形状、缺失/未知/重复字段与标量类型校验。旧v1～v21明确拒绝，不迁移、补默认或回退来源；正常导入/烘焙后生效，无热重载。
 
 | 配置位置/字段 | 默认值 | 校验或行为 |
 |---|---|---|
@@ -82,3 +82,7 @@ Result依次为None、Success、Disabled、NotOwned、AlreadyFull、Insufficient
 寿命提示v17/20归[G提示](MapPickupHud.md)：所属G六字段，原目标/拾取/期限/保存保持；静态及用户人工通过限十二项，未触发独立用例UNKNOWN；旧用户通过仍限原版本/清单。
 
 地图v18/21的[F5/保存提示](MapWorldSaveHud.md)已接入：该阶段17输入、新增所属3字段；原F/G、工具及世界/玩家存档格式保持。静态及用户人工通过限v18/revision21十二项，未触发独立用例UNKNOWN；旧通过限原版本/清单。
+
+## 【FACT】耐久预警中的修理提示
+
+[耐久预警](MapToolDurabilityHud.md)复用原3/4入口；F损坏工具及B预警/损坏详情显示Repair按键，关闭修理时损坏工具沿原1/2重做。提示只读，不代替材料/生命/预约/同tick资格，不新增输入、反馈、存档或修理恢复值；修理后按本级最大耐久重算比例，恢复20/15仍处阈值内时保留Low/Critical。新显示人工GamePlayer UNKNOWN；原修理通过仍限v14/revision17十二项。

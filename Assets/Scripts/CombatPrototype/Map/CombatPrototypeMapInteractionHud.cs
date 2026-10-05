@@ -26,6 +26,8 @@ namespace Code_01.CombatPrototype.Map
         private string _noSpaceLabel;
         private string _text;
         private string _toolText;
+        private Color _toolTextColor = Color.white;
+        private readonly CombatPrototypeMapGatherToolDurabilityHudClient _durabilityHud = new CombatPrototypeMapGatherToolDurabilityHudClient();
         private string _feedbackText;
         private string _axeName;
         private string _pickaxeName;
@@ -108,7 +110,8 @@ namespace Code_01.CombatPrototype.Map
             CombatPrototypeMapInventoryCapacityUpgradeSettings upgradeSettings,
             DynamicBuffer<CombatPrototypeMapInventoryCapacityUpgradeDefinition> upgradeDefinitions,
             CombatPrototypeMapGatherToolUpgradeSettings toolUpgradeSettings,
-            DynamicBuffer<CombatPrototypeMapGatherToolUpgradeDefinition> toolUpgradeDefinitions, float treeDuration, float mineDuration, string mapId)
+            DynamicBuffer<CombatPrototypeMapGatherToolUpgradeDefinition> toolUpgradeDefinitions,
+            CombatPrototypeMapGatherToolDurabilityHudSettings durabilitySettings, float treeDuration, float mineDuration, string mapId)
         {
             Reset();
             _settings = settings;
@@ -126,7 +129,8 @@ namespace Code_01.CombatPrototype.Map
             _treeLabel = settings.TreeLabel.ToString();
             _mineLabel = settings.MineLabel.ToString();
             _noSpaceLabel = settings.NoSpaceLabel.ToString();
-            _inventoryPanel.Configure(inventorySettings, toolSettings, axe, pickaxe, dropSettings, dropDefinitions, capacity, capacityDefinitions, upgradeSettings, upgradeDefinitions, toolUpgradeSettings, toolUpgradeDefinitions, treeDuration, mineDuration, mapId);
+            _durabilityHud.Configure(durabilitySettings, toolSettings, inventorySettings.NotOwnedLabel.ToString(), _recraftLabel);
+            _inventoryPanel.Configure(inventorySettings, toolSettings, axe, pickaxe, dropSettings, dropDefinitions, capacity, capacityDefinitions, upgradeSettings, upgradeDefinitions, toolUpgradeSettings, toolUpgradeDefinitions, _durabilityHud.Enabled, treeDuration, mineDuration, mapId);
             _pickupHud.Configure(pickupSettings);
             _highlight.Configure(highlightSettings, mapId, _highlightCamera);
             _resourceStatus.Configure(resourceStatusSettings, settings, mapId);
@@ -141,6 +145,7 @@ namespace Code_01.CombatPrototype.Map
             DynamicBuffer<CombatPrototypeInventoryItem> inventory,
             Entity source, Entity player, CombatPrototypeMapPickupHudState pickupState)
         {
+            _toolTextColor = Color.white;
             _pickupHud.Show(pickupState);
             RefreshToolStatus(tools);
             ObserveFeedback(feedback);
@@ -153,6 +158,7 @@ namespace Code_01.CombatPrototype.Map
             var feedbackKind = hasRepairFeedback ? _repairFeedback.Kind : _feedbackKind;
             _inventoryPanel.Show(inventory, _axeDurability, _pickaxeDurability, _axeLevel, _pickaxeLevel,
                 DefinitionForLevel(_axe, _axeLevel), DefinitionForLevel(_pickaxe, _pickaxeLevel),
+                _durabilityHud.Axe, _durabilityHud.Pickaxe,
                 displayFeedback, dropFeedback, capacityLevel, upgradeFeedback, toolUpgradeFeedback, source, player);
             if (_settings.Enabled == 0) { _visible = false; return; }
             if (state.Mode == CombatPrototypeMapInteractionHudMode.Hidden)
@@ -164,6 +170,7 @@ namespace Code_01.CombatPrototype.Map
                 _visible = hasFeedback;
                 _text = displayFeedback;
                 _toolText = hasFeedback ? ToolStatus(feedbackKind) : string.Empty;
+                _toolTextColor = hasFeedback ? _durabilityHud.ForKind(feedbackKind).TextColor : Color.white;
                 return;
             }
             if ((state.Mode != CombatPrototypeMapInteractionHudMode.Ready && state.Mode != CombatPrototypeMapInteractionHudMode.Working &&
@@ -189,6 +196,9 @@ namespace Code_01.CombatPrototype.Map
                 state.Kind == (byte)CombatPrototypeMapInteractionKind.Gather ? "Hands" :
                 ToolStatus(state.Kind == (byte)CombatPrototypeMapInteractionKind.Tree ?
                     CombatPrototypeMapGatherToolKind.Axe : CombatPrototypeMapGatherToolKind.Pickaxe);
+            if (!hasFeedback && state.Kind != (byte)CombatPrototypeMapInteractionKind.Gather)
+                _toolTextColor = _durabilityHud.ForKind(state.Kind == (byte)CombatPrototypeMapInteractionKind.Tree ?
+                    CombatPrototypeMapGatherToolKind.Axe : CombatPrototypeMapGatherToolKind.Pickaxe).TextColor;
             _visible = true;
         }
 
@@ -223,6 +233,8 @@ namespace Code_01.CombatPrototype.Map
                 }
                 else throw new InvalidOperationException("Unknown owner tool ID: " + tool.ToolId);
             }
+            _durabilityHud.Capture(DefinitionForLevel(_axe, axeLevel), axeDurability, axeLevel,
+                DefinitionForLevel(_pickaxe, pickaxeLevel), pickaxeDurability, pickaxeLevel);
             if (_axeDurability != axeDurability || _axeLevel != axeLevel)
             {
                 _axeDurability = axeDurability; _axeLevel = axeLevel;
@@ -249,6 +261,8 @@ namespace Code_01.CombatPrototype.Map
             if (_toolSettings.Enabled == 0) return "Hands";
             if (durability < 0) return "Hands  [" + key + ": Craft " + name + "]";
             var status = name + " " + _levelLabel + " " + level + "  " + durability + "/" + definition.MaxDurability;
+            if (durability < definition.DurabilityCostPerCompletion && _durabilityHud.Enabled && _toolSettings.RepairEnabled != 0)
+                return status + "  [" + _durabilityHud.ForKind(definition.Kind).RepairHint + "]";
             return durability < definition.DurabilityCostPerCompletion ? status + "  [" + key + ": " + _recraftLabel + "]" : status;
         }
 
@@ -314,6 +328,8 @@ namespace Code_01.CombatPrototype.Map
             _resourceStatus.Reset();
             _repairFeedback.Reset();
             _worldSaveHud.Reset();
+            _durabilityHud.Reset();
+            _toolTextColor = Color.white;
             _labelStyle = null;
             _text = _toolText = _feedbackText = string.Empty;
             _mode = CombatPrototypeMapInteractionHudMode.Hidden;
@@ -359,6 +375,7 @@ namespace Code_01.CombatPrototype.Map
                 GUI.DrawTexture(panel, Texture2D.whiteTexture);
                 GUI.color = Color.white;
                 GUI.Label(new Rect(panel.x + 12f, panel.y + 12f, panel.width - 24f, _settings.FontSize + 8f), _text, _labelStyle);
+                GUI.color = _toolTextColor;
                 GUI.Label(new Rect(panel.x + 12f, panel.y + 20f + _settings.FontSize, panel.width - 24f, _settings.FontSize + 8f),
                     _toolText, _labelStyle);
                 if (_mode != CombatPrototypeMapInteractionHudMode.Working) return;

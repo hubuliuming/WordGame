@@ -93,6 +93,7 @@ namespace Code_01.CombatPrototype.Map
                     EntityManager.GetBuffer<CombatPrototypeMapInventoryCapacityUpgradeDefinition>(source, true),
                     EntityManager.GetComponentData<CombatPrototypeMapGatherToolUpgradeSettings>(source),
                     EntityManager.GetBuffer<CombatPrototypeMapGatherToolUpgradeDefinition>(source, true),
+                    EntityManager.GetComponentData<CombatPrototypeMapGatherToolDurabilityHudSettings>(source),
                     EntityManager.GetComponentData<CombatPrototypeMapTreeSettings>(source).HarvestDuration,
                     EntityManager.GetComponentData<CombatPrototypeMapMineSettings>(source).HarvestDuration, map.MapDefinitionId.ToString());
                 _source = source;

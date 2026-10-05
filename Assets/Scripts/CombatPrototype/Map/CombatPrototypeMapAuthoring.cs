@@ -168,6 +168,22 @@ namespace Code_01.CombatPrototype.Map
                     TargetUnavailableLabel = new FixedString64Bytes(failureHud.targetUnavailableLabel),
                     FailedLabel = new FixedString64Bytes(failureHud.failedLabel)
                 });
+                var outcomeHud = config.map.gatherOutcomeHud;
+                AddComponent(entity, new CombatPrototypeMapGatherOutcomeHudSettings
+                {
+                    Enabled = (byte)(outcomeHud.enabled ? 1 : 0), FeedbackSeconds = outcomeHud.feedbackSeconds,
+                    CompletedColor = CombatPrototypeMapInteractionHighlightSettings.ColorFromHex(outcomeHud.completedColorHex),
+                    InterruptedColor = CombatPrototypeMapInteractionHighlightSettings.ColorFromHex(outcomeHud.interruptedColorHex),
+                    FailedColor = CombatPrototypeMapInteractionHighlightSettings.ColorFromHex(outcomeHud.failedColorHex),
+                    GatherCompletedLabel = new FixedString64Bytes(outcomeHud.gatherCompletedLabel),
+                    TreeCompletedLabel = new FixedString64Bytes(outcomeHud.treeCompletedLabel),
+                    MineCompletedLabel = new FixedString64Bytes(outcomeHud.mineCompletedLabel),
+                    MovingLabel = new FixedString64Bytes(outcomeHud.movingLabel),
+                    AttackingLabel = new FixedString64Bytes(outcomeHud.attackingLabel),
+                    HitLabel = new FixedString64Bytes(outcomeHud.hitLabel),
+                    OutOfRangeLabel = new FixedString64Bytes(outcomeHud.outOfRangeLabel),
+                    FailedLabel = new FixedString64Bytes(outcomeHud.failedLabel)
+                });
                 var pickupHud = config.map.pickupHud;
                 AddComponent(entity, new CombatPrototypeMapPickupHudSettings
                 {

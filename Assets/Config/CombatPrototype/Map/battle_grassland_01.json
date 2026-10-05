@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 23,
-  "configRevision": 26,
+  "schemaVersion": 24,
+  "configRevision": 27,
   "mapDefinitionId": "battle_grassland_01",
   "defaultSeed": 12345,
   "resourcePersistence": {
@@ -179,6 +179,21 @@
     "noTargetLabel": "No available resource",
     "targetUnavailableLabel": "Target unavailable",
     "failedLabel": "Interaction failed"
+  },
+  "gatherOutcomeHud": {
+    "enabled": true,
+    "feedbackSeconds": 2,
+    "completedColorHex": "#6ED88A",
+    "interruptedColorHex": "#FFB454",
+    "failedColorHex": "#FF6B6B",
+    "gatherCompletedLabel": "Gathering completed",
+    "treeCompletedLabel": "Tree felled",
+    "mineCompletedLabel": "Mining completed",
+    "movingLabel": "Interrupted: moving",
+    "attackingLabel": "Interrupted: attacking",
+    "hitLabel": "Interrupted: hit",
+    "outOfRangeLabel": "Interrupted: out of range",
+    "failedLabel": "Resource work failed"
   },
   "pickupHud": {
     "enabled": true,

@@ -105,12 +105,13 @@ namespace Code_01.CombatPrototype.Map
                     var progress = progresses.GetRefRW(point);
                     var networkId = current.ValueRO.CollectorNetworkId;
                     var placement = current.ValueRO.PlacementIndex;
+                    var rewardSaved = false;
                     try
                     {
                         var playerIndex = FindCollector(players, progress.ValueRO.Collector, networkId);
                         if (playerIndex < 0)
                         {
-                            Cancel(current, progress, map.MapDefinitionId, point, "CollectorOffline");
+                            Cancel(current, progress, map.MapDefinitionId, point, "CollectorOffline", true);
                             continue;
                         }
                         var player = players[playerIndex];
@@ -123,18 +124,21 @@ namespace Code_01.CombatPrototype.Map
                             reason = "OutOfRange";
                         if (reason != null)
                         {
-                            Cancel(current, progress, map.MapDefinitionId, point, reason);
+                            Cancel(current, progress, map.MapDefinitionId, point, reason, true);
                             continue;
                         }
-                        if (time >= progress.ValueRO.FinishAt)
-                            Complete(current, progress, config, player, access, map.MapDefinitionId, point, time, capacity, capacityDefinitions, upgradeDefinitions);
+                        if (time >= progress.ValueRO.FinishAt &&
+                            Complete(current, progress, config, player, access, map.MapDefinitionId, point, time,
+                                capacity, capacityDefinitions, upgradeDefinitions, out rewardSaved))
+                            CombatPrototypeMapGatherOutcomeFeedbackUtility.Write(EntityManager, map.MapDefinitionId,
+                                player.Entity, player.NetworkId, CombatPrototypeMapInteractionKind.Gather, CombatPrototypeMapGatherOutcomeResult.Completed);
                     }
                     catch (Exception exception)
                     {
                         Debug.LogError("[CombatPrototype.Map] Gather update failed; map=" + map.MapDefinitionId +
                             ", placement=" + placement + ", NetworkId=" + networkId + ", point=" + point + ". " + exception);
                         if (current.ValueRO.Phase == CombatPrototypeMapGatherPhase.Collecting)
-                            Cancel(current, progress, map.MapDefinitionId, point, "ProcessingFailed");
+                            Cancel(current, progress, map.MapDefinitionId, point, "ProcessingFailed", !rewardSaved);
                     }
                 }
 
@@ -196,24 +200,29 @@ namespace Code_01.CombatPrototype.Map
             return null;
         }
 
-        private static void Cancel(RefRW<CombatPrototypeMapGatherState> state,
-            RefRW<CombatPrototypeMapGatherProgress> progress, FixedString64Bytes mapId, Entity point, string reason)
+        private void Cancel(RefRW<CombatPrototypeMapGatherState> state,
+            RefRW<CombatPrototypeMapGatherProgress> progress, FixedString64Bytes mapId, Entity point, string reason, bool reportFeedback)
         {
             var placement = state.ValueRO.PlacementIndex;
             var networkId = state.ValueRO.CollectorNetworkId;
+            var collector = progress.ValueRO.Collector;
             progress.ValueRW = default;
             state.ValueRW.CollectorNetworkId = 0;
             state.ValueRW.Phase = CombatPrototypeMapGatherPhase.Available;
             Debug.Log("[CombatPrototype.Map] Gather cancelled; map=" + mapId + ", placement=" + placement +
                 ", NetworkId=" + networkId + ", point=" + point + ", reason=" + reason + ".");
+            if (reportFeedback)
+                CombatPrototypeMapGatherOutcomeFeedbackUtility.WriteCancellation(EntityManager, mapId, collector,
+                    networkId, CombatPrototypeMapInteractionKind.Gather, reason);
         }
 
-        private static void Complete(RefRW<CombatPrototypeMapGatherState> state,
+        private bool Complete(RefRW<CombatPrototypeMapGatherState> state,
             RefRW<CombatPrototypeMapGatherProgress> progress, CombatPrototypeMapGatherConfig config,
             OnlinePlayer player, PlayerLookups access, FixedString64Bytes mapId, Entity point, double time,
             CombatPrototypeMapInventoryCapacitySettings capacity, DynamicBuffer<CombatPrototypeMapInventoryCapacityDefinition> capacityDefinitions,
-            DynamicBuffer<CombatPrototypeMapInventoryCapacityUpgradeDefinition> upgradeDefinitions)
+            DynamicBuffer<CombatPrototypeMapInventoryCapacityUpgradeDefinition> upgradeDefinitions, out bool rewardSaved)
         {
+            rewardSaved = false;
             var stage = "CheckCapacity";
             var placement = state.ValueRO.PlacementIndex;
             try
@@ -226,8 +235,8 @@ namespace Code_01.CombatPrototype.Map
                     inventory, config.YieldItemName, config.YieldQuantity);
                 if (rejection != null)
                 {
-                    Cancel(state, progress, mapId, point, rejection);
-                    return;
+                    Cancel(state, progress, mapId, point, rejection, true);
+                    return false;
                 }
                 stage = "PrepareReward";
                 var itemIndex = -1;
@@ -242,6 +251,7 @@ namespace Code_01.CombatPrototype.Map
 
                 stage = "SavePrepared";
                 CombatPrototypePlayerSaveStore.SavePrepared(candidate);
+                rewardSaved = true;
 
                 // All references and buffer capacity are acquired before saving; no structural change or allocation here.
                 stage = "CommitGather";
@@ -254,6 +264,7 @@ namespace Code_01.CombatPrototype.Map
                     placement + ", objectId=" + config.ObjectId + ", NetworkId=" + player.NetworkId +
                     ", PlayerId=" + playerId + ", item=" + config.YieldItemName + ", quantity=+" +
                     config.YieldQuantity + ", totalItemQuantity=" + next.Quantity + ".");
+                return true;
             }
             catch (Exception exception)
             {
@@ -261,8 +272,9 @@ namespace Code_01.CombatPrototype.Map
                     ", placement=" + placement + ", NetworkId=" + player.NetworkId + ", player=" + player.Entity +
                     ", item=" + config.YieldItemName + ", stage=" + stage + ". " + exception);
                 if (state.ValueRO.Phase == CombatPrototypeMapGatherPhase.Collecting)
-                    Cancel(state, progress, mapId, point, "SettlementFailed");
+                    Cancel(state, progress, mapId, point, "SettlementFailed", !rewardSaved);
             }
+            return false;
         }
     }
 }

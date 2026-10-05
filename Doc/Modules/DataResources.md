@@ -238,7 +238,7 @@ MineState 同步 PlacementIndex/Phase/CollectorNetworkId/MinedTick 四字段，M
 
 ## 【FACT】统一 F 资源交互的配置边界
 
-F 复用原 Gather 输入，HarvestTree/Mine 字段保留但 H/J 停止触发/消费。服务端统一入口跨三类选目标，继续使用各类型既有距离、耗时与产出 JSON 字段；当前为schemaVersion=23/configRevision=26，原距离/耗时/产出接口、来源/烘焙、资源绑定及原玩家Items契约保持，存档写v2且保留Tools。统一 F 本身只增加两个交互脚本与 meta；矿点再生复用物体配置字段并增加 ECS 历史缓冲。当前[交互显示](MapInteractionHud.md)新增五个脚本/meta、地图显示配置及玩家所属 HUD 快照，主场景 Main Camera 仅追加一个 HUD 组件；Prefab/Animator与旧meta保持；存储类工具迁移/候选归[采集工具](MapGatherTools.md)。规则归[地图](Map.md)；人工交互/保存回归已获用户通过反馈，结论限[运行入口](Runtime.md)统一 F 八项清单，未触发的独立用例仍为 UNKNOWN。HUD 用户人工通过限 v7/revision=10 及运行入口对应八项清单，未实际触发的独立配置/烘焙/运行失败仍为 UNKNOWN。
+F 复用原 Gather 输入，HarvestTree/Mine 字段保留但 H/J 停止触发/消费。服务端统一入口跨三类选目标，继续使用各类型既有距离、耗时与产出 JSON 字段；当前为schemaVersion=24/configRevision=27，原距离/耗时/产出接口、来源/烘焙、资源绑定及原玩家Items契约保持，当前玩家存档写v4且保留Tools。统一 F 本身只增加两个交互脚本与 meta；矿点再生复用物体配置字段并增加 ECS 历史缓冲。当前[交互显示](MapInteractionHud.md)新增五个脚本/meta、地图显示配置及玩家所属 HUD 快照，主场景 Main Camera 仅追加一个 HUD 组件；Prefab/Animator与旧meta保持；存储类工具迁移/候选归[采集工具](MapGatherTools.md)。规则归[地图](Map.md)；人工交互/保存回归已获用户通过反馈，结论限[运行入口](Runtime.md)统一 F 八项清单，未触发的独立用例仍为 UNKNOWN。HUD 用户人工通过限 v7/revision=10 及运行入口对应八项清单，未实际触发的独立配置/烘焙/运行失败仍为 UNKNOWN。
 
 矿点再生配置、仅服务端字段、历史 Ghost Serializer 及八次隔离烘焙已静态核对，默认 true/600 秒，关闭再生 false/600 和关闭采矿的烘焙结果一致。新 MineRegrowSystem 脚本及 meta GUID=9da8de47253e52f4ba3b80983082bcc3 由 Unity 导入；MineState 四字段保持，新增缓冲改变矿点烘焙后的 Ghost 布局，各端须使用同版代码、配置及重新烘焙的数据。用户已确认矿点再生人工 GamePlayer 通过，资源范围限[运行入口](Runtime.md)矿点再生八项清单及 v6/revision=9，规则归[采矿](MapMining.md)；未实际触发的晚加入/预测时序/独立失败分支仍为 UNKNOWN，历史内存/网络开销未测量。
 
@@ -286,4 +286,8 @@ v10/13接入的[背包丢弃](MapInventoryDrop.md)复用原PrepareItemConsumptio
 
 ## 【FACT】统一F失败显示配置与同步
 
-地图v23/revision26新增必填[interactionFailureHud](MapInteractionFailureHud.md)九字段，Json/BuiltIn默认true/2秒/#FF6B6B及六文案；NoSpace沿原interactionHud.noSpaceLabel。严格形状/缺失/null/未知/重复键/类型/UTF-8与正有限时长/#RRGGBB/61字节文案校验，关闭仍验证，旧地图v1～v22拒绝，无默认补齐、来源回退或热重载。原地图根写九字段固定Settings，无Ghost；原Player Baker另加Sequence0/ResultNone二字段SendToOwner反馈。四新普通脚本与Unity生成meta，原F服务/绑定/HUD接入；仅请求启动失败显示，不写存档或改变保存调用。输入19、Tools3、F4/G6/资源状态4/世界保存3，玩家v4根7/Tools项3及世界v2根9/掉落项8保持。编译/实际生成Serializer、224份非法配置拒绝与32次隔离Bake静态通过，原布局/资源签名保持；16项人工GamePlayer与未触发的显示/错误隔离/联网/生命周期UNKNOWN。
+地图v23/revision26新增必填[interactionFailureHud](MapInteractionFailureHud.md)九字段，Json/BuiltIn默认true/2秒/#FF6B6B及六文案；NoSpace沿原interactionHud.noSpaceLabel。严格形状/缺失/null/未知/重复键/类型/UTF-8与正有限时长/#RRGGBB/61字节文案校验，关闭仍验证，旧地图v1～v22拒绝，无默认补齐、来源回退或热重载。原地图根写九字段固定Settings，无Ghost；原Player Baker另加Sequence0/ResultNone二字段SendToOwner反馈。四新普通脚本与Unity生成meta，原F服务/绑定/HUD接入；仅请求启动失败显示，不写存档或改变保存调用。输入19、Tools3、F4/G6/资源状态4/世界保存3，玩家v4根7/Tools项3及世界v2根9/掉落项8保持。编译/实际生成Serializer、224份非法配置拒绝与32次隔离Bake静态通过，原布局/资源签名保持；用户确认本阶段人工GamePlayer通过，限v23/revision26十六项；未触发的独立显示/错误隔离/联网/生命周期用例UNKNOWN。
+
+## 【FACT】采集完成与中断配置及所属同步
+
+当前地图v24/revision27必填[采集结果](MapGatherOutcomeHud.md)gatherOutcomeHud十三字段，Json/BuiltIn默认2秒、完成绿/中断橙/失败红及八文案；NoSpace沿原F容量文案。原严格读取与固定Settings映射保持，关闭仍验证，旧地图v1～v23拒绝，无补齐/回退/热重载。原Player Baker追加Sequence0/Kind0/ResultNone三字段SendToOwner最新反馈；各端须同版重新烘焙。五新普通脚本/meta，原资源引用/布局/兼容签名、输入及玩家v4/世界v2存档保持。静态通过，人工待验收；旧v23启动失败通过保持原清单。

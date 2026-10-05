@@ -100,7 +100,7 @@ namespace Code_01.CombatPrototype.Map
                         var index = FindCollector(players, progress.Collector, current.CollectorNetworkId);
                         if (index < 0)
                         {
-                            Cancel(tree, current, map.MapDefinitionId, "CollectorOffline");
+                            Cancel(tree, current, map.MapDefinitionId, "CollectorOffline", progress.Collector);
                             continue;
                         }
                         var player = players[index];
@@ -112,11 +112,15 @@ namespace Code_01.CombatPrototype.Map
                             settings.InteractionDistance * settings.InteractionDistance) reason = "OutOfRange";
                         if (reason != null)
                         {
-                            Cancel(tree, current, map.MapDefinitionId, reason);
+                            Cancel(tree, current, map.MapDefinitionId, reason, progress.Collector);
                             continue;
                         }
                         if (time >= progress.FinishAt)
+                        {
                             Complete(source, tree, current, player, map, settings, tick, dropOwner, out durabilitySaved);
+                            CombatPrototypeMapGatherOutcomeFeedbackUtility.Write(EntityManager, map.MapDefinitionId,
+                                player.Entity, player.NetworkId, CombatPrototypeMapInteractionKind.Tree, CombatPrototypeMapGatherOutcomeResult.Completed);
+                        }
                     }
                     catch (Exception exception)
                     {
@@ -127,7 +131,7 @@ namespace Code_01.CombatPrototype.Map
                         {
                             var latest = EntityManager.GetComponentData<CombatPrototypeMapTreeState>(tree);
                             if (latest.Phase == CombatPrototypeMapTreePhase.Chopping)
-                                Cancel(tree, latest, map.MapDefinitionId, "ProcessingFailed");
+                                Cancel(tree, latest, map.MapDefinitionId, "ProcessingFailed", progress.Collector);
                         }
                     }
                 }
@@ -162,7 +166,7 @@ namespace Code_01.CombatPrototype.Map
             var progress = EntityManager.GetComponentData<CombatPrototypeMapTreeProgress>(tree);
             if (progress.Collector == player)
                 Cancel(tree, EntityManager.GetComponentData<CombatPrototypeMapTreeState>(tree),
-                    mapId, "ReservationFailed");
+                    mapId, "ReservationFailed", player);
         }
 
         private string RejectPlayer(OnlinePlayer player, out CombatPrototypePlayerInput input,
@@ -186,7 +190,7 @@ namespace Code_01.CombatPrototype.Map
             return -1;
         }
 
-        private void Cancel(Entity tree, CombatPrototypeMapTreeState state, FixedString64Bytes mapId, string reason)
+        private void Cancel(Entity tree, CombatPrototypeMapTreeState state, FixedString64Bytes mapId, string reason, Entity player)
         {
             var collector = state.CollectorNetworkId;
             state.Phase = CombatPrototypeMapTreePhase.Standing;
@@ -196,6 +200,8 @@ namespace Code_01.CombatPrototype.Map
             EntityManager.SetComponentData(tree, state);
             Debug.Log("[CombatPrototype.Map] Tree harvest cancelled; map=" + mapId + ", placement=" +
                 state.PlacementIndex + ", NetworkId=" + collector + ", reason=" + reason + ".");
+            CombatPrototypeMapGatherOutcomeFeedbackUtility.WriteCancellation(EntityManager, mapId, player,
+                collector, CombatPrototypeMapInteractionKind.Tree, reason);
         }
 
         private void Complete(Entity source, Entity tree, CombatPrototypeMapTreeState state, OnlinePlayer player,
@@ -280,7 +286,7 @@ namespace Code_01.CombatPrototype.Map
                         var obstacles = EntityManager.GetBuffer<CombatPrototypeMapObstacle>(source);
                         obstacles[index] = oldObstacle;
                         EntityManager.GetBuffer<CombatPrototypeMapTreeBlockingEvent>(tree).ResizeUninitialized(historyLength);
-                        Cancel(tree, state, map.MapDefinitionId, "DropOrSaveOrCommitFailed");
+                        Cancel(tree, state, map.MapDefinitionId, "DropOrSaveOrCommitFailed", player.Entity);
                     }
                     catch (Exception rollback)
                     {

@@ -196,6 +196,8 @@ namespace Code_01.CombatPrototype.Map
                             ", NetworkId=" + request.NetworkId + ", player=" + request.Player + ", type=" + target.Kind +
                             ", placement=" + target.PlacementIndex + ", distance=" + math.sqrt(target.DistanceSquared) + ".");
                         WriteFeedback(map.MapDefinitionId, request, CombatPrototypeMapInteractionFailureResult.None);
+                        CombatPrototypeMapGatherOutcomeFeedbackUtility.Write(EntityManager, map.MapDefinitionId,
+                            request.Player, request.NetworkId, CombatPrototypeMapInteractionKind.None, CombatPrototypeMapGatherOutcomeResult.None);
                     }
                     catch (Exception exception)
                     {

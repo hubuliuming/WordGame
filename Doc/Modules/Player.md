@@ -279,4 +279,8 @@ v13/16的[资源状态](MapResourceStatusHud.md)由Player Baker追加所属Mode/
 
 ## 【FACT】统一F失败所属快照
 
-原Player Baker为[F失败提示](MapInteractionFailureHud.md)追加Sequence(uint)=0、Result(byte枚举)=None，两GhostField均SendToOwner；输入仍19，Tools/F/G/资源状态/世界保存原字段、生命/体力/R、Prefab与v4存档保持。服务端复用原F拒绝原因并在写入边界核实GhostOwner/存活；归属不匹配不写另一玩家，反馈错误独立记录且不取消成功预约。成功启动清旧失败，客户端初次观察不重播、原死亡/断线/绑定失效Reset清新增状态；仅最新快照，无事件队列或存档。编译/实际Serializer/32次隔离Bake静态通过，初值0/None正确；新提示16项人工及联网/生命周期UNKNOWN。
+原Player Baker为[F失败提示](MapInteractionFailureHud.md)追加Sequence(uint)=0、Result(byte枚举)=None，两GhostField均SendToOwner；输入仍19，Tools/F/G/资源状态/世界保存原字段、生命/体力/R、Prefab与v4存档保持。服务端复用原F拒绝原因并在写入边界核实GhostOwner/存活；归属不匹配不写另一玩家，反馈错误独立记录且不取消成功预约。成功启动清旧失败，客户端初次观察不重播、原死亡/断线/绑定失效Reset清新增状态；仅最新快照，无事件队列或存档。编译/实际Serializer/32次隔离Bake静态通过，初值0/None正确；用户确认新提示人工通过，限v23/revision26十六项；未触发的独立联网/生命周期用例UNKNOWN。
+
+## 【FACT】采集完成与中断所属快照
+
+原Player Baker为[采集结果](MapGatherOutcomeHud.md)追加Sequence(uint)=0、Kind(byte)=0、Result(byte枚举)=None三GhostField，SendToOwner；原启动失败二字段保持。实际结算/Cancel成功后向原Collector写最新结果，核实GhostOwner/NetworkId及存活，写入失败独立记录、不撤销业务。成功新F清旧结果；客户端初次不回放，原死亡/断线/绑定失效Reset清缓存。Player Ghost布局追加组件，各端须同版重新烘焙；输入19、Tools3、生命/体力/R、Prefab及v4存档字段保持。v24/revision27静态通过，人工待验收；原人工通过范围不扩大。

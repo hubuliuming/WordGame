@@ -1,6 +1,6 @@
 # 资源交互失败原因提示
 
-返回[地图](Map.md)、[统一F显示](MapInteractionHud.md)与[运行入口](Runtime.md)。入口CombatPrototypeNetCode，当前Forest/Grassland Json/BuiltIn为schemaVersion=23/configRevision=26。本专题负责单次F请求未能开始资源交互时的所属反馈；选目标、采集完成/中断、工具使用、G拾取与存储仍归原专题。静态核对通过，本阶段16项人工GamePlayer为UNKNOWN；耐久预警用户通过仍限v22/revision25十六项，旧通过保持原版本和清单。
+返回[地图](Map.md)、[统一F显示](MapInteractionHud.md)与[运行入口](Runtime.md)。入口CombatPrototypeNetCode，当前Forest/Grassland Json/BuiltIn为schemaVersion=24/configRevision=27。本专题负责单次F请求未能开始资源交互时的所属反馈；选目标、[完成/中断](MapGatherOutcomeHud.md)、工具使用、G拾取与存储归各自专题。静态及用户人工通过，限v23/revision26十六项，未触发独立用例UNKNOWN；耐久预警用户通过仍限v22/revision25十六项，旧通过保持原版本和清单。
 
 ## 【FACT】入口与文件
 
@@ -35,7 +35,7 @@
 | targetUnavailableLabel | Target unavailable | 同上 |
 | failedLabel | Interaction failed | 同上 |
 
-NoSpace直接复用interactionHud.noSpaceLabel，没有第二份容量文案。原严格JsonReader通过DTO字段完整检查对象形状、缺失/null/未知/重复键/标量类型及UTF-8；语义校验复用Positive、HighlightColor、HudLabel。旧地图v1～v22明确拒绝，不迁移、不补默认段、不回退来源；正常导入/烘焙后生效，无运行热重载。英文为默认文案；可配置中文，实际字形与排版仍UNKNOWN。
+NoSpace直接复用interactionHud.noSpaceLabel，没有第二份容量文案。原严格JsonReader通过DTO字段完整检查对象形状、缺失/null/未知/重复键/标量类型及UTF-8；语义校验复用Positive、HighlightColor、HudLabel。旧地图v1～v23明确拒绝，不迁移、不补默认段、不回退来源；正常导入/烘焙后生效，无运行热重载。英文为默认文案；可配置中文，实际字形与排版仍UNKNOWN。
 
 原Map Baker在唯一地图根写九字段Settings：Enabled(byte)、FeedbackSeconds(float)、ErrorColor(float3 RGB)及六个FixedString64Bytes。它不是Ghost；绑定在地图源/玩家变化时传给原HUD，普通缓存保存固定配置、文字、观察序号、期限和颜色，不跨帧持有DynamicBuffer。
 
@@ -54,7 +54,7 @@ NoSpace直接复用interactionHud.noSpaceLabel，没有第二份容量文案。�
 | 单项启动异常，或InvalidMoveInput等其他拒绝原因 | Failed；原异常日志保留 |
 | 原预约成功 | None，清旧失败；已有None不重复写快照 |
 
-每次失败更新Result并递增Sequence，成功清除已有失败时也递增；uint沿unchecked回绕。它是最新快照，没有新输入、RPC、事件队列或历史记录，连续结果可能被较新快照覆盖。只覆盖请求启动阶段，采集中断与完成失败没有新增提示通道。
+每次失败更新Result并递增Sequence，成功清除已有失败时也递增；uint沿unchecked回绕。它是最新快照，没有新输入、RPC、事件队列或历史记录，连续结果可能被较新快照覆盖。本通道只覆盖请求启动阶段，已接入的采集完成/中断通道归[完成/中断](MapGatherOutcomeHud.md)。
 
 CommandTargetOwnerMismatch与PlayerDead沿原日志/隐藏路径，不投影为新的失败提示。写入边界再次核实真实GhostOwner与请求NetworkId、存活状态：即使AlreadyInteracting早于原资格判断，也不会向另一玩家写反馈。缺少必需组件明确记录错误，不动态添加组件或默认反馈。
 
@@ -64,7 +64,7 @@ WriteFeedback在独立try/catch内记录stage=WriteFeedback、map、NetworkId、
 
 ## 【CURRENT STRATEGY】原F面板显示与生命周期
 
-默认红色提示显示2秒。Ready/Working有目标时只替换第二行，第一行F目标/工作百分比与进度颜色保持；Hidden时临时在第一行显示失败，第二行留空，反馈没有目标类型。原NoSpace两行目标提示优先，未到期失败次之，再依次修理、制作和工具状态。NoSpace反馈隐藏时仍使用原noSpaceLabel。
+默认红色提示显示2秒。Ready/Working有目标时只替换第二行，第一行F目标/工作百分比与进度颜色保持；Hidden时临时在第一行显示失败，第二行留空，反馈没有目标类型。NoSpace优先，未到期启动失败次之，再依次[完成/中断](MapGatherOutcomeHud.md)、修理、制作和工具状态；新结果NoSpace也先于普通启动失败。NoSpace反馈隐藏时仍使用原noSpaceLabel。
 
 B面板继续接收原displayFeedback（修理优先制作），本功能不改B页脚、按钮、配方或输入。每次Show先恢复两行默认白色；失败到期后第二行重新使用原工具预警颜色。绘制仍仅Repaint，GUI.matrix/color沿原finally恢复，面板位置/尺寸、G、高亮、资源状态和世界保存提示保持。
 
@@ -72,7 +72,7 @@ B面板继续接收原displayFeedback（修理优先制作），本功能不改B
 
 关闭interactionFailureHud或interactionHud隐藏新增F提示；原全部显示关闭时继续沿原绑定退出条件，新开关不强制创建/绑定HUD。新客户端时间只控制显示，不改变服务端采集完成或再生期限。输入19、原Tools所属三字段、F4/G6/资源状态4/世界保存3及玩家v4根7/Tools项3、世界v2根9/掉落项8保持；反馈不写玩家或世界存档。
 
-## 【FACT】静态核对
+## 【FACT】v23/revision26静态核对
 
 正常Unity导入/编译完成，实际Console为0 Error。Config/Settings各九字段，Settings无Ghost，新助手不是MonoBehaviour；新反馈二字段，生成Serializer的实际State为SendToOwner、ChangeMaskBits=2、SnapshotSize=8且快照二字段。隔离Editor World不初始化游戏网络函数指针，符合当前NetCode模板；未执行收发或游戏系统。
 
@@ -84,6 +84,6 @@ Bake前后实际Console均[0 Error,7 Warning,53 Log]，没有新增Bake错误/�
 
 ## 【KNOWN ISSUES】人工边界
 
-主线程静态核对通过，本阶段人工GamePlayer16项均为UNKNOWN；移动/攻击/忙/无目标/容量提示、TryBegin拒绝及实际异常、反馈错误隔离、到期/颜色恢复/排版/中文字体、开关、所属联网/序号覆盖/晚加入、死亡与生命周期需人工验证。旧通过不覆盖v23/revision26的新提示。
+用户已确认本阶段人工GamePlayer验收通过，主线程结合既有静态核对判定通过，限CombatPrototypeNetCode、v23/revision26及[运行入口](Runtime.md)十六项清单，结论来自用户反馈。清单涵盖移动/攻击/忙/无目标/容量、完成前启动拒绝及异常、反馈隔离、F优先与B原反馈、成功清除/到期/颜色、开关/绑定、所属联网/晚加入和生命周期及原玩法回归。原323项人工内容/编号逐字保留；未实际触发的独立TryBegin/异常/反馈写入失败、字形/排版、联网/序号覆盖/预测回放或生命周期用例仍UNKNOWN。旧通过保持原版本/清单，本结论不覆盖v24/revision27的[完成/中断](MapGatherOutcomeHud.md)新反馈。
 
 AI未执行GamePlayer/PlayMode、游戏/显示系统或GUI回调、逻辑单元测试、真实存档业务I/O、命令行构建、发布、性能/带宽采样或图片检查，未创建子Agent或提交Git。跨文件事务、同槽并发、保存后意外ECS故障恢复及性能/平台/线上结论仍沿原UNKNOWN边界。

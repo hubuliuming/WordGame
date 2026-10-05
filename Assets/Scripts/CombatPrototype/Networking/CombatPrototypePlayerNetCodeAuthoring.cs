@@ -71,6 +71,7 @@ namespace Code_01.CombatPrototype.Networking
                 AddComponent<CombatPrototypeMeleeState>(entity);
                 AddComponent(entity, CombatPrototypeMapInteractionHudState.Hidden);
                 AddComponent<CombatPrototypeMapInteractionFailureFeedback>(entity);
+                AddComponent<CombatPrototypeMapGatherOutcomeFeedback>(entity);
                 AddComponent(entity, CombatPrototypeMapPickupHudState.Hidden);
                 AddComponent(entity, CombatPrototypeMapResourceStatusHudState.Hidden);
                 AddComponent(entity, CombatPrototypeMapWorldSaveHudState.Hidden);

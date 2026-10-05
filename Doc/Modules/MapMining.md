@@ -25,7 +25,7 @@
 
 ## 【FACT】JSON 契约与默认值
 
-[battle_forest_01.json](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[battle_grassland_01.json](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 为 schemaVersion=23/configRevision=26。mining 及全部字段必填，interactionHud归[交互显示](MapInteractionHud.md)，gatherTools归[采集工具](MapGatherTools.md)；旧v1～v22、缺失/未知/重复字段、错误类型或无效引用明确失败，不补字段、不回退来源。配置只在烘焙时读取，无运行热重载或新联网配置校验协议。各端须使用相同代码、输入布局、Ghost、配置及资源。
+[battle_forest_01.json](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[battle_grassland_01.json](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 为 schemaVersion=24/configRevision=27。mining 及全部字段必填，interactionHud归[交互显示](MapInteractionHud.md)，gatherTools归[采集工具](MapGatherTools.md)；旧v1～v23、缺失/未知/重复字段、错误类型或无效引用明确失败，不补字段、不回退来源。配置只在烘焙时读取，无运行热重载或新联网配置校验协议。各端须使用相同代码、输入布局、Ghost、配置及资源。
 
 ```json
 "mining": {
@@ -145,3 +145,7 @@ v13/16的[资源状态](MapResourceStatusHud.md)只读Available/Mining/Depleted�
 ## 【FACT】容量等级接入边界
 
 [升级](MapInventoryCapacityUpgrade.md)：有工具的矿点完成候选保留实际Level并写v3；徒手、产地面stone及再生行为保持，活动Mining期间拒绝升级。新链静态及用户人工通过限v20/revision23升级十六项，未触发用例UNKNOWN；旧通过保持原版本/清单。
+
+## 【FACT】完成与中断所属反馈
+
+当前v24/revision27接入[采集结果](MapGatherOutcomeHud.md)：原Complete完整提交后返回，才发送本类型Completed；原Cancel成功后按实际原因发送中断/失败，Collector实体在清空前保留。启动回滚、离线、所有权不匹配及死亡不写新结果；耐久保存后的异常保持原日志/UNKNOWN，不显示成功。共享反馈写入独立隔离，原地面产出、阻挡、耐久保存顺序及原点再生保持。静态通过、人工待验收；旧人工通过保持原版本/清单。

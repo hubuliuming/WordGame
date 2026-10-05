@@ -95,6 +95,7 @@ namespace Code_01.CombatPrototype.Map
                     EntityManager.GetBuffer<CombatPrototypeMapGatherToolUpgradeDefinition>(source, true),
                     EntityManager.GetComponentData<CombatPrototypeMapGatherToolDurabilityHudSettings>(source),
                     EntityManager.GetComponentData<CombatPrototypeMapInteractionFailureHudSettings>(source),
+                    EntityManager.GetComponentData<CombatPrototypeMapGatherOutcomeHudSettings>(source),
                     EntityManager.GetComponentData<CombatPrototypeMapTreeSettings>(source).HarvestDuration,
                     EntityManager.GetComponentData<CombatPrototypeMapMineSettings>(source).HarvestDuration, map.MapDefinitionId.ToString());
                 _source = source;
@@ -111,7 +112,8 @@ namespace Code_01.CombatPrototype.Map
                 EntityManager.GetComponentData<CombatPrototypeMapInventoryCapacityUpgradeFeedback>(player),
                 EntityManager.GetComponentData<CombatPrototypeMapToolUpgradeFeedback>(player),
                 EntityManager.GetBuffer<CombatPrototypeInventoryItem>(player, true), source, player,
-                pickup, EntityManager.GetComponentData<CombatPrototypeMapInteractionFailureFeedback>(player));
+                pickup, EntityManager.GetComponentData<CombatPrototypeMapInteractionFailureFeedback>(player),
+                EntityManager.GetComponentData<CombatPrototypeMapGatherOutcomeFeedback>(player));
             _highlightTargets.Resolve(EntityManager, World.Name, map, highlightSettings,
                 EntityManager.GetComponentData<GhostOwner>(player).NetworkId, interaction, pickup, out var f, out var g);
             _hud.ShowHighlight(f, g);

@@ -100,7 +100,7 @@ namespace Code_01.CombatPrototype.Map
                         var index = FindCollector(players, progress.Collector, current.CollectorNetworkId);
                         if (index < 0)
                         {
-                            Cancel(mine, current, map.MapDefinitionId, "CollectorOffline");
+                            Cancel(mine, current, map.MapDefinitionId, "CollectorOffline", progress.Collector);
                             continue;
                         }
                         var player = players[index];
@@ -112,11 +112,15 @@ namespace Code_01.CombatPrototype.Map
                             settings.InteractionDistance * settings.InteractionDistance) reason = "OutOfRange";
                         if (reason != null)
                         {
-                            Cancel(mine, current, map.MapDefinitionId, reason);
+                            Cancel(mine, current, map.MapDefinitionId, reason, progress.Collector);
                             continue;
                         }
                         if (time >= progress.FinishAt)
+                        {
                             Complete(source, mine, current, player, map, settings, tick, dropOwner, out durabilitySaved);
+                            CombatPrototypeMapGatherOutcomeFeedbackUtility.Write(EntityManager, map.MapDefinitionId,
+                                player.Entity, player.NetworkId, CombatPrototypeMapInteractionKind.Mine, CombatPrototypeMapGatherOutcomeResult.Completed);
+                        }
                     }
                     catch (Exception exception)
                     {
@@ -129,7 +133,7 @@ namespace Code_01.CombatPrototype.Map
                         {
                             var latest = EntityManager.GetComponentData<CombatPrototypeMapMineState>(mine);
                             if (latest.Phase == CombatPrototypeMapMinePhase.Mining)
-                                Cancel(mine, latest, map.MapDefinitionId, "ProcessingFailed");
+                                Cancel(mine, latest, map.MapDefinitionId, "ProcessingFailed", progress.Collector);
                         }
                         }
                         catch (Exception cleanup)
@@ -170,7 +174,7 @@ namespace Code_01.CombatPrototype.Map
             var progress = EntityManager.GetComponentData<CombatPrototypeMapMineProgress>(mine);
             if (progress.Collector == player)
                 Cancel(mine, EntityManager.GetComponentData<CombatPrototypeMapMineState>(mine),
-                    mapId, "ReservationFailed");
+                    mapId, "ReservationFailed", player);
         }
 
         private string RejectPlayer(OnlinePlayer player, out CombatPrototypePlayerInput input,
@@ -194,7 +198,7 @@ namespace Code_01.CombatPrototype.Map
             return -1;
         }
 
-        private void Cancel(Entity mine, CombatPrototypeMapMineState state, FixedString64Bytes mapId, string reason)
+        private void Cancel(Entity mine, CombatPrototypeMapMineState state, FixedString64Bytes mapId, string reason, Entity player)
         {
             var collector = state.CollectorNetworkId;
             state.Phase = CombatPrototypeMapMinePhase.Available;
@@ -204,6 +208,8 @@ namespace Code_01.CombatPrototype.Map
             EntityManager.SetComponentData(mine, state);
             Debug.Log("[CombatPrototype.Map] Mine harvest cancelled; map=" + mapId + ", placement=" +
                 state.PlacementIndex + ", NetworkId=" + collector + ", reason=" + reason + ".");
+            CombatPrototypeMapGatherOutcomeFeedbackUtility.WriteCancellation(EntityManager, mapId, player,
+                collector, CombatPrototypeMapInteractionKind.Mine, reason);
         }
 
         private void Complete(Entity source, Entity mine, CombatPrototypeMapMineState state, OnlinePlayer player,
@@ -288,7 +294,7 @@ namespace Code_01.CombatPrototype.Map
                         var obstacles = EntityManager.GetBuffer<CombatPrototypeMapObstacle>(source);
                         obstacles[index] = oldObstacle;
                         EntityManager.GetBuffer<CombatPrototypeMapMineBlockingEvent>(mine).ResizeUninitialized(historyLength);
-                        Cancel(mine, state, map.MapDefinitionId, "DropOrSaveOrCommitFailed");
+                        Cancel(mine, state, map.MapDefinitionId, "DropOrSaveOrCommitFailed", player.Entity);
                     }
                     catch (Exception rollback)
                     {

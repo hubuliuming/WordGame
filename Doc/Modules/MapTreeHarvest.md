@@ -23,7 +23,7 @@
 
 ## 【FACT】JSON 契约与当前默认值
 
-当前两份地图定义与 BuiltIn 均为 schemaVersion=23、configRevision=26，treeHarvest 段及全部字段必填。树木基础配置仍为2米/徒手2秒/wood×3；[斧头](MapGatherTools.md)可用时Lv1/2/3耗时1.5/1.2/1秒（[等级](MapGatherToolUpgrade.md)），再生复用 objects.tree_normal 的 true/600 秒；原空间、种子、树木/采集物密度、出生及 movement/drops/grounds 数值保持。新增 mining 段与生态矿点字段归[采矿](MapMining.md)，树木规则独立。配置在 SubScene 烘焙时读取，Json 失败不回退 BuiltIn，不支持热重载或新的联网配置校验协议。
+当前两份地图定义与 BuiltIn 均为 schemaVersion=24、configRevision=27，treeHarvest 段及全部字段必填。树木基础配置仍为2米/徒手2秒/wood×3；[斧头](MapGatherTools.md)可用时Lv1/2/3耗时1.5/1.2/1秒（[等级](MapGatherToolUpgrade.md)），再生复用 objects.tree_normal 的 true/600 秒；原空间、种子、树木/采集物密度、出生及 movement/drops/grounds 数值保持。新增 mining 段与生态矿点字段归[采矿](MapMining.md)，树木规则独立。配置在 SubScene 烘焙时读取，Json 失败不回退 BuiltIn，不支持热重载或新的联网配置校验协议。
 
 | 字段 | 当前默认值 | 校验与作用 |
 |---|---|---|
@@ -39,7 +39,7 @@
 
 再生复用 objects 中所选树木的 regrowEnabled=true、regrowSeconds=600，Map Baker 复制到地图根的服务端 TreeSettings。间隔必须有限且非负，启用时须大于 0；关闭时允许 0，沿原校验器检查，不新增 DTO 或默认补字段。开关只控制成功砍倒后的本局再生，砍伐开关关闭时仍是原静态树。gather_apple 的独立再生配置保持。
 
-字符串沿原小写ASCII/数字/下划线、最长61字符约束；产出ID由原Resolver校验vitality_apple/wood/stone，砍伐默认wood，未知ID失败。旧地图v1～v16、缺段/字段、未知/重复字段或错类型沿严格UTF-8边界报错，不补默认字段；enabled=false仍校验其余字段与资源绑定。工具定义归[采集工具](MapGatherTools.md)。
+字符串沿原小写ASCII/数字/下划线、最长61字符约束；产出ID由原Resolver校验vitality_apple/wood/stone，砍伐默认wood，未知ID失败。旧地图v1～v23、缺段/字段、未知/重复字段或错类型沿严格UTF-8边界报错，不补默认字段；enabled=false仍校验其余字段与资源绑定。工具定义归[采集工具](MapGatherTools.md)。
 
 木材复用 drops 的 pickupDistanceMeters=2、flightDurationSeconds=0.4、scatterRadiusMeters=0.6、arcHeightMeters=0.6、groundOffsetMeters=0.05、visualScale=0.5、lifetimeSeconds=600；寿命 0 关闭自动到期。drops.enabled 只控制敌人额外掉落，treeHarvest.enabled 控制树木产出，二者独立；数值、运动、G 和清理规则归掉落专题。
 
@@ -125,3 +125,7 @@ v13/16的[资源状态](MapResourceStatusHud.md)只读Standing/Chopping/Felled�
 寿命提示v17/20归[G提示](MapPickupHud.md)：所属G六字段，原目标/拾取/期限/保存保持；静态及用户人工通过限十二项，未触发独立用例UNKNOWN；旧用户通过仍限原版本/清单。
 
 地图v18/21的[F5/保存提示](MapWorldSaveHud.md)已接入：该阶段17输入、新增所属3字段；原F/G、工具及世界/玩家存档格式保持。静态及用户人工通过限v18/revision21十二项，未触发独立用例UNKNOWN；旧通过限原版本/清单。
+
+## 【FACT】完成与中断所属反馈
+
+当前v24/revision27接入[采集结果](MapGatherOutcomeHud.md)：原Complete完整提交后返回，才发送本类型Completed；原Cancel成功后按实际原因发送中断/失败，Collector实体在清空前保留。启动回滚、离线、所有权不匹配及死亡不写新结果；耐久保存后的异常保持原日志/UNKNOWN，不显示成功。共享反馈写入独立隔离，原地面产出、阻挡、耐久保存顺序及原点再生保持。静态通过、人工待验收；旧人工通过保持原版本/清单。

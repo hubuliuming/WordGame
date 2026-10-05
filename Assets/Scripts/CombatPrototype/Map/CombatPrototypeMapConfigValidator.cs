@@ -11,7 +11,7 @@ namespace Code_01.CombatPrototype.Map
                 config.map.resourcePersistence == null || config.map.layout == null || config.map.movement == null || config.map.drops == null || config.map.treeHarvest == null ||
                 config.map.mining == null || config.map.gatherTools == null || config.map.gatherTools.tools == null ||
                 config.map.gatherToolUpgrade == null || config.map.gatherToolUpgrade.levels == null || config.map.gatherToolDurabilityHud == null ||
-                config.map.interactionHud == null || config.map.interactionFailureHud == null || config.map.pickupHud == null || config.map.interactionHighlight == null || config.map.resourceStatusHud == null || config.map.inventoryPanel == null || config.map.inventoryDrop == null || config.map.inventoryDrop.items == null ||
+                config.map.interactionHud == null || config.map.interactionFailureHud == null || config.map.gatherOutcomeHud == null || config.map.pickupHud == null || config.map.interactionHighlight == null || config.map.resourceStatusHud == null || config.map.inventoryPanel == null || config.map.inventoryDrop == null || config.map.inventoryDrop.items == null ||
                 config.map.worldSaveHud == null || config.map.inventoryCapacity == null || config.map.inventoryCapacity.items == null ||
                 config.map.inventoryCapacityUpgrade == null || config.map.inventoryCapacityUpgrade.levels == null ||
                 config.map.population == null || config.map.spawn == null ||
@@ -43,6 +43,7 @@ namespace Code_01.CombatPrototype.Map
             HudLabel(hud.mineLabel, "interactionHud.mineLabel");
             HudLabel(hud.noSpaceLabel, "interactionHud.noSpaceLabel");
             ValidateInteractionFailureHud(map.interactionFailureHud);
+            ValidateGatherOutcomeHud(map.gatherOutcomeHud);
             ValidatePickupHud(map.pickupHud, hud);
             ValidateInteractionHighlight(map.interactionHighlight);
             ValidateResourceStatusHud(map.resourceStatusHud, map.pickupHud);
@@ -52,8 +53,8 @@ namespace Code_01.CombatPrototype.Map
             ValidateInventoryCapacityUpgrade(map.inventoryCapacityUpgrade, map.inventoryCapacity);
             ValidateInventoryDrop(map.inventoryDrop);
             Id(map.mapDefinitionId, "mapDefinitionId");
-            if (map.schemaVersion != 23 || map.configRevision < 1 || map.defaultSeed < 1)
-                throw new InvalidOperationException("Map requires schemaVersion=23, positive revision and seed.");
+            if (map.schemaVersion != 24 || map.configRevision < 1 || map.defaultSeed < 1)
+                throw new InvalidOperationException("Map requires schemaVersion=24, positive revision and seed.");
             var drops = map.drops;
             Id(drops.itemId, "drops.itemId");
             Id(drops.visualResourceKey, "drops.visualResourceKey");
@@ -348,6 +349,22 @@ namespace Code_01.CombatPrototype.Map
             HudLabel(hud.noTargetLabel, "interactionFailureHud.noTargetLabel");
             HudLabel(hud.targetUnavailableLabel, "interactionFailureHud.targetUnavailableLabel");
             HudLabel(hud.failedLabel, "interactionFailureHud.failedLabel");
+        }
+
+        private static void ValidateGatherOutcomeHud(MapGatherOutcomeHudConfig hud)
+        {
+            Positive(hud.feedbackSeconds, "gatherOutcomeHud.feedbackSeconds");
+            HighlightColor(hud.completedColorHex, "gatherOutcomeHud.completedColorHex");
+            HighlightColor(hud.interruptedColorHex, "gatherOutcomeHud.interruptedColorHex");
+            HighlightColor(hud.failedColorHex, "gatherOutcomeHud.failedColorHex");
+            HudLabel(hud.gatherCompletedLabel, "gatherOutcomeHud.gatherCompletedLabel");
+            HudLabel(hud.treeCompletedLabel, "gatherOutcomeHud.treeCompletedLabel");
+            HudLabel(hud.mineCompletedLabel, "gatherOutcomeHud.mineCompletedLabel");
+            HudLabel(hud.movingLabel, "gatherOutcomeHud.movingLabel");
+            HudLabel(hud.attackingLabel, "gatherOutcomeHud.attackingLabel");
+            HudLabel(hud.hitLabel, "gatherOutcomeHud.hitLabel");
+            HudLabel(hud.outOfRangeLabel, "gatherOutcomeHud.outOfRangeLabel");
+            HudLabel(hud.failedLabel, "gatherOutcomeHud.failedLabel");
         }
 
         private static void HighlightColor(string value, string field)

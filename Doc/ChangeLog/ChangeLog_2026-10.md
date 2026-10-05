@@ -813,3 +813,17 @@
 - 两地图Json/BuiltIn升schema23/revision26，必填interactionFailureHud九字段、原根固定九Settings；六文案和时长/颜色完整校验，NoSpace复用原字段。新增四普通脚本及Unity正常生成meta，原输入19/Tools3/F4/G6/资源4/世界提示3、玩家v4/世界v2存储和资源结构保持。
 - 正常Unity编译0 Error，实际Serializer二快照字段/SendToOwner/2 mask bits/8字节Snapshot元数据正确；224非法配置全部拒绝，10合法配置读取通过，32次隔离Editor Bake通过。原布置/签名/反馈初值保持，实际Console[0,7,53]前后一致，主场景干净、临时资源释放。
 - 增量同步地图专题/导航/资源数据/玩家/Runtime与策划模板，新增MapInteractionFailureHud专题；原307项人工内容编号逐字保留，新16项后323项。主线程静态核对通过，本阶段人工GamePlayerUNKNOWN，旧耐久预警通过仍限v22/revision25十六项。未执行游戏/显示/GUI、逻辑单元测试、真实存档业务I/O、PlayMode、命令行构建/发布、采样/图片、子Agent或Git提交。
+
+## 2026-10-05 资源交互失败原因提示人工验收通过
+
+- 用户确认资源交互失败原因提示人工GamePlayer验收通过；主线程结合既有编译/224份非法配置拒绝/32次隔离Bake静态核对判定通过，限CombatPrototypeNetCode、v23/revision26及Runtime十六项清单，结论来自用户反馈。
+- 增量同步专题、地图/工具/HUD、资源数据、玩家、导航、Runtime及策划模板的验收状态；原323项人工内容/编号逐字保留，配置值、脚本和资源结构保持。
+- 未实际触发的独立拒绝/异常/反馈写入失败、字形/排版、联网/序号覆盖/预测回放或生命周期分支仍UNKNOWN；结论不扩大到性能/带宽/平台/线上、跨文件一致性或下一阶段。AI本次仅核对文档与差异，未运行Unity/PlayMode/GamePlayer、逻辑单元测试、构建/发布、真实存档业务I/O、采样/图片，未创建子Agent或提交Git。
+
+## 2026-10-05：采集完成与中断反馈落地
+
+- 按用户确认由主线程接入CombatPrototypeNetCode三类资源实际完成/Cancel结果；五个新普通脚本及Unity生成meta，配置v24/revision27新增必填gatherOutcomeHud十三字段，Json/BuiltIn默认2秒/绿橙红及八文案。
+- 原Player Baker追加Sequence/Kind/Result三字段SendToOwner最新反馈；成功新F清旧结果，独立写入隔离错误，原结算/掉落/耐久保存/取消与保存格式保持，保存后部分提交错误不宣称完成或取消。
+- 原F复用第二行或Hidden两行结果/工具，NoSpace>启动失败>完成/中断>修理>制作>工具；B原反馈、开关/绑定/生命周期及Scene/Prefab/Animator结构保持。
+- 正常Unity编译0 Error；336份非法配置拒绝、14组合法读取、36次隔离Editor Bake通过；实际Serializer三字段/3 mask bits/12字节Snapshot/SendToOwner，Editor网络函数指针未初始化。Bake Console[0,6,53]前后一致，原布局/签名/资源引用及输入/保存字段保持，主场景干净、未Play。
+- 同步相关模块/导航/策划模板，原323项人工内容/编号逐字保留，追加16项共339项；主线程静态通过，v24/revision27人工待验收。旧验收保持原范围，未执行GamePlayer、逻辑单元测试、真实存档业务I/O、构建/发布、性能/图片、子Agent或Git提交；未触发运行、错误隔离、联网/生命周期及性能/平台/线上UNKNOWN。

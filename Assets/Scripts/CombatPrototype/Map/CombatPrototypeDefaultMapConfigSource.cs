@@ -17,7 +17,7 @@ namespace Code_01.CombatPrototype.Map
             {
                 map = new MapDefinitionConfig
                 {
-                    schemaVersion = 23, configRevision = 26,
+                    schemaVersion = 24, configRevision = 27,
                     mapDefinitionId = mapDefinitionId, defaultSeed = 12345,
                     resourcePersistence = new MapResourcePersistenceConfig
                     {
@@ -111,6 +111,15 @@ namespace Code_01.CombatPrototype.Map
                         alreadyInteractingLabel = "Already interacting", movingLabel = "Stop moving first",
                         attackingLabel = "Finish attack first", noTargetLabel = "No available resource",
                         targetUnavailableLabel = "Target unavailable", failedLabel = "Interaction failed"
+                    },
+                    gatherOutcomeHud = new MapGatherOutcomeHudConfig
+                    {
+                        enabled = true, feedbackSeconds = 2f,
+                        completedColorHex = "#6ED88A", interruptedColorHex = "#FFB454", failedColorHex = "#FF6B6B",
+                        gatherCompletedLabel = "Gathering completed", treeCompletedLabel = "Tree felled",
+                        mineCompletedLabel = "Mining completed", movingLabel = "Interrupted: moving",
+                        attackingLabel = "Interrupted: attacking", hitLabel = "Interrupted: hit",
+                        outOfRangeLabel = "Interrupted: out of range", failedLabel = "Resource work failed"
                     },
                     interactionHud = new MapInteractionHudConfig
                     {

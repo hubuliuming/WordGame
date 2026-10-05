@@ -100,7 +100,7 @@ namespace Code_01.CombatPrototype.Map
                 AddComponent(entity, new CombatPrototypeMapResourcePersistenceSettings
                 {
                     Enabled = (byte)(persistence.enabled ? 1 : 0), SaveSlotId = persistence.saveSlotId,
-                    SaveIntervalSeconds = persistence.saveIntervalSeconds,
+                    SaveIntervalSeconds = persistence.saveIntervalSeconds, SaveGroundDrops = (byte)(persistence.saveGroundDrops ? 1 : 0),
                     LayoutSignature = new FixedString128Bytes(CombatPrototypeMapResourceLayoutSignature.Compute(config, layout))
                 });
                 AddComponent(entity, new CombatPrototypeMapResourceRestoreState

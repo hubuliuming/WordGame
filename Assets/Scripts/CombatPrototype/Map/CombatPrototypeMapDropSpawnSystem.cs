@@ -39,20 +39,9 @@ namespace Code_01.CombatPrototype.Map
             var source = _maps.GetSingletonEntity();
             var map = EntityManager.GetComponentData<CombatPrototypeMapData>(source);
             var settings = EntityManager.GetComponentData<CombatPrototypeMapDropSettings>(source);
-            if (source != _source)
-            {
-                ReleaseOwned();
-                _source = source;
-                var prefab = settings.Prefab;
-                _prefabValid = EntityManager.HasComponent<Prefab>(prefab) &&
-                    EntityManager.HasComponent<GhostType>(prefab) && EntityManager.HasComponent<LocalTransform>(prefab) &&
-                    EntityManager.HasComponent<CombatPrototypeMapDropState>(prefab) &&
-                    EntityManager.HasComponent<CombatPrototypeMapDropProgress>(prefab);
-                if (!_prefabValid)
-                    Debug.LogError("[CombatPrototype.Map] Drop spawn prerequisites failed; stage=ValidatePrefab, map=" +
-                        map.MapDefinitionId + ", itemId=" + settings.ItemId + ", resource=" + settings.ResourceKey +
-                        ", prefab=" + prefab + ", required Ghost components are missing.");
-            }
+            EnsureSource(source);
+            if (EntityManager.GetComponentData<CombatPrototypeMapResourceRestoreState>(source).Phase !=
+                CombatPrototypeMapResourceRestorePhase.Ready) return;
             if (settings.Enabled == 0 || !_prefabValid) return;
 
             // Copy the roster before Instantiate invalidates component handles.
@@ -77,6 +66,65 @@ namespace Code_01.CombatPrototype.Map
                         ", resource=" + settings.ResourceKey + ", stage=SpawnOwnedDrop. " + exception);
                 }
             }
+        }
+
+        private void EnsureSource(Entity source)
+        {
+            if (source == _source) return;
+            ReleaseOwned();
+            _source = source;
+            var map = EntityManager.GetComponentData<CombatPrototypeMapData>(source);
+            var settings = EntityManager.GetComponentData<CombatPrototypeMapDropSettings>(source);
+            var prefab = settings.Prefab;
+            _prefabValid = EntityManager.HasComponent<Prefab>(prefab) &&
+                EntityManager.HasComponent<GhostType>(prefab) && EntityManager.HasComponent<LocalTransform>(prefab) &&
+                EntityManager.HasComponent<CombatPrototypeMapDropState>(prefab) &&
+                EntityManager.HasComponent<CombatPrototypeMapDropProgress>(prefab);
+            if (!_prefabValid)
+                Debug.LogError("[CombatPrototype.Map] Drop spawn prerequisites failed; stage=ValidatePrefab, map=" +
+                    map.MapDefinitionId + ", itemId=" + settings.ItemId + ", resource=" + settings.ResourceKey +
+                    ", prefab=" + prefab + ", required Ghost components are missing.");
+        }
+
+        internal void BeginDropRestore(Entity source, int lastDropId)
+        {
+            EnsureSource(source);
+            if (_owned.Count != 0 || _nextId != 0)
+                throw new InvalidOperationException("Drop restore requires an unused owner; map source=" + source);
+            _nextId = lastDropId;
+        }
+
+        internal int GetLastAllocatedDropId(Entity source)
+        {
+            RequireSource(source);
+            return _nextId;
+        }
+
+        internal IReadOnlyList<Entity> GetOwnedDrops(Entity source)
+        {
+            RequireSource(source);
+            return _owned;
+        }
+
+        private void RequireSource(Entity source)
+        {
+            if (source != _source) throw new InvalidOperationException("Drop owner source mismatch; source=" + source);
+        }
+
+        internal Entity RestoreOwnedDrop(Entity source, CombatPrototypeMapInventoryDropDefinition definition,
+            CombatPrototypeMapDropSaveEntry entry, double time)
+        {
+            RequireSource(source);
+            var map = EntityManager.GetComponentData<CombatPrototypeMapData>(source);
+            var settings = EntityManager.GetComponentData<CombatPrototypeMapDropSettings>(source);
+            var entity = CombatPrototypeMapDropSpawnUtility.InstantiateRestored(EntityManager, map, settings, definition, entry, time);
+            try { _owned.Add(entity); }
+            catch
+            {
+                DestroyOwned(entity, "RestoreOwnershipCleanup");
+                throw;
+            }
+            return entity;
         }
 
         public Entity SpawnOwnedDrop(Entity source, Entity prefab, FixedString64Bytes resource,

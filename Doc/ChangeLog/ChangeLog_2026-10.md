@@ -699,3 +699,17 @@
 - 原资源/工具/修理/玩家SaveStore/G及掉落脚本、15输入/原Ghost字段、Scene/SubScene/Prefab/Animator、旧meta/资源引用、包/构建配置保持。玩家写v2/读v1迁移，地面掉落不存档；跨玩家/世界文件事务、同槽多服务端协调未接入。
 - 正常Unity编译/实际Assembly字段反射和Forest/Grassland各9种隔离Editor烘焙共18次通过，新四Settings/恢复初值/签名兼容及完整原布局/反馈/Prefab一致；Console前后[1 Error,4 Warning,4 Log]相同，既有Error为UnityConnect网络错误，无新编译/烘焙错误，主场景干净、临时对象释放。
 - 增量同步资源存档专题、相关模块/导航、外部配置模板及Runtime新增十二项，原189项内容/编号与用户通过边界保持。主线程静态验收通过，新GamePlayer/I-O/坏档/关闭恢复/占位预测/跨文件ECS/多人并发生命周期/性能带宽平台线上UNKNOWN；AI未运行真实存档读写、游戏/显示系统、GUI回调、逻辑单元测试、PlayMode、构建、发布、采样或图片检查，未创建子Agent或提交Git。
+
+## 2026-10-05 地图资源状态存档人工验收通过
+
+- 用户反馈“我已验收通过”，主线程结合既有Unity编译/字段反射及18次隔离Editor烘焙静态核对，判定资源存档阶段通过；范围限CombatPrototypeNetCode、schemaVersion=15/configRevision=18、世界资源v1及Runtime十二项人工清单，人工结论来自用户反馈。
+- 增量同步资源存档专题、运行清单、相关模块/导航和项目外配置模板；全部201项人工编号/内容、旧阶段通过版本/清单保持。未实际触发的独立I/O/坏档/替换/恢复/占位预测/多人时序/生命周期，以及跨文件/ECS、同槽并发、字形/性能/带宽/平台/线上UNKNOWN保持。
+- 本次只修改文档；AI未运行真实存档读写、GamePlayer/PlayMode、游戏模拟/GUI回调、逻辑单元测试、构建、发布、性能采样或图片检查，未创建子Agent或提交Git。
+
+## 2026-10-05 地面掉落物存档与恢复接入
+
+- 按用户确认方案接入CombatPrototypeNetCode地面苹果/木材/石材及背包丢弃物持久化；Json/BuiltIn升级schema16/revision19，新增必填saveGroundDrops=true，原default_world/10秒及其他值保持，旧地图v1～v15拒绝。
+- 五个新职责脚本及Unity正常生成meta、原配置/Baker、世界DTO/Store/Restore/Save及DropSpawn/SpawnUtility调整。世界同文件写v2九根字段/八字段掉落条目，合法v1严格读原字段并在内存补空掉落，下一正常保存升级；严格身份/位置/期限/绑定校验、原文件原子替换保持。
+- 只保存已提交未到期物及编号上限，排除Prepared/Consumed/清理队列；飞行物保存原落点、恢复Landed，离线暂停TTL，永久物保持。玩家准入前完整恢复并登记原所有权，失败清理本批并Failed；资源/掉落双完整缓存同时交换，关闭只读缓存，世界写失败不回滚原结算，跨文件重复物品风险明确保留。
+- 正常Unity编译与实际字段反射通过，Forest/Grassland各12种隔离Editor烘焙共24次通过；Settings5/配置4/世界根9/掉落8，原输入15/DropGhost4及原布局/Prefab/反馈保持。Console前后[0 Error,1 Warning,0 Log]相同，主场景干净、临时对象释放。Scene/SubScene/Prefab/Animator、旧meta/资源绑定/图片字体材质、包/构建配置与原G/结算/清理保持。
+- 增量同步新掉落存档专题、相关模块/导航、项目外配置模板及Runtime十二项清单，原201项编号/内容及旧用户通过保持原范围。主线程静态验收通过，新GamePlayer/真实I-O/迁移重启/飞行TTL/多人生命周期/独立失败/跨文件ECS/性能平台线上UNKNOWN；AI未运行真实存档读写、游戏/显示系统、GUI回调、逻辑单元测试、PlayMode、构建、发布、采样或图片检查，未创建子Agent或提交Git。

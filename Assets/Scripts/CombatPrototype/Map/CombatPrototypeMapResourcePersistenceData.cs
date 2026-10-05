@@ -6,6 +6,7 @@ namespace Code_01.CombatPrototype.Map
     public struct CombatPrototypeMapResourcePersistenceSettings : IComponentData
     {
         public byte Enabled;
+        public byte SaveGroundDrops;
         public FixedString64Bytes SaveSlotId;
         public float SaveIntervalSeconds;
         public FixedString128Bytes LayoutSignature;

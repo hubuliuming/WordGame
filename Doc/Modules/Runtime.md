@@ -707,7 +707,7 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 
 ## 【KNOWN ISSUES】地图资源状态存档的人工验收
 
-入口CombatPrototypeNetCode，当前schemaVersion=15/configRevision=18，默认Json/Forest、resourcePersistence=true/default_world/10秒，世界资源格式v1。正常Unity编译、字段反射和18次隔离Editor烘焙静态通过；新GamePlayer人工UNKNOWN，以下十二项待用户运行。清单使用单一服务端写同一槽；测试改变资源布局/开关/再生规则时，使用新合法槽或匹配的原资源档，避免把签名拒绝误判成加载失败。
+入口CombatPrototypeNetCode，当前schemaVersion=15/configRevision=18，默认Json/Forest、resourcePersistence=true/default_world/10秒，世界资源格式v1。正常Unity编译、字段反射和18次隔离Editor烘焙静态通过；用户已确认本阶段人工GamePlayer验收通过，主线程结合既有静态核对与用户反馈判定通过，范围限本入口、v15/18、世界v1及以下十二项清单；结论来自用户反馈，未实际触发的独立用例仍UNKNOWN。清单使用单一服务端写同一槽；测试改变资源布局/开关/再生规则时，使用新合法槽或匹配的原资源档，避免把签名拒绝误判成加载失败。
 
 1. 首次无正式资源档进入，服务端生成原89树/36采集/20矿及109阻挡，保存空Resources的v1档后Ready再准入；首次写失败拒绝准入，不创建玩家。客户端不读写世界文件。Forest/Grassland同槽分文件，原15输入/F/G/B及玩家加载保持。
 2. 完成植物采集、砍树和采矿，文件包含对应gather/tree/mine、PlacementIndex/ObjectId和剩余秒数；只在成功资源结果后保存。植物仍先玩家保存再入包，树/矿原工具保存后完成并只生成地面物，G仍独立入包。可用/工作中资源不存条目，世界恢复不额外发物品。
@@ -722,4 +722,23 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 11. PlayMode前修改enabled、saveSlotId和saveIntervalSeconds后正常导入/烘焙，合法值生效。disabled不读写世界档、按原布局重置且保留已有世界文件，仍严格校验新段。空/过长/非法字符/保留名槽、非有限/非正间隔、旧v1～v14、缺失/未知/重复字段和错类型明确失败，无默认补段/回退；未实际触发独立配置分支保持UNKNOWN。
 12. 正常关闭/重启、World/Scene退出重进和源更换无旧缓存/实体残留，最后保存只使用完整缓存，不读取已释放资源，不重复关闭写入。回归原F/G、600秒再生/占位/阻挡、高亮/资源状态、工具/修理、制作/Drop/All、E/R/战斗/镜头与玩家保存；未实际触发的清理/网络/时序、字形和性能保持UNKNOWN。
 
-本清单限本段v15/18、世界v1与默认三字段；完整路径/字段/恢复/失败边界归[资源存档](MapResourcePersistence.md)。原189项编号/内容及修理v14/17、资源状态v13/16等旧用户通过保持各自版本/清单；新增后共201项。新资源存档人工、文件I/O/坏档/关闭与重启/占位/预测、跨文件/意外ECS、多玩家/同槽并发/生命周期、字形、性能/带宽、平台/线上仍UNKNOWN。AI未执行真实存档读写方法、游戏/显示系统、GUI回调、逻辑单元测试、GamePlayer/PlayMode、命令行构建、发布、性能采样或图片检查，未创建子Agent或提交Git。
+本清单限本段v15/18、世界v1与默认三字段；完整路径/字段/恢复/失败边界归[资源存档](MapResourcePersistence.md)。原189项编号/内容及修理v14/17、资源状态v13/16等旧用户通过保持各自版本/清单；新增后共201项。本阶段人工通过结论来自用户反馈，仅覆盖本段十二项；未实际触发的独立文件I/O/坏档/替换/关闭与重启/占位/预测、多玩家时序/生命周期，以及跨文件原子一致/意外ECS故障恢复、同槽多服务端并发、未覆盖字形、性能/带宽/平台/线上仍UNKNOWN。AI未执行真实存档读写方法、游戏/显示系统、GUI回调、逻辑单元测试、GamePlayer/PlayMode、命令行构建、发布、性能采样或图片检查，未创建子Agent或提交Git。
+
+## 【KNOWN ISSUES】地面掉落物存档与恢复的人工验收
+
+入口CombatPrototypeNetCode，Json/Forest默认schemaVersion=16/configRevision=19、resourcePersistence=true/default_world/10秒/saveGroundDrops=true，世界档写v2、读v1迁移。正常Unity编译、字段反射及24次隔离Editor烘焙静态通过；新GamePlayer人工UNKNOWN，以下十二项待用户运行。单一服务端写同槽，各端同版代码/配置重新烘焙，沿原SinglePlayer或Online启动。
+
+1. 首次无世界档进入，先保存九字段v2且Resources/Drops为空、LastDropId=0，再Ready准入。默认资源/布局、15输入、Drop四Ghost字段、F/G/资源状态四字段及玩家v2加载保持；客户端不读写世界文件。初始写失败不准入。
+2. 分别触发敌人苹果、砍树木材、采矿石材及背包Single/All丢弃；快照保留ItemId、实际数量、唯一DropId、落点及剩余寿命，LastDropId包含已分配空号。正常关闭/重启后，未领取物在原保存落点恢复Landed；不直接入包、不重新扣材料/耐久、不补偿发奖。
+3. 在0.4秒飞行窗口正常关闭并有成功快照，重启直接恢复原EndPosition的Landed，无再次散落或飞行动画，Quantity/ID保持。Landed保存实际位置；落点可能在地图外，不擅自钳制或避让；不能触发窗口时保持UNKNOWN。
+4. 默认600秒寿命检查点/关闭后恢复最近成功余时，离线等待不扣时间，恢复不重置成600秒；到期掉落不进入快照。HasExpiry=true且余时0的合法条目不生成，false/0永久条目继续永久保留。新Lifetime只作用于新生成物，旧物按保存的是否到期/余时恢复。
+5. 恢复后G仍按最近Landed目标、同距小DropId选择，先保存玩家候选再库存/Consumed；成功后的世界完整快照排除该物。多人争抢只入包一次，目标文字/蓝圈沿原身份显示；玩家保存失败且物品未到期时保留掉落，恢复后须新G，不自动重试。
+6. 背包丢弃准备态、失败/回滚对象、已Consumed/排队销毁对象均不进入Drops。可控丢弃保存失败不扣库存、不把Prepared恢复成可领取物；成功丢弃保存后的物品才在重启恢复。空号保留在LastDropId，未来新ID严格递增，0/负/重复或超过上限编号不能加载。
+7. 使用匹配布局/seed的合法世界v1档，严格读取原七字段/资源身份与余时，在内存补Drops=[]、LastDropId=0，不因读取立刻写迁移文件；下一正常状态变化/检查点/关闭保存写v2。耗尽/阻挡基态与离线暂停保持，不凭旧v1补造已丢失掉落。玩家档仍写v2/读v1，地图旧v1～v15配置拒绝。
+8. 可控坏v2分别覆盖缺失/未知/重复字段、错类型、根后内容、坏UTF-8、未知版本/槽/地图/seed/签名、负LastDropId、坏DropId/ItemId/Quantity、非有限/超float范围位置、非布尔HasExpiry、非法秒数及永久物非零余时。开启掉落恢复时缺ItemId显式绑定/坏Prefab也失败；整体拒绝准入、坏档保留，不跳过坏项或回退.tmp。未触发的独立分支UNKNOWN。
+9. 正常准入后制造世界写失败，旧正式档保留，成功G/丢弃/采集/工具结算不回滚，日志带map/slot/path/reason及原异常，下一变化/检查点重试。捕获失败时资源与掉落均保留上一完整缓存，不保存半批；可控实例恢复失败清理本批掉落并Failed，不部分Ready，清理失败另记。未触发独立失败UNKNOWN。
+10. PlayMode前关闭saveGroundDrops并重新烘焙：资源耗尽/再生仍恢复，地面物沿旧规则重启清空，下一成功世界快照Drops=[]/LastDropId=0。resourcePersistence.enabled=false不读写任何世界档、保留原文件，两个开关关闭仍校验全部配置字段，单独关闭saveGroundDrops仍完整校验已读取的v2档；saveGroundDrops缺失/未知/错类型及旧schema15明确拒绝，不补段/回退。
+11. 两Client、晚加入/重连读取服务端恢复的同一物品ID/数量/位置，G提示/高亮和拾取结算正常；恢复编号上限后新敌人/木材/石材/丢弃物不撞号，World释放仍由原DropSpawn/ECB拥有和清理。玩家/世界分别保存，G已入包后世界更新失败并中断可能重现旧物，本阶段不承诺跨文件防重复或同槽多服务端并发。
+12. 森林/草地、槽名/seed/资源签名隔离沿原规则；正常退出/重启、源更换/Scene/World退出重进只保存最后完整缓存，不读取已释放实体、无重复恢复/销毁。回归三类F采集/600秒再生/占位阻挡、G、工具制作/修理、Drop/All、B显示/高亮/资源状态、E/R/战斗/镜头及玩家保存。未实际触发的时序/清理/字形/性能用例UNKNOWN。
+
+本清单限v16/19、世界v2及本段默认四配置字段，完整契约归[掉落存档](MapDropPersistence.md)/[资源存档](MapResourcePersistence.md)。原201项编号/内容与v15/18资源存档十二项及更早用户通过保持原版本/清单，新增后共213项。本阶段人工、真实I/O/迁移/重启/飞行窗口/到期与永久物、独立解析/绑定/捕获/实例化/保存/清理失败、多玩家/生命周期与时序、跨文件/ECS、同槽并发、字形/性能/带宽/平台/线上仍UNKNOWN。AI未调用真实世界/玩家存档读写或运行游戏/显示系统、GUI回调、逻辑单元测试、GamePlayer/PlayMode、构建、发布、性能采样或图片检查，未创建子Agent或提交Git。

@@ -11,6 +11,8 @@ namespace Code_01.CombatPrototype.Map
     [UpdateAfter(typeof(CombatPrototypeMapGatherRegrowSystem))]
     [UpdateAfter(typeof(CombatPrototypeMapTreeRegrowSystem))]
     [UpdateAfter(typeof(CombatPrototypeMapMineRegrowSystem))]
+    [UpdateAfter(typeof(CombatPrototypeMapDropCleanupSystem))]
+    [UpdateAfter(typeof(CombatPrototypeMapInventoryDropSystem))]
     [UpdateBefore(typeof(CombatPrototypePlayerRespawnSystem))]
     public partial class CombatPrototypeMapResourceSaveSystem : SystemBase
     {
@@ -22,6 +24,9 @@ namespace Code_01.CombatPrototype.Map
         private double[] _deadlines, _nextDeadlines;
         private double _observedTime, _nextSaveAt, _nextCaptureAt;
         private bool _hasSnapshot, _dirty;
+        private CombatPrototypeMapDropSpawnSystem _dropOwner;
+        private CombatPrototypeMapInventoryDropDefinition[] _dropBindings;
+        private CombatPrototypeMapDropPersistenceSnapshot _drops, _nextDrops;
 
         protected override void OnCreate()
         {
@@ -44,7 +49,15 @@ namespace Code_01.CombatPrototype.Map
                 _source = source;
                 _map = EntityManager.GetComponentData<CombatPrototypeMapData>(source);
                 _settings = settings;
-                _bindings = World.GetExistingSystemManaged<CombatPrototypeMapResourceRestoreSystem>().Bindings;
+                var restore = World.GetExistingSystemManaged<CombatPrototypeMapResourceRestoreSystem>();
+                _bindings = restore.Bindings;
+                if (settings.SaveGroundDrops != 0)
+                {
+                    _dropOwner = World.GetExistingSystemManaged<CombatPrototypeMapDropSpawnSystem>();
+                    _dropBindings = restore.DropBindings;
+                    _drops = new CombatPrototypeMapDropPersistenceSnapshot();
+                    _nextDrops = new CombatPrototypeMapDropPersistenceSnapshot();
+                }
                 _depleted = new bool[_bindings.Length]; _nextDepleted = new bool[_bindings.Length];
                 _deadlines = new double[_bindings.Length]; _nextDeadlines = new double[_bindings.Length];
                 _nextSaveAt = SystemAPI.Time.ElapsedTime + settings.SaveIntervalSeconds;
@@ -66,6 +79,12 @@ namespace Code_01.CombatPrototype.Map
                     _nextDeadlines[index] = depleted && binding.RegrowEnabled != 0 ? deadline : 0;
                     changed |= depleted != _depleted[index] || _nextDeadlines[index] != _deadlines[index];
                 }
+                if (_settings.SaveGroundDrops != 0)
+                {
+                    _nextDrops.Capture(EntityManager, _dropOwner, source, _dropBindings, time);
+                    changed |= !_nextDrops.SameState(_drops);
+                    var dropSwap = _drops; _drops = _nextDrops; _nextDrops = dropSwap;
+                }
                 var depletedSwap = _depleted; _depleted = _nextDepleted; _nextDepleted = depletedSwap;
                 var deadlineSwap = _deadlines; _deadlines = _nextDeadlines; _nextDeadlines = deadlineSwap;
                 _observedTime = time;
@@ -77,7 +96,7 @@ namespace Code_01.CombatPrototype.Map
             catch (Exception exception)
             {
                 _nextCaptureAt = time + _settings.SaveIntervalSeconds;
-                Debug.LogError("[CombatPrototype.Map] Resource capture failed; stage=CaptureCompleteSnapshot, map=" + _map.MapDefinitionId +
+                Debug.LogError("[CombatPrototype.Map] World snapshot capture failed; stage=CaptureCompleteSnapshot, map=" + _map.MapDefinitionId +
                     ", slot=" + _settings.SaveSlotId + ", placement=" + placement + ". " + exception);
             }
         }
@@ -132,15 +151,20 @@ namespace Code_01.CombatPrototype.Map
                             Math.Min(binding.RegrowSeconds, Math.Max(_deadlines[index] - _observedTime, 0d)) : 0d
                     };
                 }
+                if (_settings.SaveGroundDrops != 0)
+                {
+                    data.LastDropId = _drops.LastDropId;
+                    data.Drops = _drops.CreateEntries(_observedTime);
+                }
                 CombatPrototypeMapResourceSaveStore.SavePrepared(data);
                 _dirty = false;
-                Debug.Log("[CombatPrototype.Map] Resource snapshot saved; map=" + _map.MapDefinitionId + ", slot=" +
-                    _settings.SaveSlotId + ", reason=" + reason + ", depleted=" + count + ", path=" + path + ".");
+                Debug.Log("[CombatPrototype.Map] World snapshot saved; map=" + _map.MapDefinitionId + ", slot=" +
+                    _settings.SaveSlotId + ", reason=" + reason + ", depleted=" + count + ", drops=" + data.Drops.Length + ", lastDropId=" + data.LastDropId + ", path=" + path + ".");
             }
             catch (Exception exception)
             {
                 _dirty = true;
-                Debug.LogError("[CombatPrototype.Map] Resource snapshot save failed; map=" + _map.MapDefinitionId + ", slot=" +
+                Debug.LogError("[CombatPrototype.Map] World snapshot save failed; map=" + _map.MapDefinitionId + ", slot=" +
                     _settings.SaveSlotId + ", reason=" + reason + ", path=" + path + ". " + exception);
             }
         }
@@ -151,6 +175,7 @@ namespace Code_01.CombatPrototype.Map
             if (_hasSnapshot) TrySave(reason);
             _source = Entity.Null; _hasSnapshot = false; _dirty = false;
             _bindings = null; _depleted = _nextDepleted = null; _deadlines = _nextDeadlines = null;
+            _dropOwner = null; _dropBindings = null; _drops = _nextDrops = null;
             _nextSaveAt = _nextCaptureAt = 0;
         }
 

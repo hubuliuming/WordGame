@@ -8,5 +8,6 @@ namespace Code_01.CombatPrototype.Map
         public bool enabled;
         public string saveSlotId;
         public float saveIntervalSeconds;
+        public bool saveGroundDrops;
     }
 }

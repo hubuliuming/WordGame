@@ -1,12 +1,13 @@
 {
-  "schemaVersion": 15,
-  "configRevision": 18,
+  "schemaVersion": 16,
+  "configRevision": 19,
   "mapDefinitionId": "battle_grassland_01",
   "defaultSeed": 12345,
   "resourcePersistence": {
     "enabled": true,
     "saveSlotId": "default_world",
-    "saveIntervalSeconds": 10
+    "saveIntervalSeconds": 10,
+    "saveGroundDrops": true
   },
   "geometry": {
     "cellSizeMeters": 2.0,

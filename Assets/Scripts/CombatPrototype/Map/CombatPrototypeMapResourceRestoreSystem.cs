@@ -18,6 +18,7 @@ namespace Code_01.CombatPrototype.Map
     {
         private Entity _source;
         internal CombatPrototypeMapResourceBinding[] Bindings { get; private set; } = Array.Empty<CombatPrototypeMapResourceBinding>();
+        internal CombatPrototypeMapInventoryDropDefinition[] DropBindings { get; private set; } = Array.Empty<CombatPrototypeMapInventoryDropDefinition>();
 
         protected override void OnCreate()
         {
@@ -38,6 +39,7 @@ namespace Code_01.CombatPrototype.Map
             {
                 _source = source;
                 Bindings = Array.Empty<CombatPrototypeMapResourceBinding>();
+                DropBindings = Array.Empty<CombatPrototypeMapInventoryDropDefinition>();
                 SetPhase(source, CombatPrototypeMapResourceRestorePhase.Ready);
                 return;
             }
@@ -45,14 +47,19 @@ namespace Code_01.CombatPrototype.Map
             if (!tick.IsValid) return;
             _source = source;
             Bindings = Array.Empty<CombatPrototypeMapResourceBinding>();
+            DropBindings = Array.Empty<CombatPrototypeMapInventoryDropDefinition>();
             var map = EntityManager.GetComponentData<CombatPrototypeMapData>(source);
             var path = CombatPrototypeMapResourceSaveStore.GetSavePath(settings.SaveSlotId.ToString(), map.MapDefinitionId.ToString());
             var stage = "BindResources";
             try
             {
                 var bindings = BindResources(source);
+                stage = "BindDropPrefabs";
+                var dropBindings = settings.SaveGroundDrops != 0 ? CombatPrototypeMapDropPersistenceBindings.Read(EntityManager, source) :
+                    Array.Empty<CombatPrototypeMapInventoryDropDefinition>();
                 stage = "LoadAndValidate";
-                var data = CombatPrototypeMapResourceSaveStore.Load(settings, map, bindings, out var restored);
+                var data = CombatPrototypeMapResourceSaveStore.Load(settings, map, bindings,
+                    settings.SaveGroundDrops != 0 ? dropBindings : null, out var restored);
                 var byPlacement = new Dictionary<int, CombatPrototypeMapResourceBinding>(bindings.Length);
                 foreach (var binding in bindings) byPlacement.Add(binding.PlacementIndex, binding);
                 // Prepare every buffer before applying the fully validated snapshot.
@@ -74,11 +81,15 @@ namespace Code_01.CombatPrototype.Map
                 baselineTick.Decrement();
                 var time = SystemAPI.Time.ElapsedTime;
                 foreach (var entry in data.Resources) Restore(byPlacement[entry.PlacementIndex], entry, source, time, baselineTick.SerializedData);
+                stage = "RestoreGroundDrops";
+                var restoredDrops = settings.SaveGroundDrops != 0 ? CombatPrototypeMapDropPersistenceRestore.Apply(
+                    World.GetExistingSystemManaged<CombatPrototypeMapDropSpawnSystem>(), source, data, dropBindings, time) : 0;
                 Bindings = bindings;
+                DropBindings = dropBindings;
                 SetPhase(source, CombatPrototypeMapResourceRestorePhase.Ready);
                 Debug.Log("[CombatPrototype.Map] Resource restore ready; map=" + map.MapDefinitionId +
                     ", slot=" + settings.SaveSlotId + ", restored=" + restored + ", resources=" + bindings.Length +
-                    ", depleted=" + data.Resources.Length + ", path=" + path + ".");
+                    ", depleted=" + data.Resources.Length + ", drops=" + restoredDrops + ", lastDropId=" + data.LastDropId + ", path=" + path + ".");
             }
             catch (Exception exception)
             {

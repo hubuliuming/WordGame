@@ -17,11 +17,11 @@ namespace Code_01.CombatPrototype.Map
             {
                 map = new MapDefinitionConfig
                 {
-                    schemaVersion = 15, configRevision = 18,
+                    schemaVersion = 16, configRevision = 19,
                     mapDefinitionId = mapDefinitionId, defaultSeed = 12345,
                     resourcePersistence = new MapResourcePersistenceConfig
                     {
-                        enabled = true, saveSlotId = "default_world", saveIntervalSeconds = 10f
+                        enabled = true, saveSlotId = "default_world", saveIntervalSeconds = 10f, saveGroundDrops = true
                     },
                     geometry = new MapGeometryConfig
                     {

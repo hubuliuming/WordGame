@@ -12,6 +12,8 @@ namespace Code_01.CombatPrototype.Map
         public int ConfigRevision;
         public string LayoutSignature;
         public CombatPrototypeMapResourceSaveEntry[] Resources;
+        public int LastDropId;
+        public CombatPrototypeMapDropSaveEntry[] Drops;
     }
 
     [Serializable]

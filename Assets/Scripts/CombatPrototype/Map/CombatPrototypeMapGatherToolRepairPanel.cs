@@ -7,6 +7,8 @@ namespace Code_01.CombatPrototype.Map
     internal sealed class CombatPrototypeMapGatherToolRepairPanel
     {
         public const int RowCount = 11;
+        private string _levelLabel;
+        private int _axeLevel = -1, _pickaxeLevel = -1;
         private CombatPrototypeMapGatherToolSettings _settings;
         private CombatPrototypeMapGatherToolDefinition _axe, _pickaxe;
         private string _heading, _woodLabel, _stoneLabel, _missing, _full, _notOwned, _disabled, _ready;
@@ -16,10 +18,10 @@ namespace Code_01.CombatPrototype.Map
         private bool _inventoryValid, _canAxe, _canPickaxe, _requestAxe, _requestPickaxe;
 
         public void Configure(CombatPrototypeMapInventoryPanelSettings panel, CombatPrototypeMapGatherToolSettings settings,
-            CombatPrototypeMapGatherToolDefinition axe, CombatPrototypeMapGatherToolDefinition pickaxe)
+            CombatPrototypeMapGatherToolDefinition axe, CombatPrototypeMapGatherToolDefinition pickaxe, string levelLabel)
         {
             Reset();
-            _settings = settings;
+            _settings = settings; _levelLabel = levelLabel;
             _axe = axe; _pickaxe = pickaxe;
             _heading = panel.RepairLabel.ToString();
             _woodLabel = panel.WoodLabel.ToString(); _stoneLabel = panel.StoneLabel.ToString();
@@ -30,15 +32,17 @@ namespace Code_01.CombatPrototype.Map
             _pickaxeButton = "4: " + panel.RepairButtonLabel + " " + _pickaxeName;
         }
 
-        public void Capture(int wood, int stone, bool inventoryValid, int axeDurability, int pickaxeDurability)
+        public void Capture(int wood, int stone, bool inventoryValid, int axeDurability, int pickaxeDurability,
+            int axeLevel, int pickaxeLevel, CombatPrototypeMapGatherToolDefinition axe, CombatPrototypeMapGatherToolDefinition pickaxe)
         {
             if (_wood == wood && _stone == stone && _inventoryValid == inventoryValid &&
-                _axeDurability == axeDurability && _pickaxeDurability == pickaxeDurability) return;
+                _axeDurability == axeDurability && _pickaxeDurability == pickaxeDurability && _axeLevel == axeLevel && _pickaxeLevel == pickaxeLevel) return;
             _wood = wood; _stone = stone; _inventoryValid = inventoryValid;
             _axeDurability = axeDurability; _pickaxeDurability = pickaxeDurability;
+            _axeLevel = axeLevel; _pickaxeLevel = pickaxeLevel; _axe = axe; _pickaxe = pickaxe;
             _canAxe = CanRepair(_axe, axeDurability); _canPickaxe = CanRepair(_pickaxe, pickaxeDurability);
-            _axeTitle = _axeName + "  " + Availability(_axe, axeDurability);
-            _pickaxeTitle = _pickaxeName + "  " + Availability(_pickaxe, pickaxeDurability);
+            _axeTitle = _axeName + (axeLevel > 0 ? " " + _levelLabel + " " + axeLevel : string.Empty) + "  " + Availability(_axe, axeDurability);
+            _pickaxeTitle = _pickaxeName + (pickaxeLevel > 0 ? " " + _levelLabel + " " + pickaxeLevel : string.Empty) + "  " + Availability(_pickaxe, pickaxeDurability);
             _axePreview = Preview(_axe, axeDurability); _pickaxePreview = Preview(_pickaxe, pickaxeDurability);
             _axeRecipe = Recipe(_axe); _pickaxeRecipe = Recipe(_pickaxe);
             _axeMissing = Missing(_axe); _pickaxeMissing = Missing(_pickaxe);
@@ -122,6 +126,7 @@ namespace Code_01.CombatPrototype.Map
             _settings = default; _axe = _pickaxe = default;
             _wood = _stone = -1; _axeDurability = _pickaxeDurability = int.MinValue;
             _inventoryValid = _canAxe = _canPickaxe = false;
+            _levelLabel = string.Empty; _axeLevel = _pickaxeLevel = -1;
             _heading = _woodLabel = _stoneLabel = _missing = _full = _notOwned = _disabled = _ready = string.Empty;
             _axeName = _pickaxeName = _axeButton = _pickaxeButton = string.Empty;
             _axeTitle = _pickaxeTitle = _axePreview = _pickaxePreview = _axeRecipe = _pickaxeRecipe = _axeMissing = _pickaxeMissing = string.Empty;

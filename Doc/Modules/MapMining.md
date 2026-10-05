@@ -25,7 +25,7 @@
 
 ## 【FACT】JSON 契约与默认值
 
-[battle_forest_01.json](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[battle_grassland_01.json](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 为 schemaVersion=20/configRevision=23。mining 及全部字段必填，interactionHud归[交互显示](MapInteractionHud.md)，gatherTools归[采集工具](MapGatherTools.md)；旧v1～v19、缺失/未知/重复字段、错误类型或无效引用明确失败，不补字段、不回退来源。配置只在烘焙时读取，无运行热重载或新联网配置校验协议。各端须使用相同代码、输入布局、Ghost、配置及资源。
+[battle_forest_01.json](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[battle_grassland_01.json](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 为 schemaVersion=21/configRevision=24。mining 及全部字段必填，interactionHud归[交互显示](MapInteractionHud.md)，gatherTools归[采集工具](MapGatherTools.md)；旧v1～v20、缺失/未知/重复字段、错误类型或无效引用明确失败，不补字段、不回退来源。配置只在烘焙时读取，无运行热重载或新联网配置校验协议。各端须使用相同代码、输入布局、Ghost、配置及资源。
 
 ```json
 "mining": {
@@ -124,11 +124,11 @@ Tools/CombatPrototype/地图/生成第九阶段采矿资源 要求空闲 EditMod
 
 用户已确认矿点原点再生人工 GamePlayer 验收通过，主线程结合既有代码/烘焙静态核对与用户反馈判定该阶段通过；范围限 schemaVersion=6/configRevision=9 及[运行入口](Runtime.md)矿点再生八项清单。人工结论来自用户反馈，未实际触发的精确距离/特殊 Simulate、同 tick/延迟/预测回放、晚加入及独立失败分支仍为 UNKNOWN。已有统一 F 及第七/第八阶段用户通过仅限各自原版本/清单，不扩展到新行为。矿点历史随本局轮次增长，其内存/网络开销及规模性能、平台构建与线上联调未测量；AI 未运行 GamePlayer/PlayMode、游戏模拟/显示系统、逻辑单元测试、命令行构建、发布、性能采样或图片检查。
 
-当前自动镐子/耐久归[采集工具](MapGatherTools.md)，v8/revision=11锁定字段/保存链已编译和静态烘焙核对，用户确认工具人工通过限v8/revision=11及[运行入口](Runtime.md)十二项清单，未实际触发的独立失败/边界/预测用例仍为UNKNOWN；旧采矿/再生用户通过仅限各自原版本与清单。
+当前可用镐子Lv1/2/3耗时2.25/1.8/1.5秒，倍率/最大耐久归[工具升级](MapGatherToolUpgrade.md)；自动使用/成功耐久结算归[采集工具](MapGatherTools.md)，v8/revision=11锁定字段/保存链已编译和静态烘焙核对，用户确认工具人工通过限v8/revision=11及[运行入口](Runtime.md)十二项清单，未实际触发的独立失败/边界/预测用例仍为UNKNOWN；旧采矿/再生用户通过仅限各自原版本与清单。
 
 v9/revision12阶段的[材料面板](MapInventoryPanel.md)只展示石材库存/镐子耐久和原配方，按钮沿原制作链；采矿/石材/阻挡/再生逻辑保持，用户确认面板人工通过限[运行入口](Runtime.md)v9/revision12十二项，未触发的独立显示/输入失败仍UNKNOWN。
 
-当前地图v20/23必填[背包丢弃](MapInventoryDrop.md)，复用原掉落资源及保存链；本专题原交互/工具/产出/再生行为保持。新增丢弃静态及用户人工通过限[运行入口](Runtime.md)v10/13十二项，未触发用例UNKNOWN；旧通过仍限原版本/清单。
+当前地图v21/24必填[背包丢弃](MapInventoryDrop.md)，复用原掉落资源及保存链；本专题原交互/工具/产出/再生行为保持。新增丢弃静态及用户人工通过限[运行入口](Runtime.md)v10/13十二项，未触发用例UNKNOWN；旧通过仍限原版本/清单。
 
 v11/14阶段的[G提示](MapPickupHud.md)只读共用掉落目标，与原F目标/工具进度独立；不修改本专题资源状态、产出、工具耐久、再生或保存。新显示编译/十次隔离烘焙静态通过；用户确认人工通过限v11/14十项，未触发用例UNKNOWN，旧用户通过保持各自版本/清单。
 
@@ -136,12 +136,12 @@ v12/15的[高亮](MapInteractionHighlight.md)按原Kind/PlacementIndex解析矿�
 
 v13/16的[资源状态](MapResourceStatusHud.md)只读Available/Mining/Depleted与原服务端RegrowAt；到期仍Depleted显示等待再生，实际恢复后才显示可用；mining关闭时不选择矿点。原采矿/掉落/占位/阻挡及保存行为保持。新显示静态及用户人工通过，限v13/16十项，未触发用例UNKNOWN，旧通过保持原范围。
 
-当前v20/23的[工具修理](MapToolRepair.md)：Busy期间拒绝修理；原已锁定镐子、ActualDuration/FinishAt、成功扣耐久、地面stone×3、600秒再生/占位/阻挡与保存链保持。新链静态及用户人工通过，限v14/17十二项，未触发用例UNKNOWN，旧矿点用户通过保持原版本/清单。
+当前v21/24的[工具修理](MapToolRepair.md)：Busy期间拒绝修理；原已锁定镐子、ActualDuration/FinishAt、成功扣耐久、地面stone×3、600秒再生/占位/阻挡与保存链保持。新链静态及用户人工通过，限v14/17十二项，未触发用例UNKNOWN，旧矿点用户通过保持原版本/清单。
 
 寿命提示v17/20归[G提示](MapPickupHud.md)：所属G六字段，原目标/拾取/期限/保存保持；静态及用户人工通过限十二项，未触发独立用例UNKNOWN；旧用户通过仍限原版本/清单。
 
-地图v18/21的[F5/保存提示](MapWorldSaveHud.md)已接入：当前17输入、新增所属3字段；原F/G、工具及世界/玩家存档格式保持。静态及用户人工通过限v18/revision21十二项，未触发独立用例UNKNOWN；旧通过限原版本/清单。
+地图v18/21的[F5/保存提示](MapWorldSaveHud.md)已接入：该阶段17输入、新增所属3字段；原F/G、工具及世界/玩家存档格式保持。静态及用户人工通过限v18/revision21十二项，未触发独立用例UNKNOWN；旧通过限原版本/清单。
 
 ## 【FACT】容量等级接入边界
 
-[升级](MapInventoryCapacityUpgrade.md)：有工具的矿点完成候选保留实际Level并写v3；徒手、产地面stone及再生行为保持，活动Mining期间拒绝升级。新链静态通过、人工UNKNOWN；旧通过保持原版本/清单。
+[升级](MapInventoryCapacityUpgrade.md)：有工具的矿点完成候选保留实际Level并写v3；徒手、产地面stone及再生行为保持，活动Mining期间拒绝升级。新链静态及用户人工通过限v20/revision23升级十六项，未触发用例UNKNOWN；旧通过保持原版本/清单。

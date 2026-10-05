@@ -90,7 +90,11 @@ namespace Code_01.CombatPrototype.Map
                     EntityManager.GetComponentData<CombatPrototypeMapInventoryCapacitySettings>(source),
                     EntityManager.GetBuffer<CombatPrototypeMapInventoryCapacityDefinition>(source, true),
                     EntityManager.GetComponentData<CombatPrototypeMapInventoryCapacityUpgradeSettings>(source),
-                    EntityManager.GetBuffer<CombatPrototypeMapInventoryCapacityUpgradeDefinition>(source, true), map.MapDefinitionId.ToString());
+                    EntityManager.GetBuffer<CombatPrototypeMapInventoryCapacityUpgradeDefinition>(source, true),
+                    EntityManager.GetComponentData<CombatPrototypeMapGatherToolUpgradeSettings>(source),
+                    EntityManager.GetBuffer<CombatPrototypeMapGatherToolUpgradeDefinition>(source, true),
+                    EntityManager.GetComponentData<CombatPrototypeMapTreeSettings>(source).HarvestDuration,
+                    EntityManager.GetComponentData<CombatPrototypeMapMineSettings>(source).HarvestDuration, map.MapDefinitionId.ToString());
                 _source = source;
                 _player = player;
             }
@@ -103,6 +107,7 @@ namespace Code_01.CombatPrototype.Map
                 EntityManager.GetComponentData<CombatPrototypeMapInventoryDropFeedback>(player),
                 EntityManager.GetComponentData<CombatPrototypeMapInventoryCapacityLevel>(player).Level,
                 EntityManager.GetComponentData<CombatPrototypeMapInventoryCapacityUpgradeFeedback>(player),
+                EntityManager.GetComponentData<CombatPrototypeMapToolUpgradeFeedback>(player),
                 EntityManager.GetBuffer<CombatPrototypeInventoryItem>(player, true), source, player,
                 pickup);
             _highlightTargets.Resolve(EntityManager, World.Name, map, highlightSettings,
@@ -113,11 +118,11 @@ namespace Code_01.CombatPrototype.Map
         }
 
         internal bool ReadPanelInput(Keyboard keyboard, Mouse mouse, out bool craftAxe, out bool craftPickaxe, out bool repairAxe, out bool repairPickaxe,
-            out CombatPrototypeMapInventoryDropRequest dropRequest, out bool upgrade)
+            out CombatPrototypeMapInventoryDropRequest dropRequest, out bool upgrade, out bool upgradeAxe, out bool upgradePickaxe)
         {
             craftAxe = craftPickaxe = repairAxe = repairPickaxe = false;
             dropRequest = default;
-            upgrade = false;
+            upgrade = upgradeAxe = upgradePickaxe = false;
             Dependency.Complete();
             if (_map.IsEmptyIgnoreFilter) { ResetBinding(); return false; }
             var source = _map.GetSingletonEntity();
@@ -132,7 +137,7 @@ namespace Code_01.CombatPrototype.Map
             if (_hud == null)
                 throw new InvalidOperationException("[CombatPrototype.Map] World=" + World.Name +
                     ", player=" + player + " requires the Main Camera HUD for panel input.");
-            return _hud.ReadPanelInput(keyboard, mouse, out craftAxe, out craftPickaxe, out repairAxe, out repairPickaxe, out dropRequest, out upgrade);
+            return _hud.ReadPanelInput(keyboard, mouse, out craftAxe, out craftPickaxe, out repairAxe, out repairPickaxe, out dropRequest, out upgrade, out upgradeAxe, out upgradePickaxe);
         }
 
         private bool HasInGameConnection(Entity player)

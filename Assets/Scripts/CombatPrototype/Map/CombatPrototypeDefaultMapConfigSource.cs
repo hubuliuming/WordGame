@@ -17,7 +17,7 @@ namespace Code_01.CombatPrototype.Map
             {
                 map = new MapDefinitionConfig
                 {
-                    schemaVersion = 20, configRevision = 23,
+                    schemaVersion = 21, configRevision = 24,
                     mapDefinitionId = mapDefinitionId, defaultSeed = 12345,
                     resourcePersistence = new MapResourcePersistenceConfig
                     {
@@ -79,6 +79,23 @@ namespace Code_01.CombatPrototype.Map
                                 craftWoodQuantity = 2, craftStoneQuantity = 3,
                                 repairDurability = 15, repairWoodQuantity = 1, repairStoneQuantity = 1
                             }
+                        }
+                    },
+                    gatherToolUpgrade = new MapGatherToolUpgradeConfig
+                    {
+                        enabled = true, feedbackSeconds = 2f, upgradeLabel = "Tool upgrade", upgradeButtonLabel = "Upgrade",
+                        levelLabel = "Lv", maxLevelLabel = "Max level", successLabel = "Tool upgraded",
+                        rejectedLabel = "Upgrade rejected", failureLabel = "Upgrade failed", recraftLabel = "Recraft at Lv1",
+                        levels = new[]
+                        {
+                            new MapGatherToolUpgradeLevelConfig
+                            { toolId = "stone_axe", level = 2, maxDurability = 90, durationMultiplier = 0.60f, woodQuantity = 12, stoneQuantity = 8 },
+                            new MapGatherToolUpgradeLevelConfig
+                            { toolId = "stone_axe", level = 3, maxDurability = 120, durationMultiplier = 0.50f, woodQuantity = 24, stoneQuantity = 16 },
+                            new MapGatherToolUpgradeLevelConfig
+                            { toolId = "stone_pickaxe", level = 2, maxDurability = 60, durationMultiplier = 0.60f, woodQuantity = 8, stoneQuantity = 12 },
+                            new MapGatherToolUpgradeLevelConfig
+                            { toolId = "stone_pickaxe", level = 3, maxDurability = 80, durationMultiplier = 0.50f, woodQuantity = 16, stoneQuantity = 24 }
                         }
                     },
                     interactionHud = new MapInteractionHudConfig

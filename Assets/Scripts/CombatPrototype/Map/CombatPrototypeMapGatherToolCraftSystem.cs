@@ -120,7 +120,7 @@ namespace Code_01.CombatPrototype.Map
                     }
                     var nextWood = woodQuantity - definition.CraftWoodQuantity;
                     var nextStone = stoneQuantity - definition.CraftStoneQuantity;
-                    var nextTool = new CombatPrototypeMapGatherTool { ToolId = definition.ToolId, Durability = definition.MaxDurability };
+                    var nextTool = new CombatPrototypeMapGatherTool { ToolId = definition.ToolId, Durability = definition.MaxDurability, Level = 1 };
                     if (toolIndex < 0) tools.EnsureCapacity(checked(tools.Length + 1));
                     var identity = EntityManager.GetComponentData<CombatPrototypePlayerIdentity>(request.Player).PlayerId;
                     var reward = EntityManager.GetComponentData<CombatPrototypePlayerReward>(request.Player);

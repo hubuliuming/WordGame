@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 20,
-  "configRevision": 23,
+  "schemaVersion": 21,
+  "configRevision": 24,
   "mapDefinitionId": "battle_grassland_01",
   "defaultSeed": 12345,
   "resourcePersistence": {
@@ -95,6 +95,52 @@
         "repairDurability": 15,
         "repairWoodQuantity": 1,
         "repairStoneQuantity": 1
+      }
+    ]
+  },
+  "gatherToolUpgrade": {
+    "enabled": true,
+    "feedbackSeconds": 2.0,
+    "upgradeLabel": "Tool upgrade",
+    "upgradeButtonLabel": "Upgrade",
+    "levelLabel": "Lv",
+    "maxLevelLabel": "Max level",
+    "successLabel": "Tool upgraded",
+    "rejectedLabel": "Upgrade rejected",
+    "failureLabel": "Upgrade failed",
+    "recraftLabel": "Recraft at Lv1",
+    "levels": [
+      {
+        "toolId": "stone_axe",
+        "level": 2,
+        "maxDurability": 90,
+        "durationMultiplier": 0.6,
+        "woodQuantity": 12,
+        "stoneQuantity": 8
+      },
+      {
+        "toolId": "stone_axe",
+        "level": 3,
+        "maxDurability": 120,
+        "durationMultiplier": 0.5,
+        "woodQuantity": 24,
+        "stoneQuantity": 16
+      },
+      {
+        "toolId": "stone_pickaxe",
+        "level": 2,
+        "maxDurability": 60,
+        "durationMultiplier": 0.6,
+        "woodQuantity": 8,
+        "stoneQuantity": 12
+      },
+      {
+        "toolId": "stone_pickaxe",
+        "level": 3,
+        "maxDurability": 80,
+        "durationMultiplier": 0.5,
+        "woodQuantity": 16,
+        "stoneQuantity": 24
       }
     ]
   },

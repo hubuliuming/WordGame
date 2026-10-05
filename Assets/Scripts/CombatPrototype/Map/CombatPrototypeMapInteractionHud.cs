@@ -16,6 +16,9 @@ namespace Code_01.CombatPrototype.Map
         private CombatPrototypeMapGatherToolSettings _toolSettings;
         private CombatPrototypeMapGatherToolDefinition _axe;
         private CombatPrototypeMapGatherToolDefinition _pickaxe;
+        private CombatPrototypeMapGatherToolUpgradeDefinition _axeSecond, _axeThird, _pickaxeSecond, _pickaxeThird;
+        private string _levelLabel, _recraftLabel;
+        private int _axeLevel = -1, _pickaxeLevel = -1;
         private GUIStyle _labelStyle;
         private string _gatherLabel;
         private string _treeLabel;
@@ -103,20 +106,27 @@ namespace Code_01.CombatPrototype.Map
             CombatPrototypeMapResourcePersistenceSettings persistenceSettings,
             CombatPrototypeMapInventoryCapacitySettings capacity, DynamicBuffer<CombatPrototypeMapInventoryCapacityDefinition> capacityDefinitions,
             CombatPrototypeMapInventoryCapacityUpgradeSettings upgradeSettings,
-            DynamicBuffer<CombatPrototypeMapInventoryCapacityUpgradeDefinition> upgradeDefinitions, string mapId)
+            DynamicBuffer<CombatPrototypeMapInventoryCapacityUpgradeDefinition> upgradeDefinitions,
+            CombatPrototypeMapGatherToolUpgradeSettings toolUpgradeSettings,
+            DynamicBuffer<CombatPrototypeMapGatherToolUpgradeDefinition> toolUpgradeDefinitions, float treeDuration, float mineDuration, string mapId)
         {
             Reset();
             _settings = settings;
             _toolSettings = toolSettings;
             _axe = axe;
             _pickaxe = pickaxe;
+            _axeSecond = CombatPrototypeMapGatherToolUtility.RequireUpgradeDefinition(toolUpgradeDefinitions, axe.ToolId, 2);
+            _axeThird = CombatPrototypeMapGatherToolUtility.RequireUpgradeDefinition(toolUpgradeDefinitions, axe.ToolId, 3);
+            _pickaxeSecond = CombatPrototypeMapGatherToolUtility.RequireUpgradeDefinition(toolUpgradeDefinitions, pickaxe.ToolId, 2);
+            _pickaxeThird = CombatPrototypeMapGatherToolUtility.RequireUpgradeDefinition(toolUpgradeDefinitions, pickaxe.ToolId, 3);
+            _levelLabel = toolUpgradeSettings.LevelLabel.ToString(); _recraftLabel = toolUpgradeSettings.RecraftLabel.ToString();
             _axeName = axe.DisplayName.ToString();
             _pickaxeName = pickaxe.DisplayName.ToString();
             _gatherLabel = settings.GatherLabel.ToString();
             _treeLabel = settings.TreeLabel.ToString();
             _mineLabel = settings.MineLabel.ToString();
             _noSpaceLabel = settings.NoSpaceLabel.ToString();
-            _inventoryPanel.Configure(inventorySettings, toolSettings, axe, pickaxe, dropSettings, dropDefinitions, capacity, capacityDefinitions, upgradeSettings, upgradeDefinitions, mapId);
+            _inventoryPanel.Configure(inventorySettings, toolSettings, axe, pickaxe, dropSettings, dropDefinitions, capacity, capacityDefinitions, upgradeSettings, upgradeDefinitions, toolUpgradeSettings, toolUpgradeDefinitions, treeDuration, mineDuration, mapId);
             _pickupHud.Configure(pickupSettings);
             _highlight.Configure(highlightSettings, mapId, _highlightCamera);
             _resourceStatus.Configure(resourceStatusSettings, settings, mapId);
@@ -127,7 +137,7 @@ namespace Code_01.CombatPrototype.Map
         internal void Show(CombatPrototypeMapInteractionHudState state, DynamicBuffer<CombatPrototypeMapGatherTool> tools,
             CombatPrototypeMapToolCraftFeedback feedback, CombatPrototypeMapToolRepairFeedback repairFeedback,
             CombatPrototypeMapInventoryDropFeedback dropFeedback, int capacityLevel,
-            CombatPrototypeMapInventoryCapacityUpgradeFeedback upgradeFeedback,
+            CombatPrototypeMapInventoryCapacityUpgradeFeedback upgradeFeedback, CombatPrototypeMapToolUpgradeFeedback toolUpgradeFeedback,
             DynamicBuffer<CombatPrototypeInventoryItem> inventory,
             Entity source, Entity player, CombatPrototypeMapPickupHudState pickupState)
         {
@@ -141,8 +151,9 @@ namespace Code_01.CombatPrototype.Map
             var hasFeedback = hasRepairFeedback || hasCraftFeedback;
             var displayFeedback = hasRepairFeedback ? repairText : hasCraftFeedback ? _feedbackText : string.Empty;
             var feedbackKind = hasRepairFeedback ? _repairFeedback.Kind : _feedbackKind;
-            _inventoryPanel.Show(inventory, _axeDurability, _pickaxeDurability,
-                displayFeedback, dropFeedback, capacityLevel, upgradeFeedback, source, player);
+            _inventoryPanel.Show(inventory, _axeDurability, _pickaxeDurability, _axeLevel, _pickaxeLevel,
+                DefinitionForLevel(_axe, _axeLevel), DefinitionForLevel(_pickaxe, _pickaxeLevel),
+                displayFeedback, dropFeedback, capacityLevel, upgradeFeedback, toolUpgradeFeedback, source, player);
             if (_settings.Enabled == 0) { _visible = false; return; }
             if (state.Mode == CombatPrototypeMapInteractionHudMode.Hidden)
             {
@@ -194,40 +205,51 @@ namespace Code_01.CombatPrototype.Map
             if (tools.Length > 2) throw new InvalidOperationException("Invalid owner tool snapshot: too many tools.");
             var axeDurability = -1;
             var pickaxeDurability = -1;
+            var axeLevel = 0; var pickaxeLevel = 0;
             foreach (var tool in tools)
             {
+                CombatPrototypeMapGatherToolUtility.ValidateLevel(tool.Level);
                 if (tool.ToolId.Equals(_axe.ToolId))
                 {
-                    if (axeDurability >= 0 || tool.Durability < 0 || tool.Durability > _axe.MaxDurability)
+                    if (axeDurability >= 0 || tool.Durability < 0 || tool.Durability > DefinitionForLevel(_axe, tool.Level).MaxDurability)
                         throw new InvalidOperationException("Invalid owner axe snapshot.");
-                    axeDurability = tool.Durability;
+                    axeDurability = tool.Durability; axeLevel = tool.Level;
                 }
                 else if (tool.ToolId.Equals(_pickaxe.ToolId))
                 {
-                    if (pickaxeDurability >= 0 || tool.Durability < 0 || tool.Durability > _pickaxe.MaxDurability)
+                    if (pickaxeDurability >= 0 || tool.Durability < 0 || tool.Durability > DefinitionForLevel(_pickaxe, tool.Level).MaxDurability)
                         throw new InvalidOperationException("Invalid owner pickaxe snapshot.");
-                    pickaxeDurability = tool.Durability;
+                    pickaxeDurability = tool.Durability; pickaxeLevel = tool.Level;
                 }
                 else throw new InvalidOperationException("Unknown owner tool ID: " + tool.ToolId);
             }
-            if (_axeDurability != axeDurability)
+            if (_axeDurability != axeDurability || _axeLevel != axeLevel)
             {
-                _axeDurability = axeDurability;
-                _axeStatus = FormatTool(_axe, _axeName, axeDurability, "1");
+                _axeDurability = axeDurability; _axeLevel = axeLevel;
+                _axeStatus = FormatTool(DefinitionForLevel(_axe, axeLevel), _axeName, axeDurability, axeLevel, "1");
             }
-            if (_pickaxeDurability != pickaxeDurability)
+            if (_pickaxeDurability != pickaxeDurability || _pickaxeLevel != pickaxeLevel)
             {
-                _pickaxeDurability = pickaxeDurability;
-                _pickaxeStatus = FormatTool(_pickaxe, _pickaxeName, pickaxeDurability, "2");
+                _pickaxeDurability = pickaxeDurability; _pickaxeLevel = pickaxeLevel;
+                _pickaxeStatus = FormatTool(DefinitionForLevel(_pickaxe, pickaxeLevel), _pickaxeName, pickaxeDurability, pickaxeLevel, "2");
             }
         }
 
-        private string FormatTool(CombatPrototypeMapGatherToolDefinition definition, string name, int durability, string key)
+        private CombatPrototypeMapGatherToolDefinition DefinitionForLevel(CombatPrototypeMapGatherToolDefinition definition, int level)
+        {
+            // Level zero represents an absent tool in this display projection.
+            if (level <= 1) return definition;
+            var upgrade = definition.Kind == CombatPrototypeMapGatherToolKind.Axe ?
+                (level == 2 ? _axeSecond : _axeThird) : (level == 2 ? _pickaxeSecond : _pickaxeThird);
+            return CombatPrototypeMapGatherToolUtility.ApplyUpgrade(definition, upgrade);
+        }
+
+        private string FormatTool(CombatPrototypeMapGatherToolDefinition definition, string name, int durability, int level, string key)
         {
             if (_toolSettings.Enabled == 0) return "Hands";
             if (durability < 0) return "Hands  [" + key + ": Craft " + name + "]";
-            var status = name + "  " + durability + "/" + definition.MaxDurability;
-            return durability < definition.DurabilityCostPerCompletion ? status + "  [" + key + ": Craft]" : status;
+            var status = name + " " + _levelLabel + " " + level + "  " + durability + "/" + definition.MaxDurability;
+            return durability < definition.DurabilityCostPerCompletion ? status + "  [" + key + ": " + _recraftLabel + "]" : status;
         }
 
         private string ToolStatus(CombatPrototypeMapGatherToolKind kind)
@@ -270,8 +292,8 @@ namespace Code_01.CombatPrototype.Map
         }
 
         internal bool ReadPanelInput(Keyboard keyboard, Mouse mouse, out bool craftAxe, out bool craftPickaxe, out bool repairAxe, out bool repairPickaxe,
-            out CombatPrototypeMapInventoryDropRequest dropRequest, out bool upgrade) =>
-            _inventoryPanel.ReadInput(keyboard, mouse, out craftAxe, out craftPickaxe, out repairAxe, out repairPickaxe, out dropRequest, out upgrade);
+            out CombatPrototypeMapInventoryDropRequest dropRequest, out bool upgrade, out bool upgradeAxe, out bool upgradePickaxe) =>
+            _inventoryPanel.ReadInput(keyboard, mouse, out craftAxe, out craftPickaxe, out repairAxe, out repairPickaxe, out dropRequest, out upgrade, out upgradeAxe, out upgradePickaxe);
 
         internal void Clear()
         {
@@ -299,7 +321,9 @@ namespace Code_01.CombatPrototype.Map
             _percent = -1;
             _progress = 0f;
             _axeDurability = _pickaxeDurability = int.MinValue;
-            _axeStatus = _pickaxeStatus = string.Empty;
+            _axeStatus = _pickaxeStatus = _levelLabel = _recraftLabel = string.Empty;
+            _axeLevel = _pickaxeLevel = -1;
+            _axeSecond = _axeThird = _pickaxeSecond = _pickaxeThird = default;
             _observedFeedback = false;
             _feedbackSequence = 0;
             _feedbackKind = CombatPrototypeMapGatherToolKind.None;

@@ -16,6 +16,7 @@ namespace Code_01.CombatPrototype.Map
     {
         [GhostField] public FixedString64Bytes ToolId;
         [GhostField] public int Durability;
+        [GhostField] public int Level;
     }
 
     [GhostComponent(OwnerSendType = SendToOwnerType.SendToOwner)]

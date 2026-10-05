@@ -10,6 +10,7 @@ namespace Code_01.CombatPrototype.Map
             if (config == null || config.map == null || config.map.geometry == null ||
                 config.map.resourcePersistence == null || config.map.layout == null || config.map.movement == null || config.map.drops == null || config.map.treeHarvest == null ||
                 config.map.mining == null || config.map.gatherTools == null || config.map.gatherTools.tools == null ||
+                config.map.gatherToolUpgrade == null || config.map.gatherToolUpgrade.levels == null ||
                 config.map.interactionHud == null || config.map.pickupHud == null || config.map.interactionHighlight == null || config.map.resourceStatusHud == null || config.map.inventoryPanel == null || config.map.inventoryDrop == null || config.map.inventoryDrop.items == null ||
                 config.map.worldSaveHud == null || config.map.inventoryCapacity == null || config.map.inventoryCapacity.items == null ||
                 config.map.inventoryCapacityUpgrade == null || config.map.inventoryCapacityUpgrade.levels == null ||
@@ -50,8 +51,8 @@ namespace Code_01.CombatPrototype.Map
             ValidateInventoryCapacityUpgrade(map.inventoryCapacityUpgrade, map.inventoryCapacity);
             ValidateInventoryDrop(map.inventoryDrop);
             Id(map.mapDefinitionId, "mapDefinitionId");
-            if (map.schemaVersion != 20 || map.configRevision < 1 || map.defaultSeed < 1)
-                throw new InvalidOperationException("Map requires schemaVersion=20, positive revision and seed.");
+            if (map.schemaVersion != 21 || map.configRevision < 1 || map.defaultSeed < 1)
+                throw new InvalidOperationException("Map requires schemaVersion=21, positive revision and seed.");
             var drops = map.drops;
             Id(drops.itemId, "drops.itemId");
             Id(drops.visualResourceKey, "drops.visualResourceKey");
@@ -114,6 +115,7 @@ namespace Code_01.CombatPrototype.Map
                     (long)tool.repairWoodQuantity + tool.repairStoneQuantity == 0)
                     throw new InvalidOperationException("gatherTools repair requires recovery in (0,maximum], nonnegative materials and a nonzero cost for " + tool.toolId);
             }
+            ValidateGatherToolUpgrade(map.gatherToolUpgrade, gatheringTools, treeHarvest, mining);
             var geometry = map.geometry;
             Positive(geometry.cellSizeMeters, "cellSizeMeters");
             Finite(geometry.baseHeightMeters, "baseHeightMeters");
@@ -430,6 +432,52 @@ namespace Code_01.CombatPrototype.Map
                 }
                 previousTotal = level.maxTotalQuantity;
                 previousItems = level.items;
+            }
+        }
+
+        private static void ValidateGatherToolUpgrade(MapGatherToolUpgradeConfig upgrade, MapGatherToolsConfig tools,
+            MapTreeHarvestConfig tree, MapMiningConfig mining)
+        {
+            Positive(upgrade.feedbackSeconds, "gatherToolUpgrade.feedbackSeconds");
+            HudLabel(upgrade.upgradeLabel, "gatherToolUpgrade.upgradeLabel");
+            HudLabel(upgrade.upgradeButtonLabel, "gatherToolUpgrade.upgradeButtonLabel");
+            HudLabel(upgrade.levelLabel, "gatherToolUpgrade.levelLabel");
+            HudLabel(upgrade.maxLevelLabel, "gatherToolUpgrade.maxLevelLabel");
+            HudLabel(upgrade.successLabel, "gatherToolUpgrade.successLabel");
+            HudLabel(upgrade.rejectedLabel, "gatherToolUpgrade.rejectedLabel");
+            HudLabel(upgrade.failureLabel, "gatherToolUpgrade.failureLabel");
+            HudLabel(upgrade.recraftLabel, "gatherToolUpgrade.recraftLabel");
+            if (upgrade.levels.Length != 4)
+                throw new InvalidOperationException("gatherToolUpgrade requires levels 2 and 3 for stone_axe and stone_pickaxe.");
+            var keys = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var entry in upgrade.levels)
+            {
+                if (entry == null || entry.level < 2 || entry.level > 3)
+                    throw new InvalidOperationException("gatherToolUpgrade requires nonnull levels 2 and 3.");
+                CombatPrototypeMapGatherToolUtility.ResolveKind(entry.toolId);
+                if (!keys.Add(entry.toolId + "." + entry.level))
+                    throw new InvalidOperationException("Duplicate gatherToolUpgrade tool/level: " + entry.toolId + "/" + entry.level);
+            }
+            foreach (var tool in tools.tools)
+            {
+                var previousMaximum = tool.maxDurability;
+                var previousMultiplier = tool.durationMultiplier;
+                var baseDuration = tool.targetKind == "tree" ? tree.harvestDurationSeconds : mining.harvestDurationSeconds;
+                for (var number = 2; number <= 3; number++)
+                {
+                    MapGatherToolUpgradeLevelConfig tier = null;
+                    foreach (var entry in upgrade.levels)
+                        if (entry.toolId == tool.toolId && entry.level == number) { tier = entry; break; }
+                    if (tier == null) throw new InvalidOperationException("Missing gatherToolUpgrade tool/level: " + tool.toolId + "/" + number);
+                    if (tier.maxDurability <= previousMaximum || tier.woodQuantity <= 0 || tier.stoneQuantity <= 0)
+                        throw new InvalidOperationException("Tool upgrade requires increasing maximum and positive wood/stone: " + tool.toolId + "/" + number);
+                    Positive(tier.durationMultiplier, "gatherToolUpgrade.durationMultiplier");
+                    if (tier.durationMultiplier >= previousMultiplier || tier.durationMultiplier > 1f)
+                        throw new InvalidOperationException("Tool upgrade durationMultiplier must strictly decrease and be <= 1: " + tool.toolId + "/" + number);
+                    Positive(baseDuration * tier.durationMultiplier, "gatherToolUpgrade.actualDuration");
+                    previousMaximum = tier.maxDurability;
+                    previousMultiplier = tier.durationMultiplier;
+                }
             }
         }
 

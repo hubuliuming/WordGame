@@ -773,3 +773,16 @@
 - 地图schema20/revision23新增必填inventoryCapacityUpgrade；玩家Version3新增InventoryCapacityLevel，合法v1/v2仅内存迁移Lv1，原九保存入口保留当前等级。六个普通脚本及Unity正常生成meta；原Scene/SubScene/Prefab/Animator、旧meta/资源/包/构建配置保持。
 - Unity编译0 Error，新输入17/生成所属Serializer与配置元数据核对、两地图共96份非法配置拒绝、22次隔离Editor Bake通过；原布局/签名保持，Bake Console[0,8,113]前后一致、主场景干净。
 - 同步容量升级专题、调用链文档、导航、运行清单及策划模板；旧253项逐字保留，新增16项后269项，升级人工GamePlayer UNKNOWN。AI未运行游戏/显示回调、PlayMode、逻辑单元测试、真实存档I/O、构建/发布、采样、图片、子Agent或Git提交。
+
+## 2026-10-05 背包容量升级人工验收
+
+- 用户反馈“我已验收通过，接下来下一阶段”；主线程结合既有编译、所属Serializer/配置静态核对、96份非法配置拒绝及22次隔离Editor Bake，判定通过，限CombatPrototypeNetCode、schemaVersion20/configRevision23与Runtime升级十六项；人工结论来自用户反馈，AI未运行GamePlayer/PlayMode。
+- 同步升级专题、调用链摘要、导航和策划模板的验收状态，保留269项内容/编号、旧阶段通过范围及未实际触发用例UNKNOWN；按已确认的现行v3存储契约修正工具/修理专题旧v2文字，工具条目仍为ToolId/Durability两字段。
+- 本次只改文档，代码、JSON及Scene/SubScene/Prefab/Animator/meta/资源/包/构建配置保持；未执行游戏/GUI回调、真实存档I/O、逻辑单元测试、构建/发布、性能采样或图片检查，未创建子Agent/提交Git。
+
+## 2026-10-05 采集工具升级与效率提升
+
+- 按已确认范围接入每把工具Lv1～Lv3、B/6/7一次请求、所属三字段反馈和有效最大耐久/耗时；升级保留绝对耐久，修理按本级封顶并保级，重做明确满Lv1，原F/G/资源产出与再生保持。旧操作优先，复用完整候选先保存后扣料/提交。
+- 地图schema21/revision24新增必填gatherToolUpgrade根11字段/四条6字段定义；工具缓冲三字段、输入19，玩家Version4/根7/Tools项3。合法v2/v3工具只内存补Lv1，v3容量等级保持；所有候选保存两类等级，读取不写盘。六新普通脚本及Unity自动meta，原Scene/SubScene/Prefab/Animator、旧meta/资源/包/构建保持。
+- Unity编译0 Error，生成所属Serializer/字段、136份非法配置拒绝及22次隔离Editor Bake通过；原布局/资源签名保持、Bake Console[0,8,113]前后一致、主场景干净，临时对象释放。
+- 增量同步专题/调用链、导航、策划模板和Runtime22项人工清单；原269项逐字保留，共291项。静态核对通过，人工GamePlayer UNKNOWN；旧用户通过限原版本/清单。未执行逻辑单元测试、PlayMode、游戏/GUI回调、真实存档I/O、构建/发布、采样/图片、子Agent或Git提交。

@@ -21,7 +21,7 @@
 
 ## 【FACT】配置与建议值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=20/configRevision=23。resourcePersistence由4变6字段，Settings由5变7，新增ManualSaveEnabled/ManualSaveCooldownSeconds；worldSaveHud段及16字段必填。原严格UTF-8、形状、缺失/未知/重复字段、标量类型和语义检查保持；旧地图v1～v19明确拒绝，不补默认或回退来源，关闭仍校验。正常导入/烘焙后生效。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=21/configRevision=24。resourcePersistence由4变6字段，Settings由5变7，新增ManualSaveEnabled/ManualSaveCooldownSeconds；worldSaveHud段及16字段必填。原严格UTF-8、形状、缺失/未知/重复字段、标量类型和语义检查保持；旧地图v1～v20明确拒绝，不补默认或回退来源，关闭仍校验。正常导入/烘焙后生效。
 
 | 字段 | 默认值 | 校验/行为 |
 |---|---|---|
@@ -78,4 +78,4 @@ worldSaveHud.enabled=false只关闭本显示，F5继续按服务端开关处理�
 
 ## 【FACT】容量等级接入边界
 
-[升级](MapInventoryCapacityUpgrade.md)：当前17输入含数字5升级与F5世界保存，各入口沿自身资格；世界格式/原F5冷却保持，玩家v3等级保存由升级及原九入口处理。新链静态通过、人工UNKNOWN；旧通过保持原版本/清单。
+[升级](MapInventoryCapacityUpgrade.md)：当前19输入含数字5升级与F5世界保存，各入口沿自身资格；世界格式/原F5冷却保持，玩家v4工具/容量等级保存由升级及原九入口处理。新链静态及用户人工通过限v20/revision23升级十六项，未触发用例UNKNOWN；旧通过保持原版本/清单。

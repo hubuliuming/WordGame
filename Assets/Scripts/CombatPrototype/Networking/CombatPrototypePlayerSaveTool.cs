@@ -7,5 +7,6 @@ namespace Code_01.CombatPrototype.Networking
     {
         public string ToolId;
         public int Durability;
+        public int Level;
     }
 }

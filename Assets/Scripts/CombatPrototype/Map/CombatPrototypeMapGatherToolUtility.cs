@@ -8,6 +8,7 @@ namespace Code_01.CombatPrototype.Map
     {
         internal const string AxeId = "stone_axe";
         internal const string PickaxeId = "stone_pickaxe";
+        internal const int MaximumLevel = 3;
 
         internal static CombatPrototypeMapGatherToolKind ResolveKind(string toolId)
         {
@@ -25,6 +26,35 @@ namespace Code_01.CombatPrototype.Map
             foreach (var definition in definitions)
                 if (definition.Kind == kind) return definition;
             throw new InvalidOperationException("Missing gathering tool definition: " + kind);
+        }
+
+        internal static void ValidateLevel(int level)
+        {
+            if (level < 1 || level > MaximumLevel)
+                throw new InvalidOperationException("Unsupported gathering tool level: " + level);
+        }
+
+        internal static CombatPrototypeMapGatherToolUpgradeDefinition RequireUpgradeDefinition(
+            DynamicBuffer<CombatPrototypeMapGatherToolUpgradeDefinition> definitions, FixedString64Bytes toolId, int level)
+        {
+            foreach (var definition in definitions)
+                if (definition.ToolId.Equals(toolId) && definition.Level == level) return definition;
+            throw new InvalidOperationException("Missing tool upgrade definition: " + toolId + "/" + level);
+        }
+
+        internal static CombatPrototypeMapGatherToolDefinition ApplyUpgrade(CombatPrototypeMapGatherToolDefinition definition,
+            CombatPrototypeMapGatherToolUpgradeDefinition upgrade)
+        {
+            definition.MaxDurability = upgrade.MaxDurability;
+            definition.DurationMultiplier = upgrade.DurationMultiplier;
+            return definition;
+        }
+
+        internal static CombatPrototypeMapGatherToolDefinition ForLevel(CombatPrototypeMapGatherToolDefinition definition,
+            DynamicBuffer<CombatPrototypeMapGatherToolUpgradeDefinition> upgrades, int level)
+        {
+            ValidateLevel(level);
+            return level == 1 ? definition : ApplyUpgrade(definition, RequireUpgradeDefinition(upgrades, definition.ToolId, level));
         }
 
         internal static int FindOwned(DynamicBuffer<CombatPrototypeMapGatherTool> tools, FixedString64Bytes toolId)
@@ -45,6 +75,7 @@ namespace Code_01.CombatPrototype.Map
             var index = FindOwned(tools, definition.ToolId);
             if (index < 0 || tools[index].Durability < definition.DurabilityCostPerCompletion)
                 return CombatPrototypeMapGatherToolKind.None;
+            definition = ForLevel(definition, manager.GetBuffer<CombatPrototypeMapGatherToolUpgradeDefinition>(source, true), tools[index].Level);
             duration = baseDuration * definition.DurationMultiplier;
             return kind;
         }

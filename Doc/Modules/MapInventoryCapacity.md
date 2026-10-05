@@ -20,7 +20,7 @@
 
 ## 【FACT】JSON 契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为 schemaVersion=20/configRevision=23。新增必填 inventoryCapacity：
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为 schemaVersion=21/configRevision=24。新增必填 inventoryCapacity：
 
 ```json
 "inventoryCapacity": {
@@ -45,7 +45,7 @@
 | pickupHud.noSpaceLabel | 新增必填 Not enough space；G 配置/Settings 各18字段 |
 | inventoryPanel.capacityLabel / unlimitedLabel | 新增必填 Capacity / Unlimited；面板配置/Settings 各30字段，其中22文案 |
 
-沿原严格 UTF-8、完整对象形状、字段/类型与未知/缺失/重复键校验；文案非空白、无控制字符、最多61个 UTF-8 字节。enabled=false 或显示关闭仍校验全部配置；旧地图 v1～v19 明确失败，没有补字段、来源回退或运行热重载。各端使用同版代码、配置并重新烘焙。
+沿原严格 UTF-8、完整对象形状、字段/类型与未知/缺失/重复键校验；文案非空白、无控制字符、最多61个 UTF-8 字节。enabled=false 或显示关闭仍校验全部配置；旧地图 v1～v20 明确失败，没有补字段、来源回退或运行热重载。各端使用同版代码、配置并重新烘焙。
 
 原地图根追加 CapacitySettings 的 Enabled(byte)/MaxTotalQuantity(int)，Definition 缓冲含 ItemId/ItemName(FixedString64Bytes)/MaxQuantity(int)，三条按原产出映射写入。配置通过正常 JSON/BuiltIn → 校验 → Map Baker 接入，不写玩家或世界档案。
 
@@ -73,7 +73,7 @@ F 原四字段保持，Mode(byte)在 Hidden=0/Ready=1/Working=2 后追加 NoSpac
 
 G 原六字段保持，Mode在 Hidden=0/Ready=1 后追加 NoSpace=2；保留 DropId/ItemId/Quantity 与实际寿命投影。第一行显示 G Not enough space 物品×数量，第二行继续原到期/预警/永久提示。空间不足不延长寿命、不改变寿命色或追加拾取成功反馈。
 
-NoSpace 的 F/G 圆环仍按原身份解析，分别沿 Ready 黄色与 G 蓝色；不换较远目标或依据客户端距离重选。资源状态优先识别原 F NoSpace 身份，并要求资源仍 Available；背包满不把植物标记为耗尽或占用。资源/工具/掉落 Ghost、资源状态四字段、保存所属三字段保持；当前17输入及等级/反馈归[升级](MapInventoryCapacityUpgrade.md)。
+NoSpace 的 F/G 圆环仍按原身份解析，分别沿 Ready 黄色与 G 蓝色；不换较远目标或依据客户端距离重选。资源状态优先识别原 F NoSpace 身份，并要求资源仍 Available；背包满不把植物标记为耗尽或占用。资源/工具/掉落 Ghost、资源状态四字段、保存所属三字段保持；当前19输入及等级/反馈归[升级](MapInventoryCapacityUpgrade.md)。
 
 B 材料标题下显示 Capacity 当前总量/当前等级总上限，受管行显示数量/对应等级单种上限；Lv1为300/各200，Lv2为450/各300，Lv3为600/各400，未受管行保持原x数量。关闭容量后总量行显示 当前总量/Unlimited，材料行沿原数量显示。原只读 Snapshot 缓存等级与定义，上限在等级变化时刷新，即使数量未变也更新文字；非法条目仍逐项记录/跳过并禁用原按钮，不通过展示修正库存。增加一行滚动内容，原380×640、字号18/行高32、Drop/All/制作/修理与鼠标隔离保持。
 
@@ -87,4 +87,4 @@ F/G/B 显示开关仍独立。无本地玩家、死亡、断线、玩家/地图�
 
 用户已确认本阶段人工 GamePlayer 通过，主线程结合既有静态核对与用户反馈判定通过，限 CombatPrototypeNetCode、v19/revision22 及[运行入口](Runtime.md)材料容量十六项清单；人工结论来自用户反馈。旧 v18/revision21 的 F5/保存提示与其余历史237项保持各自版本/清单。未实际触发的精确容量/整批/同 tick/G并发采集中满包、旧超限恢复、异常库存/保存失败、多玩家/晚加入/生命周期、实际排版/字体仍为 UNKNOWN；性能/带宽、平台与线上未验证。
 
-v19容量阶段玩家/世界格式保持；当前玩家v3/等级规则归[升级](MapInventoryCapacityUpgrade.md)，世界格式/路径、资源/掉落寿命/再生及原保存事务保持；跨文件原子一致、防重复、同槽并发和保存成功后意外 ECS 故障恢复仍为原 UNKNOWN。AI只执行编译、配置/元数据检查与隔离 Editor Bake，未执行 GamePlayer/PlayMode、游戏/显示系统或GUI回调、逻辑单元测试、命令行构建、发布、采样、图片检查或真实存档读写，未创建子Agent或提交Git。
+v19容量阶段玩家/世界格式保持；当前玩家v4/两类等级规则归[工具升级](MapGatherToolUpgrade.md)，世界格式/路径、资源/掉落寿命/再生及原保存事务保持；跨文件原子一致、防重复、同槽并发和保存成功后意外 ECS 故障恢复仍为原 UNKNOWN。AI只执行编译、配置/元数据检查与隔离 Editor Bake，未执行 GamePlayer/PlayMode、游戏/显示系统或GUI回调、逻辑单元测试、命令行构建、发布、采样、图片检查或真实存档读写，未创建子Agent或提交Git。

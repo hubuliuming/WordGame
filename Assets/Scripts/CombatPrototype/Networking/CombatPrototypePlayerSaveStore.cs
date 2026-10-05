@@ -14,7 +14,7 @@ namespace Code_01.CombatPrototype.Networking
 {
     public static class CombatPrototypePlayerSaveStore
     {
-        public const int CurrentVersion = 3;
+        public const int CurrentVersion = 4;
         private static readonly UTF8Encoding WriteEncoding = new UTF8Encoding(false, true);
         private static readonly ProfilerMarker LoadMarker = new ProfilerMarker("CombatPrototype.PlayerSave.Load");
         private static readonly ProfilerMarker SaveMarker = new ProfilerMarker("CombatPrototype.PlayerSave.SavePrepared");
@@ -26,7 +26,8 @@ namespace Code_01.CombatPrototype.Networking
         }
 
         public static CombatPrototypePlayerSaveData Load(string playerId,
-            DynamicBuffer<CombatPrototypeMapGatherToolDefinition> toolDefinitions, out bool restored)
+            DynamicBuffer<CombatPrototypeMapGatherToolDefinition> toolDefinitions,
+            DynamicBuffer<CombatPrototypeMapGatherToolUpgradeDefinition> toolUpgradeDefinitions, out bool restored)
         {
             using var profilingScope = LoadMarker.Auto();
             FileStream stream;
@@ -54,7 +55,7 @@ namespace Code_01.CombatPrototype.Networking
                 });
                 var version = ReadInteger(root, "Version", 1, CurrentVersion);
                 if (root.Count != (version == 1 ? 5 : version == 2 ? 6 : 7))
-                    throw new InvalidDataException("Save v1 requires five original fields; v2 adds Tools; v3 also requires InventoryCapacityLevel.");
+                    throw new InvalidDataException("Save v1 requires five original fields; v2 adds Tools; v3/v4 also require InventoryCapacityLevel.");
                 var identity = root["PlayerId"];
                 if (identity == null || identity.Type != JTokenType.String ||
                     !string.Equals(identity.Value<string>(), playerId, StringComparison.Ordinal))
@@ -84,7 +85,7 @@ namespace Code_01.CombatPrototype.Networking
                         Quantity = ReadInteger(item, "Quantity", 1, int.MaxValue)
                     };
                 }
-                var capacityLevel = version == 3 ? ReadInteger(root, "InventoryCapacityLevel", 1, CombatPrototypeMapInventoryCapacityUtility.MaximumLevel) : 1;
+                var capacityLevel = version >= 3 ? ReadInteger(root, "InventoryCapacityLevel", 1, CombatPrototypeMapInventoryCapacityUtility.MaximumLevel) : 1;
                 var loadedTools = Array.Empty<CombatPrototypePlayerSaveTool>();
                 if (version >= 2)
                 {
@@ -94,16 +95,18 @@ namespace Code_01.CombatPrototype.Networking
                     var toolIds = new HashSet<string>(StringComparer.Ordinal);
                     for (var index = 0; index < tools.Count; index++)
                     {
-                        if (!(tools[index] is JObject tool) || tool.Count != 2 ||
+                        if (!(tools[index] is JObject tool) || tool.Count != (version == 4 ? 3 : 2) ||
                             tool["ToolId"] == null || tool["ToolId"].Type != JTokenType.String)
                             throw new InvalidDataException("Invalid saved tool at index=" + index);
                         var toolId = tool["ToolId"].Value<string>();
                         if (!toolIds.Add(toolId)) throw new InvalidDataException("Duplicate saved tool at index=" + index);
                         var kind = CombatPrototypeMapGatherToolUtility.ResolveKind(toolId);
                         var definition = CombatPrototypeMapGatherToolUtility.RequireDefinition(toolDefinitions, kind);
+                        var toolLevel = version == 4 ? ReadInteger(tool, "Level", 1, CombatPrototypeMapGatherToolUtility.MaximumLevel) : 1;
+                        definition = CombatPrototypeMapGatherToolUtility.ForLevel(definition, toolUpgradeDefinitions, toolLevel);
                         loadedTools[index] = new CombatPrototypePlayerSaveTool
                         {
-                            ToolId = toolId, Durability = ReadInteger(tool, "Durability", 0, definition.MaxDurability)
+                            ToolId = toolId, Durability = ReadInteger(tool, "Durability", 0, definition.MaxDurability), Level = toolLevel
                         };
                     }
                 }
@@ -246,7 +249,7 @@ namespace Code_01.CombatPrototype.Networking
         {
             var result = new CombatPrototypePlayerSaveTool[tools.Length];
             for (var index = 0; index < tools.Length; index++)
-                result[index] = new CombatPrototypePlayerSaveTool { ToolId = tools[index].ToolId.ToString(), Durability = tools[index].Durability };
+                result[index] = new CombatPrototypePlayerSaveTool { ToolId = tools[index].ToolId.ToString(), Durability = tools[index].Durability, Level = tools[index].Level };
             return result;
         }
 
@@ -257,10 +260,10 @@ namespace Code_01.CombatPrototype.Networking
             for (var index = 0; index < tools.Length; index++)
             {
                 var tool = index == toolIndex ? nextTool : tools[index];
-                result[index] = new CombatPrototypePlayerSaveTool { ToolId = tool.ToolId.ToString(), Durability = tool.Durability };
+                result[index] = new CombatPrototypePlayerSaveTool { ToolId = tool.ToolId.ToString(), Durability = tool.Durability, Level = tool.Level };
             }
             if (toolIndex < 0)
-                result[tools.Length] = new CombatPrototypePlayerSaveTool { ToolId = nextTool.ToolId.ToString(), Durability = nextTool.Durability };
+                result[tools.Length] = new CombatPrototypePlayerSaveTool { ToolId = nextTool.ToolId.ToString(), Durability = nextTool.Durability, Level = nextTool.Level };
             return result;
         }
 

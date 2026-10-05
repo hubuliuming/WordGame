@@ -298,6 +298,22 @@ namespace Code_01.CombatPrototype.Map
                         RepairDurability = tool.repairDurability, RepairWoodQuantity = tool.repairWoodQuantity,
                         RepairStoneQuantity = tool.repairStoneQuantity
                     });
+                var toolUpgrade = config.map.gatherToolUpgrade;
+                AddComponent(entity, new CombatPrototypeMapGatherToolUpgradeSettings
+                {
+                    Enabled = (byte)(toolUpgrade.enabled ? 1 : 0), FeedbackSeconds = toolUpgrade.feedbackSeconds,
+                    UpgradeLabel = toolUpgrade.upgradeLabel, UpgradeButtonLabel = toolUpgrade.upgradeButtonLabel,
+                    LevelLabel = toolUpgrade.levelLabel, MaxLevelLabel = toolUpgrade.maxLevelLabel,
+                    SuccessLabel = toolUpgrade.successLabel, RejectedLabel = toolUpgrade.rejectedLabel,
+                    FailureLabel = toolUpgrade.failureLabel, RecraftLabel = toolUpgrade.recraftLabel
+                });
+                var toolUpgradeDefinitions = AddBuffer<CombatPrototypeMapGatherToolUpgradeDefinition>(entity);
+                foreach (var tier in toolUpgrade.levels)
+                    toolUpgradeDefinitions.Add(new CombatPrototypeMapGatherToolUpgradeDefinition
+                    {
+                        ToolId = tier.toolId, Level = tier.level, MaxDurability = tier.maxDurability,
+                        DurationMultiplier = tier.durationMultiplier, WoodQuantity = tier.woodQuantity, StoneQuantity = tier.stoneQuantity
+                    });
                 var chunks = AddBuffer<CombatPrototypeMapChunk>(entity);
                 foreach (var chunk in layout.Chunks) chunks.Add(chunk);
                 var cells = AddBuffer<CombatPrototypeMapCell>(entity);

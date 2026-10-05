@@ -1,6 +1,6 @@
 # 背包容量扩展与升级
 
-返回[背包](Inventory.md)、[地图](Map.md)与[材料容量](MapInventoryCapacity.md)。本专题负责 CombatPrototypeNetCode 的个人永久容量等级、升级配方、所属反馈和 B/5 输入。玩家文件的唯一契约归[资源与数据](DataResources.md)，人工清单归[运行入口](Runtime.md)。当前地图 schemaVersion=20/configRevision=23；人工 GamePlayer 结果为 UNKNOWN。
+返回[背包](Inventory.md)、[地图](Map.md)与[材料容量](MapInventoryCapacity.md)。本专题负责 CombatPrototypeNetCode 的个人永久容量等级、升级配方、所属反馈和 B/5 输入。玩家文件的唯一契约归[资源与数据](DataResources.md)，人工清单归[运行入口](Runtime.md)。当前地图 schemaVersion=21/configRevision=24；用户已确认人工GamePlayer通过，限v20/revision23升级十六项。
 
 ## 【FACT】入口与职责
 
@@ -14,7 +14,7 @@
 | [CapacityUtility](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapInventoryCapacityUtility.cs) | 根据玩家等级选实际容量定义；原 F/G 整批入包与超限规则 |
 | [输入](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypePlayerInput.cs) / [绑定](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapInteractionHudBindingSystem.cs) | 数字5与面板按钮合并到同一所属 InputEvent；交接只读快照 |
 | [Player Baker](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypePlayerNetCodeAuthoring.cs) / [准入](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypeNetCodeLifecycle.cs) | Level=1、零反馈初值，以及固定 ID 存档等级恢复 |
-| [玩家存储](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypePlayerSaveStore.cs) | v3 候选及唯一 SavePrepared 文件替换入口 |
+| [玩家存储](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypePlayerSaveStore.cs) | v4完整候选（工具/容量等级）及唯一SavePrepared入口 |
 
 六个普通 C# 脚本及对应 meta 由正常 Unity 导入接入，没有新增 MonoBehaviour 挂载。原 Scene/SubScene/Prefab/Animator、旧 meta、资源引用、包与构建设置保持。等级不进入世界资源文件；没有新 RPC、另一份库存或配置热重载，各端使用同版代码/配置并重新烘焙。
 
@@ -44,7 +44,7 @@ Lv1 继续由 inventoryCapacity 定义；inventoryCapacityUpgrade.levels 只配�
 | levels[].items[].maxQuantity | 必填 int，按 itemId 严格大于前一级同种上限 |
 | levels[].woodQuantity / stoneQuantity | 必填正整数；相应等级的完整升级配方 |
 
-根10字段、每级5字段、每种材料2字段。七个文案均非空白、无控制字符、最多61个 UTF-8 字节。沿原严格 UTF-8、完整对象形状、缺失/未知/重复字段、标量类型和语义检查；关闭容量、升级或显示也完整校验。旧地图 v1～v19 明确拒绝，没有补字段、来源回退或自动迁移。
+根10字段、每级5字段、每种材料2字段。七个文案均非空白、无控制字符、最多61个 UTF-8 字节。沿原严格 UTF-8、完整对象形状、缺失/未知/重复字段、标量类型和语义检查；关闭容量、升级或显示也完整校验。旧地图 v1～v20 明确拒绝，没有补字段、来源回退或自动迁移。
 
 原地图根追加 UpgradeSettings 九字段：Enabled、FeedbackSeconds及七文案；两条 UpgradeDefinition 各七字段：Level、MaxTotalQuantity、AppleMaxQuantity、WoodMaxQuantity、StoneMaxQuantity、WoodQuantity、StoneQuantity。Baker 按已验证的 itemId 映射数值，未改变原容量2字段 Settings/三条3字段 Definition。
 
@@ -58,7 +58,7 @@ UpgradeSystem 位于服务端 PredictedSimulationSystemGroup，InventoryDrop 之
 
 提交顺序为：取得 Level/Feedback 可写引用与库存/工具 → 准备全部扣料、保留其余库存/金币/经验/Tools的完整 v3 候选 → 原 SavePrepared 成功 → 非结构性提交两项材料及新 Level → 本人 Success。归零条目沿原缓冲移除规则清掉；文件替换之前不修改玩家材料或等级，失败返回 Failed，旧正式文件和 ECS 保持。没有自动重试、退级或返还材料入口。
 
-玩家文件新增 InventoryCapacityLevel，Version=3；严格整数1～3。合法 v1/v2 完整校验后仅在内存补 Lv1：v1 的 Tools 仍空，v2 原 Tools/耐久保持；读取不写盘、不赠材料/工具，下一次正常保存写 v3。缺字段、额外/重复字段、错误类型、越界等级及旧坏档继续整档拒绝。完整字段数量和路径见[资源与数据](DataResources.md)。
+玩家当前Version=4，容量字段InventoryCapacityLevel自v3接入，严格整数1～3；v1/v2仅内存补容量Lv1，v3保留原容量级。Tools旧v2/v3二字段补工具Lv1、v4三字段恢复工具等级，读取不写盘、不赠工具，下一正常保存v4。坏档继续整档拒绝，完整契约见[资源与数据](DataResources.md)/[工具升级](MapGatherToolUpgrade.md)。
 
 原九个保存入口——击杀奖励、E使用、植物F、G拾取、工具制作、修理、背包丢弃、树木/矿点工具完成——均把当前实际玩家等级加入候选，避免后续保存把等级改回1。原 SavePrepared 路径、临时文件/Flush/替换、保存先于 ECS 提交及各自失败隔离保持。
 
@@ -82,12 +82,12 @@ inventoryCapacity.enabled=false 时 B 显示 Unlimited，F/G 原整批结算不�
 
 ## 【KNOWN ISSUES】静态与人工边界
 
-正常 Unity 编译通过，实际加载输入17字段、玩家存储 v3、等级和反馈的生成 Serializer/Snapshot；所属属性及全部新字段已核对。Forest/Grassland各11组隔离 Editor Bake，共22次：Json/BuiltIn默认、关闭容量、自定义基础容量/顺序/旧文案、分别关闭F/G/B、全部显示关闭及容量关闭组合、单独关闭升级、自定义两级上限/成本/顺序/七文案/反馈1.5秒。新 Settings/两级 Definition、Lv1/零反馈、原玩家/工具/三掉落 Prefab/显示与持久化初值符合，Json/BuiltIn等价。
+v20容量升级阶段正常Unity编译通过，输入17字段、当时玩家存储v3、等级和反馈的生成 Serializer/Snapshot；所属属性及全部新字段已核对。Forest/Grassland各11组隔离 Editor Bake，共22次：Json/BuiltIn默认、关闭容量、自定义基础容量/顺序/旧文案、分别关闭F/G/B、全部显示关闭及容量关闭组合、单独关闭升级、自定义两级上限/成本/顺序/七文案/反馈1.5秒。新 Settings/两级 Definition、Lv1/零反馈、原玩家/工具/三掉落 Prefab/显示与持久化初值符合，Json/BuiltIn等价。
 
 两份地图各48个非法配置，共96份，均经真实严格 JSON 来源拒绝；覆盖根/字段缺失或未知、null、错误类型、非法等级/数量、非递增上限、坏材料ID、坏文案及关闭开关仍校验。上述仅是配置/元数据核对，没有调用升级系统、存档业务读写或 GUI 回调。
 
 与修改前快照比较，区块/格子/装饰位置朝向/障碍及资源布局签名保持；默认森林/草地树89/53、采集36/38、矿20/18、阻挡109/71保持。Bake Console前后[0 Error,8 Warning,113 Log]，无新增 Bake 警告，含六条既有运行警告及未修改 PEListener/DOTween 的两条编译警告；主场景干净，临时 World/Scene/TextAsset 已释放。
 
-主线程代码/配置静态验收通过；本阶段人工 GamePlayer 为 UNKNOWN，范围仅 v20/revision23 与[运行入口](Runtime.md)升级十六项。旧253项内容/编号及容量 v19/revision22 用户通过保持原版本/清单。实际扣料/重复与同tick输入、保存失败/迁移/坏档/等级保持、多玩家/晚加入/生命周期、运行字体/滚动布局、同步与延迟均未由 AI 验证；性能/带宽/平台/线上、跨文件原子一致/防重复、同槽并发及保存后意外 ECS 故障恢复仍 UNKNOWN。
+用户已确认本阶段人工GamePlayer通过；主线程结合既有代码/配置静态核对与用户反馈判定通过，限CombatPrototypeNetCode、v20/revision23及[运行入口](Runtime.md)升级十六项，人工结论来自用户反馈。旧253项内容/编号及容量 v19/revision22 用户通过保持原版本/清单。实际扣料/重复与同tick输入、保存失败/迁移/坏档/等级保持、多玩家/晚加入/生命周期、运行字体/滚动布局、同步与延迟均未由 AI 验证；性能/带宽/平台/线上、跨文件原子一致/防重复、同槽并发及保存后意外 ECS 故障恢复仍 UNKNOWN。
 
 AI 未执行 GamePlayer/PlayMode、游戏/显示系统或 GUI 回调、逻辑单元测试、命令行构建、发布、性能采样、图片检查或真实玩家/世界存档 I/O，未创建子Agent、未提交 Git。

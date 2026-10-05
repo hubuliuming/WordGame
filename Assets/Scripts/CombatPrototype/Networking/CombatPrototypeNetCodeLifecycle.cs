@@ -71,6 +71,7 @@ namespace Code_01.CombatPrototype.Networking
             var resourceRestore = state.EntityManager.GetComponentData<CombatPrototypeMapResourceRestoreState>(mapSource);
             if (resourceRestore.Phase == CombatPrototypeMapResourceRestorePhase.Pending) return;
             var toolDefinitions = state.EntityManager.GetBuffer<CombatPrototypeMapGatherToolDefinition>(mapSource, true);
+            var toolUpgradeDefinitions = state.EntityManager.GetBuffer<CombatPrototypeMapGatherToolUpgradeDefinition>(mapSource, true);
             using var ecb = new EntityCommandBuffer(Allocator.Temp);
             using var handledThisUpdate = new NativeHashSet<Entity>(4, Allocator.Temp);
             using var occupiedPlayerIds = new NativeHashSet<FixedString64Bytes>(4, Allocator.Temp);
@@ -116,7 +117,7 @@ namespace Code_01.CombatPrototype.Networking
                         continue;
                     }
                     savePath = CombatPrototypePlayerSaveStore.GetSavePath(playerId.ToString());
-                    var data = CombatPrototypePlayerSaveStore.Load(playerId.ToString(), toolDefinitions, out var restored);
+                    var data = CombatPrototypePlayerSaveStore.Load(playerId.ToString(), toolDefinitions, toolUpgradeDefinitions, out var restored);
                     var restoredItems = new CombatPrototypeInventoryItem[data.Items.Length];
                     for (var index = 0; index < data.Items.Length; index++)
                         restoredItems[index] = new CombatPrototypeInventoryItem
@@ -129,7 +130,7 @@ namespace Code_01.CombatPrototype.Networking
                     for (var index = 0; index < data.Tools.Length; index++)
                         restoredTools[index] = new CombatPrototypeMapGatherTool
                         {
-                            ToolId = new FixedString64Bytes(data.Tools[index].ToolId), Durability = data.Tools[index].Durability
+                            ToolId = new FixedString64Bytes(data.Tools[index].ToolId), Durability = data.Tools[index].Durability, Level = data.Tools[index].Level
                         };
                     createdPlayer = ecb.Instantiate(spawner.PlayerPrefab);
                     ecb.AddComponent(createdPlayer, new CombatPrototypePlayerIdentity { PlayerId = playerId });

@@ -19,7 +19,7 @@
 
 ## 【FACT】JSON 契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 当前一致为 schemaVersion=20/configRevision=23。必填 inventoryPanel 共30字段，沿原严格UTF-8、完整字段/类型及未知/重复键检查；即使关闭面板也校验全部字段。旧地图v1～v19明确失败，不补段/默认值或回退来源；正常导入/烘焙后生效，无运行热重载。原工具配方/耐久仍从 gatherTools 唯一读取，面板不复制配置真值。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 当前一致为 schemaVersion=21/configRevision=24。必填 inventoryPanel 共30字段，沿原严格UTF-8、完整字段/类型及未知/重复键检查；即使关闭面板也校验全部字段。旧地图v1～v20明确失败，不补段/默认值或回退来源；正常导入/烘焙后生效，无运行热重载。Lv1配方/定义仍从gatherTools读取，当前级上限/倍率归[gatherToolUpgrade](MapGatherToolUpgrade.md)，面板不复制配置真值。
 
 | 字段 | 默认值 | 契约 |
 |---|---|---|
@@ -62,7 +62,7 @@
 
 新Snapshot只缓存显示文本/数量；条目名称空白/控制字符、负数量或重复名称按索引/地图/玩家记录错误并跳过该项，其余独立条目继续，当前快照有错误时禁用制作、修理和丢弃按钮，不用展示数据修正库存。原工具网络数据仍由原HUD统一校验。必需地图配置、客户端绑定/宿主缺失明确暴露错误，不查找或创建组件兜底。
 
-两条配方直接读取原definitions：斧头木3/石2、镐子木2/石3；分别列出现有/需要与max(需要-现有,0)缺少数量。只有工具开关启用、库存展示快照合法、材料充足且工具未持有或耐久小于单次成本时按钮可用。Ready仅是当前客户端材料/耐久预览，连接、生命、静止、无攻击、近战Ready、资源预约互斥及同tick优先仍由原服务端制作系统决定；网络快照滞后时服务器可拒绝，不按客户端预览扣料/发工具。工具功能关闭保留已有耐久并禁用按钮。
+两条配方直接读取原definitions：斧头木3/石2、镐子木2/石3；分别列出现有/需要与max(需要-现有,0)缺少数量。只有工具开关启用、库存展示快照合法、材料充足且工具未持有或耐久小于单次成本时按钮可用。Ready仅是当前客户端材料/耐久预览，连接、生命、静止、无攻击、近战Ready、资源预约互斥及同tick优先仍由原服务端制作系统决定；网络快照滞后时服务器可拒绝，不按客户端预览扣料/发工具。工具功能关闭保留已有耐久/等级并禁用按钮；制作/重做满耐久Lv1，损坏高等级工具的按钮明确显示Recraft at Lv1。
 
 面板右上，按min(屏幕宽/1920,屏幕高/1080)等比缩放。标题和共享反馈/关闭按钮固定，中间列表滚动；背景alpha=0.85。缓存条目/配方/按钮文本和GUI样式；GUI绘制后恢复matrix/color/enabled。新的按钮/滚动参与正常GUI事件，原F提示/进度仍仅Repaint且保持底部320×104。
 
@@ -74,7 +74,7 @@ B单次按下在GhostInputSystemGroup内切换本地面板，同一渲染帧不�
 
 制作成功/拒绝/失败共享原所属Sequence/Kind/Result，当前2秒展示期限由原宿主处理，只用于显示；新绑定只观察现有Sequence，不重播旧反馈。interactionHud.enabled只关闭F提示/进度，inventoryPanel.enabled独立；关闭F HUD仍可B打开本面板/查看制作反馈，关闭本面板仍可用原1/2。F/G文字、面板、高亮及资源状态全关时宿主清空显示，工具玩法由原开关控制。
 
-死亡、断线/无本地Ghost、玩家或地图源变化、关闭面板、World/Scene停止或释放清掉未提交按钮请求；绑定释放同时清库存投影、滚动位置、鼠标按下标记及旧反馈。重建有效绑定按initiallyOpen应用初始状态，默认保持关闭。已经消费进原输入命令的请求仍由原服务器链处理，不通过关闭面板撤销已提交制作。面板不保存/修改库存、耐久、世界资源、再生期限、金币/经验或玩家档案，沿原v2写入/v1读取迁移。
+死亡、断线/无本地Ghost、玩家或地图源变化、关闭面板、World/Scene停止或释放清掉未提交按钮请求；绑定释放同时清库存投影、滚动位置、鼠标按下标记及旧反馈。重建有效绑定按initiallyOpen应用初始状态，默认保持关闭。已经消费进原输入命令的请求仍由原服务器链处理，不通过关闭面板撤销已提交制作。面板不保存/修改库存、耐久、世界资源、再生期限、金币/经验或玩家档案，当前玩家v4与合法旧档迁移归[资源与数据](DataResources.md)。
 
 ## 【KNOWN ISSUES】静态核对与人工边界
 
@@ -98,8 +98,12 @@ v14/17修理阶段的[工具修理](MapToolRepair.md)在制作区后追加11滚�
 
 寿命提示v17/20归[G提示](MapPickupHud.md)：所属G六字段，原目标/拾取/期限/保存保持；静态及用户人工通过限十二项，未触发独立用例UNKNOWN；旧用户通过仍限原版本/清单。
 
-地图v18/21的[F5/保存提示](MapWorldSaveHud.md)已接入：当前17输入、新增所属3字段；原F/G、工具及世界/玩家存档格式保持。静态及用户人工通过限v18/revision21十二项，未触发独立用例UNKNOWN；旧通过限原版本/清单。
+地图v18/21的[F5/保存提示](MapWorldSaveHud.md)已接入：该阶段17输入、新增所属3字段；原F/G、工具及世界/玩家存档格式保持。静态及用户人工通过限v18/revision21十二项，未触发独立用例UNKNOWN；旧通过限原版本/清单。
 
 ## 【FACT】个人容量等级与升级区
 
-当前[升级](MapInventoryCapacityUpgrade.md)在材料后/工具前增加10滚动行，等级、当前→下一上限、完整配方/缺口、5按钮及本人反馈；Snapshot按实际Level刷新上限，数量未变也更新。数字5/按钮合并为同一一次事件，关闭或原绑定失效清未提交请求；满级/开关关闭/材料不足/投影无效禁用按钮，服务器资格最终判定。原尺寸/滚动/鼠标隔离和其他按钮保持；当前17输入、玩家v3保存等级，新增所属Level及Sequence/Result。22次Bake静态通过，升级人工UNKNOWN；旧面板通过限原版本/清单。
+当前[升级](MapInventoryCapacityUpgrade.md)在材料后/工具前增加10滚动行，等级、当前→下一上限、完整配方/缺口、5按钮及本人反馈；Snapshot按实际Level刷新上限，数量未变也更新。数字5/按钮合并为同一一次事件，关闭或原绑定失效清未提交请求；满级/开关关闭/材料不足/投影无效禁用按钮，服务器资格最终判定。原尺寸/滚动/鼠标隔离和其他按钮保持；当前19输入、玩家v3保存等级，新增所属Level及Sequence/Result。22次Bake静态及用户人工通过限v20/revision23升级十六项，未触发用例UNKNOWN；旧面板通过限原版本/清单。
+
+## 【FACT】工具升级面板与有效上限
+
+[工具升级](MapGatherToolUpgrade.md)在修理之后追加14滚动行，显示两工具当前/下级、保留耐久与新上限、当前→下一秒数、材料/缺口及6/7按钮、本人2秒反馈。HUD先校验ToolId/Durability/Level，原工具状态/修理预览以有效定义和Level变化刷新，耐久未变也更新最大值；缓存只读且不保存DynamicBuffer跨帧。输入19，B关闭/绑定失效清新增请求，全部显示关闭仍可6/7。当前v21/24编译/22次Bake静态通过，人工UNKNOWN；旧面板与背包升级用户通过保持各自原范围。

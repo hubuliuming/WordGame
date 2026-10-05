@@ -17,11 +17,11 @@
 | [原HUD宿主](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapInteractionHud.cs) / [绑定](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapInteractionHudBindingSystem.cs) | 原 Main Camera 组件委托独立 G 面板，沿原本地玩家/连接与生命周期绑定 |
 | [Map Baker](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapAuthoring.cs) / [Player Baker](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypePlayerNetCodeAuthoring.cs) | 地图 Settings 与玩家初始 Hidden 数据 |
 
-v11/14阶段五个新脚本及meta、v17/20寿命接入两个普通助手及meta均由正常Unity导入。新客户端类不是 MonoBehaviour，未新增组件挂载或 Scene/SubScene/Prefab/Animator 结构，也未修改旧 meta、资源绑定、网格/材质/字体/图片、包或构建配置。Baker 追加玩家 ECS 显示数据，烘焙后的 Ghost 布局变化；各端须同版代码、配置并重新烘焙。当前输入17字段，SaveWorld归[F5](MapWorldSaveHud.md)，修理归[专题](MapToolRepair.md)，G没有新增目标命令、RPC、版本协商或玩家存档字段。
+v11/14阶段五个新脚本及meta、v17/20寿命接入两个普通助手及meta均由正常Unity导入。新客户端类不是 MonoBehaviour，未新增组件挂载或 Scene/SubScene/Prefab/Animator 结构，也未修改旧 meta、资源绑定、网格/材质/字体/图片、包或构建配置。Baker 追加玩家 ECS 显示数据，烘焙后的 Ghost 布局变化；各端须同版代码、配置并重新烘焙。当前输入19字段，SaveWorld归[F5](MapWorldSaveHud.md)，修理归[专题](MapToolRepair.md)，G没有新增目标命令、RPC、版本协商或玩家存档字段。
 
 ## 【FACT】当前 JSON 契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为 schemaVersion=20/configRevision=23，pickupHud段及全部18字段必填，[interactionHighlight](MapInteractionHighlight.md)亦为必填地图段。沿原严格 UTF-8/缺失/未知/重复字段/类型和语义校验；旧 v1～v19 明确失败，不迁移、补默认段或回退来源。正常导入/烘焙后生效，没有运行热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为 schemaVersion=21/configRevision=24，pickupHud段及全部18字段必填，[interactionHighlight](MapInteractionHighlight.md)亦为必填地图段。沿原严格 UTF-8/缺失/未知/重复字段/类型和语义校验；旧 v1～v20 明确失败，不迁移、补默认段或回退来源。正常导入/烘焙后生效，没有运行热重载。
 
 | 字段 | 当前默认值 | 契约 |
 |---|---|---|
@@ -66,7 +66,7 @@ CombatPrototypeMapPickupHudState使用OwnerSendType=SendToOwner，六个GhostFie
 | LifetimeMode | byte枚举：0 None、1 Timed、2 ExpiringSoon、3 Permanent；Hidden或G文字/寿命关闭时None |
 | RemainingSeconds | float、Quantization=0；Timed/ExpiringSoon为有限正整数秒，Permanent/None/Hidden为0 |
 
-不发送世界位置或绝对ExpiresAt；仅投影目标余时，不新增工作计时器。原F及资源状态各四字段、Drop Ghost四字段保持；当前17输入的SaveWorld归[F5](MapWorldSaveHud.md)；G布局由四变六，各端须同版重新烘焙。新状态不是输入/结算依据；网络延迟可能使提示滞后，显示后目标也可能被其他玩家取走或到期。当前位置下的 G 实际目标始终由服务端决定。
+不发送世界位置或绝对ExpiresAt；仅投影目标余时，不新增工作计时器。原F及资源状态各四字段、Drop Ghost四字段保持；当前19输入的SaveWorld归[F5](MapWorldSaveHud.md)；G布局由四变六，各端须同版重新烘焙。新状态不是输入/结算依据；网络延迟可能使提示滞后，显示后目标也可能被其他玩家取走或到期。当前位置下的 G 实际目标始终由服务端决定。
 
 ## 【CURRENT STRATEGY】显示、开关与释放
 
@@ -90,7 +90,7 @@ v12/15的[高亮](MapInteractionHighlight.md)按原DropId解析同一客户端La
 
 v13/16的[资源状态](MapResourceStatusHud.md)在G面板上方增加一行；G的开关、采样资格、四字段、DropId与拾取规则保持。资源状态不显示掉落期限，也不改变G蓝圈；仅状态开启仍保留整体绑定。新显示静态及用户人工通过，限v13/16十项，未触发用例UNKNOWN，旧G/高亮通过保持原版本/清单。
 
-当前v20/23的[工具修理](MapToolRepair.md)新增两个输入和所属结果，遇同tick G请求时修理拒绝；G目标/资格/入包/保存/显示均保持原链，新增修理静态及用户人工通过，限v14/17十二项，未触发用例UNKNOWN。
+当前v21/24的[工具修理](MapToolRepair.md)新增两个输入和所属结果，遇同tick G请求时修理拒绝；G目标/资格/入包/保存/显示均保持原链，新增修理静态及用户人工通过，限v14/17十二项，未触发用例UNKNOWN。
 
 ## 【FACT】地图资源存档接入边界
 
@@ -102,8 +102,8 @@ v17/revision20寿命链正常Unity编译无C# Error；实际Assembly与生成Ser
 
 主线程代码/配置静态验收通过；用户已确认本阶段人工GamePlayer验收通过，主线程结合既有静态核对与用户反馈判定通过，限CombatPrototypeNetCode、schemaVersion=17/configRevision=20及[运行入口](Runtime.md)十二项清单。人工结论来自用户反馈。原G文字v11/14十项、高亮v12/15十项、资源状态v13/16十项、工具修理v14/17十二项、资源存档v15/18十二项、掉落存档v16/19十二项及更早用户通过保持旧版本/清单，不覆盖新增寿命显示。未实际触发的独立倒计时/30秒或小数阈值边界/永久物/恢复余时、排版/颜色/字形、模式与目标切换、同tick/延迟/多玩家/晚加入/断线及配置/绑定/快照/绘制/保存/清理失败仍UNKNOWN；带宽/性能/平台/线上、玩家与世界跨文件原子一致/防重复及意外ECS恢复不属于通过范围。未修改Scene/SubScene/Prefab/Animator/旧meta/资源引用、原G/选择/运动/到期/保存链、输入或HUD宿主/绑定脚本；两助手不挂组件。AI未运行游戏/显示系统/GUI回调、GamePlayer/PlayMode、逻辑单元测试、构建、发布、性能采样或图片检查，未读取真实存档、创建子Agent或提交Git。
 
-地图v18/21的[F5/保存提示](MapWorldSaveHud.md)已接入：当前17输入、新增所属3字段；原F/G、工具及世界/玩家存档格式保持。静态及用户人工通过限v18/revision21十二项，未触发独立用例UNKNOWN；旧通过限原版本/清单。
+地图v18/21的[F5/保存提示](MapWorldSaveHud.md)已接入：该阶段17输入、新增所属3字段；原F/G、工具及世界/玩家存档格式保持。静态及用户人工通过限v18/revision21十二项，未触发独立用例UNKNOWN；旧通过限原版本/清单。
 
 ## 【FACT】容量等级接入边界
 
-[升级](MapInventoryCapacityUpgrade.md)：G采样按实际Level选择容量，NoSpace仍保留原目标与寿命；原六所属字段和目标/到期规则保持。新链静态通过、人工UNKNOWN；旧通过保持原版本/清单。
+[升级](MapInventoryCapacityUpgrade.md)：G采样按实际Level选择容量，NoSpace仍保留原目标与寿命；原六所属字段和目标/到期规则保持。新链静态及用户人工通过限v20/revision23升级十六项，未触发用例UNKNOWN；旧通过保持原版本/清单。

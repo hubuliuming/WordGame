@@ -1,6 +1,6 @@
 # 背包展示与道具使用
 
-返回[导航](../AI_Understanding.md)。[容量](MapInventoryCapacity.md)已验收；[升级](MapInventoryCapacityUpgrade.md)人工UNKNOWN。
+返回[导航](../AI_Understanding.md)。[容量](MapInventoryCapacity.md)/[升级](MapInventoryCapacityUpgrade.md)已验收；[工具升级](MapGatherToolUpgrade.md)待验收。
 
 ## 入口文件
 

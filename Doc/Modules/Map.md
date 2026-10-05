@@ -15,7 +15,7 @@
 
 ## 【FACT】当前默认配置
 
-Json/BuiltIn v20/23，资源600秒再生；[容量](MapInventoryCapacity.md)已验收，[升级](MapInventoryCapacityUpgrade.md)人工UNKNOWN。
+Json/BuiltIn v21/24；[容量](MapInventoryCapacity.md)/[升级](MapInventoryCapacityUpgrade.md)已验收，[工具升级](MapGatherToolUpgrade.md)待验收。
 
 | 配置字段 | 当前值与用途 |
 |---|---|
@@ -64,7 +64,7 @@ gather_apple 的 footprintRadiusMeters=0.3、minimumSameTypeSpacingMeters=1.5、
 | GroundsJson | [grounds.json](../../Assets/Config/CombatPrototype/Map/grounds.json) | GroundDefinitionConfig 数组 |
 | ObjectsJson | [objects.json](../../Assets/Config/CombatPrototype/Map/objects.json) | MapObjectDefinitionConfig 数组 |
 
-SourceMode=BuiltIn 时明确使用内置来源，SourceMode=Json 时使用选中地图 JSON 和三份共享 JSON；Json 来源失败不自动回退 BuiltIn。Preset=Grassland 要求地图 ID 为 battle_grassland_01，Preset=Forest 要求 battle_forest_01。schemaVersion=19为契约版本，configRevision须为正整数；旧v1～v18或缺少必填字段明确失败，不补字段或回退来源。
+SourceMode=BuiltIn 时明确使用内置来源，SourceMode=Json 时使用选中地图 JSON 和三份共享 JSON；Json 来源失败不自动回退 BuiltIn。Preset=Grassland 要求地图 ID 为 battle_grassland_01，Preset=Forest 要求 battle_forest_01。schemaVersion=21为契约版本，configRevision须为正整数；旧v1～v20或缺少必填字段明确失败，不补字段或回退来源。
 
 [MapMovementConfig.cs](../../Assets/Scripts/CombatPrototype/Map/MapMovementConfig.cs) 是地图定义的必填 movement 段：
 

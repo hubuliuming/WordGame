@@ -10,12 +10,11 @@ namespace Code_01.CombatPrototype.Map
 {
     [WorldSystemFilter(WorldSystemFilterFlags.ServerSimulation)]
     [UpdateInGroup(typeof(PredictedSimulationSystemGroup))]
-    [UpdateAfter(typeof(CombatPrototypeMapGatherToolCraftSystem))]
-    [UpdateBefore(typeof(CombatPrototypeMapInventoryDropSystem))]
+    [UpdateAfter(typeof(CombatPrototypeMapInventoryCapacityUpgradeSystem))]
     [UpdateBefore(typeof(CombatPrototypeMapInteractionSystem))]
     [UpdateBefore(typeof(CombatPrototypePlayerRespawnSystem))]
     [CreateAfter(typeof(CombatPrototypeMapInteractionSystem))]
-    public partial class CombatPrototypeMapGatherToolRepairSystem : SystemBase
+    public partial class CombatPrototypeMapGatherToolUpgradeSystem : SystemBase
     {
         private struct Request
         {
@@ -35,7 +34,7 @@ namespace Code_01.CombatPrototype.Map
             RequireForUpdate<CombatPrototypeMapData>();
             RequireForUpdate<CombatPrototypePlayerSpawner>();
             _interaction = World.GetExistingSystemManaged<CombatPrototypeMapInteractionSystem>();
-            if (_interaction == null) throw new InvalidOperationException("Tool repair requires the F interaction service.");
+            if (_interaction == null) throw new InvalidOperationException("Tool upgrades require the F interaction service.");
         }
 
         protected override void OnUpdate()
@@ -43,7 +42,8 @@ namespace Code_01.CombatPrototype.Map
             Dependency.Complete();
             var source = SystemAPI.GetSingletonEntity<CombatPrototypeMapData>();
             var map = EntityManager.GetComponentData<CombatPrototypeMapData>(source);
-            var settings = EntityManager.GetComponentData<CombatPrototypeMapGatherToolSettings>(source);
+            var toolSettings = EntityManager.GetComponentData<CombatPrototypeMapGatherToolSettings>(source);
+            var settings = EntityManager.GetComponentData<CombatPrototypeMapGatherToolUpgradeSettings>(source);
             var definitions = EntityManager.GetBuffer<CombatPrototypeMapGatherToolDefinition>(source, true);
             var upgrades = EntityManager.GetBuffer<CombatPrototypeMapGatherToolUpgradeDefinition>(source, true);
             using var requests = new NativeList<Request>(Allocator.Temp);
@@ -57,13 +57,13 @@ namespace Code_01.CombatPrototype.Map
                 try
                 {
                     var input = EntityManager.GetComponentData<CombatPrototypePlayerInput>(player);
-                    if (!input.RepairAxe.IsSet && !input.RepairPickaxe.IsSet) continue;
+                    if (!input.UpgradeAxe.IsSet && !input.UpgradePickaxe.IsSet) continue;
                     requests.Add(new Request { Player = player, NetworkId = id.ValueRO.Value, Input = input,
-                        Kind = input.RepairAxe.IsSet ? CombatPrototypeMapGatherToolKind.Axe : CombatPrototypeMapGatherToolKind.Pickaxe });
+                        Kind = input.UpgradeAxe.IsSet ? CombatPrototypeMapGatherToolKind.Axe : CombatPrototypeMapGatherToolKind.Pickaxe });
                 }
                 catch (Exception exception)
                 {
-                    Debug.LogError("[CombatPrototype.ToolRepair] Request failed; stage=ReadInput, map=" + map.MapDefinitionId +
+                    Debug.LogError("[CombatPrototype.ToolUpgrade] Request failed; stage=ReadInput, map=" + map.MapDefinitionId +
                         ", NetworkId=" + id.ValueRO.Value + ", player=" + player + ". " + exception);
                 }
             }
@@ -79,58 +79,60 @@ namespace Code_01.CombatPrototype.Map
             foreach (var request in requests)
             {
                 var stage = "ValidatePlayer";
-                var feedback = default(RefRW<CombatPrototypeMapToolRepairFeedback>);
+                var feedback = default(RefRW<CombatPrototypeMapToolUpgradeFeedback>);
                 var hasFeedback = false;
                 var saved = false;
                 try
                 {
                     var reason = _interaction.GetInteractionHintRejection(request.Player, request.NetworkId, request.Input);
                     if (reason == "CommandTargetOwnerMismatch") continue;
-                    feedback = SystemAPI.GetComponentLookup<CombatPrototypeMapToolRepairFeedback>().GetRefRW(request.Player);
+                    feedback = SystemAPI.GetComponentLookup<CombatPrototypeMapToolUpgradeFeedback>().GetRefRW(request.Player);
                     hasFeedback = true;
-                    var result = reason != null ? CombatPrototypeMapToolRepairResult.PlayerUnavailable :
-                        HasPriorOperation(request.Input) ? CombatPrototypeMapToolRepairResult.ExistingOperationHasPriority :
-                        _busy.Contains(request.Player) ? CombatPrototypeMapToolRepairResult.Busy :
-                        settings.Enabled == 0 || settings.RepairEnabled == 0 ? CombatPrototypeMapToolRepairResult.Disabled :
-                        CombatPrototypeMapToolRepairResult.None;
-                    if (result != CombatPrototypeMapToolRepairResult.None)
+                    var result = reason != null ? CombatPrototypeMapToolUpgradeResult.PlayerUnavailable :
+                        HasPriorOperation(request.Input) ? CombatPrototypeMapToolUpgradeResult.ExistingOperationHasPriority :
+                        _busy.Contains(request.Player) ? CombatPrototypeMapToolUpgradeResult.Busy :
+                        toolSettings.Enabled == 0 || settings.Enabled == 0 ? CombatPrototypeMapToolUpgradeResult.Disabled :
+                        CombatPrototypeMapToolUpgradeResult.None;
+                    if (result != CombatPrototypeMapToolUpgradeResult.None)
                     {
                         Report(feedback, request.Kind, result);
                         Reject(map.MapDefinitionId, request, reason ?? result.ToString());
                         continue;
                     }
-                    stage = "PrepareRepair";
+                    stage = "PrepareUpgrade";
                     var definition = CombatPrototypeMapGatherToolUtility.RequireDefinition(definitions, request.Kind);
                     var tools = EntityManager.GetBuffer<CombatPrototypeMapGatherTool>(request.Player);
                     var toolIndex = CombatPrototypeMapGatherToolUtility.FindOwned(tools, definition.ToolId);
                     if (toolIndex < 0)
                     {
-                        Report(feedback, request.Kind, CombatPrototypeMapToolRepairResult.NotOwned);
+                        Report(feedback, request.Kind, CombatPrototypeMapToolUpgradeResult.NotOwned);
                         Reject(map.MapDefinitionId, request, "NotOwned");
                         continue;
                     }
                     var nextTool = tools[toolIndex];
-                    definition = CombatPrototypeMapGatherToolUtility.ForLevel(definition, upgrades, nextTool.Level);
-                    if (nextTool.Durability == definition.MaxDurability)
+                    CombatPrototypeMapGatherToolUtility.ValidateLevel(nextTool.Level);
+                    if (nextTool.Level == CombatPrototypeMapGatherToolUtility.MaximumLevel)
                     {
-                        Report(feedback, request.Kind, CombatPrototypeMapToolRepairResult.AlreadyFull);
-                        Reject(map.MapDefinitionId, request, "AlreadyFull");
+                        Report(feedback, request.Kind, CombatPrototypeMapToolUpgradeResult.MaxLevel);
+                        Reject(map.MapDefinitionId, request, "MaxLevel");
                         continue;
                     }
+                    var upgrade = CombatPrototypeMapGatherToolUtility.RequireUpgradeDefinition(upgrades, definition.ToolId, nextTool.Level + 1);
                     var inventory = EntityManager.GetBuffer<CombatPrototypeInventoryItem>(request.Player);
                     var woodIndex = FindMaterial(inventory, WoodName);
                     var stoneIndex = FindMaterial(inventory, StoneName);
                     var woodQuantity = woodIndex >= 0 ? inventory[woodIndex].Quantity : 0;
                     var stoneQuantity = stoneIndex >= 0 ? inventory[stoneIndex].Quantity : 0;
-                    if (woodQuantity < definition.RepairWoodQuantity || stoneQuantity < definition.RepairStoneQuantity)
+                    if (woodQuantity < upgrade.WoodQuantity || stoneQuantity < upgrade.StoneQuantity)
                     {
-                        Report(feedback, request.Kind, CombatPrototypeMapToolRepairResult.InsufficientMaterials);
+                        Report(feedback, request.Kind, CombatPrototypeMapToolUpgradeResult.InsufficientMaterials);
                         Reject(map.MapDefinitionId, request, "InsufficientMaterials");
                         continue;
                     }
-                    var nextWood = woodQuantity - definition.RepairWoodQuantity;
-                    var nextStone = stoneQuantity - definition.RepairStoneQuantity;
-                    nextTool.Durability += Math.Min(definition.RepairDurability, definition.MaxDurability - nextTool.Durability);
+                    var nextWood = woodQuantity - upgrade.WoodQuantity;
+                    var nextStone = stoneQuantity - upgrade.StoneQuantity;
+                    // Upgrading raises the maximum and efficiency without granting durability.
+                    nextTool.Level = upgrade.Level;
                     var identity = EntityManager.GetComponentData<CombatPrototypePlayerIdentity>(request.Player).PlayerId;
                     var reward = EntityManager.GetComponentData<CombatPrototypePlayerReward>(request.Player);
                     // The existing projection replaces one owned tool and the two material quantities.
@@ -140,19 +142,19 @@ namespace Code_01.CombatPrototype.Map
                     stage = "SavePrepared";
                     CombatPrototypePlayerSaveStore.SavePrepared(candidate);
                     saved = true;
-                    stage = "CommitRepair";
+                    stage = "CommitUpgrade";
                     // References are acquired before saving; commit needs no structural change or allocation.
                     CommitMaterials(inventory, woodIndex, nextWood, stoneIndex, nextStone);
                     tools[toolIndex] = nextTool;
-                    Report(feedback, request.Kind, CombatPrototypeMapToolRepairResult.Success);
-                    Debug.Log("[CombatPrototype.ToolRepair] Repaired and saved; map=" + map.MapDefinitionId +
+                    Report(feedback, request.Kind, CombatPrototypeMapToolUpgradeResult.Success);
+                    Debug.Log("[CombatPrototype.ToolUpgrade] Upgraded and saved; map=" + map.MapDefinitionId +
                         ", NetworkId=" + request.NetworkId + ", PlayerId=" + identity + ", tool=" + definition.ToolId +
-                        ", durability=" + nextTool.Durability + ".");
+                        ", level=" + nextTool.Level + ", durability=" + nextTool.Durability + ".");
                 }
                 catch (Exception exception)
                 {
-                    if (hasFeedback) Report(feedback, request.Kind, CombatPrototypeMapToolRepairResult.Failed);
-                    Debug.LogError("[CombatPrototype.ToolRepair] Repair failed; stage=" + stage + ", map=" + map.MapDefinitionId +
+                    if (hasFeedback) Report(feedback, request.Kind, CombatPrototypeMapToolUpgradeResult.Failed);
+                    Debug.LogError("[CombatPrototype.ToolUpgrade] Upgrade failed; stage=" + stage + ", map=" + map.MapDefinitionId +
                         ", NetworkId=" + request.NetworkId + ", player=" + request.Player + ", tool=" + request.Kind +
                         ", saved=" + saved + ". " + exception);
                 }
@@ -160,7 +162,8 @@ namespace Code_01.CombatPrototype.Map
         }
 
         private static bool HasPriorOperation(CombatPrototypePlayerInput input) => input.Gather.IsSet || input.Pickup.IsSet ||
-            input.UseItem.IsSet || input.Respawn.IsSet || input.CraftAxe.IsSet || input.CraftPickaxe.IsSet;
+            input.UseItem.IsSet || input.Respawn.IsSet || input.CraftAxe.IsSet || input.CraftPickaxe.IsSet ||
+            input.RepairAxe.IsSet || input.RepairPickaxe.IsSet || input.DropInventory.IsSet || input.UpgradeInventoryCapacity.IsSet;
 
         private static int FindMaterial(DynamicBuffer<CombatPrototypeInventoryItem> inventory, FixedString64Bytes name)
         {
@@ -180,8 +183,8 @@ namespace Code_01.CombatPrototype.Map
             if (low >= 0 && inventory[low].Quantity == 0) inventory.RemoveAt(low);
         }
 
-        private static void Report(RefRW<CombatPrototypeMapToolRepairFeedback> feedback,
-            CombatPrototypeMapGatherToolKind kind, CombatPrototypeMapToolRepairResult result)
+        private static void Report(RefRW<CombatPrototypeMapToolUpgradeFeedback> feedback,
+            CombatPrototypeMapGatherToolKind kind, CombatPrototypeMapToolUpgradeResult result)
         {
             var next = feedback.ValueRO;
             next.Sequence = unchecked(next.Sequence + 1);
@@ -191,7 +194,7 @@ namespace Code_01.CombatPrototype.Map
 
         private static void Reject(FixedString64Bytes mapId, Request request, string reason)
         {
-            Debug.Log("[CombatPrototype.ToolRepair] Rejected; map=" + mapId + ", NetworkId=" + request.NetworkId +
+            Debug.Log("[CombatPrototype.ToolUpgrade] Rejected; map=" + mapId + ", NetworkId=" + request.NetworkId +
                 ", player=" + request.Player + ", tool=" + request.Kind + ", reason=" + reason + ".");
         }
 

@@ -20,7 +20,7 @@
 
 ## 【FACT】配置与建议值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与BuiltIn当前schemaVersion=20/configRevision=23；resourcePersistence段必填，当前寿命显示归[G提示](MapPickupHud.md)。沿原严格字段、对象形状、标量类型与UTF-8校验，旧v1～v19拒绝，不迁移、补默认或回退来源；正常导入和烘焙后生效，无热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与BuiltIn当前schemaVersion=21/configRevision=24；resourcePersistence段必填，当前寿命显示归[G提示](MapPickupHud.md)。沿原严格字段、对象形状、标量类型与UTF-8校验，旧v1～v20拒绝，不迁移、补默认或回退来源；正常导入和烘焙后生效，无热重载。
 
 | 字段 | 默认值 | 校验 |
 |---|---|---|
@@ -31,7 +31,7 @@
 | resourcePersistence.manualSaveEnabled | true | 必填布尔；F5开关，不关闭原自动保存 |
 | resourcePersistence.manualSaveCooldownSeconds | 5 | 有限正数秒，服务端全局冷却，接受失败也占用；规则归[F5](MapWorldSaveHud.md) |
 
-关闭存档仍校验全部字段。Map Baker写入Enabled/SaveGroundDrops/SaveSlotId/SaveIntervalSeconds/LayoutSignature/ManualSaveEnabled/ManualSaveCooldownSeconds七字段，签名为64个小写十六进制字符，使用FixedString128Bytes；另写一字段恢复状态，开启为Pending、关闭为Ready。地图根仍不是Ghost；存档数据由服务端系统消费，资源存档原阶段未新增Ghost或输入；当前F5新增SaveWorld及所属三字段归[保存提示](MapWorldSaveHud.md)。当前输入17、F4/G6/资源状态4及原反馈/资源字段保持，各端同版代码/配置重新烘焙。
+关闭存档仍校验全部字段。Map Baker写入Enabled/SaveGroundDrops/SaveSlotId/SaveIntervalSeconds/LayoutSignature/ManualSaveEnabled/ManualSaveCooldownSeconds七字段，签名为64个小写十六进制字符，使用FixedString128Bytes；另写一字段恢复状态，开启为Pending、关闭为Ready。地图根仍不是Ghost；存档数据由服务端系统消费，资源存档原阶段未新增Ghost或输入；当前F5新增SaveWorld及所属三字段归[保存提示](MapWorldSaveHud.md)。当前输入19、F4/G6/资源状态4及原反馈/资源字段保持，各端同版代码/配置重新烘焙。
 
 ## 【FACT】文件与身份
 
@@ -85,4 +85,4 @@ saveGroundDrops开启时同文件保存地面苹果/木材/石材、DropId及剩
 
 寿命提示v17/20归[G提示](MapPickupHud.md)：所属G六字段，原目标/拾取/期限/保存保持；静态及用户人工通过限十二项，未触发独立用例UNKNOWN；旧用户通过仍限原版本/清单。
 
-地图v18/21的[F5/保存提示](MapWorldSaveHud.md)已接入：当前17输入、新增所属3字段；原F/G、工具及世界/玩家存档格式保持。静态及用户人工通过限v18/revision21十二项，未触发独立用例UNKNOWN；旧通过限原版本/清单。
+地图v18/21的[F5/保存提示](MapWorldSaveHud.md)已接入：该阶段17输入、新增所属3字段；原F/G、工具及世界/玩家存档格式保持。静态及用户人工通过限v18/revision21十二项，未触发独立用例UNKNOWN；旧通过限原版本/清单。

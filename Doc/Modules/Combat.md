@@ -244,4 +244,4 @@ v13/16的[资源状态](MapResourceStatusHud.md)允许移动/攻击时只读附�
 
 ## 【FACT】容量升级的战斗边界
 
-[升级](MapInventoryCapacityUpgrade.md)在InventoryDrop之后、F/R之前复用F资格，移动/Attack/非Ready/死亡或活动采集拒绝；同tick F/G/E/R/制作/修理/丢弃优先。原战斗数值/系统保持，奖励与E候选保存当前容量Level并写v3，成功保存后才沿原提交。新链静态通过，升级人工UNKNOWN；旧战斗通过保持原版本/清单。
+[升级](MapInventoryCapacityUpgrade.md)在InventoryDrop之后、F/R之前复用F资格，移动/Attack/非Ready/死亡或活动采集拒绝；同tick F/G/E/R/制作/修理/丢弃优先。原战斗数值/系统保持，奖励与E候选保存当前容量Level并写v4（Tools保留Level），成功保存后才沿原提交。新链静态及用户人工通过限v20/revision23升级十六项，未触发用例UNKNOWN；旧战斗通过保持原版本/清单。

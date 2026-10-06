@@ -1,6 +1,6 @@
 # 掉落物拾取成功与失败反馈
 
-返回[地图](Map.md)、[掉落与拾取](MapDrops.md)、[G目标及寿命](MapPickupHud.md)与[运行入口](Runtime.md)。入口CombatPrototypeNetCode；Forest/Grassland Json与BuiltIn当前schemaVersion=29/configRevision=32。本专题负责实际G请求结果的所属快照与原G面板显示。静态及用户人工GamePlayer通过；范围限v25/revision28十六项，详见下述人工边界；旧F完成/中断通过限v24/revision27十六项，其他旧通过保持原版本/清单。
+返回[地图](Map.md)、[掉落与拾取](MapDrops.md)、[G目标及寿命](MapPickupHud.md)与[运行入口](Runtime.md)。入口CombatPrototypeNetCode；Forest/Grassland Json与BuiltIn当前schemaVersion=30/configRevision=33。本专题负责实际G请求结果的所属快照与原G面板显示。静态及用户人工GamePlayer通过；范围限v25/revision28十六项，详见下述人工边界；旧F完成/中断通过限v24/revision27十六项，其他旧通过保持原版本/清单。
 
 ## 【FACT】文件与接入
 

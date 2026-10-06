@@ -44,6 +44,8 @@ namespace Code_01.CombatPrototype.Map
         public string SortText { get; private set; }
         public string FilterText { get; private set; }
         public string NoMatchingItemsText { get; private set; }
+        public CombatPrototypeMapInventorySortMode SortMode => _sortMode;
+        public CombatPrototypeMapInventoryFilterMode FilterMode => _filterMode;
         public int ControlRowCount => (SortEnabled ? 1 : 0) + (FilterEnabled ? 1 : 0);
 
         internal static CombatPrototypeMapInventorySortMode ResolveSortMode(string value)
@@ -86,6 +88,14 @@ namespace Code_01.CombatPrototype.Map
             _suppliesLabel = settings.SuppliesFilterLabel.ToString();
             _otherLabel = settings.OtherFilterLabel.ToString();
             NoMatchingItemsText = settings.NoMatchingItemsLabel.ToString();
+            UpdateLabels();
+        }
+
+        // 只在Configure后的首次快照前恢复有效能力，关闭项保持原配置规则。
+        public void Restore(CombatPrototypeMapInventorySortMode sortMode, CombatPrototypeMapInventoryFilterMode filterMode)
+        {
+            if (SortEnabled) _sortMode = sortMode;
+            if (FilterEnabled) _filterMode = filterMode;
             UpdateLabels();
         }
 

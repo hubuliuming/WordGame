@@ -5,12 +5,13 @@ using UnityEngine.InputSystem;
 
 namespace Code_01.CombatPrototype.Map
 {
-    // Hosted by the existing camera HUD. No scene component, inventory mutation or save call.
+    // Hosted by the existing camera HUD. Preferences are local; gameplay inventory/save state is not mutated.
     internal sealed class CombatPrototypeMapInventoryPanel
     {
         private readonly CombatPrototypeMapInventoryPanelSnapshot _snapshot = new CombatPrototypeMapInventoryPanelSnapshot();
         private readonly CombatPrototypeMapInventoryPanelListView _listView = new CombatPrototypeMapInventoryPanelListView();
         private readonly CombatPrototypeMapInventoryPanelSearch _search = new CombatPrototypeMapInventoryPanelSearch();
+        private readonly CombatPrototypeMapInventoryPanelPreferences _preferences = new CombatPrototypeMapInventoryPanelPreferences();
         private readonly CombatPrototypeMapInventoryDropClient _drop = new CombatPrototypeMapInventoryDropClient();
         private readonly CombatPrototypeMapGatherToolRepairPanel _repair = new CombatPrototypeMapGatherToolRepairPanel();
         private readonly CombatPrototypeMapInventoryCapacityUpgradePanel _upgrade = new CombatPrototypeMapInventoryCapacityUpgradePanel();
@@ -74,6 +75,7 @@ namespace Code_01.CombatPrototype.Map
             _snapshot.Configure(settings, capacity, capacityDefinitions, upgradeDefinitions);
             _listView.Configure(settings);
             _search.Configure(settings);
+            _preferences.Configure(settings, mapId, _listView, _search);
             _upgrade.Configure(settings, capacity, upgradeSettings, upgradeDefinitions, mapId);
             _drop.Configure(dropSettings, dropDefinitions, settings);
             _repair.Configure(settings, toolSettings, axe, pickaxe, _levelLabel);
@@ -93,6 +95,7 @@ namespace Code_01.CombatPrototype.Map
             _snapshot.Capture(inventory, axeDurability, pickaxeDurability, source, player, capacityLevel);
             if (_listView.Capture(_snapshot, _search, out var selectionChanged)) _rowMousePressAccepted = false;
             if (selectionChanged) _scroll = Vector2.zero;
+            _preferences.Capture(_listView, _search);
             _upgrade.Capture(_snapshot, capacityLevel, upgradeFeedback);
             _canCraftAxe = CanCraft(_axe, axeDurability);
             _canCraftPickaxe = CanCraft(_pickaxe, pickaxeDurability);
@@ -358,6 +361,7 @@ namespace Code_01.CombatPrototype.Map
 
         private void Close()
         {
+            _preferences.Flush();
             _open = _craftAxe = _craftPickaxe = _mousePressAccepted = _rowMousePressAccepted = false;
             _listView.ClearPending();
             _search.Close();
@@ -378,6 +382,7 @@ namespace Code_01.CombatPrototype.Map
             _snapshot.Reset();
             _listView.Reset();
             _search.Reset();
+            _preferences.Reset();
             _drop.Reset();
             _repair.Reset();
             _upgrade.Reset();

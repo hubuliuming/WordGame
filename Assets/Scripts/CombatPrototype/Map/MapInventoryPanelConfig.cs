@@ -56,5 +56,9 @@ namespace Code_01.CombatPrototype.Map
         public string searchPlaceholderLabel;
         public string clearSearchLabel;
         public string noSearchResultsLabel;
+        public bool preferencesEnabled;
+        public bool preferencesSaveSearch;
+        public string preferencesFileId;
+        public float preferencesSaveDelaySeconds;
     }
 }

@@ -313,7 +313,11 @@ namespace Code_01.CombatPrototype.Map
                     SearchLabel = new FixedString64Bytes(inventoryPanel.searchLabel),
                     SearchPlaceholderLabel = new FixedString64Bytes(inventoryPanel.searchPlaceholderLabel),
                     ClearSearchLabel = new FixedString64Bytes(inventoryPanel.clearSearchLabel),
-                    NoSearchResultsLabel = new FixedString64Bytes(inventoryPanel.noSearchResultsLabel)
+                    NoSearchResultsLabel = new FixedString64Bytes(inventoryPanel.noSearchResultsLabel),
+                    PreferencesEnabled = (byte)(inventoryPanel.preferencesEnabled ? 1 : 0),
+                    PreferencesSaveSearch = (byte)(inventoryPanel.preferencesSaveSearch ? 1 : 0),
+                    PreferencesFileId = new FixedString64Bytes(inventoryPanel.preferencesFileId),
+                    PreferencesSaveDelaySeconds = inventoryPanel.preferencesSaveDelaySeconds
                 });
                 var inventoryDrop = config.map.inventoryDrop;
                 AddComponent(entity, new CombatPrototypeMapInventoryDropSettings

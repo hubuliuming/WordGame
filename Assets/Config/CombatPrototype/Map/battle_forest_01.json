@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 29,
-  "configRevision": 32,
+  "schemaVersion": 30,
+  "configRevision": 33,
   "mapDefinitionId": "battle_forest_01",
   "defaultSeed": 12345,
   "resourcePersistence": {
@@ -331,7 +331,11 @@
     "searchLabel": "Search",
     "searchPlaceholderLabel": "Name keyword",
     "clearSearchLabel": "Clear",
-    "noSearchResultsLabel": "No search results"
+    "noSearchResultsLabel": "No search results",
+    "preferencesEnabled": true,
+    "preferencesSaveSearch": true,
+    "preferencesFileId": "inventory_display",
+    "preferencesSaveDelaySeconds": 0.5
   },
   "inventoryCapacity": {
     "enabled": true,

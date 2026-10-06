@@ -891,3 +891,15 @@
 - inventoryPanel追加七必填字段，DTO/Settings44→51；Forest/Grassland Json与BuiltIn29/32一致，旧v1～v28拒绝，长度严格1～64、四文案沿61 UTF-8字节规则，关闭仍完整校验。十一现有脚本、一新普通Search类和Unity正常生成meta接入；编辑及焦点切换帧沿原Binding→HUD→Panel输出blocksKeyboard，隔离原游戏键盘采样，外部释放点击不写Attack。
 - 正常Unity编译、元数据及1410份非法配置拒绝/76组合法读取、82次隔离Editor Bake静态通过；51Settings、输入19/Drop4/Tools3及原反馈、玩家v4/世界v2布局、原布置/签名保持，Bake Console前后[0,9,47]相同，主场景干净、临时资源释放。
 - 同步搜索专题、受影响模块/导航与策划模板第7节完整JSON/新第38节；原403项人工内容/编号保留，追加十六项后419项。本阶段GamePlayer待验收，旧排序筛选通过仍限v28/revision31原十六项。未改Scene/SubScene/Prefab/Animator/旧meta/资源/包/构建结构，未运行搜索/库存/焦点/GUI业务测试、GamePlayer/PlayMode、逻辑单元测试、命令行构建/发布、真实存档业务I/O、性能/图片，未创建子Agent或提交Git。
+
+## 2026-10-06 背包材料搜索人工验收确认
+
+- 用户反馈“我已验收通过，接下来下一阶段”；主线程结合既有编译/配置/隔离烘焙静态核对及用户反馈判定通过，限CombatPrototypeNetCode、Forest/Grassland Json/BuiltIn v29/revision32与Runtime.md本阶段十六项。人工结论来自用户反馈，原419项内容/编号和旧阶段通过范围保持，未实际触发的独立用例、性能/平台/线上仍UNKNOWN。
+- 增量同步导航、地图、搜索与相关B面板/排序筛选/容量/丢弃/库存/HUD/玩家/配置/运行文档及策划模板第38节的验收状态；仅文档修改，未执行游戏/GUI业务、GamePlayer/PlayMode、逻辑单元测试、真实存档业务I/O、编译/烘焙/构建/发布、采样或图片检查，未创建子Agent或提交Git。
+
+## 2026-10-06 背包显示偏好本地保存（v30/revision33）
+
+- 按用户确认方案，由主线程在CombatPrototypeNetCode原B面板保存已应用排序/类别/搜索文本；有效绑定读取一次，首次无正式文件按配置初始化，默认0.5秒unscaledTime合并写入，Close/Reset提交待写值。面板开关/滚动/焦点和未应用编辑不保存，关闭能力保留对应原记录，载入截断不自动写回。
+- inventoryPanel追加四必填字段，DTO/Settings51→55；两地图Json/BuiltIn30/33一致，旧v1～v29拒绝，文件ID沿原1～61小写ID规则、延迟有限正float，关闭仍验证。八现有脚本、三普通偏好类及Unity正常生成meta接入；独立客户端目录采用版本1五字段JSON、严格读取、.tmp/Flush(true)/Replace或Move提交，坏档/写失败明确日志且暂停本绑定I/O。
+- 正常编译、55Settings/五字段协议/普通类元数据、1612份非法地图配置拒绝/96组合法读取及98次隔离Editor Bake静态通过；输入19/Drop4/Tools3/全部反馈、玩家v4/世界v2格式及完整布置/资源签名保持。更新时旧Worker留下两条未知新字段导入错误；当前程序集读取/Bake与正常再导入完成，Bake/再导入计数均[2,7,47]，未清空Console、未宣称0 Error，主场景干净、临时资源释放。
+- 增量同步偏好专题、受影响模块/导航与策划模板第7节JSON/第39节；原419项人工内容/编号保留，新增十六项后435项，本阶段人工待验收。Scene/SubScene/Prefab/Animator/旧meta/资源/包/构建结构与HUD/Binding/PlayerInput/服务器业务保持；未执行偏好或GUI业务/真实偏好及游戏存档I/O、GamePlayer/PlayMode、逻辑单元测试、命令行构建/发布、采样/图片，未创建子Agent或提交Git。

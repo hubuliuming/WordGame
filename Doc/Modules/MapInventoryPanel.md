@@ -10,7 +10,8 @@
 | [InventoryPanelData](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapInventoryPanelData.cs) | 原地图根上的固定显示 Settings；无 GhostField/新玩家数据 |
 | [InventoryPanelSnapshot](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapInventoryPanelSnapshot.cs) | 完整库存原顺序缓存、材料计数及本地行Revision |
 | [ListView](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapInventoryPanelListView.cs) | [排序筛选](MapInventoryListView.md)的可见行、顺序及本地选择缓存 |
-| [InventoryPanel](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapInventoryPanel.cs) | GUI 列表/滚动/按钮、本地开关和待提交按钮请求 |
+| [InventoryPanel](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapInventoryPanel.cs) | GUI 列表/滚动/按钮、本地开关、待提交按钮请求与偏好协调入口 |
+| [本机偏好](MapInventoryPreferences.md) | 原Panel持有普通协调类，按地图读取/保存已应用展示选择 |
 | [Map Baker](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapAuthoring.cs) | 原根追加 InventoryPanelSettings 烘焙数据 |
 | [HUD 绑定](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapInteractionHudBindingSystem.cs) | 所属玩家/连接检查、配置、投影与输入交接 |
 | [HUD 宿主](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapInteractionHud.cs) | 复用 Main Camera 原组件，委托绘制并共享原制作反馈 |
@@ -20,7 +21,7 @@
 
 ## 【FACT】JSON 契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 当前一致为 schemaVersion=29/configRevision=32。必填 inventoryPanel 共51字段，原30字段加[排序筛选](MapInventoryListView.md)十四字段及[搜索](MapInventorySearch.md)七字段，沿原严格UTF-8、完整字段/类型及未知/重复键检查；即使关闭面板也校验全部字段。旧地图v1～v28明确失败，不补段/默认值或回退来源；正常导入/烘焙后生效，无运行热重载。Lv1配方/定义仍从gatherTools读取，当前级上限/倍率归[gatherToolUpgrade](MapGatherToolUpgrade.md)，面板不复制配置真值。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 当前一致为 schemaVersion=30/configRevision=33。必填 inventoryPanel 共55字段，原30字段加[排序筛选](MapInventoryListView.md)十四、[搜索](MapInventorySearch.md)七及[本机偏好](MapInventoryPreferences.md)四字段，沿原严格UTF-8、完整字段/类型及未知/重复键检查；即使关闭面板也校验全部字段。旧地图v1～v29明确失败，不补段/默认值或回退来源；正常导入/烘焙后生效，无运行热重载。Lv1配方/定义仍从gatherTools读取，当前级上限/倍率归[gatherToolUpgrade](MapGatherToolUpgrade.md)，面板不复制配置真值。
 
 | 字段 | 默认值 | 契约 |
 |---|---|---|
@@ -77,7 +78,7 @@ B单次按下在GhostInputSystemGroup内切换本地面板，同一渲染帧不�
 
 制作成功/拒绝/失败共享原所属Sequence/Kind/Result，当前2秒展示期限由原宿主处理，只用于显示；新绑定只观察现有Sequence，不重播旧反馈。interactionHud.enabled只关闭F提示/进度，inventoryPanel.enabled独立；关闭F HUD仍可B打开本面板/查看制作反馈，关闭本面板仍可用原1/2。F/G文字、面板、高亮及资源状态全关时宿主清空显示，工具玩法由原开关控制。
 
-死亡、断线/无本地Ghost、玩家或地图源变化、关闭面板、World/Scene停止或释放清掉未提交按钮请求；绑定释放同时清库存投影、滚动位置、鼠标按下标记及旧反馈。同一绑定内B或关闭按钮保留已应用的排序/筛选选择与搜索词，清本地未应用编辑/切换并释放文本焦点；重建有效绑定按initiallyOpen及两默认模式初始化，默认关闭/type/all，原滚动归零。已经消费进原输入命令的请求仍由原服务器链处理，不通过关闭面板撤销已提交制作。面板不保存/修改库存、耐久、世界资源、再生期限、金币/经验或玩家档案，当前玩家v4与合法旧档迁移归[资源与数据](DataResources.md)。
+死亡、断线/无本地Ghost、玩家或地图源变化、关闭面板、World/Scene停止或释放清掉未提交按钮请求；绑定释放同时清库存投影、滚动位置、鼠标按下标记及旧反馈。同一绑定内B或关闭按钮保留已应用的排序/筛选选择与搜索词，清本地未应用编辑/切换并释放文本焦点；重建有效绑定先按initiallyOpen及两默认模式初始化，默认关闭/type/all，原滚动归零；偏好启用且正式文件合法时再恢复已启用能力的选择/搜索词，不恢复开关、滚动或焦点。Close及Reset提交未保存的已应用偏好，未应用编辑/切换不提交。已经消费进原输入命令的请求仍由原服务器链处理，不通过关闭面板撤销已提交制作。面板不保存/修改库存、耐久、世界资源、再生期限、金币/经验或玩家档案，当前玩家v4与合法旧档迁移归[资源与数据](DataResources.md)。
 
 ## 【KNOWN ISSUES】静态核对与人工边界
 
@@ -127,4 +128,6 @@ v26/revision29的[地面合并](MapDropMerge.md)在已保存激活的丢弃物�
 
 v28/revision31排序筛选已落地，正常Unity编译、1078份非法配置拒绝/62组合法读取、64次隔离Editor Bake及44配置/Settings、0 GhostField静态核对通过。原输入19/G7/其他Ghost字段、玩家v4/世界v2与资源布局签名保持；用户已确认人工GamePlayer通过，范围限v28/revision31及[运行入口](Runtime.md)十六项，主线程结合既有静态核对判定通过；人工结论来自用户反馈，完整边界归[排序筛选](MapInventoryListView.md)。旧面板及部分拾取通过仍限各原版本/清单；AI未执行排序/筛选/库存Capture、面板/HUD/GUI、GamePlayer/PlayMode、逻辑单元测试、构建/发布、真实存档业务I/O、采样/图片或子Agent/Git提交，未实际触发的独立交互/时序、字体/排版/缩放、联网/生命周期及性能仍UNKNOWN。
 
-本阶段搜索配置、输入调用链与静态证据归[搜索](MapInventorySearch.md)：当前v29/revision32、51配置/Settings；人工GamePlayer十六项待验收，旧面板与排序筛选通过仍限各自原版本/清单。
+本阶段搜索配置、输入调用链与静态证据归[搜索](MapInventorySearch.md)：v29搜索阶段51配置/Settings；用户已确认人工GamePlayer通过，限v29/revision32及运行入口十六项，结论来自用户反馈；未实际触发的独立用例UNKNOWN，旧面板与排序筛选通过仍限各自原版本/清单。
+
+当前v30/revision33的[本机偏好](MapInventoryPreferences.md)新增四必填字段，配置/Settings各55；八现有脚本与三普通类、两JSON接入，原HUD/Binding与十九输入不变。正常编译、1612份非法配置拒绝/96组合法读取及98次隔离Editor Bake静态通过，原库存/工具/服务器保存保持；人工十六项待验收。

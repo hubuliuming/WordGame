@@ -20,6 +20,7 @@ namespace Code_01.CombatPrototype.Map
         public string Label { get; private set; }
         public string NoResultsText { get; private set; }
         public uint Revision { get; private set; }
+        public string AppliedText => _applied;
         public bool HasQuery => Enabled && _query.Length != 0;
         public int RowCount => Enabled ? 2 : 0;
         public bool BlocksKeyboard => Enabled && (_focused || _focusRequested || _keyboardFrame == Time.frameCount);
@@ -103,6 +104,15 @@ namespace Code_01.CombatPrototype.Map
                 }
             }
             finally { GUI.enabled = oldEnabled; }
+        }
+
+        // 绑定时使用当前长度限制恢复文本，不聚焦、不排队编辑或直接写文件。
+        public void Restore(string text)
+        {
+            _draft = _applied = CleanInput(text);
+            _query = _applied.Trim();
+            _pending = false;
+            Revision = unchecked(Revision + 1);
         }
 
         public bool ApplyPending()

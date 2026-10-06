@@ -54,8 +54,8 @@ namespace Code_01.CombatPrototype.Map
             ValidateInventoryCapacityUpgrade(map.inventoryCapacityUpgrade, map.inventoryCapacity);
             ValidateInventoryDrop(map.inventoryDrop);
             Id(map.mapDefinitionId, "mapDefinitionId");
-            if (map.schemaVersion != 29 || map.configRevision < 1 || map.defaultSeed < 1)
-                throw new InvalidOperationException("Map requires schemaVersion=29, positive revision and seed.");
+            if (map.schemaVersion != 30 || map.configRevision < 1 || map.defaultSeed < 1)
+                throw new InvalidOperationException("Map requires schemaVersion=30, positive revision and seed.");
             var drops = map.drops;
             Id(drops.itemId, "drops.itemId");
             Id(drops.visualResourceKey, "drops.visualResourceKey");
@@ -605,6 +605,8 @@ namespace Code_01.CombatPrototype.Map
             HudLabel(panel.searchPlaceholderLabel, "inventoryPanel.searchPlaceholderLabel");
             HudLabel(panel.clearSearchLabel, "inventoryPanel.clearSearchLabel");
             HudLabel(panel.noSearchResultsLabel, "inventoryPanel.noSearchResultsLabel");
+            Id(panel.preferencesFileId, "inventoryPanel.preferencesFileId");
+            Positive(panel.preferencesSaveDelaySeconds, "inventoryPanel.preferencesSaveDelaySeconds");
         }
 
         private static void HudLabel(string value, string field)

@@ -1,6 +1,6 @@
 # 背包材料搜索
 
-返回[地图](Map.md)、[背包](Inventory.md)、[B面板](MapInventoryPanel.md)、[排序筛选](MapInventoryListView.md)、[容量](MapInventoryCapacity.md)、[丢弃](MapInventoryDrop.md)、[配置](DataResources.md)、[玩家输入](Player.md)与[运行入口](Runtime.md)。入口CombatPrototypeNetCode；Forest/Grassland Json/BuiltIn当前schemaVersion=29/configRevision=32。主线程实现、正常编译、严格配置读取和隔离Editor Bake静态核对通过；本阶段十六项GamePlayer人工验收待完成。旧排序筛选用户通过限v28/revision31十六项，其他旧通过保持原版本/清单。
+返回[地图](Map.md)、[背包](Inventory.md)、[B面板](MapInventoryPanel.md)、[排序筛选](MapInventoryListView.md)、[容量](MapInventoryCapacity.md)、[丢弃](MapInventoryDrop.md)、[配置](DataResources.md)、[玩家输入](Player.md)与[运行入口](Runtime.md)。入口CombatPrototypeNetCode；Forest/Grassland Json/BuiltIn当前schemaVersion=30/configRevision=33；[本机偏好](MapInventoryPreferences.md)静态核对通过、人工待验收。主线程实现、正常编译、严格配置读取和隔离Editor Bake静态核对通过；用户已确认本阶段人工GamePlayer验收通过，主线程结合既有静态核对与用户反馈判定通过，限CombatPrototypeNetCode、v29/revision32及运行入口十六项清单；人工结论来自用户反馈。旧排序筛选用户通过限v28/revision31十六项，其他旧通过保持原版本/清单。
 
 ## 【FACT】文件与配置
 
@@ -13,7 +13,7 @@
 | 客户端采样调用链 | [Binding](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapInteractionHudBindingSystem.cs)→[HUD](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapInteractionHud.cs)→Panel；[PlayerInput](../../Assets/Scripts/CombatPrototype/Networking/CombatPrototypePlayerInput.cs)消费blocksKeyboard |
 | 显式配置 | [Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) |
 
-十一现有脚本、一新普通Search类及Unity正常生成meta、两JSON接入；Search非MonoBehaviour，没有新组件类型/挂载或Scene/SubScene/Prefab/Animator/旧meta/资源/字体/包/构建结构变更。Input十九字段、Ghost及存档布局保持。
+v29搜索阶段十一现有脚本、一新普通Search类及Unity正常生成meta、两JSON接入；Search非MonoBehaviour，没有新组件类型/挂载或Scene/SubScene/Prefab/Animator/旧meta/资源/字体/包/构建结构变更。Input十九字段、Ghost及存档布局保持。
 
 inventoryPanel原44字段保留，新增七项均必填：
 
@@ -27,7 +27,7 @@ inventoryPanel原44字段保留，新增七项均必填：
 | clearSearchLabel | Clear | 清空按钮文案 |
 | noSearchResultsLabel | No search results | 完整库存非空且有效搜索无可见行时显示 |
 
-DTO共51字段：六bool、五float、两int、两模式string、36文案string；原Settings对应六byte、五float、两int、两byte枚举、36 FixedString64Bytes，0 GhostField且无GhostComponent。四新文案沿非空白、无控制字符与最多61 UTF-8字节规则；即使关闭搜索、面板或全部显示仍校验所有字段。原Reader保留UTF-8/形状/缺失/null/错类型/未知或重复键检查，当前只接受schema29和正revision/seed，旧v1～v28拒绝，无补默认、来源回退或热重载。正常导入/烘焙后生效，各端同版代码/配置并重新烘焙。
+当前DTO共55字段：八bool、六float、两int、两模式string、36文案string及一偏好文件ID；原Settings对应八byte、六float、两int、两byte枚举、37 FixedString64Bytes，0 GhostField且无GhostComponent。四新文案沿非空白、无控制字符与最多61 UTF-8字节规则；即使关闭搜索、面板或全部显示仍校验所有字段。原Reader保留UTF-8/形状/缺失/null/错类型/未知或重复键检查，当前只接受schema30和正revision/seed，旧v1～v29拒绝，无补默认、来源回退或热重载。正常导入/烘焙后生效，各端同版代码/配置并重新烘焙。
 
 ## 【CURRENT STRATEGY】本地文本与列表投影
 
@@ -49,11 +49,11 @@ Drop/All仍按真实Row.Name解析稳定Kind/Mode；搜索重建造成行身份/
 
 Enter/小键盘Enter/Esc释放编辑焦点，活跃IME compositionString非空时保留候选处理键；之后B关闭。点击其他面板区域释放焦点，沿原面板内鼠标隔离；点击面板外释放焦点并消费该次左键，避免同时Attack，释放帧键盘仍屏蔽。其余原鼠标攻击/镜头滚轮及面板有效按钮请求保持。原键盘指针可空，不查找组件兜底。
 
-同一有效绑定Close保留已应用查询，draft回退到applied并清pending、释放焦点和滚动，重开继续查询且不自动编辑。逐帧HUD.Clear/Panel.Clear只隐藏当次显示，避免清编辑；死亡/断线、无所属Ghost/有效连接、源或玩家变化、World/Scene停止释放沿Reset清全部搜索文本/Revision/焦点/按下帧和GUI样式。GUI焦点只在Draw释放，隐藏也可清自己的控制；新绑定Configure为空查询并按原initiallyOpen/默认模式初始化。搜索状态仅当前客户端绑定所有，不保存、复制给其他玩家或跨绑定继承。
+同一有效绑定Close保留已应用查询，draft回退到applied并清pending、释放焦点和滚动，重开继续查询且不自动编辑。逐帧HUD.Clear/Panel.Clear只隐藏当次显示，避免清编辑；死亡/断线、无所属Ghost/有效连接、源或玩家变化、World/Scene停止释放沿Reset先提交待保存的已应用偏好，再清全部搜索文本/Revision/焦点/按下帧和GUI样式。GUI焦点只在Draw释放，隐藏也可清自己的控制；新绑定先按原initiallyOpen/默认模式与空查询初始化；[偏好](MapInventoryPreferences.md)启用、允许保存搜索且搜索能力开启时，再读取合法正式文件的文本，经当前CleanInput长度限制恢复且不聚焦。载入截断不触发写回；焦点/滚动/面板开关不保存，查询不入网络或玩家/世界档案。
 
 ## 【KNOWN ISSUES】静态证据与人工边界
 
-正常Unity刷新/编译完成，当前C# Error为0；Search普通类、51配置/Settings、0 GhostField与两byte模式已在当前程序集核对。编译后Console保留原警告及PEListener、DOTween、MCP连接警告；隔离Bake前后均[0 Error,9 Warning,47 Log]，没有新增Bake警告，未清空Console。
+以下静态证据限v29/revision32搜索阶段，当前偏好静态及人工边界归[偏好](MapInventoryPreferences.md)。该阶段正常Unity刷新/编译完成，C# Error为0；Search普通类、51配置/Settings、0 GhostField与两byte模式已在当前程序集核对。编译后Console保留原警告及PEListener、DOTween、MCP连接警告；隔离Bake前后均[0 Error,9 Warning,47 Log]，没有新增Bake警告，未清空Console。
 
 1410份非法配置全部拒绝（每地图705），76组合法读取通过（每地图38）：完整51字段形状/类型/重复键，二开关错误标量，长度0/负数/65/int极值/浮点字面量，四文案空白/控制字符/62字节与中文超限，关闭仍必填/验证，旧v1～v28、未来版本以及全部原模式/部分拾取/合并/几何约束。合法含Json/BuiltIn等价、四开关组合、1/64长度边界、61字节/中文文案、原三排序×四分类、模式/面板/全部显示或其他功能关闭及定义/等级换序。仅执行配置Reader/Validator，没有调用搜索/排序/库存/焦点/GUI业务作为测试。
 
@@ -61,4 +61,4 @@ Enter/小键盘Enter/Esc释放编辑焦点，活跃IME compositionString非空�
 
 Input19、DropGhost4、Tools3、F4/G7/资源状态4/世界保存3与原结果组件、玩家v4根7/工具项3、世界v2根9/掉落项8保持。服务器采集/拾取/丢弃/制作/修理/升级/保存、Ghost Serializer和Camera脚本保持，只有原客户端键盘采样链按本地编辑状态隔离。
 
-原403项人工内容/编号保留，追加本阶段十六项，共419项，归[运行入口](Runtime.md)，当前待GamePlayer人工验收。IME实际输入/候选键、粘贴/代理边界、焦点切换帧、GUI事件/排版/字形/缩放/点击/滚动、多人/联网/预测/重绑与性能/平台/线上均UNKNOWN，未把静态核对当人工通过。AI未调用Search匹配/清理/ApplyPending/焦点输入、ListView/库存Capture、面板/HUD/GUI、GamePlayer/PlayMode、逻辑单元测试、真实存档业务I/O、命令行构建/发布、性能采样或图片；未创建子Agent/提交Git。
+原403项人工内容/编号保留，追加本阶段十六项，共419项，归[运行入口](Runtime.md)，用户已确认本阶段人工GamePlayer通过，主线程结合既有静态核对判定通过，限CombatPrototypeNetCode、v29/revision32及十六项清单，结论来自用户反馈；未实际触发的独立IME输入/候选键、粘贴/代理边界、焦点切换帧、GUI事件/排版/字形/缩放/点击/滚动、多人/联网/预测/重绑及性能/平台/线上仍UNKNOWN。AI未调用Search匹配/清理/ApplyPending/焦点输入、ListView/库存Capture、面板/HUD/GUI、GamePlayer/PlayMode、逻辑单元测试、真实存档业务I/O、命令行构建/发布、性能采样或图片；未创建子Agent/提交Git。

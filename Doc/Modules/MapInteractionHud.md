@@ -20,7 +20,7 @@
 
 ## 【FACT】当前 JSON 契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 为 schemaVersion=38/configRevision=41，interactionHud、[高亮](MapInteractionHighlight.md)、[G提示](MapPickupHud.md)、[工具配置](MapGatherTools.md)与[面板配置](MapInventoryPanel.md)均必填；interactionHud全部十个字段必填，沿原严格 UTF-8/字段/类型/重复键检查。旧 v1～v37 明确失败，不补默认段或回退来源；JSON 只在正常导入和烘焙后生效，无运行热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 为 schemaVersion=39/configRevision=42，interactionHud、[高亮](MapInteractionHighlight.md)、[G提示](MapPickupHud.md)、[工具配置](MapGatherTools.md)与[面板配置](MapInventoryPanel.md)均必填；interactionHud全部十个字段必填，沿原严格 UTF-8/字段/类型/重复键检查。旧 v1～v38 明确失败，不补默认段或回退来源；JSON 只在正常导入和烘焙后生效，无运行热重载。
 
 | 字段 | 默认值 | 契约 |
 |---|---|---|
@@ -61,6 +61,10 @@ CombatPrototypeMapInteractionHudState 用 OwnerSendType=SendToOwner 同步给所
 NoSpace第一行显示noSpaceLabel、第二行显示F目标，不画进度；Ready 显示“F  文案”；Working 显示“文案  百分比%”和按千分比填充的进度条，整数百分比为 ProgressPermille/10。第二行读取所属工具缓冲显示对应名称/Level/本级耐久上限、Hands、3/4修理或Lv1重做提示（依耐久预警/修理开关），制作/修理反馈默认各2秒；F显示优先级为NoSpace>启动失败>完成/中断>修理>制作>工具状态；新F失败有Ready/Working目标时只替换第二行，Hidden时临时第一行显示且第二行空，成功启动清旧失败、默认2秒后恢复原工具颜色。原制作/修理无F目标时仍临时显示结果及对应工具；B页脚继续接收原修理/制作反馈。初次绑定只观察现有Sequence，不重播旧结果；只有反馈显示使用客户端unscaledTime。F面板仍只在Repaint绘制，库存列表/按钮委托[制作面板](MapInventoryPanel.md)处理GUI事件；B由客户端输入系统读取。缓存文案与样式，绘制后恢复GUI.matrix/color/enabled。F文字面板不显示掉落拾取提示、世界标记或再生倒计时；独立G面板归[拾取提示](MapPickupHud.md)，宿主先绘制[投影圆环](MapInteractionHighlight.md)再绘制原面板。
 
 资源采样错误按单项暴露地图、类型、布置索引、实体和原异常并继续；玩家帧错误按连接隔离，未生成有效快照者清为 Hidden。必需服务、地图 Settings、HUD 挂载或本地 HUD 数据缺失明确报错，不查找节点、不创建替代组件或默认配置；非法非隐藏网络快照明确报错并保持隐藏。
+
+## 【CURRENT STRATEGY】配方分类关联
+
+当前v39/revision42的[配方筛选](MapInventoryRecipeFilter.md)只控制B配方显示、切换取消及行数；材料与工具状态、原输入/事务/存档链保持。分类不写偏好v3，完整契约与本阶段待人工范围归专题；既有通过限原版本/清单。
 
 ## 【KNOWN ISSUES】静态核对与人工边界
 
@@ -120,15 +124,15 @@ v26/revision29的[地面合并](MapDropMerge.md)通过原掉落Quantity/Phase及
 
 ## 【FACT】G可领取量投影
 
-当前v38/revision41的[部分拾取](MapDropPartialPickup.md)在原G所属快照增加PickupQuantity；原绑定整体传递该struct，宿主/高亮/面板布局与F/B优先级保持。G显示本次可领量/地面量或零余量NoSpace，实际结果仍暂时覆盖Ready目标；全部显示关闭只关闭展示。输入19、F4/资源状态4及原结果字段保持，静态及用户人工通过限v27/revision30十六项，未触发独立用例UNKNOWN。
+当前v39/revision42的[部分拾取](MapDropPartialPickup.md)在原G所属快照增加PickupQuantity；原绑定整体传递该struct，宿主/高亮/面板布局与F/B优先级保持。G显示本次可领量/地面量或零余量NoSpace，实际结果仍暂时覆盖Ready目标；全部显示关闭只关闭展示。输入19、F4/资源状态4及原结果字段保持，静态及用户人工通过限v27/revision30十六项，未触发独立用例UNKNOWN。
 
 ## 【FACT】B列表本地排序筛选
 
-当前v38/revision41的[排序筛选](MapInventoryListView.md)沿原绑定整体传递InventoryPanelSettings到宿主/Panel；v28排序筛选阶段原绑定、Main Camera组件和输入系统代码保持。Panel.Show在完整库存Capture后应用本地模式并缓存可见行，原GUI滚动区新增0～2控制行；F/G提示、高亮、资源/世界保存状态和原所属反馈布局保持。关闭保留该绑定已应用选择，死亡/断线/源或玩家变化及World/Scene释放沿原Reset清缓存；新绑定先配置默认，再由[本机偏好](MapInventoryPreferences.md)恢复启用能力的合法选择。静态及用户人工通过限v28/revision31十六项，人工结论来自用户反馈；未实际触发的独立GUI事件/字体/排版/联网时序仍UNKNOWN。
+当前v39/revision42的[排序筛选](MapInventoryListView.md)沿原绑定整体传递InventoryPanelSettings到宿主/Panel；v28排序筛选阶段原绑定、Main Camera组件和输入系统代码保持。Panel.Show在完整库存Capture后应用本地模式并缓存可见行，原GUI滚动区新增0～2控制行；F/G提示、高亮、资源/世界保存状态和原所属反馈布局保持。关闭保留该绑定已应用选择，死亡/断线/源或玩家变化及World/Scene释放沿原Reset清缓存；新绑定先配置默认，再由[本机偏好](MapInventoryPreferences.md)恢复启用能力的合法选择。静态及用户人工通过限v28/revision31十六项，人工结论来自用户反馈；未实际触发的独立GUI事件/字体/排版/联网时序仍UNKNOWN。
 
 ## 【FACT】B搜索输入隔离
 
-当前v38/revision41的[搜索](MapInventorySearch.md)在原Binding.ReadPanelInput→HUD.ReadPanelInput→Panel.ReadInput传递本地blocksKeyboard；原有效地图、存活所属Ghost/Connected/InGame检查保持。PlayerInput先采样面板再按焦点决定是否采样键盘，十九字段及原Ghost/反馈布局保持。Show在完整Snapshot之后应用待处理搜索、分类交集及排序；逐帧Clear只隐藏展示，不清编辑状态，原Reset绑定失效时清搜索。文本焦点只在原OnGUI读取/设置/释放，无新宿主或组件。搜索静态及用户人工GamePlayer通过，限v29/revision32及运行入口十六项，结论来自用户反馈；未实际触发的独立GUI/焦点/联网用例UNKNOWN，v28排序筛选通过不覆盖搜索。
+当前v39/revision42的[搜索](MapInventorySearch.md)在原Binding.ReadPanelInput→HUD.ReadPanelInput→Panel.ReadInput传递本地blocksKeyboard；原有效地图、存活所属Ghost/Connected/InGame检查保持。PlayerInput先采样面板再按焦点决定是否采样键盘，十九字段及原Ghost/反馈布局保持。Show在完整Snapshot之后应用待处理搜索、分类交集及排序；逐帧Clear只隐藏展示，不清编辑状态，原Reset绑定失效时清搜索。文本焦点只在原OnGUI读取/设置/释放，无新宿主或组件。搜索静态及用户人工GamePlayer通过，限v29/revision32及运行入口十六项，结论来自用户反馈；未实际触发的独立GUI/焦点/联网用例UNKNOWN，v28排序筛选通过不覆盖搜索。
 
 v30/revision33保存阶段的[本机偏好](MapInventoryPreferences.md)复用原Configure传递的mapDefinitionId与完整Settings，原Binding/HUD脚本不变。Panel在ListView应用选择/搜索之后观察已应用状态，Close/Reset提交待保存值，逐帧Clear仍只隐藏；输入、F/G目标、反馈和游戏存档布局保持。静态核对通过，新增十六项人工已获用户通过反馈，范围见[运行入口](Runtime.md)，未实际触发的独立用例仍UNKNOWN。
 
@@ -160,4 +164,4 @@ v37/revision40提示阶段的[收藏材料消耗提示](MapInventoryFavoritesCon
 
 ## 【CURRENT STRATEGY】收藏材料消耗确认
 
-当前v38/revision41的[收藏材料消耗确认](MapInventoryFavoritesConsumptionConfirm.md)仅处理原B七个制作/修理/容量与工具升级按钮。首次有效按钮请求命中已应用收藏木石的正成本时暂存一个操作，在配方内显示数量提示，以Confirm/Cancel替换原按钮行；确认按最新已捕获候选和本地Revision复核后沿原请求提交一次，取消/关闭B/相关数量、等级、耐久、配方或已应用收藏变化/绑定失效清待确认。逐帧Clear仅隐藏，确认目标或高度变化清旧面板与行鼠标许可。确认独立于原消耗提示开关；数字1～7保持原直达链，偏好v3七字段、输入19、Ghost/服务器与保存入口保持。本阶段十六项人工GamePlayer待验收，已验收提示仍限v37/revision40，全部旧通过保持原版本/清单。
+当前v39/revision42的[收藏材料消耗确认](MapInventoryFavoritesConsumptionConfirm.md)仅处理原B七个制作/修理/容量与工具升级按钮。首次有效按钮请求命中已应用收藏木石的正成本时暂存一个操作，在配方内显示数量提示，以Confirm/Cancel替换原按钮行；确认按最新已捕获候选和本地Revision复核后沿原请求提交一次，取消/关闭B/相关数量、等级、耐久、配方或已应用收藏变化/绑定失效清待确认。逐帧Clear仅隐藏，确认目标或高度变化清旧面板与行鼠标许可。确认独立于原消耗提示开关；数字1～7保持原直达链，偏好v3七字段、输入19、Ghost/服务器与保存入口保持。本阶段十六项人工GamePlayer已获用户通过反馈，主线程结合既有静态核对判定通过，限CombatPrototypeNetCode、v38/revision41及运行入口清单，人工结论来自用户反馈；未实际触发的独立用例仍UNKNOWN，已验收提示仍限v37/revision40，全部旧通过保持原版本/清单。

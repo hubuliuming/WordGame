@@ -1019,3 +1019,16 @@
 - schemaVersion38/configRevision41、inventoryPanel89→93字段，追加一个严格bool与三条61 UTF-8字节文案，显式BuiltIn默认值及原根Baker映射；原89字段/顺序/值保持，关闭仍完整验证，无新输入/RPC/Ghost/保存字段或I/O入口，原资源结构保持。
 - 正常Unity编译/重载及93字段/类型/零GhostField/新普通类GUID/原协议元数据通过；3492份非法配置全部拒绝、334组合法读取与两地图各167次、共334次隔离Editor Bake完成，全部93Settings/原Settings/零反馈/引用/布局/签名符合检查。Console[0,7,53]→[0,5,53]→[0,7,53]，原警告保留、本次未重报原两编译警告，Bake新增两MCP连接工具警告；工具空失败返回后核实完整落盘结果和资源释放，未重跑业务。主场景干净、3根对象、单场景、未Play。
 - 增量同步相关模块、AI导航、消耗确认专题及外部模板第7节JSON/第47节；原547项人工内容与编号逐字保留，追加十六项后共563项。本阶段人工GamePlayer待验收；已验收提示限v37/revision40，各旧通过保持原范围，独立运行/GUI/真实I/O/联网/性能用例UNKNOWN。未执行逻辑单元测试、PlayMode/业务调用、命令行构建/发布或图片读取，未创建子Agent、暂存或提交Git。
+
+## 2026-10-06 收藏材料消耗确认人工验收通过
+
+- 用户明确反馈“我已验收通过”，主线程结合既有代码、配置/元数据及334次隔离Editor Bake静态核对，判定本阶段通过；范围限CombatPrototypeNetCode、v38/revision41和运行入口十六项清单，人工结论来自用户反馈，未实际触发的独立用例仍UNKNOWN，各旧通过保持原范围。
+- 同步消耗确认专题、运行清单、AI导航、相关模块及外部模板第47节的验收状态；保留原563项人工内容/编号、3492份非法配置拒绝/334组合法读取和Console/资源释放的原静态证据。外部容量段同步当前B配置93字段及第37～47节索引。
+- 本次仅文档更新，代码/JSON/Scene/SubScene/Prefab/Animator/全部meta与输入/存档布局保持；未补测GUI/业务/真实偏好或游戏存档I/O、GamePlayer/PlayMode、逻辑单元测试、命令行构建/发布、性能或图片，未创建子Agent、暂存或提交Git。
+
+## 2026-10-06 制作配方分类与筛选
+
+- 按用户确认方案在CombatPrototypeNetCode原B面板接入普通RecipeFilter辅助类/四模式byte枚举；材料行后追加全宽分类按钮，All/Craft/Repair/Upgrade控制原七项显隐。保持全部Capture、原按钮资格、材料/工具状态及数字1～7直达；分类变化清七个未消费B请求、待消耗确认与旧鼠标许可，滚动归零；Close保留同绑定类别，Reset view/新绑定恢复配置默认，逐帧Clear保持类别与待切换。
+- 六现有C#及两地图JSON修改；inventoryPanel追加七必填字段，schema38/revision41→schema39/revision42、93→100字段/69文案。分类开关严格bool，默认模式逐字all/craft/repair/upgrade，五文案沿非空白/控制字符/61 UTF-8字节验证；关闭仍验证。新C# meta由正常Unity导入生成，GUID=b11ee8ac85c058e4884416ea3c754db6；三预览/确认、原输入/Ghost/服务器、偏好v3/玩家v4/世界v2及所有资源结构保持。
+- 正常Unity编译、100字段/零GhostField/元数据核对通过；4034份非法配置拒绝、418组合法读取及两地图各209次、共418次隔离Editor Bake完成，原Settings/反馈/引用/布局/签名保持，临时资源释放，主场景干净/3根对象/单场景/未Play。初次自动导入旧DTO读新JSON产生两条未知字段异常，重载后重新导入两JSON/源SubScene无新增Error；另有Unity账号Token Exchange异常，三条历史Error保留。Console前[0,0,0]、编译/Bake前[3,2,0]、Bake及源重导入后[3,4,0]；保留原两编译警告及两MCP连接工具警告，空失败返回已核实完整落盘结果与释放。
+- 同步专题、关联Doc、导航、策划模板第7节Forest完整JSON与第48节；原563项人工内容/编号保留，追加十六项后579项。主线程实现/静态范围核对通过，人工GamePlayer待验收；旧确认用户通过限v38/revision41原清单。AI未执行GUI业务/真实偏好或游戏保存I/O、GamePlayer/PlayMode、逻辑单元测试、命令行构建/发布、性能或图片，未创建子Agent、暂存或提交Git。

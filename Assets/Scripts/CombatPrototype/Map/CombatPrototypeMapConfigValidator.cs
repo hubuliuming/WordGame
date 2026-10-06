@@ -54,8 +54,8 @@ namespace Code_01.CombatPrototype.Map
             ValidateInventoryCapacityUpgrade(map.inventoryCapacityUpgrade, map.inventoryCapacity);
             ValidateInventoryDrop(map.inventoryDrop);
             Id(map.mapDefinitionId, "mapDefinitionId");
-            if (map.schemaVersion != 38 || map.configRevision < 1 || map.defaultSeed < 1)
-                throw new InvalidOperationException("Map requires schemaVersion=38, positive revision and seed.");
+            if (map.schemaVersion != 39 || map.configRevision < 1 || map.defaultSeed < 1)
+                throw new InvalidOperationException("Map requires schemaVersion=39, positive revision and seed.");
             var drops = map.drops;
             Id(drops.itemId, "drops.itemId");
             Id(drops.visualResourceKey, "drops.visualResourceKey");
@@ -637,6 +637,12 @@ namespace Code_01.CombatPrototype.Map
             HudLabel(panel.favoritesConsumptionConfirmationLabel, "inventoryPanel.favoritesConsumptionConfirmationLabel");
             HudLabel(panel.favoritesConsumptionConfirmLabel, "inventoryPanel.favoritesConsumptionConfirmLabel");
             HudLabel(panel.favoritesConsumptionCancelLabel, "inventoryPanel.favoritesConsumptionCancelLabel");
+            CombatPrototypeMapInventoryRecipeFilter.ResolveMode(panel.defaultRecipeFilterMode);
+            HudLabel(panel.recipeFilterLabel, "inventoryPanel.recipeFilterLabel");
+            HudLabel(panel.allRecipesLabel, "inventoryPanel.allRecipesLabel");
+            HudLabel(panel.craftRecipesLabel, "inventoryPanel.craftRecipesLabel");
+            HudLabel(panel.repairRecipesLabel, "inventoryPanel.repairRecipesLabel");
+            HudLabel(panel.upgradeRecipesLabel, "inventoryPanel.upgradeRecipesLabel");
         }
 
         private static void HudLabel(string value, string field)

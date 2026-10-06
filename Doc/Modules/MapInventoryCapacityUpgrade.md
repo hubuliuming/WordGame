@@ -1,6 +1,6 @@
 # 背包容量扩展与升级
 
-返回[背包](Inventory.md)、[地图](Map.md)与[材料容量](MapInventoryCapacity.md)。本专题负责 CombatPrototypeNetCode 的个人永久容量等级、升级配方、所属反馈和 B/5 输入。玩家文件的唯一契约归[资源与数据](DataResources.md)，人工清单归[运行入口](Runtime.md)。当前地图 schemaVersion=38/configRevision=41；用户已确认人工GamePlayer通过，限v20/revision23升级十六项。
+返回[背包](Inventory.md)、[地图](Map.md)与[材料容量](MapInventoryCapacity.md)。本专题负责 CombatPrototypeNetCode 的个人永久容量等级、升级配方、所属反馈和 B/5 输入。玩家文件的唯一契约归[资源与数据](DataResources.md)，人工清单归[运行入口](Runtime.md)。当前地图 schemaVersion=39/configRevision=42；用户已确认人工GamePlayer通过，限v20/revision23升级十六项。
 
 ## 【FACT】入口与职责
 
@@ -80,6 +80,10 @@ inventoryCapacity.enabled=false 时 B 显示 Unlimited，F/G 原整批结算不�
 
 升级反馈只在本通道显示，客户端 unscaledTime 仅决定2秒期限。初次绑定只观察既有 Sequence，不重播旧结果；非法 Result 或 None搭配非零序号记录原异常并隐藏本反馈。关闭B清未提交请求和滚动位置；无有效玩家帧隐藏面板并清请求。死亡/断线及源/玩家/World/Scene变化沿原绑定Reset清投影、旧序号/文字/期限。等级永久状态由服务器/玩家档保留，不由显示清理重置；已进入 NetCode 命令的请求仍按服务端当次资格处理。
 
+## 【CURRENT STRATEGY】配方分类关联
+
+当前v39/revision42的[配方筛选](MapInventoryRecipeFilter.md)只控制B配方显示、切换取消及行数；材料与工具状态、原输入/事务/存档链保持。分类不写偏好v3，完整契约与本阶段待人工范围归专题；既有通过限原版本/清单。
+
 ## 【KNOWN ISSUES】静态与人工边界
 
 v20容量升级阶段正常Unity编译通过，输入17字段、当时玩家存储v3、等级和反馈的生成 Serializer/Snapshot；所属属性及全部新字段已核对。Forest/Grassland各11组隔离 Editor Bake，共22次：Json/BuiltIn默认、关闭容量、自定义基础容量/顺序/旧文案、分别关闭F/G/B、全部显示关闭及容量关闭组合、单独关闭升级、自定义两级上限/成本/顺序/七文案/反馈1.5秒。新 Settings/两级 Definition、Lv1/零反馈、原玩家/工具/三掉落 Prefab/显示与持久化初值符合，Json/BuiltIn等价。
@@ -118,4 +122,4 @@ v36/revision39保护阶段的[收藏保护](MapInventoryFavoritesDropProtection.
 
 ## 【CURRENT STRATEGY】配方消耗确认
 
-原CapacityUpgradePanel.Capture按实际当前级下一定义的木石成本、完整材料数、当前容量等级和同一Favorites捕获确认候选。原5面板按钮行可替换为Confirm/Cancel，数字5直达；关闭容量/升级、满级或材料不足沿原资格，容量/配方/所属反馈及完整候选保存保持。 单个待确认、取消条件与滚动/点击许可归[消耗确认](MapInventoryFavoritesConsumptionConfirm.md)。当前v38/revision41人工GamePlayer待验收；本专题旧通过及v37提示通过均保持各自原版本/清单。
+原CapacityUpgradePanel.Capture按实际当前级下一定义的木石成本、完整材料数、当前容量等级和同一Favorites捕获确认候选。原5面板按钮行可替换为Confirm/Cancel，数字5直达；关闭容量/升级、满级或材料不足沿原资格，容量/配方/所属反馈及完整候选保存保持。 单个待确认、取消条件与滚动/点击许可归[消耗确认](MapInventoryFavoritesConsumptionConfirm.md)。本阶段十六项人工GamePlayer已获用户通过反馈，主线程结合既有静态核对判定通过，限CombatPrototypeNetCode、v38/revision41及运行入口清单，人工结论来自用户反馈；未实际触发的独立用例仍UNKNOWN；本专题旧通过及v37提示通过均保持各自原版本/清单。

@@ -21,7 +21,7 @@
 
 ## 【FACT】当前配置契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=38/configRevision=41。resourcePersistence/geometry/layout/movement/drops/treeHarvest/mining/gatherTools/interactionHud/pickupHud/interactionHighlight/resourceStatusHud/worldSaveHud/inventoryPanel/inventoryDrop/population/spawn均必填；新增字段沿原严格UTF-8、对象形状、缺失/未知/重复字段与标量类型校验。旧v1～v37明确拒绝，不迁移、补默认或回退来源；正常导入/烘焙后生效，无热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=39/configRevision=42。resourcePersistence/geometry/layout/movement/drops/treeHarvest/mining/gatherTools/interactionHud/pickupHud/interactionHighlight/resourceStatusHud/worldSaveHud/inventoryPanel/inventoryDrop/population/spawn均必填；新增字段沿原严格UTF-8、对象形状、缺失/未知/重复字段与标量类型校验。旧v1～v38明确拒绝，不迁移、补默认或回退来源；正常导入/烘焙后生效，无热重载。
 
 | 配置位置/字段 | 默认值 | 校验或行为 |
 |---|---|---|
@@ -35,7 +35,7 @@
 | inventoryPanel.repairButtonLabel | Repair | 同上 |
 | inventoryPanel.fullDurabilityLabel | Full durability | 同上 |
 
-gatherTools根5字段、tools每条11字段，修理所用字段保持；当前inventoryPanel93字段/64文案、两模式ID及一偏好文件ID，新增展示项归[排序筛选](MapInventoryListView.md)、[搜索](MapInventorySearch.md)与[本机偏好](MapInventoryPreferences.md)，容量文案归[容量](MapInventoryCapacity.md)。关闭修理、工具或面板仍校验全部字段；不以开关补参数。0木材或0石材成本合法，但两者不可同时为0。工具ID、槽数、Lv1最大耐久60/40（升级后按本级上限）、制作配方木3石2/木2石3、成功消耗1/Lv1倍率0.75、原F/B/高亮默认值、三类600秒再生及地图空间/种子/32敌人/出生保持。
+gatherTools根5字段、tools每条11字段，修理所用字段保持；当前inventoryPanel100字段/69文案、三模式ID及一偏好文件ID，新增展示项归[排序筛选](MapInventoryListView.md)、[搜索](MapInventorySearch.md)与[本机偏好](MapInventoryPreferences.md)，容量文案归[容量](MapInventoryCapacity.md)。关闭修理、工具或面板仍校验全部字段；不以开关补参数。0木材或0石材成本合法，但两者不可同时为0。工具ID、槽数、Lv1最大耐久60/40（升级后按本级上限）、制作配方木3石2/木2石3、成功消耗1/Lv1倍率0.75、原F/B/高亮默认值、三类600秒再生及地图空间/种子/32敌人/出生保持。
 
 ## 【CURRENT STRATEGY】服务端资格与事务
 
@@ -68,6 +68,10 @@ Result依次为None、Success、Disabled、NotOwned、AlreadyFull、Insufficient
 反馈缓存只在所属Sequence变化时显示默认2秒，初次绑定只观察当前Sequence，不重播旧结果；使用客户端unscaledTime只决定文案期限，不恢复耐久或结算修理。无F目标时沿原F面板显示结果/对应工具，交互中保留原F第一行并在第二行显示结果；当前未到期修理结果优先于制作结果，B页脚仍先显示未到期丢弃结果。F文字关闭而B开启仍可看到修理反馈，全部显示关闭不关闭快捷键玩法。
 
 非法修理网络反馈在新缓存边界记录地图/Sequence/Kind/Result与原异常，只清修理反馈，原制作/F/G/B/圆环/资源状态保持；Configure/Reset清文案、观察序号、期限与工具身份。没有本地补耐久、按键自动重试、客户端保存或新的GameObject组件挂载。
+
+## 【CURRENT STRATEGY】配方分类关联
+
+当前v39/revision42的[配方筛选](MapInventoryRecipeFilter.md)只控制B配方显示、切换取消及行数；材料与工具状态、原输入/事务/存档链保持。分类不写偏好v3，完整契约与本阶段待人工范围归专题；既有通过限原版本/清单。
 
 ## 【KNOWN ISSUES】静态证据与人工边界
 
@@ -113,4 +117,4 @@ v36/revision39保护阶段的[收藏保护](MapInventoryFavoritesDropProtection.
 
 ## 【CURRENT STRATEGY】配方消耗确认
 
-原RepairPanel.Capture在有效预览更新时，将实际级修理正成本、材料数、等级、耐久、上限和同一已应用Favorites捕获到Panel持有的确认辅助类。原两修理配方各按稳定操作标识绘制确认行和按钮，沿原3/4面板请求消费；数字3/4保持直达，CanRepair/恢复值/服务端保存保持。 单个待确认、取消条件与滚动/点击许可归[消耗确认](MapInventoryFavoritesConsumptionConfirm.md)。当前v38/revision41人工GamePlayer待验收；本专题旧通过及v37提示通过均保持各自原版本/清单。
+原RepairPanel.Capture在有效预览更新时，将实际级修理正成本、材料数、等级、耐久、上限和同一已应用Favorites捕获到Panel持有的确认辅助类。原两修理配方各按稳定操作标识绘制确认行和按钮，沿原3/4面板请求消费；数字3/4保持直达，CanRepair/恢复值/服务端保存保持。 单个待确认、取消条件与滚动/点击许可归[消耗确认](MapInventoryFavoritesConsumptionConfirm.md)。本阶段十六项人工GamePlayer已获用户通过反馈，主线程结合既有静态核对判定通过，限CombatPrototypeNetCode、v38/revision41及运行入口清单，人工结论来自用户反馈；未实际触发的独立用例仍UNKNOWN；本专题旧通过及v37提示通过均保持各自原版本/清单。

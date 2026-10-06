@@ -355,7 +355,14 @@ namespace Code_01.CombatPrototype.Map
                     FavoritesConsumptionConfirmationEnabled = (byte)(inventoryPanel.favoritesConsumptionConfirmationEnabled ? 1 : 0),
                     FavoritesConsumptionConfirmationLabel = new FixedString64Bytes(inventoryPanel.favoritesConsumptionConfirmationLabel),
                     FavoritesConsumptionConfirmLabel = new FixedString64Bytes(inventoryPanel.favoritesConsumptionConfirmLabel),
-                    FavoritesConsumptionCancelLabel = new FixedString64Bytes(inventoryPanel.favoritesConsumptionCancelLabel)
+                    FavoritesConsumptionCancelLabel = new FixedString64Bytes(inventoryPanel.favoritesConsumptionCancelLabel),
+                    RecipeFilterEnabled = (byte)(inventoryPanel.recipeFilterEnabled ? 1 : 0),
+                    DefaultRecipeFilterMode = CombatPrototypeMapInventoryRecipeFilter.ResolveMode(inventoryPanel.defaultRecipeFilterMode),
+                    RecipeFilterLabel = new FixedString64Bytes(inventoryPanel.recipeFilterLabel),
+                    AllRecipesLabel = new FixedString64Bytes(inventoryPanel.allRecipesLabel),
+                    CraftRecipesLabel = new FixedString64Bytes(inventoryPanel.craftRecipesLabel),
+                    RepairRecipesLabel = new FixedString64Bytes(inventoryPanel.repairRecipesLabel),
+                    UpgradeRecipesLabel = new FixedString64Bytes(inventoryPanel.upgradeRecipesLabel)
                 });
                 var inventoryDrop = config.map.inventoryDrop;
                 AddComponent(entity, new CombatPrototypeMapInventoryDropSettings

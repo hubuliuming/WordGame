@@ -21,7 +21,7 @@
 
 ## 【FACT】JSON 契约与当前默认值
 
-[battle_forest_01.json](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[battle_grassland_01.json](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn来源](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)均为schemaVersion=38/configRevision=41，drops必填，工具配置归[采集工具](MapGatherTools.md)。原空间、移动、出生及drops/grounds值保持；mining与生态矿点字段归采矿专题，tree_normal/gather_apple/mine_rock均默认600秒再生。配置只在烘焙时读取，不支持热重载；各端须相同版本、输入布局与资源，未新增一致性协议。
+[battle_forest_01.json](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[battle_grassland_01.json](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn来源](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)均为schemaVersion=39/configRevision=42，drops必填，工具配置归[采集工具](MapGatherTools.md)。原空间、移动、出生及drops/grounds值保持；mining与生态矿点字段归采矿专题，tree_normal/gather_apple/mine_rock均默认600秒再生。配置只在烘焙时读取，不支持热重载；各端须相同版本、输入布局与资源，未新增一致性协议。
 
 | 字段 | 默认值 | 校验/行为 |
 |---|---|---|
@@ -71,6 +71,10 @@ lifetimeSeconds>0 时 ExpiresAt=生成时的 Server World 模拟时间+寿命；
 [DroppedApple.prefab](../../Assets/Prefabs/CombatPrototype/Map/DroppedApple.prefab) 的稳定键为 drop_apple，新单根含 Transform/MeshFilter/MeshRenderer/GhostAuthoringComponent/DropAuthoring 及 Ghost 必需的 LinkedEntityGroupAuthoring；无子节点、Collider、Animator、Owner 或 AutoCommandTarget，只支持 Interpolated，优化模式为 Dynamic。复用原 GatherApple.asset 和 GatherApple.mat，未新建或改写网格/材质，种植 GatherApple.prefab 保持。
 
 Tools/CombatPrototype/地图 下的“生成第六阶段掉落资源”只创建明确的新 Prefab 路径，资源已存在时拒绝覆盖；“绑定第六阶段掉落物”要求原唯一 CombatPrototypeNetworkRoot、MapAuthoring/Spawner、完整资源及干净 SubScene，先检查两种配置与布局，再仅追加一个 drop_apple 引用，已绑定时拒绝重复执行。资源创建使用临时 Editor 场景，绑定只保存原网络 SubScene。新脚本/Prefab 的 meta 由 Unity 正常导入生成，原主场景、玩家/敌人及采集 Prefab、Animator、旧 meta、包与构建设置保持。
+
+## 【CURRENT STRATEGY】配方分类关联
+
+当前v39/revision42的[配方筛选](MapInventoryRecipeFilter.md)只控制B配方显示、切换取消及行数；材料与工具状态、原输入/事务/存档链保持。分类不写偏好v3，完整契约与本阶段待人工范围归专题；既有通过限原版本/清单。
 
 ## 【KNOWN ISSUES】验收与未接入边界
 
@@ -140,4 +144,4 @@ v25/revision28阶段的[拾取反馈](MapPickupFeedbackHud.md)仅发布原G实�
 
 ## 【FACT】同类地面合并接入
 
-当前v38/revision41必填[合并](MapDropMerge.md)四字段，默认开启/0.8米/99份/0.2秒；服务端在Motion后、G前只扫描当前源已登记Landed未到期物，按编号升序合入较小编号的最近合格同物品堆。保留目标编号/位置，整份数量相加，超限不拆分，有限寿命取最早到期、永久仅与永久合并；新物可能更早到期。来源Consumed沿原Cleanup释放，非到期清理日志为Consumed，G日志包含实际领取量及地面余量。G接收数量按[部分拾取](MapDropPartialPickup.md)开关计算，原四掉落GhostField、世界v2快照/编号上限及原寿命/高亮保持；合并不入包或发布拾取结果。合并v26阶段编译/194份非法配置拒绝/28组合法读取/64次隔离Bake静态通过；用户已确认合并人工GamePlayer通过，主线程结合既有静态核对判定通过，限v26/revision29十六项，未触发独立用例UNKNOWN；旧G结果通过仍限v25/revision28十六项。
+当前v39/revision42必填[合并](MapDropMerge.md)四字段，默认开启/0.8米/99份/0.2秒；服务端在Motion后、G前只扫描当前源已登记Landed未到期物，按编号升序合入较小编号的最近合格同物品堆。保留目标编号/位置，整份数量相加，超限不拆分，有限寿命取最早到期、永久仅与永久合并；新物可能更早到期。来源Consumed沿原Cleanup释放，非到期清理日志为Consumed，G日志包含实际领取量及地面余量。G接收数量按[部分拾取](MapDropPartialPickup.md)开关计算，原四掉落GhostField、世界v2快照/编号上限及原寿命/高亮保持；合并不入包或发布拾取结果。合并v26阶段编译/194份非法配置拒绝/28组合法读取/64次隔离Bake静态通过；用户已确认合并人工GamePlayer通过，主线程结合既有静态核对判定通过，限v26/revision29十六项，未触发独立用例UNKNOWN；旧G结果通过仍限v25/revision28十六项。

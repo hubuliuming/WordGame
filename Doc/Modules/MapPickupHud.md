@@ -21,7 +21,7 @@ v11/14阶段五个新脚本及meta、v17/20寿命接入两个普通助手及meta
 
 ## 【FACT】当前 JSON 契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为 schemaVersion=38/configRevision=41，pickupHud段及全部18字段必填，[interactionHighlight](MapInteractionHighlight.md)亦为必填地图段。沿原严格 UTF-8/缺失/未知/重复字段/类型和语义校验；旧 v1～v37 明确失败，不迁移、补默认段或回退来源。正常导入/烘焙后生效，没有运行热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为 schemaVersion=39/configRevision=42，pickupHud段及全部18字段必填，[interactionHighlight](MapInteractionHighlight.md)亦为必填地图段。沿原严格 UTF-8/缺失/未知/重复字段/类型和语义校验；旧 v1～v38 明确失败，不迁移、补默认段或回退来源。正常导入/烘焙后生效，没有运行热重载。
 
 | 字段 | 当前默认值 | 契约 |
 |---|---|---|
@@ -78,6 +78,10 @@ NoSpace第一行将Pick up替换为noSpaceLabel，保留原物品/实际数量�
 默认G为400×84、底距168、字号20；资源状态行400×52的底距由236改268，保持与G间隔16像素，F仍320×104/底48。两行各字号+4高、间隔8，整体垂直居中；寿命关闭沿单行G路径，默认配置高度仍84，可显式配置52并同步状态底距236。Hidden收起原目标与寿命；有效[拾取反馈](MapPickupFeedbackHud.md)仍按其期限显示。沿1920×1080参考像素等比缩放、黑底alpha0.7、普通白字、内置GUI字体和Texture2D.whiteTexture、richText=false；只在父G面板的Repaint委托绘制，缓存稳定文案/样式并恢复GUI.matrix/color，不消费键鼠事件。
 
 pickupHud.enabled、interactionHud.enabled、inventoryPanel.enabled与interactionHighlight的主开关/F/G通道独立。关闭G文字仍可显示G高亮和实际拾取；关闭F HUD和背包面板仍可只显示G。三文字全关、无高亮通道且资源状态/存档HUD均关闭时原绑定收起，键盘原玩法继续。死亡/断线、无本地玩家或地图、玩家/地图源变化、World/Scene停止及释放沿原Clear/Reset清掉可见状态和缓存，不保留上一局目标。非法目标快照明确报错并保持G隐藏，不以默认标签伪装有效目标；非法[拾取结果](MapPickupFeedbackHud.md)只清结果通道，原有效目标/寿命保持。Clear逐帧隐藏，Reset清目标与新增结果观察/期限。
+
+## 【CURRENT STRATEGY】配方分类关联
+
+当前v39/revision42的[配方筛选](MapInventoryRecipeFilter.md)只控制B配方显示、切换取消及行数；材料与工具状态、原输入/事务/存档链保持。分类不写偏好v3，完整契约与本阶段待人工范围归专题；既有通过限原版本/清单。
 
 ## 【KNOWN ISSUES】静态证据与人工边界
 

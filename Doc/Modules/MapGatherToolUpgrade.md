@@ -1,6 +1,6 @@
 # 采集工具升级与效率提升
 
-返回[采集工具](MapGatherTools.md)、[工具修理](MapToolRepair.md)与[材料面板](MapInventoryPanel.md)。本专题负责 CombatPrototypeNetCode 的工具 Lv1～Lv3、B/6/7 升级、有效耐久上限与采集耗时；玩家文件完整契约归[资源与数据](DataResources.md)，人工清单归[运行入口](Runtime.md)。当前地图 schemaVersion=38/configRevision=41，玩家存档 Version=4；用户已确认本阶段人工 GamePlayer 通过，主线程结合既有静态核对判定通过，限 v21/revision24 及[运行入口](Runtime.md)二十二项清单，结论来自用户反馈。未实际触发的独立边界仍为 UNKNOWN。背包升级及更早用户通过仍限各自原版本/清单。
+返回[采集工具](MapGatherTools.md)、[工具修理](MapToolRepair.md)与[材料面板](MapInventoryPanel.md)。本专题负责 CombatPrototypeNetCode 的工具 Lv1～Lv3、B/6/7 升级、有效耐久上限与采集耗时；玩家文件完整契约归[资源与数据](DataResources.md)，人工清单归[运行入口](Runtime.md)。当前地图 schemaVersion=39/configRevision=42，玩家存档 Version=4；用户已确认本阶段人工 GamePlayer 通过，主线程结合既有静态核对判定通过，限 v21/revision24 及[运行入口](Runtime.md)二十二项清单，结论来自用户反馈。未实际触发的独立边界仍为 UNKNOWN。背包升级及更早用户通过仍限各自原版本/清单。
 
 ## 【FACT】入口与职责
 
@@ -88,6 +88,10 @@ HUD统一校验所属工具ID/重复/Level/本级耐久上限，只读缓存四�
 
 按钮沿原可见有效绑定的鼠标按下标记提交一次；关闭B清待提交请求/滚动位置，已进入命令的请求由服务器判断。无有效帧、死亡/断线、玩家/地图源/World/Scene失效沿原Reset清投影/旧文字/序号/期限，不重置服务器工具。关闭B或全部显示不关闭数字6/7；客户端没有扣料、保级、恢复耐久或存档写入入口。原380×640、字号18/行高32、指针/滚轮隔离及F/G/高亮/资源状态显示规则保持。
 
+## 【CURRENT STRATEGY】配方分类关联
+
+当前v39/revision42的[配方筛选](MapInventoryRecipeFilter.md)只控制B配方显示、切换取消及行数；材料与工具状态、原输入/事务/存档链保持。分类不写偏好v3，完整契约与本阶段待人工范围归专题；既有通过限原版本/清单。
+
 ## 【KNOWN ISSUES】静态证据与人工范围
 
 正常Unity编译通过，实际新类型及生成Serializer/Snapshot核对工具三字段、升级反馈三字段及SendToOwner，输入19、玩家存储v4/根7/工具项3。新增配置根11/条目6、Settings10/Definition6×4和原F/G/世界/面板布局已核对。Forest/Grassland各11组隔离Editor Bake共22次：Json/BuiltIn默认、新升级关闭、工具关闭、分别B/F/G关闭、全部显示关闭、自定义四档最大值/倍率/木石成本/八文案/反馈1.75秒及平铺数组顺序、修理关闭、背包升级关闭。值/初值/原工具及三掉落Prefab对应，两个来源一致。
@@ -128,4 +132,4 @@ v36/revision39保护阶段的[收藏保护](MapInventoryFavoritesDropProtection.
 
 ## 【CURRENT STRATEGY】配方消耗确认
 
-原ToolUpgradePanel两ToolPreview在有效预览更新时，按实际当前级下一配方、材料数、等级、耐久、有效上限和同一Favorites捕获对应确认候选。原6/7面板按钮行可替换为Confirm/Cancel，数字6/7直达；原未持有/满级资格、升级保留绝对耐久和效率倍率、所属反馈/保存保持。 单个待确认、取消条件与滚动/点击许可归[消耗确认](MapInventoryFavoritesConsumptionConfirm.md)。当前v38/revision41人工GamePlayer待验收；本专题旧通过及v37提示通过均保持各自原版本/清单。
+原ToolUpgradePanel两ToolPreview在有效预览更新时，按实际当前级下一配方、材料数、等级、耐久、有效上限和同一Favorites捕获对应确认候选。原6/7面板按钮行可替换为Confirm/Cancel，数字6/7直达；原未持有/满级资格、升级保留绝对耐久和效率倍率、所属反馈/保存保持。 单个待确认、取消条件与滚动/点击许可归[消耗确认](MapInventoryFavoritesConsumptionConfirm.md)。本阶段十六项人工GamePlayer已获用户通过反馈，主线程结合既有静态核对判定通过，限CombatPrototypeNetCode、v38/revision41及运行入口清单，人工结论来自用户反馈；未实际触发的独立用例仍UNKNOWN；本专题旧通过及v37提示通过均保持各自原版本/清单。

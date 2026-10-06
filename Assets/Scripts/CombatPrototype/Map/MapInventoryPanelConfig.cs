@@ -98,5 +98,12 @@ namespace Code_01.CombatPrototype.Map
         public string favoritesConsumptionConfirmationLabel;
         public string favoritesConsumptionConfirmLabel;
         public string favoritesConsumptionCancelLabel;
+        public bool recipeFilterEnabled;
+        public string defaultRecipeFilterMode;
+        public string recipeFilterLabel;
+        public string allRecipesLabel;
+        public string craftRecipesLabel;
+        public string repairRecipesLabel;
+        public string upgradeRecipesLabel;
     }
 }

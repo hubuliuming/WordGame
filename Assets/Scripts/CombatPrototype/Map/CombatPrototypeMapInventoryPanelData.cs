@@ -98,5 +98,12 @@ namespace Code_01.CombatPrototype.Map
         public FixedString64Bytes FavoritesConsumptionConfirmationLabel;
         public FixedString64Bytes FavoritesConsumptionConfirmLabel;
         public FixedString64Bytes FavoritesConsumptionCancelLabel;
+        public byte RecipeFilterEnabled;
+        public CombatPrototypeMapInventoryRecipeFilterMode DefaultRecipeFilterMode;
+        public FixedString64Bytes RecipeFilterLabel;
+        public FixedString64Bytes AllRecipesLabel;
+        public FixedString64Bytes CraftRecipesLabel;
+        public FixedString64Bytes RepairRecipesLabel;
+        public FixedString64Bytes UpgradeRecipesLabel;
     }
 }

@@ -20,7 +20,7 @@
 
 ## 【FACT】JSON 契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为 schemaVersion=38/configRevision=41。新增必填 inventoryCapacity：
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为 schemaVersion=39/configRevision=42。新增必填 inventoryCapacity：
 
 ```json
 "inventoryCapacity": {
@@ -79,6 +79,10 @@ B 材料标题下显示 Capacity 当前总量/当前等级总上限，受管行�
 
 F/G/B 显示开关仍独立。无本地玩家、死亡、断线、玩家/地图源变化、World/Scene停止时沿原绑定清显示、投影和未提交按钮请求；没有新监听、客户端计时器或保存入口。提示仅代表最近所属快照，延迟或同 tick 其他入包可使显示与实际按键结果不同，服务端完成检查为准。F预约/完成、G及F/G采样均读取个人CapacityLevel；升级关闭保留已有等级上限，容量关闭显示Unlimited并禁用付费升级，永久等级仍保留。
 
+## 【CURRENT STRATEGY】配方分类关联
+
+当前v39/revision42的[配方筛选](MapInventoryRecipeFilter.md)只控制B配方显示、切换取消及行数；材料与工具状态、原输入/事务/存档链保持。分类不写偏好v3，完整契约与本阶段待人工范围归专题；既有通过限原版本/清单。
+
 ## 【KNOWN ISSUES】静态核对与人工边界
 
 正常 Unity 编译无 C# Error，四个新脚本/meta 与配置/Settings、原所属字段已核对。Forest/Grassland各覆盖 Json默认、BuiltIn默认、关闭容量、自定义150总量/71苹果/83木材/97石材及调整定义顺序/四文案、单独关闭F/G/B、全部显示关闭与容量关闭组合，共18次隔离 Editor Bake。新容量2字段Settings/3条三字段Definition、F10/G18/B30配置与Settings、玩家初值及既有工具/掉落/持久化参数符合；Json/BuiltIn等价。
@@ -95,6 +99,6 @@ v26/revision29的[地面合并](MapDropMerge.md)只改原地面数量/期限；G
 
 ## 【FACT】列表筛选与完整容量统计
 
-当前v38/revision41的[排序筛选](MapInventoryListView.md)只改变B材料列表可见行/顺序。Snapshot仍先校验全部原库存并统计受管苹果/木材/石材总量及当前等级上限，筛选资源时隐藏的苹果仍占容量；非法独立库存条目照原记录/跳过并置InventoryValid=false，筛选不能放开制作/修理/丢弃/升级资格。服务器F/G接收、部分拾取与容量等级/玩家保存链保持；静态及用户人工通过限v28/revision31十六项，人工结论来自用户反馈；未触发的独立用例UNKNOWN。
+当前v39/revision42的[排序筛选](MapInventoryListView.md)只改变B材料列表可见行/顺序。Snapshot仍先校验全部原库存并统计受管苹果/木材/石材总量及当前等级上限，筛选资源时隐藏的苹果仍占容量；非法独立库存条目照原记录/跳过并置InventoryValid=false，筛选不能放开制作/修理/丢弃/升级资格。服务器F/G接收、部分拾取与容量等级/玩家保存链保持；静态及用户人工通过限v28/revision31十六项，人工结论来自用户反馈；未触发的独立用例UNKNOWN。
 
 当前[搜索](MapInventorySearch.md)与分类取交集后再排序，仍只投影B材料可见行；完整Snapshot先校验全部库存并统计容量，隐藏材料继续参与受管总量与原配方/业务资格。搜索静态及用户人工GamePlayer通过，限v29/revision32及运行入口十六项，结论来自用户反馈；未实际触发的独立用例UNKNOWN。

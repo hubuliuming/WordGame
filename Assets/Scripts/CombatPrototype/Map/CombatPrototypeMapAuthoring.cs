@@ -333,7 +333,13 @@ namespace Code_01.CombatPrototype.Map
                     StoneDescriptionLabel = new FixedString64Bytes(inventoryPanel.stoneDescriptionLabel),
                     AppleDescriptionLabel = new FixedString64Bytes(inventoryPanel.appleDescriptionLabel),
                     MeatDescriptionLabel = new FixedString64Bytes(inventoryPanel.meatDescriptionLabel),
-                    MeatUsageLabel = new FixedString64Bytes(inventoryPanel.meatUsageLabel)
+                    MeatUsageLabel = new FixedString64Bytes(inventoryPanel.meatUsageLabel),
+                    FavoritesEnabled = (byte)(inventoryPanel.favoritesEnabled ? 1 : 0),
+                    FavoritesMaxCount = inventoryPanel.favoritesMaxCount,
+                    FavoriteButtonLabel = new FixedString64Bytes(inventoryPanel.favoriteButtonLabel),
+                    UnfavoriteButtonLabel = new FixedString64Bytes(inventoryPanel.unfavoriteButtonLabel),
+                    FavoriteTagLabel = new FixedString64Bytes(inventoryPanel.favoriteTagLabel),
+                    FavoritesFullLabel = new FixedString64Bytes(inventoryPanel.favoritesFullLabel)
                 });
                 var inventoryDrop = config.map.inventoryDrop;
                 AddComponent(entity, new CombatPrototypeMapInventoryDropSettings

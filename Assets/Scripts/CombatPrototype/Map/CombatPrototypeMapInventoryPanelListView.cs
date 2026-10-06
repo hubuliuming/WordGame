@@ -33,7 +33,7 @@ namespace Code_01.CombatPrototype.Map
         private readonly List<FixedString64Bytes> _previousNames = new List<FixedString64Bytes>();
         private CombatPrototypeMapInventorySortMode _sortMode;
         private CombatPrototypeMapInventoryFilterMode _filterMode;
-        private uint _revision, _searchRevision;
+        private uint _revision, _searchRevision, _favoritesRevision;
         private bool _hasSnapshot, _sortPending, _filterPending;
         private string _sortLabel, _originalLabel, _typeLabel, _quantityLabel;
         private string _filterLabel, _allLabel, _resourcesLabel, _suppliesLabel, _otherLabel;
@@ -109,7 +109,7 @@ namespace Code_01.CombatPrototype.Map
             UpdateLabels();
         }
 
-        public bool Capture(CombatPrototypeMapInventoryPanelSnapshot snapshot, CombatPrototypeMapInventoryPanelSearch search, out bool selectionChanged)
+        public bool Capture(CombatPrototypeMapInventoryPanelSnapshot snapshot, CombatPrototypeMapInventoryPanelSearch search, CombatPrototypeMapInventoryPanelFavorites favorites, out bool selectionChanged)
         {
             var searchChanged = search.ApplyPending();
             selectionChanged = _sortPending || _filterPending || searchChanged;
@@ -124,15 +124,18 @@ namespace Code_01.CombatPrototype.Map
                     CombatPrototypeMapInventoryFilterMode.All;
             ClearPending();
             if (selectionChanged) UpdateLabels();
-            if (_hasSnapshot && _revision == snapshot.Revision && _searchRevision == search.Revision && !selectionChanged) return false;
+            if (_hasSnapshot && _revision == snapshot.Revision && _searchRevision == search.Revision && _favoritesRevision == favorites.Revision && !favorites.HasPending && !selectionChanged) return false;
 
             _previousNames.Clear();
             foreach (var row in _items) _previousNames.Add(row.Name);
             _items.Clear();
             foreach (var row in snapshot.Items)
                 if (Matches(row.Name) && search.Matches(row)) _items.Add(row);
+            selectionChanged |= favorites.ApplyPending(_items);
             if (_sortMode == CombatPrototypeMapInventorySortMode.Type) _items.Sort(TypeComparison);
             else if (_sortMode == CombatPrototypeMapInventorySortMode.Quantity) _items.Sort(QuantityComparison);
+            favorites.Pin(_items);
+            favorites.CaptureLabels(_items);
 
             var identitiesChanged = _previousNames.Count != _items.Count;
             if (!identitiesChanged)
@@ -140,6 +143,7 @@ namespace Code_01.CombatPrototype.Map
                     if (!_previousNames[index].Equals(_items[index].Name)) { identitiesChanged = true; break; }
             _revision = snapshot.Revision;
             _searchRevision = search.Revision;
+            _favoritesRevision = favorites.Revision;
             _hasSnapshot = true;
             return identitiesChanged;
         }
@@ -215,7 +219,7 @@ namespace Code_01.CombatPrototype.Map
             _previousNames.Clear();
             SortEnabled = FilterEnabled = _hasSnapshot = false;
             ClearPending();
-            _revision = _searchRevision = 0;
+            _revision = _searchRevision = _favoritesRevision = 0;
             _sortMode = CombatPrototypeMapInventorySortMode.Original;
             _filterMode = CombatPrototypeMapInventoryFilterMode.All;
             _sortLabel = _originalLabel = _typeLabel = _quantityLabel = string.Empty;

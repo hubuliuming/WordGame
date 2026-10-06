@@ -21,7 +21,7 @@
 
 ## 【FACT】JSON 契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 当前一致为 schemaVersion=32/configRevision=35。必填 inventoryPanel 共71字段，原30字段加[排序筛选](MapInventoryListView.md)十四、[搜索](MapInventorySearch.md)七、[本机偏好与重置](MapInventoryPreferences.md)六及[材料详情](MapInventoryDetails.md)十四字段，沿原严格UTF-8、完整字段/类型及未知/重复键检查；即使关闭面板也校验全部字段。旧地图v1～v31明确失败，不补段/默认值或回退来源；正常导入/烘焙后生效，无运行热重载。Lv1配方/定义仍从gatherTools读取，当前级上限/倍率归[gatherToolUpgrade](MapGatherToolUpgrade.md)，面板不复制配置真值。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 当前一致为 schemaVersion=33/configRevision=36。必填 inventoryPanel 共77字段，原30字段加[排序筛选](MapInventoryListView.md)十四、[搜索](MapInventorySearch.md)七、[本机偏好与重置](MapInventoryPreferences.md)六、[材料详情](MapInventoryDetails.md)十四及[收藏](MapInventoryFavorites.md)六字段，沿原严格UTF-8、完整字段/类型及未知/重复键检查；即使关闭面板也校验全部字段。旧地图v1～v32明确失败，不补段/默认值或回退来源；正常导入/烘焙后生效，无运行热重载。Lv1配方/定义仍从gatherTools读取，当前级上限/倍率归[gatherToolUpgrade](MapGatherToolUpgrade.md)，面板不复制配置真值。
 
 | 字段 | 默认值 | 契约 |
 |---|---|---|
@@ -56,7 +56,7 @@
 | repairButtonLabel | Repair |
 | fullDurabilityLabel | Full durability |
 
-全部50文案（上表原22项、排序筛选十项、搜索四项、重置一项及[材料详情](MapInventoryDetails.md)十三项）须非空白、无控制字符且最多61个UTF-8字节，烘焙为FixedString64Bytes。内置GUI字体和白色纹理复用；当前英文文案，中文接口保留，字体/字形覆盖为UNKNOWN，没有读取图片或界面截图。
+全部54文案（上表原22项、排序筛选十项、搜索四项、重置一项、[材料详情](MapInventoryDetails.md)十三项及[收藏](MapInventoryFavorites.md)四项）须非空白、无控制字符且最多61个UTF-8字节，烘焙为FixedString64Bytes。内置GUI字体和白色纹理复用；当前英文文案，中文接口保留，字体/字形覆盖为UNKNOWN，没有读取图片或界面截图。
 
 ## 【CURRENT STRATEGY】库存、工具与配方显示
 
@@ -136,4 +136,10 @@ v31/revision34重置阶段的显示重置在原GUI排队，在有效Show的Snaps
 
 ## 【CURRENT STRATEGY】材料详情
 
-当前v32/revision35在原材料名称行右侧绘制Details按钮；GUI排队真实Name，Show在完整Snapshot/可见行刷新后应用详情，随后原Preferences只观察显示偏好。选择行的原Drop/All行之后展开只读详情，标题与正文自动换行、Close details复用全宽行，滚动高度计入实际测量结果；材料重排保留同一Name，隐藏/消失、显示重置、关闭/无效输入与释放绑定清选择。原每帧Clear仍只隐藏，详情开关关闭恢复整宽材料名称及原行高。完整字段、调用链/点击许可、配方及静态/人工边界归[材料详情](MapInventoryDetails.md)，人工十六项待验收。
+v32/revision35详情阶段在原材料名称行右侧绘制Details按钮；GUI排队真实Name，Show在完整Snapshot/可见行刷新后应用详情，随后原Preferences只观察显示偏好。选择行的原Drop/All行之后展开只读详情；当前收藏开启时先追加收藏控制行，再展开详情，标题与正文自动换行、Close details复用全宽行，滚动高度计入实际测量结果；材料重排保留同一Name，隐藏/消失、显示重置、关闭/无效输入与释放绑定清选择。原每帧Clear仍只隐藏，详情开关关闭恢复整宽材料名称及原行高。完整字段、调用链/点击许可、配方及静态/人工边界归[材料详情](MapInventoryDetails.md)，人工十六项已获用户通过反馈，限v32/revision35及运行入口清单，未触发独立用例仍UNKNOWN。
+
+## 【CURRENT STRATEGY】收藏与置顶
+
+当前v33/revision36在每个可见材料的Drop/All之后增加一行全宽Favorite/Unfavorite；详情在该行之后展开，收藏关闭则沿原两行布局。GUI按真实Name排队，下一有效Show先捕获完整库存及分类/搜索可见行，再应用收藏，原排序后稳定分为收藏/普通两组，组内保持原顺序；名称仅追加配置标记。实际收藏变化归零滚动并取消旧面板/行按下许可；原排序/搜索许可规则及已排队业务保持。内容基础材料行数为可见数×3（关闭收藏×2），实际详情高度另计。
+
+Panel先配置Favorites再恢复Preferences，ListView使用收藏Revision/待请求刷新缓存，Preferences仅观察已应用值。重置清启用的收藏；Close/无效输入清待请求，同一绑定已应用收藏保留，绑定Reset先提交已观察值再清缓存。完整规则、77字段及本机偏好v2兼容v1归[收藏](MapInventoryFavorites.md)，人工十六项待验收；原详情通过仍限v32/revision35十六项。

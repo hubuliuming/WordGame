@@ -76,5 +76,11 @@ namespace Code_01.CombatPrototype.Map
         public string appleDescriptionLabel;
         public string meatDescriptionLabel;
         public string meatUsageLabel;
+        public bool favoritesEnabled;
+        public int favoritesMaxCount;
+        public string favoriteButtonLabel;
+        public string unfavoriteButtonLabel;
+        public string favoriteTagLabel;
+        public string favoritesFullLabel;
     }
 }

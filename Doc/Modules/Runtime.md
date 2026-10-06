@@ -1094,7 +1094,9 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 
 入口CombatPrototypeNetCode，原B面板；两地图Json/BuiltIn v32/revision35，完整71配置/Settings和零GhostField、普通Details类/正常生成meta已编译/注册。2414份非法配置全部拒绝，128组合法读取通过；128次隔离Editor Bake静态通过，全部71Settings、原Settings/反馈/Prefab引用、布置/兼容签名及原输入19/Tools3、玩家v4/世界v2/偏好v1五字段保持。只读源SubScene，临时资源释放，主场景干净、3根对象、未Play；最终详情标题高度适配已正常编译，配置/烘焙契约保持。
 
-执行前已有UnityConnect Token Exchange Error及两条PEListener/DOTween Warning，编译/重载后另有MCP WebSocket未初始化Warning；隔离Bake Console前后[1 Error,3 Warning,0 Log]相同，最终正常重载后[1 Error,2 Warning,0 Log]；未清空或宣称0 Error。本阶段人工十六项待验收；原451项内容/编号逐字保留，重置用户通过限v31/revision34十六项及其他旧阶段原范围。
+执行前已有UnityConnect Token Exchange Error及两条PEListener/DOTween Warning，编译/重载后另有MCP WebSocket未初始化Warning；隔离Bake Console前后[1 Error,3 Warning,0 Log]相同，最终正常重载后[1 Error,2 Warning,0 Log]；未清空或宣称0 Error。本阶段人工十六项已获用户通过反馈；原451项内容/编号逐字保留，重置用户通过限v31/revision34十六项及其他旧阶段原范围。
+
+用户明确反馈“我已验收通过，接下来下一阶段”；用户已确认本阶段人工GamePlayer验收通过，主线程结合既有静态核对与用户反馈判定通过，限CombatPrototypeNetCode、v32/revision35及运行入口十六项清单，人工结论来自用户反馈；未实际触发的独立用例仍UNKNOWN。原467项内容/编号与其他旧通过原范围保持，各端同版代码/配置并正常导入/烘焙，静态通过不替代实际交互验收。
 
 1. 两地图Json/BuiltIn均v32/revision35，十四新增字段采用详情专题默认值；DTO/Settings各71、零GhostField。旧v1～v31、缺失/null/错类型/未知或重复键、非有限值、空白/控制/超61 UTF-8字节文案明确失败；关闭详情/面板仍验证，未触发独立配置分支UNKNOWN。
 2. 原B面板材料名称行右侧显示Details，原Drop/All行保持；detailsEnabled=false恢复整宽名称、无详情按钮/展开高度，其他原功能保持。面板内点击沿原指针隔离，不误触Attack；无额外快捷键或挂载。
@@ -1114,3 +1116,28 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 16. 原F/G/B/E/R/F5、采集再生/资源交互/掉落合并与部分拾取、丢弃、制作/修理/两升级、战斗镜头/阻挡与游戏保存回归。各端同版代码/配置，原输入19/Tools3/全部反馈与玩家v4/世界v2保持；多人/延迟/预测、故障/性能/平台/线上未触发UNKNOWN。
 
 共467项；完整当前规则归[材料详情](MapInventoryDetails.md)，原业务/隔离归[B面板](MapInventoryPanel.md)，配置/协议归[资源与数据](DataResources.md)。AI未执行详情/面板/库存/GUI业务、真实偏好或游戏存档I/O、GamePlayer/PlayMode、逻辑单元测试、命令行构建/发布、采样/图片，未创建子Agent或提交Git；未实际触发的独立交互/生命周期/联网/故障及性能/平台/线上仍UNKNOWN。
+
+## 【KNOWN ISSUES】背包材料收藏与置顶验收边界
+
+入口CombatPrototypeNetCode，原B面板；Forest/Grassland Json/BuiltIn v33/revision36，原71配置/Settings追加六收藏字段至77，零GhostField；普通Favorites类/正常生成meta、偏好v2六实例字段及原协议元数据已正常Unity编译/核对。2692份非法地图配置拒绝、146组合法读取、146次隔离Editor Bake通过；全部77Settings、原Settings/零反馈/Prefab引用/完整布置与兼容签名匹配，输入19/Tools3/原反馈和玩家v4/世界v2保持。只读源SubScene、临时资源释放，主场景干净、3根对象、单场景、未Play。烘焙后仅限定收藏变化取消按下许可，正常编译/字段再次核对，配置/烘焙契约保持。
+
+执行前Console[0 Error,5 Warning,106 Log]，五条已有NetCode Server Tick Batching Warning；Bake前后和最终编译核对均[0 Error,7 Warning,106 Log]，另两条为MCP WebSocket未初始化及既有PEListener源码序列化Warning。未清空Console，不将旧运行日志视为本阶段性能结论。原467项人工内容/编号逐字保留，以下追加十六项待人工GamePlayer验收；详情用户通过仍限v32/revision35十六项及其他旧阶段原范围。
+
+1. 两地图Json/BuiltIn均v33/revision36，六新增字段采用收藏专题默认值；DTO/Settings各77、零GhostField。严格收藏上限1～256、四文案61 UTF-8字节及完整字段检查，旧v1～v32拒绝；关闭收藏/面板仍验证，未触发独立配置分支UNKNOWN。
+2. 原B面板每个可见材料Drop/All之后显示全宽Favorite/Unfavorite，收藏标记使用配置tag，详情在收藏控制行之后展开；收藏关闭恢复两行材料布局。默认尺寸/滚动/页脚/指针隔离保持，未遍历命中边界UNKNOWN。
+3. 分别收藏/取消木材、石材、苹果、小块肉及其他合法Name，下一有效刷新只切换实际Name；相同显示名不交叉切换，已排队操作不使用行索引，未触发未知材料/重复文案UNKNOWN。
+4. 切换original/type/quantity，收藏组在前且两组内部保持原模式顺序；关闭排序仍按原顺序分组。取消收藏回到普通组对应位置，不修改原库存顺序或数量，未遍历模式组合UNKNOWN。
+5. 分类/搜索先过滤再收藏置顶，隐藏收藏不强制显示，清查询/切分类不清收藏；原IME/焦点/键盘隔离及搜索命中保持。未触发交集/焦点时序UNKNOWN。
+6. 数量改变、Drop/All或制作扣料使材料归零/消失时保留收藏Name，重新获得同名时重新置顶；完整容量/木石配方及工具资格仍使用全部库存，未触发重新获得/网络快照时序UNKNOWN。
+7. 上限配置1/64/256时达到容量只禁新增并显示Favorite limit，已有收藏仍可Unfavorite且释放名额；暂不存在材料的收藏同样占名额，未遍历边界UNKNOWN。
+8. 降低当前favoritesMaxCount后重建绑定，合法偏好最多256条全部保留，不删超过当前上限的记录；只限新增，取消后按当前上限判断，未触发多记录/降上限分支UNKNOWN。
+9. GUI只排队Name，下一Show用最新分类/搜索合法正数量可见行应用一次；待Name隐藏/消失即丢弃。收藏实际变化取消旧面板/行按下许可，重排不误点Drop/All或后续按钮，已排队原业务保持；未触发按下抬起/同帧时序UNKNOWN。
+10. Reset view清启用的已应用/待收藏、恢复当前默认模式并清搜索/详情/焦点；重复默认状态不新增写入，收藏关闭保留文件原收藏。未触发开关/重置组合UNKNOWN。
+11. 合法本机偏好v2恰六字段，favoriteItemNames按真实Name保存；变化后默认0.5秒合并、B关闭/绑定Reset提交已观察值，回到已写集合取消待写、库存刷新不重写，未实际观察文件时序UNKNOWN。
+12. 严格合法v1五字段读取保留原模式/查询、内存迁移空收藏到v2；读取本身不写盘，下一实际已应用偏好变化才写v2。v1额外字段/v2缺字段/未知版本明确失败，未触发迁移和文件检查UNKNOWN。
+13. 偏好关闭或本绑定I/O暂停仅临时收藏；收藏关闭时其他偏好保存保留原数组。错数组/元素/重复Name/空白/控制/孤立代理/超61字节/257项整档失败，原文件保留且不自动重试，实际I/O/故障组合未触发UNKNOWN。
+14. B/关闭按钮/无效输入清未应用收藏，同一绑定已应用收藏关闭重开保留；死亡/重连、地图源/玩家/World/Scene释放清缓存并按合法偏好/开关重载。逐帧Clear只隐藏，未触发独立生命周期UNKNOWN。
+15. 收藏重排保留同Name详情，分类隐藏/数量归零仍关闭详情，收藏仍保留；新增行/标记与标题/正文换行、默认/最小尺寸及ASCII/UTF-8 61字节/中文字形/缩放、页脚/搜索几何正确。未遍历布局分支UNKNOWN。
+16. 原F/G/B/E/R/F5、Drop/All、采集再生/掉落合并/部分拾取、制作/修理/两升级及战斗镜头/阻挡/SavePrepared回归；输入19/Tools3/全部反馈及玩家v4/世界v2保持，各端同版导入/烘焙。多人/预测/延迟/故障及性能/平台/线上未触发UNKNOWN。
+
+共483项；完整规则归[收藏](MapInventoryFavorites.md)，本机偏好v2/严格v1兼容归[偏好](MapInventoryPreferences.md)，原业务/输入归[B面板](MapInventoryPanel.md)，配置/协议归[资源与数据](DataResources.md)。主线程静态范围核对通过，人工收藏待验收；AI未执行收藏/列表/面板/偏好/GUI业务、真实偏好/游戏存档I/O、GamePlayer/PlayMode、逻辑单元测试、命令行构建/发布、采样/图片或子Agent/暂存/提交Git；未实际触发的独立交互/生命周期/文件/故障/联网用例及性能/平台/线上仍UNKNOWN。

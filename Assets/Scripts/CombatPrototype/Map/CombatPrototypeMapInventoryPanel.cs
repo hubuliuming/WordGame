@@ -12,6 +12,7 @@ namespace Code_01.CombatPrototype.Map
         private readonly CombatPrototypeMapInventoryPanelListView _listView = new CombatPrototypeMapInventoryPanelListView();
         private readonly CombatPrototypeMapInventoryPanelSearch _search = new CombatPrototypeMapInventoryPanelSearch();
         private readonly CombatPrototypeMapInventoryPanelPreferences _preferences = new CombatPrototypeMapInventoryPanelPreferences();
+        private readonly CombatPrototypeMapInventoryPanelFavorites _favorites = new CombatPrototypeMapInventoryPanelFavorites();
         private readonly CombatPrototypeMapInventoryPanelDetails _details = new CombatPrototypeMapInventoryPanelDetails();
         private readonly CombatPrototypeMapInventoryDropClient _drop = new CombatPrototypeMapInventoryDropClient();
         private readonly CombatPrototypeMapGatherToolRepairPanel _repair = new CombatPrototypeMapGatherToolRepairPanel();
@@ -79,7 +80,8 @@ namespace Code_01.CombatPrototype.Map
             _snapshot.Configure(settings, capacity, capacityDefinitions, upgradeDefinitions);
             _listView.Configure(settings);
             _search.Configure(settings);
-            _preferences.Configure(settings, mapId, _listView, _search);
+            _favorites.Configure(settings);
+            _preferences.Configure(settings, mapId, _listView, _search, _favorites);
             _details.Configure(settings, toolSettings, axe, pickaxe, capacity, upgradeSettings, upgradeDefinitions,
                 toolUpgradeSettings, toolUpgradeDefinitions);
             _upgrade.Configure(settings, capacity, upgradeSettings, upgradeDefinitions, mapId);
@@ -104,15 +106,18 @@ namespace Code_01.CombatPrototype.Map
                 _preferencesResetPending = false;
                 _listView.ResetDisplay(_settings.DefaultSortMode, _settings.DefaultFilterMode);
                 _search.ResetDisplay();
+                _favorites.ResetDisplay();
                 _details.Close();
                 _scroll = Vector2.zero;
                 _mousePressAccepted = _rowMousePressAccepted = false;
             }
-            if (_listView.Capture(_snapshot, _search, out var selectionChanged)) _rowMousePressAccepted = false;
+            var favoritesRevision = _favorites.Revision;
+            if (_listView.Capture(_snapshot, _search, _favorites, out var selectionChanged)) _rowMousePressAccepted = false;
             if (selectionChanged) _scroll = Vector2.zero;
+            if (favoritesRevision != _favorites.Revision) _mousePressAccepted = _rowMousePressAccepted = false;
             if (_details.Capture(_snapshot, _listView, axeLevel, pickaxeLevel, effectiveAxe, effectivePickaxe, capacityLevel))
                 _mousePressAccepted = _rowMousePressAccepted = false;
-            _preferences.Capture(_listView, _search);
+            _preferences.Capture(_listView, _search, _favorites);
             _upgrade.Capture(_snapshot, capacityLevel, upgradeFeedback);
             _canCraftAxe = CanCraft(_axe, axeDurability);
             _canCraftPickaxe = CanCraft(_pickaxe, pickaxeDurability);
@@ -186,6 +191,7 @@ namespace Code_01.CombatPrototype.Map
                 _craftAxe = _craftPickaxe = _mousePressAccepted = _rowMousePressAccepted = _preferencesResetPending = false;
                 _search.ReleaseFocus();
                 _details.Close();
+                _favorites.ClearPending();
                 _drop.ClearPending();
                 _repair.ClearPending();
                 _upgrade.ClearPending();
@@ -274,7 +280,7 @@ namespace Code_01.CombatPrototype.Map
                 GUI.color = Color.white;
                 GUI.Label(new Rect(panel.x + 12f, panel.y + 12f, panel.width - 24f, _settings.RowHeightPixels), _title, _labelStyle);
                 var viewport = Viewport(panel);
-                var rows = Mathf.Max(_listView.Items.Count * 2, 1) + _listView.ControlRowCount + _search.RowCount + (PreferencesResetEnabled ? 1 : 0) + 14 + CombatPrototypeMapGatherToolRepairPanel.RowCount + CombatPrototypeMapInventoryCapacityUpgradePanel.RowCount + CombatPrototypeMapGatherToolUpgradePanel.RowCount + (_durabilityEnabled ? 2 : 0);
+                var rows = Mathf.Max(_listView.Items.Count * (_favorites.Enabled ? 3 : 2), 1) + _listView.ControlRowCount + _search.RowCount + (PreferencesResetEnabled ? 1 : 0) + 14 + CombatPrototypeMapGatherToolRepairPanel.RowCount + CombatPrototypeMapInventoryCapacityUpgradePanel.RowCount + CombatPrototypeMapGatherToolUpgradePanel.RowCount + (_durabilityEnabled ? 2 : 0);
                 var contentWidth = viewport.width - 18f;
                 var content = new Rect(0f, 0f, contentWidth, rows * _settings.RowHeightPixels +
                     _details.ExtraHeight(contentWidth, _settings.RowHeightPixels, _labelStyle));
@@ -312,10 +318,11 @@ namespace Code_01.CombatPrototype.Map
                 Label(width, ref y, _snapshot.Items.Count == 0 ? _empty : _search.HasQuery ? _search.NoResultsText : _listView.NoMatchingItemsText);
             foreach (var item in _listView.Items)
             {
-                _details.DrawItemLabel(width, ref y, _settings.RowHeightPixels, _labelStyle, _buttonStyle, item, _rowMousePressAccepted);
+                _details.DrawItemLabel(width, ref y, _settings.RowHeightPixels, _labelStyle, _buttonStyle, item, _favorites.ItemText(item), _rowMousePressAccepted);
                 _drop.DrawRow(width, y, _settings.RowHeightPixels, _labelStyle, _buttonStyle, item,
                     _snapshot.InventoryValid, _rowMousePressAccepted);
                 y += _settings.RowHeightPixels;
+                _favorites.DrawRow(width, ref y, _settings.RowHeightPixels, _buttonStyle, item, _rowMousePressAccepted);
                 _details.DrawExpanded(width, ref y, _settings.RowHeightPixels, _labelStyle, _buttonStyle, item.Name, _mousePressAccepted);
             }
             _upgrade.Draw(width, ref y, _settings.RowHeightPixels, _labelStyle, _buttonStyle, _mousePressAccepted);
@@ -396,6 +403,7 @@ namespace Code_01.CombatPrototype.Map
             _listView.ClearPending();
             _search.Close();
             _details.Close();
+            _favorites.ClearPending();
             _drop.ClearPending();
             _repair.ClearPending();
             _upgrade.ClearPending();
@@ -415,6 +423,7 @@ namespace Code_01.CombatPrototype.Map
             _search.Reset();
             _preferences.Reset();
             _details.Reset();
+            _favorites.Reset();
             _drop.Reset();
             _repair.Reset();
             _upgrade.Reset();

@@ -1,6 +1,6 @@
 # 背包材料排序与筛选
 
-返回[地图](Map.md)、[背包](Inventory.md)、[B面板](MapInventoryPanel.md)、[容量](MapInventoryCapacity.md)、[丢弃](MapInventoryDrop.md)、[配置](DataResources.md)与[运行入口](Runtime.md)。入口CombatPrototypeNetCode，Forest/Grassland Json/BuiltIn当前schemaVersion=32/configRevision=35；下述排序筛选静态及人工结论来自v28/revision31阶段。用户已确认该阶段人工GamePlayer通过，主线程结合既有静态核对与用户反馈判定通过，限v28/revision31及运行入口十六项，人工结论来自用户反馈。旧部分拾取用户通过限v27/revision30十六项，旧面板/丢弃/容量/工具通过保持原版本/清单。
+返回[地图](Map.md)、[背包](Inventory.md)、[B面板](MapInventoryPanel.md)、[容量](MapInventoryCapacity.md)、[丢弃](MapInventoryDrop.md)、[配置](DataResources.md)与[运行入口](Runtime.md)。入口CombatPrototypeNetCode，Forest/Grassland Json/BuiltIn当前schemaVersion=33/configRevision=36；下述排序筛选静态及人工结论来自v28/revision31阶段。用户已确认该阶段人工GamePlayer通过，主线程结合既有静态核对与用户反馈判定通过，限v28/revision31及运行入口十六项，人工结论来自用户反馈。旧部分拾取用户通过限v27/revision30十六项，旧面板/丢弃/容量/工具通过保持原版本/清单。
 
 ## 【FACT】文件与配置
 
@@ -36,17 +36,17 @@ v28排序筛选阶段七个现有脚本接入，新ListView是普通客户端C#�
 }
 ```
 
-当前配置与原Settings各71字段：DTO十bool、六float、两int、两模式string、50文案string及一文件ID；Settings十byte、六float、两int、两byte枚举及51 FixedString64Bytes；搜索七字段归[搜索](MapInventorySearch.md)，偏好四字段及重置两字段归[本机偏好](MapInventoryPreferences.md)，0 GhostField且无GhostComponent。sortEnabled/filterEnabled只控制两种展示能力；关闭排序强制original并隐藏排序按钮，关闭筛选强制all并隐藏筛选按钮，两者关闭沿原完整列表顺序。地图Settings仍保存已配置默认模式，强制显示模式在客户端Configure及显式ResetDisplay应用。
+当前配置与原Settings各77字段：DTO十一bool、六float、三int、两模式string、54文案string及一文件ID；Settings十一byte、六float、三int、两byte枚举及55 FixedString64Bytes；搜索七字段归[搜索](MapInventorySearch.md)，偏好四字段及重置两字段归[本机偏好](MapInventoryPreferences.md)，0 GhostField且无GhostComponent。sortEnabled/filterEnabled只控制两种展示能力；关闭排序强制original并隐藏排序按钮，关闭筛选强制all并隐藏筛选按钮，两者关闭沿原完整列表顺序。地图Settings仍保存已配置默认模式，强制显示模式在客户端Configure及显式ResetDisplay应用。
 
-defaultSortMode仅original/type/quantity，defaultFilterMode仅all/resources/supplies/other，大小写与空格严格匹配，不修剪/转换未知值。两模式ID通过共用Resolver校验/烘焙；十新文案沿原非空白、无控制字符且最多61 UTF-8字节。关闭任一能力、面板或全部显示仍检查全部字段与语义。原Reader保留UTF-8/完整对象、缺失/null/错误类型/未知或重复键检查；当前仅schema31，revision/seed须正数，旧v1～v31拒绝，无补默认、来源回退或运行热重载。正常导入/烘焙后生效，各端同版代码/配置并重新烘焙。
+defaultSortMode仅original/type/quantity，defaultFilterMode仅all/resources/supplies/other，大小写与空格严格匹配，不修剪/转换未知值。两模式ID通过共用Resolver校验/烘焙；十新文案沿原非空白、无控制字符且最多61 UTF-8字节。关闭任一能力、面板或全部显示仍检查全部字段与语义。原Reader保留UTF-8/完整对象、缺失/null/错误类型/未知或重复键检查；当前仅schema33，revision/seed须正数，旧v1～v32拒绝，无补默认、来源回退或运行热重载。正常导入/烘焙后生效，各端同版代码/配置并重新烘焙。
 
 ## 【CURRENT STRATEGY】完整库存与显示投影
 
 原绑定枚举启用GhostOwnerIsLocal且Connected/InGame的有效所属玩家，Panel.Show调用Snapshot.Capture校验完整原库存。Snapshot继续按原顺序缓存正数量Name/OriginalName/DisplayName/Quantity/Text；零条目不显示，木/石材料数量及受管三种材料总量/本级上限仍基于全部库存。名称空白/控制字符、负数量或重复名称沿原索引/地图/玩家日志跳过独立条目，InventoryValid=false继续限制所有原业务按钮；筛选隐藏该条目不能恢复合法性。
 
-Snapshot的uint Revision仅为本地展示缓存：行名/数量/顺序/行数或容量等级改变时在Capture更新一次；等级变化仍沿原清行及文本重建，Reset归零。ListView消费该Revision、搜索Revision、本地选择变化或显式显示重置才重建可见行，复用列表、比较委托及文字缓存；没有复制可变游戏库存、LINQ集合转换、服务器库存写入、奖励或保存调用。未变化时原可见行继续使用，GUI不执行排序。
+Snapshot的uint Revision仅为本地展示缓存：行名/数量/顺序/行数或容量等级改变时在Capture更新一次；等级变化仍沿原清行及文本重建，Reset归零。ListView消费该Revision、搜索Revision、收藏Revision/待请求、本地选择变化或显式显示重置才重建可见行，复用列表、比较委托及文字缓存；没有复制可变游戏库存、LINQ集合转换、服务器库存写入、奖励或保存调用。未变化时原可见行继续使用，GUI不执行排序。
 
-类型顺序固定为木材、石材、活力苹果、小块肉、其他。依据原ItemName比较，不按可配置显示文案或本地语言排序；其他合法名称按OriginalName的StringComparer.Ordinal升序。quantity为正数量降序，用CompareTo避免相减溢出；相同数量按类型，再按原名确定顺序。original保留Snapshot原行顺序，各模式只作用于客户端副本，原缓冲顺序不改。分类与[搜索](MapInventorySearch.md)条件取交集后才排序，清空搜索不清当前模式。
+类型顺序固定为木材、石材、活力苹果、小块肉、其他。依据原ItemName比较，不按可配置显示文案或本地语言排序；其他合法名称按OriginalName的StringComparer.Ordinal升序。quantity为正数量降序，用CompareTo避免相减溢出；相同数量按类型，再按原名确定顺序。original保留Snapshot原行顺序，各模式只作用于客户端副本，原缓冲顺序不改。分类与[搜索](MapInventorySearch.md)条件取交集后才按原模式排序；随后[收藏](MapInventoryFavorites.md)稳定分组置顶，两组内部顺序保持。清空搜索不清当前模式或收藏，隐藏的收藏不强制显示。
 
 | 筛选ID | 实际条目 |
 |---|---|
@@ -59,7 +59,7 @@ Snapshot的uint Revision仅为本地展示缓存：行名/数量/顺序/行数�
 
 ## 【CURRENT STRATEGY】控件、点击与生命周期
 
-复用原380×640面板、边距右24/顶64、字号18/行高32、1920×1080比例、背景0.85、原标题/页脚/滚动区及鼠标隔离。材料标题、完整容量行后有0～2个全宽控制行，分别默认Sort: Type与Filter: All；滚动内容高度按max(可见数×2,1)+启用模式控制行+搜索两行（开启时）+原固定区域计算。每个可见行仍有原Drop/All操作行。不改面板矩形、宿主或任何场景资源结构。
+复用原380×640面板、边距右24/顶64、字号18/行高32、1920×1080比例、背景0.85、原标题/页脚/滚动区及鼠标隔离。材料标题、完整容量行后有0～2个全宽控制行，分别默认Sort: Type与Filter: All；滚动内容基础高度按max(可见数×3,1)计算材料行（收藏关闭时×2），加启用模式/搜索/重置控制行及原固定区域，详情实际展开高度另计。每个可见行仍有原Drop/All操作行。不改面板矩形、宿主或任何场景资源结构。
 
 GUI按钮仅QueueSort/QueueFilter，保持原有效鼠标按下来源检查，每种本地请求在下一Show/Capture最多应用一次；原列表在同次绘制中保持稳定。排序循环type→quantity→original→type，筛选循环all→resources→supplies→other→all；两类可同次应用，变化后更新缓存标题并滚动归零。不写输入事件/RPC、玩家Ghost或游戏存档；已应用模式经[本机偏好](MapInventoryPreferences.md)协调类保存。完整库存为空沿原Empty；完整库存非空、没有有效搜索而筛选无可见行使用No matching items；有有效搜索而交集无可见行使用No search results，不更改容量或配方显示。
 
@@ -85,4 +85,8 @@ v31/revision34重置阶段显式重置在原Panel.Show中调用ResetDisplay：�
 
 ## 【FACT】材料详情的只读类别
 
-当前v32/revision35新增CategoryLabel，只读复用原TypeRank及配置Resources/Supplies/Other文案；排序/筛选规则、缓存和库存保持。详情按真实Name匹配当前可见行，排序保持同一材料，分类/搜索隐藏时清选择；数量与配方不从可见行总量推导。规则及十六项人工待验收归[详情](MapInventoryDetails.md)。
+v32/revision35详情阶段新增CategoryLabel，只读复用原TypeRank及配置Resources/Supplies/Other文案；排序/筛选规则、缓存和库存保持。详情按真实Name匹配当前可见行，排序保持同一材料，分类/搜索隐藏时清选择；数量与配方不从可见行总量推导。本阶段十六项人工已获用户通过反馈，限v32/revision35及运行入口清单；未触发独立用例仍UNKNOWN，完整规则与验收边界归[详情](MapInventoryDetails.md)。
+
+## 【CURRENT STRATEGY】收藏分组与行身份
+
+当前v33/revision36在最新分类/搜索可见行建立后消费收藏请求，只有当前仍可见的合法正数量Name可切换。原type/quantity排序或original顺序完成后，Favorites用复用列表稳定分组，并缓存可见收藏名称的标记文本；未变化快照继续复用，不在GUI排序。收藏隐藏/归零/消失仍保留Name，再次出现参与同一规则。收藏切换实际改变时归零滚动并取消旧面板/行按下许可；列表身份变化仍沿原行许可检查，已排队业务不撤回。完整保存/上限与人工边界归[收藏](MapInventoryFavorites.md)，人工十六项待验收。

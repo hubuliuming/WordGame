@@ -76,5 +76,11 @@ namespace Code_01.CombatPrototype.Map
         public FixedString64Bytes AppleDescriptionLabel;
         public FixedString64Bytes MeatDescriptionLabel;
         public FixedString64Bytes MeatUsageLabel;
+        public byte FavoritesEnabled;
+        public int FavoritesMaxCount;
+        public FixedString64Bytes FavoriteButtonLabel;
+        public FixedString64Bytes UnfavoriteButtonLabel;
+        public FixedString64Bytes FavoriteTagLabel;
+        public FixedString64Bytes FavoritesFullLabel;
     }
 }

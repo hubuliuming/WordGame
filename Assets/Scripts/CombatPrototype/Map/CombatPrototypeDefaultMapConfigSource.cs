@@ -17,7 +17,7 @@ namespace Code_01.CombatPrototype.Map
             {
                 map = new MapDefinitionConfig
                 {
-                    schemaVersion = 32, configRevision = 35,
+                    schemaVersion = 33, configRevision = 36,
                     mapDefinitionId = mapDefinitionId, defaultSeed = 12345,
                     resourcePersistence = new MapResourcePersistenceConfig
                     {
@@ -231,7 +231,13 @@ namespace Code_01.CombatPrototype.Map
                         stoneDescriptionLabel = "Material from ore nodes",
                         appleDescriptionLabel = "Supply from vegetation",
                         meatDescriptionLabel = "Supply from enemy rewards",
-                        meatUsageLabel = "E: Restore power"
+                        meatUsageLabel = "E: Restore power",
+                        favoritesEnabled = true,
+                        favoritesMaxCount = 64,
+                        favoriteButtonLabel = "Favorite",
+                        unfavoriteButtonLabel = "Unfavorite",
+                        favoriteTagLabel = "Favorite",
+                        favoritesFullLabel = "Favorite limit"
                     },
                     inventoryCapacity = new MapInventoryCapacityConfig
                     {

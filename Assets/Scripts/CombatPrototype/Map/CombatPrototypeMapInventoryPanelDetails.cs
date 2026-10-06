@@ -164,12 +164,12 @@ namespace Code_01.CombatPrototype.Map
         }
 
         public void DrawItemLabel(float width, ref float y, float rowHeight, GUIStyle labelStyle, GUIStyle buttonStyle,
-            CombatPrototypeMapInventoryPanelSnapshot.Row row, bool mousePressAccepted)
+            CombatPrototypeMapInventoryPanelSnapshot.Row row, string itemText, bool mousePressAccepted)
         {
             if (Enabled)
             {
                 var buttonWidth = width * 0.3f;
-                GUI.Label(new Rect(0f, y, width - buttonWidth - 4f, rowHeight), row.Text, labelStyle);
+                GUI.Label(new Rect(0f, y, width - buttonWidth - 4f, rowHeight), itemText, labelStyle);
                 if (GUI.Button(new Rect(width - buttonWidth, y, buttonWidth, rowHeight - 4f), _button, buttonStyle) && mousePressAccepted)
                 {
                     _pendingName = row.Name;
@@ -177,7 +177,7 @@ namespace Code_01.CombatPrototype.Map
                     _closePending = false;
                 }
             }
-            else GUI.Label(new Rect(0f, y, width, rowHeight), row.Text, labelStyle);
+            else GUI.Label(new Rect(0f, y, width, rowHeight), itemText, labelStyle);
             y += rowHeight;
         }
 

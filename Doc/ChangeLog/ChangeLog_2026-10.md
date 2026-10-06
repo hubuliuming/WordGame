@@ -930,3 +930,19 @@
 - 正常Unity编译/元数据、2414份非法配置拒绝/128组合法读取、128次隔离Editor Bake通过；全量71Settings、原Settings/零反馈/绑定/资源签名/布局及输入19/Tools3/玩家v4/世界v2保持。Bake前后Console[1,3,0]相同，含已有UnityConnect Error、两条源码Warning和MCP WebSocket Warning；未清空Console或宣称0 Error，主场景干净未Play，临时资源释放。烘焙后仅详情标题/关闭行高度适配并正常编译，配置/烘焙契约未改变；最终重载后Console[1,2,0]，保留UnityConnect Error和两条源码Warning。
 - 新增详情专题，增量同步受影响模块、导航及策划模板第7节JSON/第41节；原451项人工内容/编号逐字保留，追加十六项后467项，详情人工待验收，旧用户通过保持原范围。两升级专题、资源/数据与模板总说明的当前地图版本引用同步至真实32/35，业务与原人工结论保持。
 - Scene/SubScene/Prefab/Animator/旧meta/资源/字体/包/构建配置、HUD/Binding/PlayerInput及服务器/保存代码保持；未执行详情/面板/库存/GUI业务、实际偏好/游戏存档I/O、GamePlayer/PlayMode、逻辑单元测试、命令行构建/发布、采样/图片，未创建子Agent或提交Git。
+
+## 2026-10-06 背包材料详情与用途提示人工验收状态同步（v32/revision35）
+
+- 用户明确反馈“我已验收通过，接下来下一阶段”。用户已确认本阶段人工GamePlayer验收通过，主线程结合既有静态核对与用户反馈判定通过，限CombatPrototypeNetCode、v32/revision35及运行入口十六项清单，人工结论来自用户反馈。
+- 增量同步导航、地图、背包、B面板、排序筛选、搜索、偏好、HUD、玩家、配置/存档与材料详情及其配方引用专题的验收状态，项目外建议模板第41节同步为已验收；Runtime原467项内容/编号逐字保留，旧阶段通过范围保持。
+- 本次只更新十六份项目文档及建议模板，不修改代码、JSON、Scene/SubScene/Prefab/Animator/meta/资源或项目设置，未新增结构；未执行Unity业务、GamePlayer/PlayMode、逻辑单元测试、构建/发布、真实偏好/游戏存档I/O、图片或采样，未创建子Agent或提交Git。
+- 未实际触发的独立交互/生命周期/联网/故障用例仍UNKNOWN；性能、平台构建和线上联调未获单独验收结论，仍UNKNOWN。
+
+## 2026-10-06 背包材料收藏与置顶（v33/revision36）
+
+- 按用户已确认方案由主线程执行：原B面板每个材料Drop/All后追加全宽Favorite/Unfavorite，名称缓存追加配置标记；GUI排队真实Name，下一有效Show在最新分类/搜索可见行后应用，原排序后稳定分组置顶，组内顺序保持。实际收藏变化取消旧面板/行按下许可并归零滚动；详情随真实Name保留，展开在收藏行之后，已排队原业务保持。
+- 收藏默认开启/上限64，严格1～256；达到上限禁新增但可取消，归零/消失与降低上限不删已有记录。Reset view清启用收藏，Close/无效输入清待请求，同一绑定已应用收藏保留；绑定Reset沿原提交后清本地缓存，关闭功能保留文件记录。
+- 十一现有脚本、一普通Favorites类及Unity正常生成meta、两地图JSON接入；inventoryPanel71→77，Json/BuiltIn33/36一致，六新增字段为开关/上限/四文案。偏好独立v2恰六字段，严格兼容v1五字段、空收藏内存迁移，读取不写盘、下一实际偏好变化写v2；收藏数组最多256个Ordinal唯一合法Name。原0.5秒合并、.tmp/Flush/Replace或Move及绑定失败暂停边界保持，返回已写集合取消待写。
+- 正常Unity编译/元数据、2692份非法配置拒绝/146组合法读取及146次隔离Editor Bake静态通过；全77Settings、原Settings/零反馈/引用/布局/兼容签名及输入19/Tools3/全部所属反馈、玩家v4/世界v2保持。Bake前后及最终编译核对Console[0,7,106]相同，保留五条旧NetCode Tick Batching、新增MCP WebSocket及既有PEListener源码Warning，未清空；主场景干净未Play，临时资源释放。烘焙后仅限定收藏变化的按下许可取消，正常编译/字段再次核对，配置/烘焙契约未变。
+- 新增收藏专题，增量同步受影响模块/导航及策划模板第7节完整JSON和第42节；原467项人工内容/编号逐字保留，新增十六项后483项，收藏人工待验收；旧详情通过仍限v32/revision35十六项及其他旧范围。当前版本/字段引用同步，既有阶段编译/烘焙/人工证据保留原版本。
+- Scene/SubScene/Prefab/Animator/旧meta/资源/字体/包/构建配置、HUD/Binding/PlayerInput及服务器/玩家世界保存代码保持；未执行收藏/列表/面板/偏好/GUI业务、真实偏好/游戏存档I/O、GamePlayer/PlayMode、逻辑单元测试、命令行构建/发布、采样/图片，未创建子Agent、暂存或提交Git。

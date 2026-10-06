@@ -1,6 +1,6 @@
 # 背包材料搜索
 
-返回[地图](Map.md)、[背包](Inventory.md)、[B面板](MapInventoryPanel.md)、[排序筛选](MapInventoryListView.md)、[容量](MapInventoryCapacity.md)、[丢弃](MapInventoryDrop.md)、[配置](DataResources.md)、[玩家输入](Player.md)与[运行入口](Runtime.md)。入口CombatPrototypeNetCode；Forest/Grassland Json/BuiltIn当前schemaVersion=32/configRevision=35；[本机偏好](MapInventoryPreferences.md)静态核对通过、人工已获用户通过反馈，限v30/revision33及运行入口偏好阶段十六项。主线程实现、正常编译、严格配置读取和隔离Editor Bake静态核对通过；用户已确认本阶段人工GamePlayer验收通过，主线程结合既有静态核对与用户反馈判定通过，限CombatPrototypeNetCode、v29/revision32及运行入口十六项清单；人工结论来自用户反馈。旧排序筛选用户通过限v28/revision31十六项，其他旧通过保持原版本/清单。
+返回[地图](Map.md)、[背包](Inventory.md)、[B面板](MapInventoryPanel.md)、[排序筛选](MapInventoryListView.md)、[容量](MapInventoryCapacity.md)、[丢弃](MapInventoryDrop.md)、[配置](DataResources.md)、[玩家输入](Player.md)与[运行入口](Runtime.md)。入口CombatPrototypeNetCode；Forest/Grassland Json/BuiltIn当前schemaVersion=33/configRevision=36；[本机偏好](MapInventoryPreferences.md)静态核对通过、人工已获用户通过反馈，限v30/revision33及运行入口偏好阶段十六项。主线程实现、正常编译、严格配置读取和隔离Editor Bake静态核对通过；用户已确认本阶段人工GamePlayer验收通过，主线程结合既有静态核对与用户反馈判定通过，限CombatPrototypeNetCode、v29/revision32及运行入口十六项清单；人工结论来自用户反馈。旧排序筛选用户通过限v28/revision31十六项，其他旧通过保持原版本/清单。
 
 ## 【FACT】文件与配置
 
@@ -27,7 +27,7 @@ inventoryPanel原44字段保留，新增七项均必填：
 | clearSearchLabel | Clear | 清空按钮文案 |
 | noSearchResultsLabel | No search results | 完整库存非空且有效搜索无可见行时显示 |
 
-当前DTO共57字段：九bool、六float、两int、两模式string、37文案string及一偏好文件ID；原Settings对应九byte、六float、两int、两byte枚举、38 FixedString64Bytes，0 GhostField且无GhostComponent。四新文案沿非空白、无控制字符与最多61 UTF-8字节规则；即使关闭搜索、面板或全部显示仍校验所有字段。原Reader保留UTF-8/形状/缺失/null/错类型/未知或重复键检查，当前只接受schema31和正revision/seed，旧v1～v31拒绝，无补默认、来源回退或热重载。正常导入/烘焙后生效，各端同版代码/配置并重新烘焙。
+当前DTO共57字段：九bool、六float、两int、两模式string、37文案string及一偏好文件ID；原Settings对应九byte、六float、两int、两byte枚举、38 FixedString64Bytes，0 GhostField且无GhostComponent。四新文案沿非空白、无控制字符与最多61 UTF-8字节规则；即使关闭搜索、面板或全部显示仍校验所有字段。原Reader保留UTF-8/形状/缺失/null/错类型/未知或重复键检查，当前只接受schema31和正revision/seed，旧v1～v32拒绝，无补默认、来源回退或热重载。正常导入/烘焙后生效，各端同版代码/配置并重新烘焙。
 
 ## 【CURRENT STRATEGY】本地文本与列表投影
 
@@ -67,4 +67,8 @@ v31/revision34重置阶段显示重置由Panel在Snapshot之后调用Search.Rese
 
 ## 【FACT】材料详情与搜索边界
 
-当前v32/revision35的[详情](MapInventoryDetails.md)位于搜索控件之后，原SearchField几何、焦点释放与键盘/面板指针隔离代码保持。查询隐藏选中Name时关闭详情，清查询不自动恢复详情；详情选择不作为搜索词或偏好保存，显示重置清两者。详情人工十六项待验收，原搜索用户通过仍限v29/revision32清单。
+v32/revision35详情阶段的[详情](MapInventoryDetails.md)位于搜索控件之后，原SearchField几何、焦点释放与键盘/面板指针隔离代码保持。查询隐藏选中Name时关闭详情，清查询不自动恢复详情；详情选择不作为搜索词或偏好保存，显示重置清两者。详情人工十六项已获用户通过反馈，限v32/revision35及运行入口清单，未触发独立用例仍UNKNOWN，原搜索用户通过仍限v29/revision32清单。
+
+## 【FACT】收藏显示边界
+
+当前v33/revision36的[收藏](MapInventoryFavorites.md)：分类/查询先产生可见行，再稳定分组置顶；隐藏收藏不强制出现，清词不清收藏，原SearchField位置/焦点及键盘隔离保持。人工收藏十六项待验收，旧通过仍限各自版本/清单。

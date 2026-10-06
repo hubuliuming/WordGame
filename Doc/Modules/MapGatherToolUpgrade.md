@@ -1,6 +1,6 @@
 # 采集工具升级与效率提升
 
-返回[采集工具](MapGatherTools.md)、[工具修理](MapToolRepair.md)与[材料面板](MapInventoryPanel.md)。本专题负责 CombatPrototypeNetCode 的工具 Lv1～Lv3、B/6/7 升级、有效耐久上限与采集耗时；玩家文件完整契约归[资源与数据](DataResources.md)，人工清单归[运行入口](Runtime.md)。当前地图 schemaVersion=32/configRevision=35，玩家存档 Version=4；用户已确认本阶段人工 GamePlayer 通过，主线程结合既有静态核对判定通过，限 v21/revision24 及[运行入口](Runtime.md)二十二项清单，结论来自用户反馈。未实际触发的独立边界仍为 UNKNOWN。背包升级及更早用户通过仍限各自原版本/清单。
+返回[采集工具](MapGatherTools.md)、[工具修理](MapToolRepair.md)与[材料面板](MapInventoryPanel.md)。本专题负责 CombatPrototypeNetCode 的工具 Lv1～Lv3、B/6/7 升级、有效耐久上限与采集耗时；玩家文件完整契约归[资源与数据](DataResources.md)，人工清单归[运行入口](Runtime.md)。当前地图 schemaVersion=33/configRevision=36，玩家存档 Version=4；用户已确认本阶段人工 GamePlayer 通过，主线程结合既有静态核对判定通过，限 v21/revision24 及[运行入口](Runtime.md)二十二项清单，结论来自用户反馈。未实际触发的独立边界仍为 UNKNOWN。背包升级及更早用户通过仍限各自原版本/清单。
 
 ## 【FACT】入口与职责
 
@@ -104,4 +104,8 @@ HUD统一校验所属工具ID/重复/Level/本级耐久上限，只读缓存四�
 
 ## 【FACT】详情升级用途
 
-当前v32/revision35的[材料详情](MapInventoryDetails.md)沿原RequireUpgradeDefinition复制只读Lv2/Lv3配方，按真实ToolId+Level匹配，不依赖数组顺序；工具/升级开关启用且持有未满级工具才列下一等级需求。满级或未持有不列升级用途，原升级资格/扣料/效率及保存保持；详情人工待验收，原工具升级用户通过仍限v21/revision24二十二项。
+v32/revision35详情阶段的[材料详情](MapInventoryDetails.md)沿原RequireUpgradeDefinition复制只读Lv2/Lv3配方，按真实ToolId+Level匹配，不依赖数组顺序；工具/升级开关启用且持有未满级工具才列下一等级需求。满级或未持有不列升级用途，原升级资格/扣料/效率及保存保持；详情人工已获用户通过反馈，限v32/revision35十六项，未触发独立用例仍UNKNOWN，原工具升级用户通过仍限v21/revision24二十二项。
+
+## 【FACT】收藏显示边界
+
+当前v33/revision36的[收藏](MapInventoryFavorites.md)：收藏不修改工具等级/耐久/效率、原配方来源、6/7请求或升级事务；原工具升级用户通过范围保持。人工收藏十六项待验收，旧通过仍限各自版本/清单。

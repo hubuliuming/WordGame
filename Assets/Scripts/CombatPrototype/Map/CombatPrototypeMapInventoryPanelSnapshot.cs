@@ -150,6 +150,8 @@ namespace Code_01.CombatPrototype.Map
             return true;
         }
 
+        public int DisplayMaximum(FixedString64Bytes name) => _capacityEnabled ? Maximum(name) : 0;
+
         private int Maximum(FixedString64Bytes name)
         {
             if (name.Equals(Wood)) return _woodMaximum;

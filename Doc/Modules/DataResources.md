@@ -258,7 +258,7 @@ v10/13接入的[背包丢弃](MapInventoryDrop.md)复用原PrepareItemConsumptio
 
 当前v23/26必填[resourceStatusHud](MapResourceStatusHud.md)11字段：true/400×52/底268/字号20和六文案；严格形状/类型、有限尺寸、字号容纳、G间隔16与61 UTF-8字节文案校验。五职责脚本及Unity生成meta、地图Settings和所属四字段已接入，无新输入或存档字段，原F/G与资源/再生/掉落契约保持。v13/16编译、Serializer/SendToOwner及14次隔离烘焙静态通过，用户确认人工通过限v13/16十项，未触发用例UNKNOWN；旧通过保持原版本/清单。
 
-v23/revision26修理阶段的[工具修理](MapToolRepair.md)必填gatherTools.repairEnabled=true/repairFeedbackSeconds=2及每工具恢复20/15、木1石1；修理新增Repair/Repair/Full durability三文案；修理阶段面板30字段；当前面板57字段/37文案、两模式ID及一偏好文件ID，排序筛选归[展示](MapInventoryListView.md)，容量文案归[容量](MapInventoryCapacity.md)。四新脚本及正常生成meta、原工具Settings/Definitions和Player零所属修理反馈已接入，该v23阶段输入19、F4/G6/资源状态4字段；PrepareToolCraft候选投影和SavePrepared复用，当前候选写v4并保留工具/容量Level，合法旧档迁移归本节契约；路径/工具槽/世界状态保持。编译/Serializer/18次隔离Editor烘焙静态通过；用户确认修理人工通过，限v14/17及[运行入口](Runtime.md)十二项；未触发独立保存/恢复失败仍UNKNOWN，旧阶段通过保持原版本/清单。
+v23/revision26修理阶段的[工具修理](MapToolRepair.md)必填gatherTools.repairEnabled=true/repairFeedbackSeconds=2及每工具恢复20/15、木1石1；修理新增Repair/Repair/Full durability三文案；修理阶段面板30字段；当前面板71字段/50文案、两模式ID及一偏好文件ID，排序筛选归[展示](MapInventoryListView.md)，容量文案归[容量](MapInventoryCapacity.md)。四新脚本及正常生成meta、原工具Settings/Definitions和Player零所属修理反馈已接入，该v23阶段输入19、F4/G6/资源状态4字段；PrepareToolCraft候选投影和SavePrepared复用，当前候选写v4并保留工具/容量Level，合法旧档迁移归本节契约；路径/工具槽/世界状态保持。编译/Serializer/18次隔离Editor烘焙静态通过；用户确认修理人工通过，限v14/17及[运行入口](Runtime.md)十二项；未触发独立保存/恢复失败仍UNKNOWN，旧阶段通过保持原版本/清单。
 
 ## 【FACT】地图资源状态持久化
 
@@ -278,7 +278,7 @@ v23/revision26修理阶段的[工具修理](MapToolRepair.md)必填gatherTools.r
 
 ## 【FACT】工具等级、有效定义与v4候选
 
-[工具升级](MapGatherToolUpgrade.md)新增必填gatherToolUpgrade根11字段、四条6字段定义；地图当前v26/29。原ToolId/Durability缓冲追加Level，三GhostField所属同步，升级反馈另有Sequence/Kind/Result三字段；输入新增6/7至19字段。原准入严格校验旧工具二字段/v4三字段后恢复等级；ForLevel按实际级取上限/倍率，修理与HUD共用有效最大值，升级保留绝对耐久、重做显式满Lv1。所有ProjectTools分支及完整候选保存工具Level和实际容量Level，世界v2/资源签名与路径保持。编译/生成Serializer、136份非法配置拒绝及22次隔离Editor Bake静态通过；用户确认人工GamePlayer通过限v21/revision24二十二项，未触发独立用例UNKNOWN；原269项及旧用户通过保持，完整当前契约与人工边界归[专题](MapGatherToolUpgrade.md)/[运行入口](Runtime.md)。
+[工具升级](MapGatherToolUpgrade.md)新增必填gatherToolUpgrade根11字段、四条6字段定义；地图当前v32/revision35。原ToolId/Durability缓冲追加Level，三GhostField所属同步，升级反馈另有Sequence/Kind/Result三字段；输入新增6/7至19字段。原准入严格校验旧工具二字段/v4三字段后恢复等级；ForLevel按实际级取上限/倍率，修理与HUD共用有效最大值，升级保留绝对耐久、重做显式满Lv1。所有ProjectTools分支及完整候选保存工具Level和实际容量Level，世界v2/资源签名与路径保持。编译/生成Serializer、136份非法配置拒绝及22次隔离Editor Bake静态通过；用户确认人工GamePlayer通过限v21/revision24二十二项，未触发独立用例UNKNOWN；原269项及旧用户通过保持，完整当前契约与人工边界归[专题](MapGatherToolUpgrade.md)/[运行入口](Runtime.md)。
 
 ## 【FACT】采集工具耐久预警配置
 
@@ -298,11 +298,11 @@ v23/revision26修理阶段的[工具修理](MapToolRepair.md)必填gatherTools.r
 
 ## 【FACT】地面合并配置与原快照
 
-当前v31/revision34根必填[dropMerge](MapDropMerge.md)四字段，Json/BuiltIn默认true/0.8米/99份/0.2秒；原严格UTF-8/形状/完整字段/类型与语义检查保持，距离/间隔有限正float、上限正int，关闭仍校验，旧v1～v30拒绝，无补齐/回退/热重载。根Baker写四字段仅Server的Settings、0 GhostField；原掉落四同步字段、输入19、Tools3及所有所属反馈、玩家v4/世界v2路径/字段和资源布局/签名保持。世界快照沿原数量/期限/条目比较保存合并结果，来源Consumed排除、LastDropId不回退；Ready后的恢复物可参与，合法大堆不拒绝/拆分。合并v26阶段编译/元数据、194份非法配置拒绝、28组合法读取与64次隔离Bake静态通过；用户已确认合并人工GamePlayer通过，主线程结合既有静态核对判定通过，限v26/revision29十六项，未触发独立用例UNKNOWN；旧通过保持原范围。
+当前v32/revision35根必填[dropMerge](MapDropMerge.md)四字段，Json/BuiltIn默认true/0.8米/99份/0.2秒；原严格UTF-8/形状/完整字段/类型与语义检查保持，距离/间隔有限正float、上限正int，关闭仍校验，旧v1～v31拒绝，无补齐/回退/热重载。根Baker写四字段仅Server的Settings、0 GhostField；原掉落四同步字段、输入19、Tools3及所有所属反馈、玩家v4/世界v2路径/字段和资源布局/签名保持。世界快照沿原数量/期限/条目比较保存合并结果，来源Consumed排除、LastDropId不回退；Ready后的恢复物可参与，合法大堆不拒绝/拆分。合并v26阶段编译/元数据、194份非法配置拒绝、28组合法读取与64次隔离Bake静态通过；用户已确认合并人工GamePlayer通过，主线程结合既有静态核对判定通过，限v26/revision29十六项，未触发独立用例UNKNOWN；旧通过保持原范围。
 
 ## 【FACT】部分拾取配置与G布局
 
-当前v31/revision34的drops包含必填严格bool partialPickupEnabled=true，drops共12字段、原Server Settings共14字段，新增byte PartialPickupEnabled且0 GhostField；false恢复整堆规则，drops.enabled只控制敌人新物，容量关闭沿原整堆接收/checked边界。旧v1～v30、缺失/null/错类型/重复或未知键拒绝，关闭仍完整校验，无补默认/回退/热重载。两地图Json/BuiltIn一致，正常导入/烘焙后生效。
+当前v32/revision35的drops包含必填严格bool partialPickupEnabled=true，drops共12字段、原Server Settings共14字段，新增byte PartialPickupEnabled且0 GhostField；false恢复整堆规则，drops.enabled只控制敌人新物，容量关闭沿原整堆接收/checked边界。旧v1～v31、缺失/null/错类型/重复或未知键拒绝，关闭仍完整校验，无补默认/回退/热重载。两地图Json/BuiltIn一致，正常导入/烘焙后生效。
 
 G目标增加int PickupQuantity，当前七个SendToOwner GhostField，真实地面Quantity保持；生成Serializer/Snapshot七字段、7 mask bits/88字节结构已静态核对，实际收发/带宽不由结构大小推断。输入19、DropGhost4、Tools3/F4/资源状态4/世界保存3及原结果、玩家v4/世界v2字段和资源签名保持。部分拾取v27阶段258份非法配置拒绝、42组合法读取、40次隔离Bake通过；完整接收/提交规则归[部分拾取](MapDropPartialPickup.md)；用户人工通过限v27/revision30十六项，未触发独立用例UNKNOWN。
 
@@ -320,7 +320,7 @@ v29/revision32搜索阶段两地图Json/BuiltIn在inventoryPanel原44字段上�
 
 ## 【FACT】本机背包显示偏好文件
 
-当前两地图Json/BuiltIn为v31/revision34；inventoryPanel原四个保存字段true/true/inventory_display/0.5保留，追加preferencesResetEnabled=true、preferencesResetLabel=Reset view，DTO/Settings各57。新开关严格bool→byte，新文案非空白/无控制字符/最多61 UTF-8字节→FixedString64Bytes；关闭仍验证，旧地图v1～v30拒绝，无补齐/回退/热重载。当前37文案、两模式ID及一偏好文件ID，原参数保持。
+当前两地图Json/BuiltIn为v32/revision35；inventoryPanel原六个偏好/重置字段保持，追加[材料详情](MapInventoryDetails.md)十四字段，DTO/Settings各71。新开关严格bool→byte，十三文案非空白/无控制字符/最多61 UTF-8字节→FixedString64Bytes；关闭仍验证，旧地图v1～v31拒绝，无补齐/回退/热重载。当前50文案、两模式ID及一偏好文件ID，原参数保持。
 
 [Store](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapInventoryPanelPreferencesStore.cs)采用独立版本1的五字段JSON：version、mapDefinitionId、sortMode、filterMode、searchText；不复用玩家/世界档案或SavePrepared。路径为Application.persistentDataPath/CombatPrototype/Client/InventoryDisplay/<preferencesFileId>/<mapDefinitionId>.json，只有原客户端Panel的有效绑定调用。合法UTF-8可带BOM；完整五字段/类型、重复键、版本/地图ID、已知模式、搜索最多64 UTF-16单元及控制/孤立代理项检查。正式文件不存在属于首次使用，不创建或立即写入；其他读取错误明确日志并暂停本绑定偏好I/O，临时显示操作仍可用，不覆盖坏档。
 
@@ -328,4 +328,8 @@ v29/revision32搜索阶段两地图Json/BuiltIn在inventoryPanel原44字段上�
 
 v30/revision33保存阶段正常编译与55Settings/三个普通类/五字段协议元数据、1612份非法地图配置拒绝/96组合法读取、98次隔离Editor Bake静态通过；原输入19/Drop4/Tools3/G7及全部反馈、玩家v4根7/工具项3、世界v2根9/掉落项8、原布局/签名保持。偏好人工十六项已获用户通过反馈，限v30/revision33及[运行入口](Runtime.md)本阶段清单，人工结论来自用户反馈；AI未执行偏好实际I/O。未实际触发的独立读写/关闭/重启/故障与多人场景、平台File.Replace/Flush语义、同机同地图多进程并发写与异常断电仍UNKNOWN。
 
-当前v31/revision34显示重置只让原Panel恢复当前配置默认模式/空查询，由原Preferences.Capture延迟保存；关闭能力/禁止保存搜索的原字段仍保留，保存关闭或I/O暂停仅临时生效，不删除/迁移文件、不重新开启I/O。独立v1五字段、本机/地图路径、.tmp/Flush/Replace或Move边界保持；57字段、1716份非法配置拒绝/112组合法读取及112次隔离Bake静态通过，人工十六项待验收，完整规则归[偏好](MapInventoryPreferences.md)。
+v31/revision34重置阶段显示重置只让原Panel恢复当前配置默认模式/空查询，由原Preferences.Capture延迟保存；关闭能力/禁止保存搜索的原字段仍保留，保存关闭或I/O暂停仅临时生效，不删除/迁移文件、不重新开启I/O。独立v1五字段、本机/地图路径、.tmp/Flush/Replace或Move边界保持；57字段、1716份非法配置拒绝/112组合法读取及112次隔离Bake静态通过，人工十六项已获用户通过反馈，限本阶段版本/清单，未触发独立用例仍UNKNOWN，完整规则归[偏好](MapInventoryPreferences.md)。
+
+## 【FACT】材料详情配置与保存边界
+
+当前v32/revision35新增detailsEnabled=true及十三文案，共十四必填inventoryPanel字段；全量71配置/Settings和零GhostField静态核对，正常Unity编译、2414份非法配置拒绝/128组合法读取、128次隔离Editor Bake通过。新Details普通类及Unity生成meta已注册；原输入19、Tools3、反馈与玩家v4/世界v2/偏好v1五字段保持。详情选择不进入任何档案、不调用保存或自动创建记录，规则与人工十六项待验收归[详情](MapInventoryDetails.md)。

@@ -1,6 +1,6 @@
 # 背包容量扩展与升级
 
-返回[背包](Inventory.md)、[地图](Map.md)与[材料容量](MapInventoryCapacity.md)。本专题负责 CombatPrototypeNetCode 的个人永久容量等级、升级配方、所属反馈和 B/5 输入。玩家文件的唯一契约归[资源与数据](DataResources.md)，人工清单归[运行入口](Runtime.md)。当前地图 schemaVersion=23/configRevision=26；用户已确认人工GamePlayer通过，限v20/revision23升级十六项。
+返回[背包](Inventory.md)、[地图](Map.md)与[材料容量](MapInventoryCapacity.md)。本专题负责 CombatPrototypeNetCode 的个人永久容量等级、升级配方、所属反馈和 B/5 输入。玩家文件的唯一契约归[资源与数据](DataResources.md)，人工清单归[运行入口](Runtime.md)。当前地图 schemaVersion=32/configRevision=35；用户已确认人工GamePlayer通过，限v20/revision23升级十六项。
 
 ## 【FACT】入口与职责
 
@@ -91,3 +91,7 @@ v20容量升级阶段正常Unity编译通过，输入17字段、当时玩家存�
 用户已确认本阶段人工GamePlayer通过；主线程结合既有代码/配置静态核对与用户反馈判定通过，限CombatPrototypeNetCode、v20/revision23及[运行入口](Runtime.md)升级十六项，人工结论来自用户反馈。旧253项内容/编号及容量 v19/revision22 用户通过保持原版本/清单。实际扣料/重复与同tick输入、保存失败/迁移/坏档/等级保持、多玩家/晚加入/生命周期、运行字体/滚动布局、同步与延迟均未由 AI 验证；性能/带宽/平台/线上、跨文件原子一致/防重复、同槽并发及保存后意外 ECS 故障恢复仍 UNKNOWN。
 
 AI 未执行 GamePlayer/PlayMode、游戏/显示系统或 GUI 回调、逻辑单元测试、命令行构建、发布、性能采样、图片检查或真实玩家/世界存档 I/O，未创建子Agent、未提交 Git。
+
+## 【FACT】详情扩容用途
+
+当前v32/revision35的[材料详情](MapInventoryDetails.md)沿原RequireUpgradeDefinition读取Lv2/Lv3配方；容量/升级开关启用且未满级时，只列当前下一等级木材/石材需求。单种容量从原Snapshot当前等级读取，容量关闭或未受管材料显示Unlimited；原扩容资格/事务及玩家v4容量等级保持。详情人工待验收，原扩容用户通过仍限v20/revision23十六项。

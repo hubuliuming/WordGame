@@ -17,7 +17,7 @@ namespace Code_01.CombatPrototype.Map
             {
                 map = new MapDefinitionConfig
                 {
-                    schemaVersion = 31, configRevision = 34,
+                    schemaVersion = 32, configRevision = 35,
                     mapDefinitionId = mapDefinitionId, defaultSeed = 12345,
                     resourcePersistence = new MapResourcePersistenceConfig
                     {
@@ -217,7 +217,21 @@ namespace Code_01.CombatPrototype.Map
                         clearSearchLabel = "Clear", noSearchResultsLabel = "No search results",
                         preferencesEnabled = true, preferencesSaveSearch = true,
                         preferencesFileId = "inventory_display", preferencesSaveDelaySeconds = 0.5f,
-                        preferencesResetEnabled = true, preferencesResetLabel = "Reset view"
+                        preferencesResetEnabled = true, preferencesResetLabel = "Reset view",
+                        detailsEnabled = true,
+                        detailsButtonLabel = "Details",
+                        detailsTitleLabel = "Material details",
+                        detailsCloseLabel = "Close details",
+                        detailsQuantityLabel = "Quantity",
+                        detailsDescriptionLabel = "Description",
+                        detailsUsageLabel = "Uses",
+                        detailsNoUsageLabel = "No listed uses",
+                        detailsUnknownDescriptionLabel = "No description configured",
+                        woodDescriptionLabel = "Material from trees",
+                        stoneDescriptionLabel = "Material from ore nodes",
+                        appleDescriptionLabel = "Supply from vegetation",
+                        meatDescriptionLabel = "Supply from enemy rewards",
+                        meatUsageLabel = "E: Restore power"
                     },
                     inventoryCapacity = new MapInventoryCapacityConfig
                     {

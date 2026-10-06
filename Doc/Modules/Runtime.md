@@ -1069,7 +1069,7 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 
 入口CombatPrototypeNetCode，原B面板；本阶段两地图Json/BuiltIn为v31/revision34，57配置/Settings和0 GhostField正常编译/元数据核对通过；1716份非法地图配置全部拒绝/112组合法读取通过，112次隔离Editor Bake静态通过。完整57Settings、原全部Settings/零反馈/Prefab引用、资源布置/签名、原十九输入与Ghost/玩家v4/世界v2及偏好v1五字段保持，Bake Console前后[0 Error,2 Warning,0 Log]一致；主场景干净、3根对象，临时资源释放，未Play。
 
-本阶段十六项人工GamePlayer待验收；原435项内容/编号及偏好保存v30/revision33、搜索v29/revision32与其他用户通过原范围保持。各端同版代码/配置并正常导入/烘焙，静态通过不替代实际重置点击与偏好文件恢复验收。
+用户明确反馈“我已验收通过，接下来下一阶段”；主线程结合既有静态核对与用户反馈判定本阶段通过，限CombatPrototypeNetCode、v31/revision34及下述十六项人工GamePlayer清单，人工结论来自用户反馈，未实际触发的独立用例仍UNKNOWN。原435项内容/编号及偏好保存v30/revision33、搜索v29/revision32与其他用户通过原范围保持；各端同版代码/配置并正常导入/烘焙，静态通过不替代实际交互验收。
 
 1. 两地图Json/BuiltIn均v31/revision34，preferencesResetEnabled=true、preferencesResetLabel=Reset view必填，DTO/Settings57字段且0 GhostField；旧v1～v30、缺失/null/错类型/未知或重复键、空白/控制/超61字节文案明确失败，关闭重置/保存/面板仍验证。
 2. B面板在排序/分类/搜索之后、材料列表之前显示一行重置按钮；沿原有效面板鼠标按下许可触发，无额外快捷键。关闭preferencesResetEnabled后按钮及内容高度中的该行消失；关闭面板仍沿原隐藏，未触发边界UNKNOWN。
@@ -1089,3 +1089,28 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 16. 重置开关、新控制行/滚动高度与搜索框命中几何、Empty/无分类/无搜索结果文案回归；原制作/修理/升级、F/G/B/E/R/F5、采集再生/掉落拾取/战斗镜头/阻挡及游戏存档保持。多人/延迟/预测、分辨率/字形/性能/平台/线上未触发UNKNOWN。
 
 共451项；完整重置规则及保存失败/关闭能力边界归[偏好](MapInventoryPreferences.md)，可见行/缓存归[排序筛选](MapInventoryListView.md)，文本/焦点归[搜索](MapInventorySearch.md)，原业务归[B面板](MapInventoryPanel.md)，配置/协议归[资源与数据](DataResources.md)。AI未执行ResetDisplay/面板/偏好/GUI业务、实际偏好或游戏存档I/O、GamePlayer/PlayMode、逻辑单元测试、命令行构建/发布、性能采样或图片，未创建子Agent或提交Git；独立失败/联网/生命周期、并发/断电、性能/平台/线上仍UNKNOWN。
+
+## 【KNOWN ISSUES】背包材料详情与用途提示验收边界
+
+入口CombatPrototypeNetCode，原B面板；两地图Json/BuiltIn v32/revision35，完整71配置/Settings和零GhostField、普通Details类/正常生成meta已编译/注册。2414份非法配置全部拒绝，128组合法读取通过；128次隔离Editor Bake静态通过，全部71Settings、原Settings/反馈/Prefab引用、布置/兼容签名及原输入19/Tools3、玩家v4/世界v2/偏好v1五字段保持。只读源SubScene，临时资源释放，主场景干净、3根对象、未Play；最终详情标题高度适配已正常编译，配置/烘焙契约保持。
+
+执行前已有UnityConnect Token Exchange Error及两条PEListener/DOTween Warning，编译/重载后另有MCP WebSocket未初始化Warning；隔离Bake Console前后[1 Error,3 Warning,0 Log]相同，最终正常重载后[1 Error,2 Warning,0 Log]；未清空或宣称0 Error。本阶段人工十六项待验收；原451项内容/编号逐字保留，重置用户通过限v31/revision34十六项及其他旧阶段原范围。
+
+1. 两地图Json/BuiltIn均v32/revision35，十四新增字段采用详情专题默认值；DTO/Settings各71、零GhostField。旧v1～v31、缺失/null/错类型/未知或重复键、非有限值、空白/控制/超61 UTF-8字节文案明确失败；关闭详情/面板仍验证，未触发独立配置分支UNKNOWN。
+2. 原B面板材料名称行右侧显示Details，原Drop/All行保持；detailsEnabled=false恢复整宽名称、无详情按钮/展开高度，其他原功能保持。面板内点击沿原指针隔离，不误触Attack；无额外快捷键或挂载。
+3. 点击木材/石材/苹果/小块肉详情，下一有效刷新仅展开所选材料，标题/关闭行、名称、类别、当前数量/容量、来源及用途正确；重复选择不创建多个详情，切换材料只留一个。详情不扣库存/工具或提交业务。
+4. 改变原顺序/类型/数量排序后仍查看同一真实Name；配置两个材料使用同一显示名时仍按实际Name选择，重排期间不点错材料或丢错物品。行索引、相同文案与按下抬起时序未触发UNKNOWN。
+5. 分类/搜索隐藏所选Name时自动关闭；清搜索/切回分类不自动恢复旧详情。搜索编辑、释放焦点同帧及IME保持原键盘隔离；未知分类/焦点时序未触发UNKNOWN。
+6. G入包/部分拾取、Drop/All或制作扣料改变数量后详情随原库存刷新；数量归零或物品移除关闭，重新获得须重新选择，不显示旧数量。独立网络/同帧/业务失败时序未触发UNKNOWN。
+7. 容量Lv1/Lv2/Lv3下三种受管材料显示当前单种上限；关闭容量或查看未受管材料显示Unlimited。完整容量统计与原业务资格保持，不按搜索结果重新算库存；未遍历等级/开关组合UNKNOWN。
+8. 木材/石材制作用途读取实际斧头/镐子Lv1配方；PlayMode前修改合法成本并正常导入/烘焙后显示新需求，零消耗所选材料不列该用途。仅说明配方，原缺料/已持有/损坏重制资格仍由业务区决定。
+9. 工具/修理启用且持有工具时，修理用途标识当前等级并读取原有效Repair成本；满耐久/缺料仍可显示配方，原按钮资格不变。未持有或关闭工具/修理不列该用途，独立零成本/等级组合未触发UNKNOWN。
+10. 工具升级用途只显示当前持有且未满级工具的下一档需求；Lv1对应Lv2、Lv2对应Lv3、Lv3/未持有/关闭功能不列该项。调整合法配方和定义数组顺序后正常导入/烘焙，仍按ToolId+Level匹配，未触发配置组合UNKNOWN。
+11. 背包升级用途只在容量与升级开启且未满级时显示下一等级成本；Lv3或关闭开关不列扩容项。合法等级定义换序后匹配保持，原升级扣料/保存/容量结果不变，独立失败未触发UNKNOWN。
+12. 小块肉显示E用途文本但详情按钮不执行使用；苹果显示无用途记录且未新增使用效果。其他合法名称使用通用简介与无用途记录，不把未知物品映射成木材/石材；未知材料输入或旧数据未实际触发UNKNOWN。
+13. 开/关详情的GUI只排队，下一Show在Snapshot/ListView后应用；关闭B、显示重置、无效输入或绑定释放清选择/请求。逐帧Clear正常隐藏后再Show仍保留选择；已排队原业务及已提交服务器动作保持，独立时序未触发UNKNOWN。
+14. 默认380×640/字号18/行32下标题和正文换行，实际详情高度纳入滚动，Close details可操作，收起后后续按钮位置/搜索命中/页脚正确。ASCII/UTF-8 61字节/中文文案、最小合法尺寸、缩放/字形未遍历UNKNOWN。
+15. 关闭再开、死亡/复活、断线/重连、地图源/玩家/World/Scene变化不恢复旧详情；详情不写偏好文件，也不制造排序/搜索保存变化。原默认0.5秒保存及显示重置恢复保持，独立生命周期/I/O未触发UNKNOWN。
+16. 原F/G/B/E/R/F5、采集再生/资源交互/掉落合并与部分拾取、丢弃、制作/修理/两升级、战斗镜头/阻挡与游戏保存回归。各端同版代码/配置，原输入19/Tools3/全部反馈与玩家v4/世界v2保持；多人/延迟/预测、故障/性能/平台/线上未触发UNKNOWN。
+
+共467项；完整当前规则归[材料详情](MapInventoryDetails.md)，原业务/隔离归[B面板](MapInventoryPanel.md)，配置/协议归[资源与数据](DataResources.md)。AI未执行详情/面板/库存/GUI业务、真实偏好或游戏存档I/O、GamePlayer/PlayMode、逻辑单元测试、命令行构建/发布、采样/图片，未创建子Agent或提交Git；未实际触发的独立交互/生命周期/联网/故障及性能/平台/线上仍UNKNOWN。

@@ -915,3 +915,18 @@
 - inventoryPanel追加preferencesResetEnabled=true/preferencesResetLabel=Reset view，DTO/Settings55→57；两地图Json/BuiltIn31/34一致，旧v1～v30拒绝，关闭仍严格完整验证，文案沿非空白/无控制字符/61 UTF-8字节规则。仅八现有脚本、两JSON接入，无新文件/meta或资源结构；保存协调类、v1五字段/路径/延迟及失败隔离保持，保存关闭或错误暂停只临时重置，关闭能力/禁止保存搜索不覆盖原字段。
 - 正常编译/元数据、1716份非法配置拒绝/112组合法读取及112次隔离Editor Bake静态通过；57Settings、输入19/Drop4/Tools3及原所有所属反馈、玩家v4/世界v2、原完整布置/资源签名保持。Bake Console前后[0,2,0]一致，仅PEListener/DOTween源码Warning，未清空，主场景干净、3根对象、临时资源释放。
 - 增量同步偏好专题、受影响模块/导航与策划模板第7节JSON/第40节；原435项人工内容/编号保留，新增十六项后451项，本阶段人工待验收，旧保存阶段通过仍限v30/revision33原清单。Scene/SubScene/Prefab/Animator/所有meta/资源/包/构建配置与HUD/Binding/PlayerInput/服务器业务保持；未执行重置/面板/偏好/GUI业务、真实偏好或游戏存档I/O、GamePlayer/PlayMode、逻辑单元测试、命令行构建/发布、采样或图片，未创建子Agent或提交Git。
+
+## 2026-10-06 背包显示偏好重置人工验收状态同步（v31/revision34）
+
+- 用户明确反馈“我已验收通过，接下来下一阶段”。主线程结合既有静态核对与用户反馈判定背包显示偏好重置阶段通过；范围限CombatPrototypeNetCode、v31/revision34及Runtime中的十六项人工GamePlayer清单，人工结论来自用户反馈。
+- 增量同步导航、地图、背包、B面板、排序筛选、搜索、偏好、HUD、玩家、配置/存档及运行验收状态，项目外建议模板第40节同步为已验收；Runtime原451项内容/编号逐字保留，旧阶段通过范围保持。
+- 本次只更新十二份项目文档及建议模板，不修改代码、JSON、Scene/SubScene/Prefab/Animator/meta/资源或项目设置，未新增结构；未执行Unity业务、GamePlayer/PlayMode、逻辑单元测试、构建/发布、真实偏好/游戏存档I/O、图片或采样，未创建子Agent或提交Git。
+- 未实际触发的独立文件I/O/失败、生命周期/时序、焦点/字形/分辨率与联网用例仍UNKNOWN；同机并发、断电、平台语义和性能未获单独验收结论，仍UNKNOWN。
+
+## 2026-10-06 背包材料详情与用途提示（v32/revision35）
+
+- 按已确认方案，由主线程在CombatPrototypeNetCode原B面板接入Details：按真实Name排队/应用，最多展开一个材料，显示类别/数量/单种容量/简介与原配方用途；重排保留同名选择，隐藏/消失/显示重置/关闭/绑定释放清选择，内容高度按标题/正文实际换行测量，取消旧面板/行按下许可，已排队原业务保持。
+- 八现有脚本与一新普通Details类及Unity生成meta、两地图JSON接入；inventoryPanel追加一个开关/十三文案，57→71字段，Json/BuiltIn32/35一致。原工具制作/有效等级修理/下一档工具及容量升级配方只读，未知材料用配置通用文案，无新业务操作、Ghost/命令或存档字段，原保存三类与v1五字段保持。
+- 正常Unity编译/元数据、2414份非法配置拒绝/128组合法读取、128次隔离Editor Bake通过；全量71Settings、原Settings/零反馈/绑定/资源签名/布局及输入19/Tools3/玩家v4/世界v2保持。Bake前后Console[1,3,0]相同，含已有UnityConnect Error、两条源码Warning和MCP WebSocket Warning；未清空Console或宣称0 Error，主场景干净未Play，临时资源释放。烘焙后仅详情标题/关闭行高度适配并正常编译，配置/烘焙契约未改变；最终重载后Console[1,2,0]，保留UnityConnect Error和两条源码Warning。
+- 新增详情专题，增量同步受影响模块、导航及策划模板第7节JSON/第41节；原451项人工内容/编号逐字保留，追加十六项后467项，详情人工待验收，旧用户通过保持原范围。两升级专题、资源/数据与模板总说明的当前地图版本引用同步至真实32/35，业务与原人工结论保持。
+- Scene/SubScene/Prefab/Animator/旧meta/资源/字体/包/构建配置、HUD/Binding/PlayerInput及服务器/保存代码保持；未执行详情/面板/库存/GUI业务、实际偏好/游戏存档I/O、GamePlayer/PlayMode、逻辑单元测试、命令行构建/发布、采样/图片，未创建子Agent或提交Git。

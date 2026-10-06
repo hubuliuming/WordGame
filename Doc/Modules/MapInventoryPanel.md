@@ -21,7 +21,7 @@
 
 ## 【FACT】JSON 契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 当前一致为 schemaVersion=31/configRevision=34。必填 inventoryPanel 共57字段，原30字段加[排序筛选](MapInventoryListView.md)十四、[搜索](MapInventorySearch.md)七及[本机偏好与重置](MapInventoryPreferences.md)六字段，沿原严格UTF-8、完整字段/类型及未知/重复键检查；即使关闭面板也校验全部字段。旧地图v1～v30明确失败，不补段/默认值或回退来源；正常导入/烘焙后生效，无运行热重载。Lv1配方/定义仍从gatherTools读取，当前级上限/倍率归[gatherToolUpgrade](MapGatherToolUpgrade.md)，面板不复制配置真值。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 当前一致为 schemaVersion=32/configRevision=35。必填 inventoryPanel 共71字段，原30字段加[排序筛选](MapInventoryListView.md)十四、[搜索](MapInventorySearch.md)七、[本机偏好与重置](MapInventoryPreferences.md)六及[材料详情](MapInventoryDetails.md)十四字段，沿原严格UTF-8、完整字段/类型及未知/重复键检查；即使关闭面板也校验全部字段。旧地图v1～v31明确失败，不补段/默认值或回退来源；正常导入/烘焙后生效，无运行热重载。Lv1配方/定义仍从gatherTools读取，当前级上限/倍率归[gatherToolUpgrade](MapGatherToolUpgrade.md)，面板不复制配置真值。
 
 | 字段 | 默认值 | 契约 |
 |---|---|---|
@@ -56,7 +56,7 @@
 | repairButtonLabel | Repair |
 | fullDurabilityLabel | Full durability |
 
-全部36文案（上表原22项加排序筛选十项与搜索四项）须非空白、无控制字符且最多61个UTF-8字节，烘焙为FixedString64Bytes。内置GUI字体和白色纹理复用；当前英文文案，中文接口保留，字体/字形覆盖为UNKNOWN，没有读取图片或界面截图。
+全部50文案（上表原22项、排序筛选十项、搜索四项、重置一项及[材料详情](MapInventoryDetails.md)十三项）须非空白、无控制字符且最多61个UTF-8字节，烘焙为FixedString64Bytes。内置GUI字体和白色纹理复用；当前英文文案，中文接口保留，字体/字形覆盖为UNKNOWN，没有读取图片或界面截图。
 
 ## 【CURRENT STRATEGY】库存、工具与配方显示
 
@@ -132,4 +132,8 @@ v28/revision31排序筛选已落地，正常Unity编译、1078份非法配置拒
 
 v30/revision33保存阶段的[本机偏好](MapInventoryPreferences.md)新增四必填字段，配置/Settings各55；八现有脚本与三普通类、两JSON接入，原HUD/Binding与十九输入不变。正常编译、1612份非法配置拒绝/96组合法读取及98次隔离Editor Bake静态通过，原库存/工具/服务器保存保持；人工十六项已获用户通过反馈，范围见[运行入口](Runtime.md)，未实际触发的独立用例仍UNKNOWN。
 
-当前v31/revision34的显示重置在原GUI排队，在有效Show的Snapshot之后、ListView刷新及Preferences观察之前恢复配置默认模式/空查询，归零滚动、释放焦点并取消旧行按下许可。Close/Reset及无效ReadInput清未应用重置；不调用保存类重建或服务器业务。57字段、严格配置读取和112组隔离Bake静态通过，新增十六项人工待验收，范围见[运行入口](Runtime.md)。
+v31/revision34重置阶段的显示重置在原GUI排队，在有效Show的Snapshot之后、ListView刷新及Preferences观察之前恢复配置默认模式/空查询，归零滚动、释放焦点并取消旧行按下许可。Close/Reset及无效ReadInput清未应用重置；不调用保存类重建或服务器业务。57字段、严格配置读取和112组隔离Bake静态通过，新增十六项人工已获用户通过反馈，限v31/revision34本阶段清单，未触发独立用例仍UNKNOWN，范围见[运行入口](Runtime.md)。
+
+## 【CURRENT STRATEGY】材料详情
+
+当前v32/revision35在原材料名称行右侧绘制Details按钮；GUI排队真实Name，Show在完整Snapshot/可见行刷新后应用详情，随后原Preferences只观察显示偏好。选择行的原Drop/All行之后展开只读详情，标题与正文自动换行、Close details复用全宽行，滚动高度计入实际测量结果；材料重排保留同一Name，隐藏/消失、显示重置、关闭/无效输入与释放绑定清选择。原每帧Clear仍只隐藏，详情开关关闭恢复整宽材料名称及原行高。完整字段、调用链/点击许可、配方及静态/人工边界归[材料详情](MapInventoryDetails.md)，人工十六项待验收。

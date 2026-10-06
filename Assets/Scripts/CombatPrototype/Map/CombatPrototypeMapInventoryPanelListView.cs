@@ -161,6 +161,12 @@ namespace Code_01.CombatPrototype.Map
             }
         }
 
+        public string CategoryLabel(FixedString64Bytes name)
+        {
+            var rank = TypeRank(name);
+            return rank < 2 ? _resourcesLabel : rank < 4 ? _suppliesLabel : _otherLabel;
+        }
+
         private static int TypeRank(FixedString64Bytes name)
         {
             if (name.Equals(Wood)) return 0;

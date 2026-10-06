@@ -62,5 +62,19 @@ namespace Code_01.CombatPrototype.Map
         public float PreferencesSaveDelaySeconds;
         public byte PreferencesResetEnabled;
         public FixedString64Bytes PreferencesResetLabel;
+        public byte DetailsEnabled;
+        public FixedString64Bytes DetailsButtonLabel;
+        public FixedString64Bytes DetailsTitleLabel;
+        public FixedString64Bytes DetailsCloseLabel;
+        public FixedString64Bytes DetailsQuantityLabel;
+        public FixedString64Bytes DetailsDescriptionLabel;
+        public FixedString64Bytes DetailsUsageLabel;
+        public FixedString64Bytes DetailsNoUsageLabel;
+        public FixedString64Bytes DetailsUnknownDescriptionLabel;
+        public FixedString64Bytes WoodDescriptionLabel;
+        public FixedString64Bytes StoneDescriptionLabel;
+        public FixedString64Bytes AppleDescriptionLabel;
+        public FixedString64Bytes MeatDescriptionLabel;
+        public FixedString64Bytes MeatUsageLabel;
     }
 }

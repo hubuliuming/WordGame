@@ -12,6 +12,7 @@ namespace Code_01.CombatPrototype.Map
         private readonly CombatPrototypeMapInventoryPanelListView _listView = new CombatPrototypeMapInventoryPanelListView();
         private readonly CombatPrototypeMapInventoryPanelSearch _search = new CombatPrototypeMapInventoryPanelSearch();
         private readonly CombatPrototypeMapInventoryPanelPreferences _preferences = new CombatPrototypeMapInventoryPanelPreferences();
+        private readonly CombatPrototypeMapInventoryPanelDetails _details = new CombatPrototypeMapInventoryPanelDetails();
         private readonly CombatPrototypeMapInventoryDropClient _drop = new CombatPrototypeMapInventoryDropClient();
         private readonly CombatPrototypeMapGatherToolRepairPanel _repair = new CombatPrototypeMapGatherToolRepairPanel();
         private readonly CombatPrototypeMapInventoryCapacityUpgradePanel _upgrade = new CombatPrototypeMapInventoryCapacityUpgradePanel();
@@ -79,6 +80,8 @@ namespace Code_01.CombatPrototype.Map
             _listView.Configure(settings);
             _search.Configure(settings);
             _preferences.Configure(settings, mapId, _listView, _search);
+            _details.Configure(settings, toolSettings, axe, pickaxe, capacity, upgradeSettings, upgradeDefinitions,
+                toolUpgradeSettings, toolUpgradeDefinitions);
             _upgrade.Configure(settings, capacity, upgradeSettings, upgradeDefinitions, mapId);
             _drop.Configure(dropSettings, dropDefinitions, settings);
             _repair.Configure(settings, toolSettings, axe, pickaxe, _levelLabel);
@@ -101,11 +104,14 @@ namespace Code_01.CombatPrototype.Map
                 _preferencesResetPending = false;
                 _listView.ResetDisplay(_settings.DefaultSortMode, _settings.DefaultFilterMode);
                 _search.ResetDisplay();
+                _details.Close();
                 _scroll = Vector2.zero;
-                _rowMousePressAccepted = false;
+                _mousePressAccepted = _rowMousePressAccepted = false;
             }
             if (_listView.Capture(_snapshot, _search, out var selectionChanged)) _rowMousePressAccepted = false;
             if (selectionChanged) _scroll = Vector2.zero;
+            if (_details.Capture(_snapshot, _listView, axeLevel, pickaxeLevel, effectiveAxe, effectivePickaxe, capacityLevel))
+                _mousePressAccepted = _rowMousePressAccepted = false;
             _preferences.Capture(_listView, _search);
             _upgrade.Capture(_snapshot, capacityLevel, upgradeFeedback);
             _canCraftAxe = CanCraft(_axe, axeDurability);
@@ -179,6 +185,7 @@ namespace Code_01.CombatPrototype.Map
             {
                 _craftAxe = _craftPickaxe = _mousePressAccepted = _rowMousePressAccepted = _preferencesResetPending = false;
                 _search.ReleaseFocus();
+                _details.Close();
                 _drop.ClearPending();
                 _repair.ClearPending();
                 _upgrade.ClearPending();
@@ -268,7 +275,9 @@ namespace Code_01.CombatPrototype.Map
                 GUI.Label(new Rect(panel.x + 12f, panel.y + 12f, panel.width - 24f, _settings.RowHeightPixels), _title, _labelStyle);
                 var viewport = Viewport(panel);
                 var rows = Mathf.Max(_listView.Items.Count * 2, 1) + _listView.ControlRowCount + _search.RowCount + (PreferencesResetEnabled ? 1 : 0) + 14 + CombatPrototypeMapGatherToolRepairPanel.RowCount + CombatPrototypeMapInventoryCapacityUpgradePanel.RowCount + CombatPrototypeMapGatherToolUpgradePanel.RowCount + (_durabilityEnabled ? 2 : 0);
-                var content = new Rect(0f, 0f, viewport.width - 18f, rows * _settings.RowHeightPixels);
+                var contentWidth = viewport.width - 18f;
+                var content = new Rect(0f, 0f, contentWidth, rows * _settings.RowHeightPixels +
+                    _details.ExtraHeight(contentWidth, _settings.RowHeightPixels, _labelStyle));
                 _scroll = GUI.BeginScrollView(viewport, _scroll, content);
                 try { DrawBody(content.width); }
                 finally { GUI.EndScrollView(); }
@@ -303,10 +312,11 @@ namespace Code_01.CombatPrototype.Map
                 Label(width, ref y, _snapshot.Items.Count == 0 ? _empty : _search.HasQuery ? _search.NoResultsText : _listView.NoMatchingItemsText);
             foreach (var item in _listView.Items)
             {
-                Label(width, ref y, item.Text);
+                _details.DrawItemLabel(width, ref y, _settings.RowHeightPixels, _labelStyle, _buttonStyle, item, _rowMousePressAccepted);
                 _drop.DrawRow(width, y, _settings.RowHeightPixels, _labelStyle, _buttonStyle, item,
                     _snapshot.InventoryValid, _rowMousePressAccepted);
                 y += _settings.RowHeightPixels;
+                _details.DrawExpanded(width, ref y, _settings.RowHeightPixels, _labelStyle, _buttonStyle, item.Name, _mousePressAccepted);
             }
             _upgrade.Draw(width, ref y, _settings.RowHeightPixels, _labelStyle, _buttonStyle, _mousePressAccepted);
             Label(width, ref y, _tools);
@@ -385,6 +395,7 @@ namespace Code_01.CombatPrototype.Map
             _open = _craftAxe = _craftPickaxe = _mousePressAccepted = _rowMousePressAccepted = _preferencesResetPending = false;
             _listView.ClearPending();
             _search.Close();
+            _details.Close();
             _drop.ClearPending();
             _repair.ClearPending();
             _upgrade.ClearPending();
@@ -403,6 +414,7 @@ namespace Code_01.CombatPrototype.Map
             _listView.Reset();
             _search.Reset();
             _preferences.Reset();
+            _details.Reset();
             _drop.Reset();
             _repair.Reset();
             _upgrade.Reset();

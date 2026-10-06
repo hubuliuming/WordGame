@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 31,
-  "configRevision": 34,
+  "schemaVersion": 32,
+  "configRevision": 35,
   "mapDefinitionId": "battle_forest_01",
   "defaultSeed": 12345,
   "resourcePersistence": {
@@ -337,7 +337,21 @@
     "preferencesFileId": "inventory_display",
     "preferencesSaveDelaySeconds": 0.5,
     "preferencesResetEnabled": true,
-    "preferencesResetLabel": "Reset view"
+    "preferencesResetLabel": "Reset view",
+    "detailsEnabled": true,
+    "detailsButtonLabel": "Details",
+    "detailsTitleLabel": "Material details",
+    "detailsCloseLabel": "Close details",
+    "detailsQuantityLabel": "Quantity",
+    "detailsDescriptionLabel": "Description",
+    "detailsUsageLabel": "Uses",
+    "detailsNoUsageLabel": "No listed uses",
+    "detailsUnknownDescriptionLabel": "No description configured",
+    "woodDescriptionLabel": "Material from trees",
+    "stoneDescriptionLabel": "Material from ore nodes",
+    "appleDescriptionLabel": "Supply from vegetation",
+    "meatDescriptionLabel": "Supply from enemy rewards",
+    "meatUsageLabel": "E: Restore power"
   },
   "inventoryCapacity": {
     "enabled": true,

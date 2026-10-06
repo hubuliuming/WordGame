@@ -54,8 +54,8 @@ namespace Code_01.CombatPrototype.Map
             ValidateInventoryCapacityUpgrade(map.inventoryCapacityUpgrade, map.inventoryCapacity);
             ValidateInventoryDrop(map.inventoryDrop);
             Id(map.mapDefinitionId, "mapDefinitionId");
-            if (map.schemaVersion != 31 || map.configRevision < 1 || map.defaultSeed < 1)
-                throw new InvalidOperationException("Map requires schemaVersion=31, positive revision and seed.");
+            if (map.schemaVersion != 32 || map.configRevision < 1 || map.defaultSeed < 1)
+                throw new InvalidOperationException("Map requires schemaVersion=32, positive revision and seed.");
             var drops = map.drops;
             Id(drops.itemId, "drops.itemId");
             Id(drops.visualResourceKey, "drops.visualResourceKey");
@@ -608,6 +608,19 @@ namespace Code_01.CombatPrototype.Map
             Id(panel.preferencesFileId, "inventoryPanel.preferencesFileId");
             Positive(panel.preferencesSaveDelaySeconds, "inventoryPanel.preferencesSaveDelaySeconds");
             HudLabel(panel.preferencesResetLabel, "inventoryPanel.preferencesResetLabel");
+            HudLabel(panel.detailsButtonLabel, "inventoryPanel.detailsButtonLabel");
+            HudLabel(panel.detailsTitleLabel, "inventoryPanel.detailsTitleLabel");
+            HudLabel(panel.detailsCloseLabel, "inventoryPanel.detailsCloseLabel");
+            HudLabel(panel.detailsQuantityLabel, "inventoryPanel.detailsQuantityLabel");
+            HudLabel(panel.detailsDescriptionLabel, "inventoryPanel.detailsDescriptionLabel");
+            HudLabel(panel.detailsUsageLabel, "inventoryPanel.detailsUsageLabel");
+            HudLabel(panel.detailsNoUsageLabel, "inventoryPanel.detailsNoUsageLabel");
+            HudLabel(panel.detailsUnknownDescriptionLabel, "inventoryPanel.detailsUnknownDescriptionLabel");
+            HudLabel(panel.woodDescriptionLabel, "inventoryPanel.woodDescriptionLabel");
+            HudLabel(panel.stoneDescriptionLabel, "inventoryPanel.stoneDescriptionLabel");
+            HudLabel(panel.appleDescriptionLabel, "inventoryPanel.appleDescriptionLabel");
+            HudLabel(panel.meatDescriptionLabel, "inventoryPanel.meatDescriptionLabel");
+            HudLabel(panel.meatUsageLabel, "inventoryPanel.meatUsageLabel");
         }
 
         private static void HudLabel(string value, string field)

@@ -35,7 +35,7 @@
 | inventoryPanel.repairButtonLabel | Repair | 同上 |
 | inventoryPanel.fullDurabilityLabel | Full durability | 同上 |
 
-gatherTools根5字段、tools每条11字段，修理所用字段保持；当前inventoryPanel57字段/37文案、两模式ID及一偏好文件ID，新增展示项归[排序筛选](MapInventoryListView.md)、[搜索](MapInventorySearch.md)与[本机偏好](MapInventoryPreferences.md)，容量文案归[容量](MapInventoryCapacity.md)。关闭修理、工具或面板仍校验全部字段；不以开关补参数。0木材或0石材成本合法，但两者不可同时为0。工具ID、槽数、Lv1最大耐久60/40（升级后按本级上限）、制作配方木3石2/木2石3、成功消耗1/Lv1倍率0.75、原F/B/高亮默认值、三类600秒再生及地图空间/种子/32敌人/出生保持。
+gatherTools根5字段、tools每条11字段，修理所用字段保持；当前inventoryPanel71字段/50文案、两模式ID及一偏好文件ID，新增展示项归[排序筛选](MapInventoryListView.md)、[搜索](MapInventorySearch.md)与[本机偏好](MapInventoryPreferences.md)，容量文案归[容量](MapInventoryCapacity.md)。关闭修理、工具或面板仍校验全部字段；不以开关补参数。0木材或0石材成本合法，但两者不可同时为0。工具ID、槽数、Lv1最大耐久60/40（升级后按本级上限）、制作配方木3石2/木2石3、成功消耗1/Lv1倍率0.75、原F/B/高亮默认值、三类600秒再生及地图空间/种子/32敌人/出生保持。
 
 ## 【CURRENT STRATEGY】服务端资格与事务
 
@@ -86,3 +86,7 @@ Result依次为None、Success、Disabled、NotOwned、AlreadyFull、Insufficient
 ## 【FACT】耐久预警中的修理提示
 
 [耐久预警](MapToolDurabilityHud.md)复用原3/4入口；F损坏工具及B预警/损坏详情显示Repair按键，关闭修理时损坏工具沿原1/2重做。提示只读，不代替材料/生命/预约/同tick资格，不新增输入、反馈、存档或修理恢复值；修理后按本级最大耐久重算比例，恢复20/15仍处阈值内时保留Low/Critical。用户确认新显示人工GamePlayer通过，限v22/revision25十六项，未触发用例UNKNOWN；原修理通过仍限v14/revision17十二项。
+
+## 【FACT】详情修理用途
+
+当前v32/revision35的[材料详情](MapInventoryDetails.md)在工具与修理开关启用且持有工具时，只读原Show传入的本级有效RepairWoodQuantity/RepairStoneQuantity，零消耗材料不列该用途。满耐久或缺料仍可显示用途配方，不表示可执行；原修理按钮与服务器资格/扣料/保存保持。详情人工待验收，原修理通过仍限v23/revision26十六项。

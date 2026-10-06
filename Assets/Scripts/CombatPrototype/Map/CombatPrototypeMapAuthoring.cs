@@ -319,7 +319,21 @@ namespace Code_01.CombatPrototype.Map
                     PreferencesFileId = new FixedString64Bytes(inventoryPanel.preferencesFileId),
                     PreferencesSaveDelaySeconds = inventoryPanel.preferencesSaveDelaySeconds,
                     PreferencesResetEnabled = (byte)(inventoryPanel.preferencesResetEnabled ? 1 : 0),
-                    PreferencesResetLabel = new FixedString64Bytes(inventoryPanel.preferencesResetLabel)
+                    PreferencesResetLabel = new FixedString64Bytes(inventoryPanel.preferencesResetLabel),
+                    DetailsEnabled = (byte)(inventoryPanel.detailsEnabled ? 1 : 0),
+                    DetailsButtonLabel = new FixedString64Bytes(inventoryPanel.detailsButtonLabel),
+                    DetailsTitleLabel = new FixedString64Bytes(inventoryPanel.detailsTitleLabel),
+                    DetailsCloseLabel = new FixedString64Bytes(inventoryPanel.detailsCloseLabel),
+                    DetailsQuantityLabel = new FixedString64Bytes(inventoryPanel.detailsQuantityLabel),
+                    DetailsDescriptionLabel = new FixedString64Bytes(inventoryPanel.detailsDescriptionLabel),
+                    DetailsUsageLabel = new FixedString64Bytes(inventoryPanel.detailsUsageLabel),
+                    DetailsNoUsageLabel = new FixedString64Bytes(inventoryPanel.detailsNoUsageLabel),
+                    DetailsUnknownDescriptionLabel = new FixedString64Bytes(inventoryPanel.detailsUnknownDescriptionLabel),
+                    WoodDescriptionLabel = new FixedString64Bytes(inventoryPanel.woodDescriptionLabel),
+                    StoneDescriptionLabel = new FixedString64Bytes(inventoryPanel.stoneDescriptionLabel),
+                    AppleDescriptionLabel = new FixedString64Bytes(inventoryPanel.appleDescriptionLabel),
+                    MeatDescriptionLabel = new FixedString64Bytes(inventoryPanel.meatDescriptionLabel),
+                    MeatUsageLabel = new FixedString64Bytes(inventoryPanel.meatUsageLabel)
                 });
                 var inventoryDrop = config.map.inventoryDrop;
                 AddComponent(entity, new CombatPrototypeMapInventoryDropSettings

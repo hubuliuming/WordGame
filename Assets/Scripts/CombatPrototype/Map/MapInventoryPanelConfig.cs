@@ -62,5 +62,19 @@ namespace Code_01.CombatPrototype.Map
         public float preferencesSaveDelaySeconds;
         public bool preferencesResetEnabled;
         public string preferencesResetLabel;
+        public bool detailsEnabled;
+        public string detailsButtonLabel;
+        public string detailsTitleLabel;
+        public string detailsCloseLabel;
+        public string detailsQuantityLabel;
+        public string detailsDescriptionLabel;
+        public string detailsUsageLabel;
+        public string detailsNoUsageLabel;
+        public string detailsUnknownDescriptionLabel;
+        public string woodDescriptionLabel;
+        public string stoneDescriptionLabel;
+        public string appleDescriptionLabel;
+        public string meatDescriptionLabel;
+        public string meatUsageLabel;
     }
 }

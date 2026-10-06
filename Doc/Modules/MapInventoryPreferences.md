@@ -1,6 +1,6 @@
 # 背包显示偏好本地保存
 
-返回[地图](Map.md)、[背包](Inventory.md)、[B面板](MapInventoryPanel.md)、[排序筛选](MapInventoryListView.md)、[搜索](MapInventorySearch.md)、[配置与存档](DataResources.md)及[运行验收](Runtime.md)。入口CombatPrototypeNetCode，原B面板；Forest/Grassland Json/BuiltIn当前v31/revision34，重置阶段人工待验收。主线程按确认方案完成代码、配置及静态核对；用户已确认v30保存阶段人工GamePlayer验收通过，主线程结合既有静态核对与用户反馈判定通过，限CombatPrototypeNetCode、v30/revision33及运行入口十六项清单。人工结论来自用户反馈；搜索已验收仅限v29/revision32原十六项。
+返回[地图](Map.md)、[背包](Inventory.md)、[B面板](MapInventoryPanel.md)、[排序筛选](MapInventoryListView.md)、[搜索](MapInventorySearch.md)、[配置与存档](DataResources.md)及[运行验收](Runtime.md)。入口CombatPrototypeNetCode，原B面板；Forest/Grassland Json/BuiltIn当前v32/revision35，[材料详情](MapInventoryDetails.md)人工待验收；用户已确认重置阶段人工GamePlayer验收通过，主线程结合既有静态核对与用户反馈判定通过，限CombatPrototypeNetCode、v31/revision34及运行入口十六项清单，人工结论来自用户反馈。主线程按确认方案完成代码、配置及静态核对；用户已确认v30保存阶段人工GamePlayer验收通过，主线程结合既有静态核对与用户反馈判定通过，限CombatPrototypeNetCode、v30/revision33及运行入口十六项清单。人工结论来自用户反馈；搜索已验收仅限v29/revision32原十六项。
 
 ## 【FACT】文件与配置
 
@@ -21,7 +21,7 @@
 | preferencesResetEnabled | true | 必填严格bool→byte；原面板中的重置按钮开关 |
 | preferencesResetLabel | Reset view | 必填非空白、无控制字符、最多61 UTF-8字节→FixedString64Bytes |
 
-原55字段保留，当前DTO九bool、六float、两int、两模式string、37文案string及一文件ID，共57；Settings九byte、六float、两int、两byte枚举及38 FixedString64Bytes，共57，0 GhostField/无GhostComponent。关闭重置/偏好/搜索/排序/筛选/面板仍完整校验。地图Reader只接受schema31和正revision/seed，旧v1～v30拒绝；无补默认、来源回退或热重载，正常导入/烘焙生效，各端同版。
+原57字段保留，追加[详情](MapInventoryDetails.md)十四字段，当前DTO十bool、六float、两int、两模式string、50文案string及一文件ID，共71；Settings十byte、六float、两int、两byte枚举及51 FixedString64Bytes，共71，0 GhostField/无GhostComponent。关闭详情/重置/偏好/搜索/排序/筛选/面板仍完整校验。地图Reader只接受schema32和正revision/seed，旧v1～v31拒绝；无补默认、来源回退或热重载，正常导入/烘焙生效，各端同版。
 
 ## 【CURRENT STRATEGY】读取、应用与生命周期
 
@@ -63,10 +63,14 @@ Close/Reset及原无效ReadInput分支清未应用重置，逐帧Clear仍只隐�
 
 ## 【KNOWN ISSUES】v31重置阶段验收边界
 
-当前v31/revision34、57配置/Settings及0 GhostField已正常Unity编译/重载并核对；1716份非法地图配置拒绝（每地图858），112组合法读取通过（每地图56），包括新开关标量/完整57字段/新文案和关闭仍验证、旧v1～v30/未来版本及原规则。
+v31/revision34重置阶段的57配置/Settings及0 GhostField已正常Unity编译/重载并核对；1716份非法地图配置拒绝（每地图858），112组合法读取通过（每地图56），包括新开关标量/完整57字段/新文案和关闭仍验证、旧v1～v30/未来版本及原规则。
 
 两地图各56次，共112次隔离Editor Bake通过：保留原49变体，增加重置关闭、ASCII/中文61字节/中文文案、显示与重置关闭、面板与重置关闭及自定义默认模式/初始打开/保存关闭组合。全部57Settings与原Settings/零反馈/Prefab引用、完整布置/资源签名匹配；Forest89树/36采集/20矿/109阻挡，Grassland53/38/18/71保持。Bake Console前后均[0 Error,2 Warning,0 Log]，两条PEListener/DOTween源码警告，未清空Console；临时资源释放，主场景干净、3根对象、未Play。
 
-原输入19/DropGhost4/Tools3和全部所属反馈、玩家v4根7/工具项3、世界v2根9/掉落项8及本机偏好v1五字段保持。重置阶段仅八现有脚本、两JSON与文档修改，Scene/SubScene/Prefab/Animator/全部meta/资源/字体/包/构建配置、HUD/Binding/PlayerInput及服务器业务保持。原435项人工内容/编号保留，新增十六项后451项，清单归[运行入口](Runtime.md)；本阶段人工待验收，既有用户通过仍限各阶段原版本/清单。
+原输入19/DropGhost4/Tools3和全部所属反馈、玩家v4根7/工具项3、世界v2根9/掉落项8及本机偏好v1五字段保持。重置阶段仅八现有脚本、两JSON与文档修改，Scene/SubScene/Prefab/Animator/全部meta/资源/字体/包/构建配置、HUD/Binding/PlayerInput及服务器业务保持。原435项人工内容/编号保留，新增十六项后451项，清单归[运行入口](Runtime.md)；本阶段人工十六项已获用户通过反馈，限CombatPrototypeNetCode、v31/revision34及运行入口清单，主线程结合既有静态核对判定通过，结论来自用户反馈；既有用户通过仍限各阶段原版本/清单。
 
-重置实际点击/列表刷新/焦点与输入、关闭/重绑/重启恢复、文件写入/失败、多人/时序/字形/分辨率、同机并发/断电/平台语义及性能仍UNKNOWN。AI未执行ResetDisplay/面板/偏好/GUI业务、实际偏好或游戏存档I/O、GamePlayer/PlayMode、逻辑单元测试、命令行构建/发布、采样或图片，未创建子Agent或提交Git。
+本阶段人工通过范围限上述版本和十六项清单；未实际触发的独立点击/刷新/焦点输入、关闭/重绑/重启、文件I/O/失败、多人/时序/字形/分辨率仍UNKNOWN，同机并发/断电/平台语义及性能未获单独验收结论，仍UNKNOWN。AI未执行ResetDisplay/面板/偏好/GUI业务、实际偏好或游戏存档I/O、GamePlayer/PlayMode、逻辑单元测试、命令行构建/发布、采样或图片，未创建子Agent或提交Git。
+
+## 【CURRENT STRATEGY】材料详情与偏好边界
+
+当前v32/revision35的[详情](MapInventoryDetails.md)选择只属当前客户端绑定，不观察为排序/分类/搜索变化，也不写入原v1五字段文件。原显示重置、Close/Reset及无效ReadInput清详情选择/未应用请求；展开高度变化取消旧面板/行按下许可，已排队业务保持。Store/Data/Preferences三个保存类、默认0.5秒延迟及关闭能力/失败隔离规则保持，详情人工待验收。

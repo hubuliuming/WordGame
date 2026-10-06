@@ -291,7 +291,7 @@ v13/16的[资源状态](MapResourceStatusHud.md)由Player Baker追加所属Mode/
 
 ## 【FACT】G目标可领取数量
 
-当前v31/revision34的[部分拾取](MapDropPartialPickup.md)在原CombatPrototypeMapPickupHudState增加int PickupQuantity，第七个GhostField仍SendToOwner；Player Baker继续添加原Hidden默认值，七字段均零/空初态，组件挂载与Player Prefab保持。实际G读取本人的容量Level/库存决定本次量，所属结果仍原四字段且成功数量为实际增量。输入19、Tools3、F4/资源状态4/世界保存3及原反馈、生命/体力/R、玩家v4/世界v2保持；各端同版重新烘焙。部分拾取v27阶段编译、Serializer七字段/7 mask bits/88字节结构与40次隔离Bake静态通过；用户人工通过限v27/revision30十六项，未触发独立用例UNKNOWN；旧通过仍限原版本/清单。
+当前v32/revision35的[部分拾取](MapDropPartialPickup.md)在原CombatPrototypeMapPickupHudState增加int PickupQuantity，第七个GhostField仍SendToOwner；Player Baker继续添加原Hidden默认值，七字段均零/空初态，组件挂载与Player Prefab保持。实际G读取本人的容量Level/库存决定本次量，所属结果仍原四字段且成功数量为实际增量。输入19、Tools3、F4/资源状态4/世界保存3及原反馈、生命/体力/R、玩家v4/世界v2保持；各端同版重新烘焙。部分拾取v27阶段编译、Serializer七字段/7 mask bits/88字节结构与40次隔离Bake静态通过；用户人工通过限v27/revision30十六项，未触发独立用例UNKNOWN；旧通过仍限原版本/清单。
 
 ## 【CURRENT STRATEGY】B材料搜索的本地键盘采样
 
@@ -301,4 +301,8 @@ v13/16的[资源状态](MapResourceStatusHud.md)由Player Baker追加所属Mode/
 
 v30/revision33保存阶段的[本机显示偏好](MapInventoryPreferences.md)由原客户端Panel在有效绑定后处理，PlayerInput/Ghost/玩家档案未修改，输入仍十九字段；偏好文件仅包含版本、地图ID和三个显示值，不包含玩家ID/库存/工具。搜索文本恢复不取得焦点，原键盘隔离保持；静态核对通过，人工十六项已获用户通过反馈，范围见[运行入口](Runtime.md)，未实际触发的独立用例仍UNKNOWN。
 
-当前v31/revision34显示重置仅为原Panel本地请求，原输入仍十九字段，无新增命令/RPC/Ghost/玩家或世界档案字段；搜索焦点释放仍走原ReadInput/OnGUI隔离。原PlayerInput/服务器业务及偏好v1五字段保持，重置人工十六项待验收，归[偏好](MapInventoryPreferences.md)。
+v31/revision34重置阶段显示重置仅为原Panel本地请求，原输入仍十九字段，无新增命令/RPC/Ghost/玩家或世界档案字段；搜索焦点释放仍走原ReadInput/OnGUI隔离。原PlayerInput/服务器业务及偏好v1五字段保持，重置人工十六项已获用户通过反馈，限本阶段版本/清单，未触发独立用例仍UNKNOWN，归[偏好](MapInventoryPreferences.md)。
+
+## 【FACT】材料详情与玩家输入
+
+当前v32/revision35的[详情](MapInventoryDetails.md)只排队Panel本地Name/关闭请求，无新按键/命令/RPC/Ghost字段。E说明仅为小块肉用途文本，原PlayerInput/使用资格、所属工具/库存与玩家v4/世界v2及偏好v1五字段保持；死亡/断线/重绑沿原Reset清详情。71Settings/元数据静态通过，人工十六项待验收。

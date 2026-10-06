@@ -88,5 +88,7 @@ namespace Code_01.CombatPrototype.Map
         public string favoritesFilterAllLabel;
         public string favoritesFilterOnlyLabel;
         public string noMatchingFavoritesLabel;
+        public bool favoritesCountEnabled;
+        public string favoritesCountLabel;
     }
 }

@@ -88,5 +88,7 @@ namespace Code_01.CombatPrototype.Map
         public FixedString64Bytes FavoritesFilterAllLabel;
         public FixedString64Bytes FavoritesFilterOnlyLabel;
         public FixedString64Bytes NoMatchingFavoritesLabel;
+        public byte FavoritesCountEnabled;
+        public FixedString64Bytes FavoritesCountLabel;
     }
 }

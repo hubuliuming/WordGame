@@ -1146,13 +1146,15 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 
 ## 【KNOWN ISSUES】背包仅看收藏筛选验收边界
 
-入口CombatPrototypeNetCode、原B面板；Forest/Grassland Json/BuiltIn v34/revision37，六新增配置接入，原77面板字段至83，偏好v3七字段严格兼容v1/v2。本阶段静态范围核对通过，以下十六项待人工GamePlayer验收；原483项内容/编号逐字保留，收藏旧通过仍限v33/revision36十六项及其他旧阶段原范围。
+入口CombatPrototypeNetCode、原B面板；Forest/Grassland Json/BuiltIn v34/revision37，六新增配置接入，原77面板字段至83，偏好v3七字段严格兼容v1/v2。本阶段静态范围核对通过，以下十六项人工GamePlayer已获用户通过反馈；原483项内容/编号逐字保留，收藏旧通过仍限v33/revision36十六项及其他旧阶段原范围。
 
 正常Unity编译/重载及元数据核对通过：DTO十三bool、六float、三int、两模式string、58文案string与一文件ID，共83；Settings十三byte、六float、三int、两byte枚举、59 FixedString64Bytes，共83，零GhostField。偏好CurrentVersion=3/Data七实例字段、严格FavoritesOnly布尔类型已反射核对；原普通类身份和GUID保持。2986份非法配置全部拒绝（每地图1493），174组合法读取（每地图87）通过，含两地图Json/BuiltIn等价、83字段完整/类型/重复键、两新严格bool、四文案边界及关闭仍校验、旧v1～v33/未来版本与全部原规则。仅配置Reader/Validator及元数据检查，不执行列表/GUI/偏好业务或I/O。
 
 两地图各87次、共174次隔离Editor Bake通过；保留原73变体，新增筛选关闭/默认仅看收藏/收藏或面板关闭且默认true、四文案ASCII61/UTF-8 61/中文、原分类/搜索/偏好关闭仍开启筛选、全部原控件关闭、详情关闭及自定义默认模式组合。全部83Settings和原Settings/零反馈/Prefab引用、布置及兼容签名匹配：Forest89树/36采集/20矿/109阻挡，Grassland53/38/18/71。源SubScene只读，临时克隆/TextAsset/Scene/World/BlobAssetStore释放；主场景干净、3根对象、单场景、未Play。
 
 执行前Console[0 Error,7 Warning,106 Log]；正常编译后及Bake前后均[0 Error,8 Warning,106 Log]，新增一条既有DOTween编辑器代码的FindObjectsOfType弃用CS0618警告，原五条NetCode Tick Batching、MCP WebSocket与PEListener UAC1001警告保留。未清空Console，不将旧运行日志作为当前性能结论。原输入19、DropGhost4、Tools3、F4/G7/资源状态4/世界保存3和全部反馈、玩家v4根7/工具项3、世界v2根9/掉落项8及业务事务保持。
+
+用户明确反馈“我已验收通过，接下来下一阶段”；主线程结合既有静态核对与用户反馈判定本阶段通过，限CombatPrototypeNetCode、v34/revision37及下述十六项人工GamePlayer清单，人工结论来自用户反馈；未实际触发的独立用例仍UNKNOWN。原499项人工内容/编号与其他旧通过范围保持，各端同版代码/配置并正常导入/烘焙。
 
 1. 两地图Json/BuiltIn均v34/revision37，六新增字段采用收藏筛选专题默认值；DTO/Settings各83、零GhostField。两开关严格bool、四文案非空白/无控制且61 UTF-8字节；旧v1～v33拒绝，关闭仍完整验证，独立配置分支未触发UNKNOWN。
 2. 原B面板排序/分类之后、搜索之前出现全宽Favorites: All items，点击切为Favorites only，再点击返回；不增加快捷键。默认/最小几何与关闭控件布局、滚动及固定页脚命中未遍历UNKNOWN。
@@ -1171,4 +1173,33 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 15. B/关闭按钮/无效ReadInput清未应用新模式，同一绑定已应用模式关闭重开保留；逐帧Clear只隐藏，死亡/重连、地图源/玩家/World/Scene释放按原提交/清缓存，新绑定按配置/合法偏好恢复，生命周期未触发UNKNOWN。
 16. 新增控制行纳入ControlRowCount、滚动内容和SearchField命中；原搜索焦点/IME/键盘隔离、详情换行/高度、Drop/All及F/G/B/E/R/F5/1～7、采集/掉落/制作/修理/升级/战斗镜头回归。各端同版导入/烘焙，实际字形/分辨率/多人/预测/延迟及性能/平台/线上未触发UNKNOWN。
 
-共499项；完整配置/交集/生命周期与偏好规则归[收藏筛选](MapInventoryFavoritesFilter.md)，收藏容量归[收藏](MapInventoryFavorites.md)，业务入口归[B面板](MapInventoryPanel.md)。AI未执行列表/收藏/面板/偏好/GUI业务、实际偏好或游戏存档I/O、GamePlayer/PlayMode、逻辑单元测试、命令行构建/发布、采样/图片，未创建子Agent、暂存或提交Git；未实际触发的独立用例和性能/平台/线上仍UNKNOWN。
+共499项；本阶段人工十六项已获用户通过反馈，主线程结合既有静态核对判定通过，限上述版本/清单。完整配置/交集/生命周期与偏好规则归[收藏筛选](MapInventoryFavoritesFilter.md)，收藏容量归[收藏](MapInventoryFavorites.md)，业务入口归[B面板](MapInventoryPanel.md)。AI未执行列表/收藏/面板/偏好/GUI业务、实际偏好或游戏存档I/O、GamePlayer/PlayMode、逻辑单元测试、命令行构建/发布、采样/图片，未创建子Agent、暂存或提交Git；未实际触发的独立用例和性能/平台/线上仍UNKNOWN。
+
+## 【KNOWN ISSUES】背包收藏数量与上限提示验收边界
+
+入口CombatPrototypeNetCode、原B面板；两地图Json/BuiltIn v35/revision38，inventoryPanel83→85、两必填字段接入，原收藏上限64与Favorite limit复用。主线程静态范围核对通过，以下十六项待人工GamePlayer验收；原499项内容/编号逐字保留，筛选用户通过限v34/revision37十六项及其他旧范围。
+
+正常Unity编译/重载及元数据核对通过：DTO十四bool、六float、三int、两模式string、59文案string及一文件ID，共85；Settings十四byte、六float、三int、两byte枚举及60 FixedString64Bytes，共85、零GhostField。原Favorites普通类/GUID、CountText字符串和CountRowCount整数元数据、偏好CurrentVersion=3/Data七字段及原协议保持。3084份非法配置全部拒绝（每地图1542），202组合法读取（每地图101）通过，包含85字段完整/形状/类型/重复键、计数严格bool、文案空白/控制/61字节与关闭仍校验、旧v1～v34/未来版本及全部原规则；只配置读取和元数据，不调用计数/GUI/偏好业务。
+
+两地图各101次、共202次隔离Editor Bake通过；保留原87变体，新增计数关闭、收藏/面板关闭、计数/满额文案ASCII61/UTF-8 61/中文、收藏筛选/排序/分类/搜索/详情/偏好/重置关闭仍配置计数、计数与收藏同时关闭。全部85Settings、原Settings/零反馈/Prefab引用、资源布置/兼容签名匹配：Forest89树/36采集/20矿/109阻挡，Grassland53/38/18/71。源SubScene只读，临时克隆/TextAsset/Scene/World/BlobAssetStore释放；主场景干净、3根对象、单场景，未Play。
+
+执行前Console[0 Error,3 Warning,27 Log]；正常编译后/Bake前后/最终均[0 Error,5 Warning,27 Log]，新增两条既有PEListener UAC1001与DOTween编辑器CS0618警告，原三条NetCode Tick Batching警告保留；未清空Console，不把旧运行日志视为当前性能结论。七现有C#脚本、两JSON接入，无新脚本/meta/组件/挂载或Scene/SubScene/Prefab/Animator/资源/字体/包/构建结构变更。原输入19/DropGhost4/Tools3/F4/G7/资源状态4/世界保存3及全部反馈、玩家v4根7/工具项3、世界v2根9/掉落项8和本机偏好v3七字段/业务事务保持。
+
+1. 两地图Json/BuiltIn均v35/revision38，favoritesCountEnabled=true/favoritesCountLabel=Favorites必填，DTO/Settings各85且0 GhostField；旧v1～v34、缺失/null/错类型/未知或重复字段拒绝，关闭仍全量验证，未触发独立配置分支UNKNOWN。
+2. 原B面板容量之后、Sort/Filter/Favorites之前出现固定一行Favorites: 0/64；库存为空仍显示此行和原Empty，计数行不接受点击、不增加快捷键，位置/布局分支未遍历UNKNOWN。
+3. 主动收藏/取消同Name仅在下一有效Show消费实际请求后增减一次，GUI排队时不提前计数；无效/隐藏/消失待Name请求丢弃，未触发独立时序UNKNOWN。
+4. 分类、搜索、三种排序与全部/仅看收藏组合不改变总数，交集为空仍显示全量收藏数；计数不按可见行数或材料堆数量计算，未遍历组合UNKNOWN。
+5. 材料库存数量变化、归零/消失或重新获得同Name，原收藏记录/名额保留；没有库存的收藏仍计数，未触发快照/未知Name用例UNKNOWN。
+6. 原合法偏好恢复包含暂不在库存的Name，首次Show前更新真实总数；无文件/v1空收藏为0，v2/v3按合法数组恢复，读取本身不写盘，未触发迁移/I/O用例UNKNOWN。
+7. 达到当前64上限显示Favorites: 64/64 - Favorite limit；原新增按钮禁用、已收藏可取消，取消到63后撤销满额后缀并释放名额，未触发边界时序UNKNOWN。
+8. 自定义上限1/256及合法旧数组数量超过当前上限时显示真实Count/Max和满额后缀，不截断/删旧记录；取消仍可用，到低于上限才允许新增，未触发超限恢复UNKNOWN。
+9. Reset view清启用收藏后同次有效刷新显示0/Max，沿原恢复默认模式/清查询与详情；defaultFavoritesOnly=true时可同时显示0/Max和No matching favorites，组合未触发UNKNOWN。
+10. B/关闭按钮清未应用请求，同一绑定重开保留已应用集合与计数；逐帧Clear只隐藏，死亡/断线/源或玩家变化、World/Scene释放按原提交/Reset清缓存，新绑定按配置/偏好重建，生命周期未触发UNKNOWN。
+11. favoritesEnabled=false或favoritesCountEnabled=false隐藏计数行；关闭计数不停止原收藏/置顶/容量/保存，关闭收藏保留原文件数组，关闭组合/导入重绑未触发UNKNOWN。
+12. favoritesFilterEnabled=false及sort/filter/search/details/preferences/preferencesReset开关关闭，计数只依赖收藏与计数开关；关闭偏好或I/O暂停时按临时已应用集合显示，独立组合未触发UNKNOWN。
+13. CountRowCount启用1/关闭0共用于绘制、滚动内容和SearchField命中；三类模式ControlRowCount仍0～3，新增计数使文本框另下移一行，焦点/IME/按下抬起及缩放/滚动分支未遍历UNKNOWN。
+14. 默认/最小面板尺寸、字号/行高、长计数/满额文案ASCII61/UTF-8 61/中文、真实字体/分辨率和固定页脚/Drop/All/详情展开正确；固定单行不自动换行，未遍历字形/裁切UNKNOWN。
+15. 偏好仍v3七字段且严格兼容v1/v2，无独立计数字段；库存刷新/模式切换不因计数新增写入，实际收藏变化沿原延迟/Close提交与失败暂停规则，文件故障/并发/断电未触发UNKNOWN。
+16. 原F/G/B/E/R/F5/1～7、采集/砍树/采矿/再生、掉落/合并/部分拾取、制作/修理/两升级与战斗镜头/指针隔离回归，各端同版导入/烘焙。多人/预测/延迟及性能/平台/线上未触发UNKNOWN。
+
+共515项；完整计数/配置/生命周期归[收藏计数](MapInventoryFavoritesCount.md)，收藏容量归[收藏](MapInventoryFavorites.md)，交集归[收藏筛选](MapInventoryFavoritesFilter.md)，业务入口归[B面板](MapInventoryPanel.md)。当前计数十六项待人工GamePlayer验收；AI未执行计数/Favorites/ListView/Panel/Preferences/GUI业务、真实偏好或游戏存档I/O、GamePlayer/PlayMode、逻辑单元测试、命令行构建/发布、采样或图片，未创建子Agent、暂存或提交Git；独立交互/生命周期/文件/故障/字形/联网用例及性能/平台/线上仍UNKNOWN。

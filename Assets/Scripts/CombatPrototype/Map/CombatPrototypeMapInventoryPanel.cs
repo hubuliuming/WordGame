@@ -245,7 +245,7 @@ namespace Code_01.CombatPrototype.Map
             var point = mouse.position.ReadValue();
             var local = new Vector2(point.x / scale, (Screen.height - point.y) / scale);
             var field = CombatPrototypeMapInventoryPanelSearch.FieldRect(viewport.width - 18f,
-                (3 + _listView.ControlRowCount) * _settings.RowHeightPixels, _settings.RowHeightPixels);
+                (3 + _favorites.CountRowCount + _listView.ControlRowCount) * _settings.RowHeightPixels, _settings.RowHeightPixels);
             field.position += viewport.position - _scroll;
             return viewport.Contains(local) && field.Contains(local);
         }
@@ -282,7 +282,7 @@ namespace Code_01.CombatPrototype.Map
                 GUI.color = Color.white;
                 GUI.Label(new Rect(panel.x + 12f, panel.y + 12f, panel.width - 24f, _settings.RowHeightPixels), _title, _labelStyle);
                 var viewport = Viewport(panel);
-                var rows = Mathf.Max(_listView.Items.Count * (_favorites.Enabled ? 3 : 2), 1) + _listView.ControlRowCount + _search.RowCount + (PreferencesResetEnabled ? 1 : 0) + 14 + CombatPrototypeMapGatherToolRepairPanel.RowCount + CombatPrototypeMapInventoryCapacityUpgradePanel.RowCount + CombatPrototypeMapGatherToolUpgradePanel.RowCount + (_durabilityEnabled ? 2 : 0);
+                var rows = Mathf.Max(_listView.Items.Count * (_favorites.Enabled ? 3 : 2), 1) + _favorites.CountRowCount + _listView.ControlRowCount + _search.RowCount + (PreferencesResetEnabled ? 1 : 0) + 14 + CombatPrototypeMapGatherToolRepairPanel.RowCount + CombatPrototypeMapInventoryCapacityUpgradePanel.RowCount + CombatPrototypeMapGatherToolUpgradePanel.RowCount + (_durabilityEnabled ? 2 : 0);
                 var contentWidth = viewport.width - 18f;
                 var content = new Rect(0f, 0f, contentWidth, rows * _settings.RowHeightPixels +
                     _details.ExtraHeight(contentWidth, _settings.RowHeightPixels, _labelStyle));
@@ -308,6 +308,7 @@ namespace Code_01.CombatPrototype.Map
             var y = 0f;
             Label(width, ref y, _materials);
             Label(width, ref y, _snapshot.CapacityText);
+            if (_favorites.CountRowCount != 0) Label(width, ref y, _favorites.CountText);
             DrawListControls(width, ref y);
             if (_search.Enabled)
             {

@@ -1,6 +1,6 @@
 # 掉落物按背包余量部分拾取
 
-返回[地图](Map.md)、[掉落](MapDrops.md)、[容量](MapInventoryCapacity.md)、[G提示](MapPickupHud.md)、[拾取结果](MapPickupFeedbackHud.md)、[掉落存档](MapDropPersistence.md)与[运行入口](Runtime.md)。入口CombatPrototypeNetCode；Forest/Grassland Json与BuiltIn当前schemaVersion=34/configRevision=37。部分拾取v27/revision30的代码/配置/烘焙/Serializer静态核对通过，用户已确认该阶段人工GamePlayer通过，范围见运行入口十六项。旧合并用户通过限v26/revision29十六项，旧G结果限v25/revision28十六项，其余旧范围保持。
+返回[地图](Map.md)、[掉落](MapDrops.md)、[容量](MapInventoryCapacity.md)、[G提示](MapPickupHud.md)、[拾取结果](MapPickupFeedbackHud.md)、[掉落存档](MapDropPersistence.md)与[运行入口](Runtime.md)。入口CombatPrototypeNetCode；Forest/Grassland Json与BuiltIn当前schemaVersion=35/configRevision=38。部分拾取v27/revision30的代码/配置/烘焙/Serializer静态核对通过，用户已确认该阶段人工GamePlayer通过，范围见运行入口十六项。旧合并用户通过限v26/revision29十六项，旧G结果限v25/revision28十六项，其余旧范围保持。
 
 ## 【FACT】文件与配置
 

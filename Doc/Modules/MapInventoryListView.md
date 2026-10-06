@@ -1,6 +1,6 @@
 # 背包材料排序与筛选
 
-返回[地图](Map.md)、[背包](Inventory.md)、[B面板](MapInventoryPanel.md)、[容量](MapInventoryCapacity.md)、[丢弃](MapInventoryDrop.md)、[配置](DataResources.md)与[运行入口](Runtime.md)。入口CombatPrototypeNetCode，Forest/Grassland Json/BuiltIn当前schemaVersion=34/configRevision=37；下述排序筛选静态及人工结论来自v28/revision31阶段。用户已确认该阶段人工GamePlayer通过，主线程结合既有静态核对与用户反馈判定通过，限v28/revision31及运行入口十六项，人工结论来自用户反馈。旧部分拾取用户通过限v27/revision30十六项，旧面板/丢弃/容量/工具通过保持原版本/清单。
+返回[地图](Map.md)、[背包](Inventory.md)、[B面板](MapInventoryPanel.md)、[容量](MapInventoryCapacity.md)、[丢弃](MapInventoryDrop.md)、[配置](DataResources.md)与[运行入口](Runtime.md)。入口CombatPrototypeNetCode，Forest/Grassland Json/BuiltIn当前schemaVersion=35/configRevision=38；下述排序筛选静态及人工结论来自v28/revision31阶段。用户已确认该阶段人工GamePlayer通过，主线程结合既有静态核对与用户反馈判定通过，限v28/revision31及运行入口十六项，人工结论来自用户反馈。旧部分拾取用户通过限v27/revision30十六项，旧面板/丢弃/容量/工具通过保持原版本/清单。
 
 ## 【FACT】文件与配置
 
@@ -36,9 +36,9 @@ v28排序筛选阶段七个现有脚本接入，新ListView是普通客户端C#�
 }
 ```
 
-当前配置与原Settings各83字段：DTO十三bool、六float、三int、两模式string、58文案string及一文件ID；Settings十三byte、六float、三int、两byte枚举及59 FixedString64Bytes；搜索七字段归[搜索](MapInventorySearch.md)，偏好四字段及重置两字段归[本机偏好](MapInventoryPreferences.md)，0 GhostField且无GhostComponent。sortEnabled/filterEnabled只控制两种展示能力；关闭排序强制original并隐藏排序按钮，关闭筛选强制all并隐藏筛选按钮，两者关闭时分类为all、排序为original，仍应用搜索和启用的独立收藏条件。地图Settings仍保存已配置默认模式，强制显示模式在客户端Configure及显式ResetDisplay应用。
+当前配置与原Settings各85字段：DTO十四bool、六float、三int、两模式string、59文案string及一文件ID；Settings十四byte、六float、三int、两byte枚举及60 FixedString64Bytes；搜索七字段归[搜索](MapInventorySearch.md)，偏好四字段及重置两字段归[本机偏好](MapInventoryPreferences.md)，0 GhostField且无GhostComponent。sortEnabled/filterEnabled只控制两种展示能力；关闭排序强制original并隐藏排序按钮，关闭筛选强制all并隐藏筛选按钮，两者关闭时分类为all、排序为original，仍应用搜索和启用的独立收藏条件。地图Settings仍保存已配置默认模式，强制显示模式在客户端Configure及显式ResetDisplay应用。
 
-defaultSortMode仅original/type/quantity，defaultFilterMode仅all/resources/supplies/other，大小写与空格严格匹配，不修剪/转换未知值。两模式ID通过共用Resolver校验/烘焙；十新文案沿原非空白、无控制字符且最多61 UTF-8字节。关闭任一能力、面板或全部显示仍检查全部字段与语义。原Reader保留UTF-8/完整对象、缺失/null/错误类型/未知或重复键检查；当前仅schema34，revision/seed须正数，旧v1～v33拒绝，无补默认、来源回退或运行热重载。正常导入/烘焙后生效，各端同版代码/配置并重新烘焙。
+defaultSortMode仅original/type/quantity，defaultFilterMode仅all/resources/supplies/other，大小写与空格严格匹配，不修剪/转换未知值。两模式ID通过共用Resolver校验/烘焙；十新文案沿原非空白、无控制字符且最多61 UTF-8字节。关闭任一能力、面板或全部显示仍检查全部字段与语义。原Reader保留UTF-8/完整对象、缺失/null/错误类型/未知或重复键检查；当前仅schema35，revision/seed须正数，旧v1～v34拒绝，无补默认、来源回退或运行热重载。正常导入/烘焙后生效，各端同版代码/配置并重新烘焙。
 
 ## 【CURRENT STRATEGY】完整库存与显示投影
 
@@ -59,7 +59,7 @@ Snapshot的uint Revision仅为本地展示缓存：行名/数量/顺序/行数�
 
 ## 【CURRENT STRATEGY】控件、点击与生命周期
 
-复用原380×640面板、边距右24/顶64、字号18/行高32、1920×1080比例、背景0.85、原标题/页脚/滚动区及鼠标隔离。材料标题、完整容量行后有0～3个全宽控制行，分别默认Sort: Type、Filter: All与Favorites: All items；滚动内容基础高度按max(可见数×3,1)计算材料行（收藏关闭时×2），加启用模式/搜索/重置控制行及原固定区域，详情实际展开高度另计。每个可见行仍有原Drop/All操作行。不改面板矩形、宿主或任何场景资源结构。
+复用原380×640面板、边距右24/顶64、字号18/行高32、1920×1080比例、背景0.85、原标题/页脚/滚动区及鼠标隔离。材料标题、完整容量及启用收藏计数行后有0～3个全宽控制行，分别默认Sort: Type、Filter: All与Favorites: All items；滚动内容基础高度按max(可见数×3,1)计算材料行（收藏关闭时×2），加启用收藏计数行、模式/搜索/重置控制行及原固定区域，详情实际展开高度另计。每个可见行仍有原Drop/All操作行。不改面板矩形、宿主或任何场景资源结构。
 
 GUI按钮仅QueueSort/QueueFilter/QueueFavoritesFilter，保持原有效鼠标按下来源检查，每种本地请求在下一Show/Capture最多应用一次；原列表在同次绘制中保持稳定。排序循环type→quantity→original→type，分类循环all→resources→supplies→other→all，收藏条件在All items/Favorites only间切换；三个本地控件可同次应用，变化后更新缓存标题并滚动归零。不写输入事件/RPC、玩家Ghost或游戏存档；已应用模式经[本机偏好](MapInventoryPreferences.md)协调类保存。完整库存为空沿原Empty；库存非空且仅看收藏交集为空优先No matching favorites；全部模式没有有效搜索而分类无可见行使用No matching items，有有效搜索而交集无可见行使用No search results，不更改容量或配方显示。
 
@@ -93,6 +93,10 @@ v33/revision36收藏阶段在最新分类/搜索可见行建立后消费收藏�
 
 ## 【CURRENT STRATEGY】收藏条件与刷新
 
-当前v34/revision37增加独立FavoritesOnly布尔值；GUI QueueFavoritesFilter只排队，下一有效Capture在搜索/原模式应用后切换一次。先建立最新分类×搜索×收藏条件可见行，再消费同Name收藏请求；仅看收藏时再原地移除取消收藏的行，随后原排序、稳定收藏分组及标记缓存照常运行。待Name不在最新交集则丢弃，身份比较及Details.Capture沿原真实Name规则；收藏Revision或模式实际变化使缓存重建。
+当前v35/revision38增加独立FavoritesOnly布尔值；GUI QueueFavoritesFilter只排队，下一有效Capture在搜索/原模式应用后切换一次。先建立最新分类×搜索×收藏条件可见行，再消费同Name收藏请求；仅看收藏时再原地移除取消收藏的行，随后原排序、稳定收藏分组及标记缓存照常运行。待Name不在最新交集则丢弃，身份比较及Details.Capture沿原真实Name规则；收藏Revision或模式实际变化使缓存重建。
 
-控制开启条件为FavoritesEnabled且FavoritesFilterEnabled，与原分类开关无依赖；关闭强制FavoritesOnly=false。模式实际变化归零滚动并取消两种旧鼠标许可，原排序/搜索许可保持；ClearPending同时清新待切换，原无效ReadInput只额外清新请求。Close保留已应用值，ResetDisplay恢复配置默认值；绑定Reset清缓存。完整本机保存与人工范围归[收藏筛选](MapInventoryFavoritesFilter.md)，当前阶段待验收。
+控制开启条件为FavoritesEnabled且FavoritesFilterEnabled，与原分类开关无依赖；关闭强制FavoritesOnly=false。模式实际变化归零滚动并取消两种旧鼠标许可，原排序/搜索许可保持；ClearPending同时清新待切换，原无效ReadInput只额外清新请求。Close保留已应用值，ResetDisplay恢复配置默认值；绑定Reset清缓存。完整本机保存与人工范围归[收藏筛选](MapInventoryFavoritesFilter.md)，当前阶段十六项已获用户通过反馈，限v34/revision37及运行入口清单；未触发独立用例仍UNKNOWN。
+
+## 【FACT】收藏计数与可见集合
+
+当前v35/revision38的[收藏计数](MapInventoryFavoritesCount.md)由原Favorites集合提供，ListView代码保持；分类/搜索/仅看收藏只改变可见行，不减少全量收藏名额。ControlRowCount仍仅三类模式控件0～3，Panel额外加CountRowCount0～1用于绘制高度与搜索命中。当前计数十六项待人工GamePlayer验收；筛选旧通过限v34/revision37及运行入口清单。

@@ -20,7 +20,7 @@
 
 ## 【FACT】当前 JSON 契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 为 schemaVersion=34/configRevision=37，interactionHud、[高亮](MapInteractionHighlight.md)、[G提示](MapPickupHud.md)、[工具配置](MapGatherTools.md)与[面板配置](MapInventoryPanel.md)均必填；interactionHud全部十个字段必填，沿原严格 UTF-8/字段/类型/重复键检查。旧 v1～v33 明确失败，不补默认段或回退来源；JSON 只在正常导入和烘焙后生效，无运行热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 为 schemaVersion=35/configRevision=38，interactionHud、[高亮](MapInteractionHighlight.md)、[G提示](MapPickupHud.md)、[工具配置](MapGatherTools.md)与[面板配置](MapInventoryPanel.md)均必填；interactionHud全部十个字段必填，沿原严格 UTF-8/字段/类型/重复键检查。旧 v1～v34 明确失败，不补默认段或回退来源；JSON 只在正常导入和烘焙后生效，无运行热重载。
 
 | 字段 | 默认值 | 契约 |
 |---|---|---|
@@ -120,15 +120,15 @@ v26/revision29的[地面合并](MapDropMerge.md)通过原掉落Quantity/Phase及
 
 ## 【FACT】G可领取量投影
 
-当前v34/revision37的[部分拾取](MapDropPartialPickup.md)在原G所属快照增加PickupQuantity；原绑定整体传递该struct，宿主/高亮/面板布局与F/B优先级保持。G显示本次可领量/地面量或零余量NoSpace，实际结果仍暂时覆盖Ready目标；全部显示关闭只关闭展示。输入19、F4/资源状态4及原结果字段保持，静态及用户人工通过限v27/revision30十六项，未触发独立用例UNKNOWN。
+当前v35/revision38的[部分拾取](MapDropPartialPickup.md)在原G所属快照增加PickupQuantity；原绑定整体传递该struct，宿主/高亮/面板布局与F/B优先级保持。G显示本次可领量/地面量或零余量NoSpace，实际结果仍暂时覆盖Ready目标；全部显示关闭只关闭展示。输入19、F4/资源状态4及原结果字段保持，静态及用户人工通过限v27/revision30十六项，未触发独立用例UNKNOWN。
 
 ## 【FACT】B列表本地排序筛选
 
-当前v34/revision37的[排序筛选](MapInventoryListView.md)沿原绑定整体传递InventoryPanelSettings到宿主/Panel；v28排序筛选阶段原绑定、Main Camera组件和输入系统代码保持。Panel.Show在完整库存Capture后应用本地模式并缓存可见行，原GUI滚动区新增0～2控制行；F/G提示、高亮、资源/世界保存状态和原所属反馈布局保持。关闭保留该绑定已应用选择，死亡/断线/源或玩家变化及World/Scene释放沿原Reset清缓存；新绑定先配置默认，再由[本机偏好](MapInventoryPreferences.md)恢复启用能力的合法选择。静态及用户人工通过限v28/revision31十六项，人工结论来自用户反馈；未实际触发的独立GUI事件/字体/排版/联网时序仍UNKNOWN。
+当前v35/revision38的[排序筛选](MapInventoryListView.md)沿原绑定整体传递InventoryPanelSettings到宿主/Panel；v28排序筛选阶段原绑定、Main Camera组件和输入系统代码保持。Panel.Show在完整库存Capture后应用本地模式并缓存可见行，原GUI滚动区新增0～2控制行；F/G提示、高亮、资源/世界保存状态和原所属反馈布局保持。关闭保留该绑定已应用选择，死亡/断线/源或玩家变化及World/Scene释放沿原Reset清缓存；新绑定先配置默认，再由[本机偏好](MapInventoryPreferences.md)恢复启用能力的合法选择。静态及用户人工通过限v28/revision31十六项，人工结论来自用户反馈；未实际触发的独立GUI事件/字体/排版/联网时序仍UNKNOWN。
 
 ## 【FACT】B搜索输入隔离
 
-当前v34/revision37的[搜索](MapInventorySearch.md)在原Binding.ReadPanelInput→HUD.ReadPanelInput→Panel.ReadInput传递本地blocksKeyboard；原有效地图、存活所属Ghost/Connected/InGame检查保持。PlayerInput先采样面板再按焦点决定是否采样键盘，十九字段及原Ghost/反馈布局保持。Show在完整Snapshot之后应用待处理搜索、分类交集及排序；逐帧Clear只隐藏展示，不清编辑状态，原Reset绑定失效时清搜索。文本焦点只在原OnGUI读取/设置/释放，无新宿主或组件。搜索静态及用户人工GamePlayer通过，限v29/revision32及运行入口十六项，结论来自用户反馈；未实际触发的独立GUI/焦点/联网用例UNKNOWN，v28排序筛选通过不覆盖搜索。
+当前v35/revision38的[搜索](MapInventorySearch.md)在原Binding.ReadPanelInput→HUD.ReadPanelInput→Panel.ReadInput传递本地blocksKeyboard；原有效地图、存活所属Ghost/Connected/InGame检查保持。PlayerInput先采样面板再按焦点决定是否采样键盘，十九字段及原Ghost/反馈布局保持。Show在完整Snapshot之后应用待处理搜索、分类交集及排序；逐帧Clear只隐藏展示，不清编辑状态，原Reset绑定失效时清搜索。文本焦点只在原OnGUI读取/设置/释放，无新宿主或组件。搜索静态及用户人工GamePlayer通过，限v29/revision32及运行入口十六项，结论来自用户反馈；未实际触发的独立GUI/焦点/联网用例UNKNOWN，v28排序筛选通过不覆盖搜索。
 
 v30/revision33保存阶段的[本机偏好](MapInventoryPreferences.md)复用原Configure传递的mapDefinitionId与完整Settings，原Binding/HUD脚本不变。Panel在ListView应用选择/搜索之后观察已应用状态，Close/Reset提交待保存值，逐帧Clear仍只隐藏；输入、F/G目标、反馈和游戏存档布局保持。静态核对通过，新增十六项人工已获用户通过反馈，范围见[运行入口](Runtime.md)，未实际触发的独立用例仍UNKNOWN。
 
@@ -144,4 +144,8 @@ v33/revision36收藏阶段的[收藏](MapInventoryFavorites.md)：复用原宿�
 
 ## 【FACT】仅看收藏边界
 
-当前v34/revision37的[收藏筛选](MapInventoryFavoritesFilter.md)：沿原完整Settings到Panel传递，不改HUD/Binding代码、F/G目标和进度、所属反馈或新输入；新增控制只在原B面板滚动区。本阶段十六项待人工GamePlayer验收，旧通过范围保持。
+v34/revision37筛选阶段的[收藏筛选](MapInventoryFavoritesFilter.md)：沿原完整Settings到Panel传递，不改HUD/Binding代码、F/G目标和进度、所属反馈或新输入；新增控制只在原B面板滚动区。本阶段十六项人工GamePlayer已获用户通过反馈，限上述版本及运行入口清单；未触发独立用例仍UNKNOWN，旧通过范围保持。
+
+## 【FACT】收藏计数边界
+
+当前v35/revision38的[收藏计数](MapInventoryFavoritesCount.md)：沿原整体Settings传递到Panel，HUD/Binding、F/G目标/进度和所属反馈代码保持；新增计数只在B滚动区。本阶段十六项待人工GamePlayer验收；筛选旧通过限v34/revision37及其他阶段原版本/清单。

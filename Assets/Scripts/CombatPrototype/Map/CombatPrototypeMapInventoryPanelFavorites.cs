@@ -14,12 +14,14 @@ namespace Code_01.CombatPrototype.Map
             new List<CombatPrototypeMapInventoryPanelSnapshot.Row>();
         private readonly Dictionary<FixedString64Bytes, string> _markedText = new Dictionary<FixedString64Bytes, string>();
         private FixedString64Bytes _pendingName;
-        private string _favorite, _unfavorite, _tag, _full;
+        private string _favorite, _unfavorite, _tag, _full, _countLabel;
         private int _maximum;
-        private bool _pending;
+        private bool _pending, _countEnabled;
 
         public bool Enabled { get; private set; }
         public bool HasPending => _pending;
+        public int CountRowCount => _countEnabled ? 1 : 0;
+        public string CountText { get; private set; } = string.Empty;
         public uint Revision { get; private set; }
         public bool IsFavorite(FixedString64Bytes name) => Enabled && _names.Contains(name);
 
@@ -32,6 +34,9 @@ namespace Code_01.CombatPrototype.Map
             _unfavorite = settings.UnfavoriteButtonLabel.ToString();
             _tag = settings.FavoriteTagLabel.ToString();
             _full = settings.FavoritesFullLabel.ToString();
+            _countEnabled = Enabled && settings.FavoritesCountEnabled != 0;
+            _countLabel = settings.FavoritesCountLabel.ToString();
+            UpdateCountText();
         }
 
         // Store has already validated the complete external record, including absent inventory names.
@@ -40,6 +45,7 @@ namespace Code_01.CombatPrototype.Map
             if (!Enabled) return;
             foreach (var name in names) _names.Add(new FixedString64Bytes(name));
             if (_names.Count != 0) Revision++;
+            UpdateCountText();
         }
 
         // Called after the latest filter/search has produced valid, positive visible rows.
@@ -59,6 +65,7 @@ namespace Code_01.CombatPrototype.Map
                 _names.Add(name);
             }
             Revision++;
+            UpdateCountText();
             return true;
         }
 
@@ -126,16 +133,24 @@ namespace Code_01.CombatPrototype.Map
             _names.Clear();
             _markedText.Clear();
             Revision++;
+            UpdateCountText();
+        }
+
+        private void UpdateCountText()
+        {
+            if (!_countEnabled) return;
+            CountText = _countLabel + ": " + _names.Count + "/" + _maximum +
+                (_names.Count >= _maximum ? " - " + _full : string.Empty);
         }
 
         public void Reset()
         {
             ClearPending();
             _names.Clear(); _ordinary.Clear(); _markedText.Clear();
-            Enabled = false;
+            Enabled = _countEnabled = false;
             Revision = 0;
             _maximum = 0;
-            _favorite = _unfavorite = _tag = _full = string.Empty;
+            _favorite = _unfavorite = _tag = _full = _countLabel = CountText = string.Empty;
         }
     }
 }

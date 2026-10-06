@@ -961,3 +961,17 @@
 - 正常Unity编译/83字段及偏好v3七字段元数据、2986份非法配置拒绝/174组合法读取、174次隔离Editor Bake静态通过；全部83Settings、原Settings/零反馈/Prefab引用、地图布置与兼容签名以及输入19/Tools3/所属反馈、玩家v4/世界v2保持。执行前Console[0,7,106]，编译后/Bake前后[0,8,106]，新增既有DOTween编辑器FindObjectsOfType弃用CS0618警告；未清空Console，主场景干净未Play，临时资源释放。
 - 新增收藏筛选专题，增量同步相关模块/导航、策划模板第7节完整JSON及第43节；原483项人工内容/编号保留，追加十六项后499项，当前人工待验收，旧收藏通过限v33/revision36清单及其他旧范围。既有阶段证明保留原版本/数值。
 - Scene/SubScene/Prefab/Animator/全部meta/资源/字体/包/构建结构、Details/HUD/Binding/PlayerInput和服务器/玩家世界保存代码保持；未执行列表/收藏/面板/偏好/GUI业务、真实偏好/游戏存档I/O、GamePlayer/PlayMode、逻辑单元测试、命令行构建/发布、采样/图片，未创建子Agent、暂存或提交Git。
+
+## 2026-10-06 背包仅看收藏筛选人工验收确认
+
+- 用户明确反馈“我已验收通过，接下来下一阶段”；主线程结合既有静态核对与用户反馈判定本阶段通过，限CombatPrototypeNetCode、v34/revision37及运行入口十六项人工GamePlayer清单，人工结论来自用户反馈。
+- 增量同步收藏筛选专题、相关模块/导航/运行入口及策划模板第43节的验收状态；资源与数据中遗留的当前版本摘要同步为已确认v34/revision37和拒绝旧v1～v33。原499项人工内容/编号、2986份非法配置/174组合法读取/174次隔离Editor Bake等既有静态证据、代码/JSON/资源结构和旧通过范围保持。
+- 未实际触发的独立GUI交集/点击/布局、偏好迁移/I/O/故障、关闭/重绑、字形/多人/预测用例仍UNKNOWN；性能、平台构建和线上未获单独验收结论。本次只记录用户反馈并核对文档，未执行游戏/GUI/偏好读写、GamePlayer/PlayMode、逻辑单元测试、构建/发布或图片检查，未创建子Agent、暂存或提交Git。
+
+## 2026-10-06 背包收藏数量与上限提示（v35/revision38）
+
+- 按用户已确认方案由主线程执行：原B面板容量之后、模式控件之前显示固定一行全量已应用收藏Name数/原上限；Count>=Max追加原Favorite limit。原收藏容量/置顶/待请求与超限旧记录保留/取消规则保持；Configure、合法Restore、实际ApplyPending变化、非空ResetDisplay更新缓存，Reset清缓存。CountRowCount0～1共用于绘制、内容高度和搜索命中，原ControlRowCount0～3及输入/鼠标许可沿原。
+- 修改七现有C#脚本与两地图JSON，无新脚本/meta/组件/挂载；新增favoritesCountEnabled=true、favoritesCountLabel=Favorites，inventoryPanel83→85、59文案，Json/BuiltIn35/38一致。严格bool和61 UTF-8字节文案，关闭仍验证、旧v1～v34拒绝；收藏和计数双开关才显示，其他显示/偏好开关独立。本机偏好v3七字段及严格v1/v2兼容、玩家v4/世界v2与原业务保存协议/事务保持。
+- 正常Unity编译/85字段/零GhostField和原GUID/协议元数据、3084份非法配置拒绝/202组合法读取、202次隔离Editor Bake静态通过；全部原Settings/零反馈/引用、资源布置与兼容签名、输入19/Tools3及全部所属状态/反馈保持。Console从[0,3,27]至编译后/Bake前后/最终[0,5,27]，新增既有PEListener UAC1001与DOTween CS0618警告；未清空，主场景干净未Play，临时资源释放。
+- 新增收藏计数专题，增量同步相关模块/导航与策划模板第7节完整JSON/第44节；搜索文档遗留的当前字段/版本摘要同步85/schema35，已有空态优先级改为引用B面板/收藏筛选主规则。原499项人工内容/编号、月志既有前缀与各旧阶段原版本静态证据/用户通过范围保留，追加十六项后515项，当前计数人工待验收。
+- Scene/SubScene/Prefab/Animator/全部meta/资源/字体/包/构建结构及方案外代码保持；未执行计数/Favorites/ListView/Panel/Preferences/GUI业务、实际偏好或游戏存档I/O、GamePlayer/PlayMode、逻辑单元测试、命令行构建/发布、采样或图片，未创建子Agent、暂存或提交Git。

@@ -21,7 +21,7 @@
 
 ## 【FACT】JSON 契约与当前默认值
 
-[battle_forest_01.json](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[battle_grassland_01.json](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn来源](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)均为schemaVersion=34/configRevision=37，drops必填，工具配置归[采集工具](MapGatherTools.md)。原空间、移动、出生及drops/grounds值保持；mining与生态矿点字段归采矿专题，tree_normal/gather_apple/mine_rock均默认600秒再生。配置只在烘焙时读取，不支持热重载；各端须相同版本、输入布局与资源，未新增一致性协议。
+[battle_forest_01.json](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[battle_grassland_01.json](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn来源](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)均为schemaVersion=35/configRevision=38，drops必填，工具配置归[采集工具](MapGatherTools.md)。原空间、移动、出生及drops/grounds值保持；mining与生态矿点字段归采矿专题，tree_normal/gather_apple/mine_rock均默认600秒再生。配置只在烘焙时读取，不支持热重载；各端须相同版本、输入布局与资源，未新增一致性协议。
 
 | 字段 | 默认值 | 校验/行为 |
 |---|---|---|
@@ -140,4 +140,4 @@ v25/revision28阶段的[拾取反馈](MapPickupFeedbackHud.md)仅发布原G实�
 
 ## 【FACT】同类地面合并接入
 
-当前v34/revision37必填[合并](MapDropMerge.md)四字段，默认开启/0.8米/99份/0.2秒；服务端在Motion后、G前只扫描当前源已登记Landed未到期物，按编号升序合入较小编号的最近合格同物品堆。保留目标编号/位置，整份数量相加，超限不拆分，有限寿命取最早到期、永久仅与永久合并；新物可能更早到期。来源Consumed沿原Cleanup释放，非到期清理日志为Consumed，G日志包含实际领取量及地面余量。G接收数量按[部分拾取](MapDropPartialPickup.md)开关计算，原四掉落GhostField、世界v2快照/编号上限及原寿命/高亮保持；合并不入包或发布拾取结果。合并v26阶段编译/194份非法配置拒绝/28组合法读取/64次隔离Bake静态通过；用户已确认合并人工GamePlayer通过，主线程结合既有静态核对判定通过，限v26/revision29十六项，未触发独立用例UNKNOWN；旧G结果通过仍限v25/revision28十六项。
+当前v35/revision38必填[合并](MapDropMerge.md)四字段，默认开启/0.8米/99份/0.2秒；服务端在Motion后、G前只扫描当前源已登记Landed未到期物，按编号升序合入较小编号的最近合格同物品堆。保留目标编号/位置，整份数量相加，超限不拆分，有限寿命取最早到期、永久仅与永久合并；新物可能更早到期。来源Consumed沿原Cleanup释放，非到期清理日志为Consumed，G日志包含实际领取量及地面余量。G接收数量按[部分拾取](MapDropPartialPickup.md)开关计算，原四掉落GhostField、世界v2快照/编号上限及原寿命/高亮保持；合并不入包或发布拾取结果。合并v26阶段编译/194份非法配置拒绝/28组合法读取/64次隔离Bake静态通过；用户已确认合并人工GamePlayer通过，主线程结合既有静态核对判定通过，限v26/revision29十六项，未触发独立用例UNKNOWN；旧G结果通过仍限v25/revision28十六项。

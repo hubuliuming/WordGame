@@ -21,7 +21,7 @@
 
 ## 【FACT】当前配置契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=34/configRevision=37。resourcePersistence/geometry/layout/movement/drops/treeHarvest/mining/gatherTools/interactionHud/pickupHud/interactionHighlight/resourceStatusHud/worldSaveHud/inventoryPanel/inventoryDrop/population/spawn均必填；新增字段沿原严格UTF-8、对象形状、缺失/未知/重复字段与标量类型校验。旧v1～v33明确拒绝，不迁移、补默认或回退来源；正常导入/烘焙后生效，无热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=35/configRevision=38。resourcePersistence/geometry/layout/movement/drops/treeHarvest/mining/gatherTools/interactionHud/pickupHud/interactionHighlight/resourceStatusHud/worldSaveHud/inventoryPanel/inventoryDrop/population/spawn均必填；新增字段沿原严格UTF-8、对象形状、缺失/未知/重复字段与标量类型校验。旧v1～v34明确拒绝，不迁移、补默认或回退来源；正常导入/烘焙后生效，无热重载。
 
 | 配置位置/字段 | 默认值 | 校验或行为 |
 |---|---|---|
@@ -35,7 +35,7 @@
 | inventoryPanel.repairButtonLabel | Repair | 同上 |
 | inventoryPanel.fullDurabilityLabel | Full durability | 同上 |
 
-gatherTools根5字段、tools每条11字段，修理所用字段保持；当前inventoryPanel83字段/58文案、两模式ID及一偏好文件ID，新增展示项归[排序筛选](MapInventoryListView.md)、[搜索](MapInventorySearch.md)与[本机偏好](MapInventoryPreferences.md)，容量文案归[容量](MapInventoryCapacity.md)。关闭修理、工具或面板仍校验全部字段；不以开关补参数。0木材或0石材成本合法，但两者不可同时为0。工具ID、槽数、Lv1最大耐久60/40（升级后按本级上限）、制作配方木3石2/木2石3、成功消耗1/Lv1倍率0.75、原F/B/高亮默认值、三类600秒再生及地图空间/种子/32敌人/出生保持。
+gatherTools根5字段、tools每条11字段，修理所用字段保持；当前inventoryPanel85字段/59文案、两模式ID及一偏好文件ID，新增展示项归[排序筛选](MapInventoryListView.md)、[搜索](MapInventorySearch.md)与[本机偏好](MapInventoryPreferences.md)，容量文案归[容量](MapInventoryCapacity.md)。关闭修理、工具或面板仍校验全部字段；不以开关补参数。0木材或0石材成本合法，但两者不可同时为0。工具ID、槽数、Lv1最大耐久60/40（升级后按本级上限）、制作配方木3石2/木2石3、成功消耗1/Lv1倍率0.75、原F/B/高亮默认值、三类600秒再生及地图空间/种子/32敌人/出生保持。
 
 ## 【CURRENT STRATEGY】服务端资格与事务
 
@@ -97,4 +97,8 @@ v33/revision36收藏阶段的[收藏](MapInventoryFavorites.md)：收藏行改�
 
 ## 【FACT】仅看收藏边界
 
-当前v34/revision37的[收藏筛选](MapInventoryFavoritesFilter.md)：筛选仅减少可见材料行，修理的木/石完整数量、3/4输入、服务器资格及SavePrepared保持。本阶段十六项待人工GamePlayer验收，旧通过范围保持。
+v34/revision37筛选阶段的[收藏筛选](MapInventoryFavoritesFilter.md)：筛选仅减少可见材料行，修理的木/石完整数量、3/4输入、服务器资格及SavePrepared保持。本阶段十六项人工GamePlayer已获用户通过反馈，限上述版本及运行入口清单；未触发独立用例仍UNKNOWN，旧通过范围保持。
+
+## 【FACT】收藏计数边界
+
+当前v35/revision38的[收藏计数](MapInventoryFavoritesCount.md)：计数不参与木/石完整数量、修理配方/3/4资格或服务器SavePrepared。本阶段十六项待人工GamePlayer验收；筛选旧通过限v34/revision37及其他阶段原版本/清单。

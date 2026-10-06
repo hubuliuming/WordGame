@@ -12,7 +12,7 @@ namespace Code_01.CombatPrototype.Map
     // 文件协议和读写独立于界面状态；只有客户端偏好协调类调用。
     internal static class CombatPrototypeMapInventoryPanelPreferencesStore
     {
-        public const int CurrentVersion = 2;
+        public const int CurrentVersion = 3;
         private static readonly UTF8Encoding Encoding = new UTF8Encoding(false, true);
 
         public static string PathFor(string fileId, string mapId) => Path.Combine(Application.persistentDataPath,
@@ -42,10 +42,10 @@ namespace Code_01.CombatPrototype.Map
             var version = root["version"];
             if (version == null || version.Type != JTokenType.Integer ||
                 !int.TryParse(version.ToString(Formatting.None), NumberStyles.Integer, CultureInfo.InvariantCulture, out var value) ||
-                (value != 1 && value != CurrentVersion))
-                throw new InvalidDataException("Preferences require version=1 or 2: " + path);
-            if (root.Count != (value == 1 ? 5 : 6))
-                throw new InvalidDataException("Preferences require exactly five v1 or six v2 fields: " + path);
+                (value != 1 && value != 2 && value != CurrentVersion))
+                throw new InvalidDataException("Preferences require version=1, 2 or 3: " + path);
+            if (root.Count != (value == 1 ? 5 : value == 2 ? 6 : 7))
+                throw new InvalidDataException("Preferences require exactly five v1, six v2 or seven v3 fields: " + path);
             var storedMap = ReadString(root, "mapDefinitionId", path);
             if (!string.Equals(storedMap, mapId, StringComparison.Ordinal))
                 throw new InvalidDataException("Preferences mapDefinitionId mismatch: " + path);
@@ -58,7 +58,8 @@ namespace Code_01.CombatPrototype.Map
                 SortMode = CombatPrototypeMapInventoryPanelListView.ResolveSortMode(ReadString(root, "sortMode", path)),
                 FilterMode = CombatPrototypeMapInventoryPanelListView.ResolveFilterMode(ReadString(root, "filterMode", path)),
                 SearchText = search,
-                FavoriteItemNames = value == 1 ? new List<string>() : ReadFavorites(root, path)
+                FavoriteItemNames = value == 1 ? new List<string>() : ReadFavorites(root, path),
+                FavoritesOnly = value == CurrentVersion && ReadBool(root, "favoritesOnly", path)
             };
         }
 
@@ -73,7 +74,8 @@ namespace Code_01.CombatPrototype.Map
                 ["sortMode"] = data.SortMode.ToString().ToLowerInvariant(),
                 ["filterMode"] = data.FilterMode.ToString().ToLowerInvariant(),
                 ["searchText"] = data.SearchText,
-                ["favoriteItemNames"] = favorites
+                ["favoriteItemNames"] = favorites,
+                ["favoritesOnly"] = data.FavoritesOnly
             };
             var bytes = Encoding.GetBytes(root.ToString(Formatting.Indented) + "\n");
             var temporaryPath = path + ".tmp";
@@ -93,6 +95,14 @@ namespace Code_01.CombatPrototype.Map
             if (token == null || token.Type != JTokenType.String)
                 throw new InvalidDataException(name + " must be a string: " + path);
             return token.Value<string>();
+        }
+
+        private static bool ReadBool(JObject root, string name, string path)
+        {
+            var token = root[name];
+            if (token == null || token.Type != JTokenType.Boolean)
+                throw new InvalidDataException(name + " must be a boolean: " + path);
+            return token.Value<bool>();
         }
 
         private static List<string> ReadFavorites(JObject root, string path)

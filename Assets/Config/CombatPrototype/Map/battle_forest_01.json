@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 33,
-  "configRevision": 36,
+  "schemaVersion": 34,
+  "configRevision": 37,
   "mapDefinitionId": "battle_forest_01",
   "defaultSeed": 12345,
   "resourcePersistence": {
@@ -357,7 +357,13 @@
     "favoriteButtonLabel": "Favorite",
     "unfavoriteButtonLabel": "Unfavorite",
     "favoriteTagLabel": "Favorite",
-    "favoritesFullLabel": "Favorite limit"
+    "favoritesFullLabel": "Favorite limit",
+    "favoritesFilterEnabled": true,
+    "defaultFavoritesOnly": false,
+    "favoritesFilterLabel": "Favorites",
+    "favoritesFilterAllLabel": "All items",
+    "favoritesFilterOnlyLabel": "Favorites only",
+    "noMatchingFavoritesLabel": "No matching favorites"
   },
   "inventoryCapacity": {
     "enabled": true,

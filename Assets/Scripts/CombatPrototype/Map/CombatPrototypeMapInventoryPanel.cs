@@ -104,7 +104,7 @@ namespace Code_01.CombatPrototype.Map
             if (_preferencesResetPending)
             {
                 _preferencesResetPending = false;
-                _listView.ResetDisplay(_settings.DefaultSortMode, _settings.DefaultFilterMode);
+                _listView.ResetDisplay(_settings.DefaultSortMode, _settings.DefaultFilterMode, _settings.DefaultFavoritesOnly != 0);
                 _search.ResetDisplay();
                 _favorites.ResetDisplay();
                 _details.Close();
@@ -112,9 +112,10 @@ namespace Code_01.CombatPrototype.Map
                 _mousePressAccepted = _rowMousePressAccepted = false;
             }
             var favoritesRevision = _favorites.Revision;
+            var favoritesOnly = _listView.FavoritesOnly;
             if (_listView.Capture(_snapshot, _search, _favorites, out var selectionChanged)) _rowMousePressAccepted = false;
             if (selectionChanged) _scroll = Vector2.zero;
-            if (favoritesRevision != _favorites.Revision) _mousePressAccepted = _rowMousePressAccepted = false;
+            if (favoritesRevision != _favorites.Revision || favoritesOnly != _listView.FavoritesOnly) _mousePressAccepted = _rowMousePressAccepted = false;
             if (_details.Capture(_snapshot, _listView, axeLevel, pickaxeLevel, effectiveAxe, effectivePickaxe, capacityLevel))
                 _mousePressAccepted = _rowMousePressAccepted = false;
             _preferences.Capture(_listView, _search, _favorites);
@@ -192,6 +193,7 @@ namespace Code_01.CombatPrototype.Map
                 _search.ReleaseFocus();
                 _details.Close();
                 _favorites.ClearPending();
+                _listView.ClearFavoritesFilterPending();
                 _drop.ClearPending();
                 _repair.ClearPending();
                 _upgrade.ClearPending();
@@ -315,7 +317,7 @@ namespace Code_01.CombatPrototype.Map
             }
             DrawPreferencesReset(width, ref y);
             if (_listView.Items.Count == 0)
-                Label(width, ref y, _snapshot.Items.Count == 0 ? _empty : _search.HasQuery ? _search.NoResultsText : _listView.NoMatchingItemsText);
+                Label(width, ref y, _snapshot.Items.Count == 0 ? _empty : _listView.FavoritesOnly ? _listView.NoMatchingFavoritesText : _search.HasQuery ? _search.NoResultsText : _listView.NoMatchingItemsText);
             foreach (var item in _listView.Items)
             {
                 _details.DrawItemLabel(width, ref y, _settings.RowHeightPixels, _labelStyle, _buttonStyle, item, _favorites.ItemText(item), _rowMousePressAccepted);
@@ -350,6 +352,12 @@ namespace Code_01.CombatPrototype.Map
             {
                 if (GUI.Button(new Rect(0f, y, width, _settings.RowHeightPixels - 4f),
                     _listView.FilterText, _buttonStyle) && _mousePressAccepted) _listView.QueueFilter();
+                y += _settings.RowHeightPixels;
+            }
+            if (_listView.FavoritesFilterEnabled)
+            {
+                if (GUI.Button(new Rect(0f, y, width, _settings.RowHeightPixels - 4f),
+                    _listView.FavoritesFilterText, _buttonStyle) && _mousePressAccepted) _listView.QueueFavoritesFilter();
                 y += _settings.RowHeightPixels;
             }
         }

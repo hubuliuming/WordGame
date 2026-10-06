@@ -11,5 +11,6 @@ namespace Code_01.CombatPrototype.Map
         public CombatPrototypeMapInventoryFilterMode FilterMode;
         public string SearchText;
         public List<string> FavoriteItemNames = new List<string>();
+        public bool FavoritesOnly;
     }
 }

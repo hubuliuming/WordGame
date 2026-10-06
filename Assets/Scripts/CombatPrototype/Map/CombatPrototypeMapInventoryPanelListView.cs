@@ -34,19 +34,24 @@ namespace Code_01.CombatPrototype.Map
         private CombatPrototypeMapInventorySortMode _sortMode;
         private CombatPrototypeMapInventoryFilterMode _filterMode;
         private uint _revision, _searchRevision, _favoritesRevision;
-        private bool _hasSnapshot, _sortPending, _filterPending;
+        private bool _hasSnapshot, _sortPending, _filterPending, _favoritesFilterPending;
         private string _sortLabel, _originalLabel, _typeLabel, _quantityLabel;
         private string _filterLabel, _allLabel, _resourcesLabel, _suppliesLabel, _otherLabel;
+        private string _favoritesFilterLabel, _favoritesAllLabel, _favoritesOnlyLabel;
 
         public IReadOnlyList<CombatPrototypeMapInventoryPanelSnapshot.Row> Items => _items;
         public bool SortEnabled { get; private set; }
         public bool FilterEnabled { get; private set; }
+        public bool FavoritesFilterEnabled { get; private set; }
+        public bool FavoritesOnly { get; private set; }
+        public string FavoritesFilterText { get; private set; }
+        public string NoMatchingFavoritesText { get; private set; }
         public string SortText { get; private set; }
         public string FilterText { get; private set; }
         public string NoMatchingItemsText { get; private set; }
         public CombatPrototypeMapInventorySortMode SortMode => _sortMode;
         public CombatPrototypeMapInventoryFilterMode FilterMode => _filterMode;
-        public int ControlRowCount => (SortEnabled ? 1 : 0) + (FilterEnabled ? 1 : 0);
+        public int ControlRowCount => (SortEnabled ? 1 : 0) + (FilterEnabled ? 1 : 0) + (FavoritesFilterEnabled ? 1 : 0);
 
         internal static CombatPrototypeMapInventorySortMode ResolveSortMode(string value)
         {
@@ -76,6 +81,8 @@ namespace Code_01.CombatPrototype.Map
             Reset();
             SortEnabled = settings.SortEnabled != 0;
             FilterEnabled = settings.FilterEnabled != 0;
+            FavoritesFilterEnabled = settings.FavoritesEnabled != 0 && settings.FavoritesFilterEnabled != 0;
+            FavoritesOnly = FavoritesFilterEnabled && settings.DefaultFavoritesOnly != 0;
             _sortMode = SortEnabled ? settings.DefaultSortMode : CombatPrototypeMapInventorySortMode.Original;
             _filterMode = FilterEnabled ? settings.DefaultFilterMode : CombatPrototypeMapInventoryFilterMode.All;
             _sortLabel = settings.SortLabel.ToString();
@@ -88,6 +95,10 @@ namespace Code_01.CombatPrototype.Map
             _suppliesLabel = settings.SuppliesFilterLabel.ToString();
             _otherLabel = settings.OtherFilterLabel.ToString();
             NoMatchingItemsText = settings.NoMatchingItemsLabel.ToString();
+            _favoritesFilterLabel = settings.FavoritesFilterLabel.ToString();
+            _favoritesAllLabel = settings.FavoritesFilterAllLabel.ToString();
+            _favoritesOnlyLabel = settings.FavoritesFilterOnlyLabel.ToString();
+            NoMatchingFavoritesText = settings.NoMatchingFavoritesLabel.ToString();
             UpdateLabels();
         }
 
@@ -99,12 +110,19 @@ namespace Code_01.CombatPrototype.Map
             UpdateLabels();
         }
 
+        public void RestoreFavoritesOnly(bool favoritesOnly)
+        {
+            FavoritesOnly = FavoritesFilterEnabled && favoritesOnly;
+            UpdateLabels();
+        }
+
         // 已确认的显示重置在Panel.Show中应用，不改库存或重建配置。
-        public void ResetDisplay(CombatPrototypeMapInventorySortMode sortMode, CombatPrototypeMapInventoryFilterMode filterMode)
+        public void ResetDisplay(CombatPrototypeMapInventorySortMode sortMode, CombatPrototypeMapInventoryFilterMode filterMode, bool favoritesOnly)
         {
             ClearPending();
             _sortMode = SortEnabled ? sortMode : CombatPrototypeMapInventorySortMode.Original;
             _filterMode = FilterEnabled ? filterMode : CombatPrototypeMapInventoryFilterMode.All;
+            FavoritesOnly = FavoritesFilterEnabled && favoritesOnly;
             _hasSnapshot = false;
             UpdateLabels();
         }
@@ -112,7 +130,7 @@ namespace Code_01.CombatPrototype.Map
         public bool Capture(CombatPrototypeMapInventoryPanelSnapshot snapshot, CombatPrototypeMapInventoryPanelSearch search, CombatPrototypeMapInventoryPanelFavorites favorites, out bool selectionChanged)
         {
             var searchChanged = search.ApplyPending();
-            selectionChanged = _sortPending || _filterPending || searchChanged;
+            selectionChanged = _sortPending || _filterPending || _favoritesFilterPending || searchChanged;
             if (_sortPending)
                 _sortMode = _sortMode == CombatPrototypeMapInventorySortMode.Type ? CombatPrototypeMapInventorySortMode.Quantity :
                     _sortMode == CombatPrototypeMapInventorySortMode.Quantity ? CombatPrototypeMapInventorySortMode.Original :
@@ -122,6 +140,7 @@ namespace Code_01.CombatPrototype.Map
                     _filterMode == CombatPrototypeMapInventoryFilterMode.Resources ? CombatPrototypeMapInventoryFilterMode.Supplies :
                     _filterMode == CombatPrototypeMapInventoryFilterMode.Supplies ? CombatPrototypeMapInventoryFilterMode.Other :
                     CombatPrototypeMapInventoryFilterMode.All;
+            if (_favoritesFilterPending) FavoritesOnly = !FavoritesOnly;
             ClearPending();
             if (selectionChanged) UpdateLabels();
             if (_hasSnapshot && _revision == snapshot.Revision && _searchRevision == search.Revision && _favoritesRevision == favorites.Revision && !favorites.HasPending && !selectionChanged) return false;
@@ -130,8 +149,16 @@ namespace Code_01.CombatPrototype.Map
             foreach (var row in _items) _previousNames.Add(row.Name);
             _items.Clear();
             foreach (var row in snapshot.Items)
-                if (Matches(row.Name) && search.Matches(row)) _items.Add(row);
+                if (Matches(row.Name) && search.Matches(row) && (!FavoritesOnly || favorites.IsFavorite(row.Name))) _items.Add(row);
             selectionChanged |= favorites.ApplyPending(_items);
+            // Validate the pending favorite against the latest visible rows, then remove unfavorited rows immediately.
+            if (FavoritesOnly)
+            {
+                var write = 0;
+                for (var index = 0; index < _items.Count; index++)
+                    if (favorites.IsFavorite(_items[index].Name)) _items[write++] = _items[index];
+                if (write < _items.Count) _items.RemoveRange(write, _items.Count - write);
+            }
             if (_sortMode == CombatPrototypeMapInventorySortMode.Type) _items.Sort(TypeComparison);
             else if (_sortMode == CombatPrototypeMapInventorySortMode.Quantity) _items.Sort(QuantityComparison);
             favorites.Pin(_items);
@@ -150,7 +177,9 @@ namespace Code_01.CombatPrototype.Map
 
         public void QueueSort() { if (SortEnabled) _sortPending = true; }
         public void QueueFilter() { if (FilterEnabled) _filterPending = true; }
-        public void ClearPending() { _sortPending = _filterPending = false; }
+        public void QueueFavoritesFilter() { if (FavoritesFilterEnabled) _favoritesFilterPending = true; }
+        public void ClearFavoritesFilterPending() { _favoritesFilterPending = false; }
+        public void ClearPending() { _sortPending = _filterPending = _favoritesFilterPending = false; }
 
         private bool Matches(FixedString64Bytes name)
         {
@@ -196,6 +225,7 @@ namespace Code_01.CombatPrototype.Map
 
         private void UpdateLabels()
         {
+            FavoritesFilterText = _favoritesFilterLabel + ": " + (FavoritesOnly ? _favoritesOnlyLabel : _favoritesAllLabel);
             switch (_sortMode)
             {
                 case CombatPrototypeMapInventorySortMode.Original: SortText = _sortLabel + ": " + _originalLabel; break;
@@ -217,14 +247,15 @@ namespace Code_01.CombatPrototype.Map
         {
             _items.Clear();
             _previousNames.Clear();
-            SortEnabled = FilterEnabled = _hasSnapshot = false;
+            SortEnabled = FilterEnabled = FavoritesFilterEnabled = FavoritesOnly = _hasSnapshot = false;
             ClearPending();
             _revision = _searchRevision = _favoritesRevision = 0;
             _sortMode = CombatPrototypeMapInventorySortMode.Original;
             _filterMode = CombatPrototypeMapInventoryFilterMode.All;
             _sortLabel = _originalLabel = _typeLabel = _quantityLabel = string.Empty;
             _filterLabel = _allLabel = _resourcesLabel = _suppliesLabel = _otherLabel = string.Empty;
-            SortText = FilterText = NoMatchingItemsText = string.Empty;
+            _favoritesFilterLabel = _favoritesAllLabel = _favoritesOnlyLabel = string.Empty;
+            SortText = FilterText = NoMatchingItemsText = FavoritesFilterText = NoMatchingFavoritesText = string.Empty;
         }
     }
 }

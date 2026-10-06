@@ -946,3 +946,18 @@
 - 正常Unity编译/元数据、2692份非法配置拒绝/146组合法读取及146次隔离Editor Bake静态通过；全77Settings、原Settings/零反馈/引用/布局/兼容签名及输入19/Tools3/全部所属反馈、玩家v4/世界v2保持。Bake前后及最终编译核对Console[0,7,106]相同，保留五条旧NetCode Tick Batching、新增MCP WebSocket及既有PEListener源码Warning，未清空；主场景干净未Play，临时资源释放。烘焙后仅限定收藏变化的按下许可取消，正常编译/字段再次核对，配置/烘焙契约未变。
 - 新增收藏专题，增量同步受影响模块/导航及策划模板第7节完整JSON和第42节；原467项人工内容/编号逐字保留，新增十六项后483项，收藏人工待验收；旧详情通过仍限v32/revision35十六项及其他旧范围。当前版本/字段引用同步，既有阶段编译/烘焙/人工证据保留原版本。
 - Scene/SubScene/Prefab/Animator/旧meta/资源/字体/包/构建配置、HUD/Binding/PlayerInput及服务器/玩家世界保存代码保持；未执行收藏/列表/面板/偏好/GUI业务、真实偏好/游戏存档I/O、GamePlayer/PlayMode、逻辑单元测试、命令行构建/发布、采样/图片，未创建子Agent、暂存或提交Git。
+
+## 2026-10-06 背包材料收藏与置顶人工验收确认
+
+- 用户明确反馈“我已验收通过，接下来下一阶段”；主线程结合既有静态核对与用户反馈判定收藏阶段通过，范围限CombatPrototypeNetCode、v33/revision36及运行入口十六项人工GamePlayer清单，人工结论来自用户反馈。
+- 增量同步收藏专题、相关模块/导航/运行入口及策划模板第42节的验收状态；原483项人工内容/编号、2692份非法配置/146组合法读取/146次隔离Bake等既有静态证据、代码/JSON/资源结构和旧通过范围保持。
+- 未实际触发的独立交互、生命周期、偏好迁移/文件故障、联网/预测/字形/缩放用例仍UNKNOWN；性能、平台构建和线上联调未获单独验收结论。此次只记录用户反馈并核对文档，未执行游戏/GUI/偏好读写、GamePlayer/PlayMode、逻辑单元测试、构建/发布或图片检查，未创建子Agent、暂存或提交Git。
+
+## 2026-10-06 背包仅看收藏筛选（v34/revision37）
+
+- 按用户已确认方案由主线程执行：原B面板排序/分类之后、搜索之前接入全宽Favorites All items/Favorites only切换；GUI只排队，下一有效Show在完整Snapshot后按分类×搜索×收藏条件生成可见行，原排序/稳定置顶保持。仅看收藏取消收藏在同次有效刷新移除行并关闭被隐藏详情；空交集文案、共享ControlRowCount/搜索命中和内容高度已接入。新模式实际变化取消旧面板/行许可并归零滚动，原排序/搜索及已排队业务保持。
+- 修改十一现有C#脚本及两地图JSON，没有新helper/meta/组件/挂载；inventoryPanel77→83，新增两严格bool和四文案，Json/BuiltIn34/37一致，旧地图v1～v33拒绝，关闭仍全量验证。新能力需收藏与新开关同时开启，独立于原分类开关；Reset view恢复DefaultFavoritesOnly并沿原清启用收藏，Close/无效输入清待模式，同一绑定已应用模式保留。
+- 本机偏好v3七字段新增严格bool favoritesOnly；兼容严格v1五字段（空收藏/false）和v2六字段（保留收藏/false），只内存迁移，读取不写盘、下一实际已应用变化写v3。只观察启用且已应用模式，关闭功能时其他偏好保存保留原flag；原0.5秒合并、.tmp/Flush(true)/Replace或Move及失败暂停当前绑定保持。
+- 正常Unity编译/83字段及偏好v3七字段元数据、2986份非法配置拒绝/174组合法读取、174次隔离Editor Bake静态通过；全部83Settings、原Settings/零反馈/Prefab引用、地图布置与兼容签名以及输入19/Tools3/所属反馈、玩家v4/世界v2保持。执行前Console[0,7,106]，编译后/Bake前后[0,8,106]，新增既有DOTween编辑器FindObjectsOfType弃用CS0618警告；未清空Console，主场景干净未Play，临时资源释放。
+- 新增收藏筛选专题，增量同步相关模块/导航、策划模板第7节完整JSON及第43节；原483项人工内容/编号保留，追加十六项后499项，当前人工待验收，旧收藏通过限v33/revision36清单及其他旧范围。既有阶段证明保留原版本/数值。
+- Scene/SubScene/Prefab/Animator/全部meta/资源/字体/包/构建结构、Details/HUD/Binding/PlayerInput和服务器/玩家世界保存代码保持；未执行列表/收藏/面板/偏好/GUI业务、真实偏好/游戏存档I/O、GamePlayer/PlayMode、逻辑单元测试、命令行构建/发布、采样/图片，未创建子Agent、暂存或提交Git。

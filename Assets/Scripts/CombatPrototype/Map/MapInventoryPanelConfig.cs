@@ -82,5 +82,11 @@ namespace Code_01.CombatPrototype.Map
         public string unfavoriteButtonLabel;
         public string favoriteTagLabel;
         public string favoritesFullLabel;
+        public bool favoritesFilterEnabled;
+        public bool defaultFavoritesOnly;
+        public string favoritesFilterLabel;
+        public string favoritesFilterAllLabel;
+        public string favoritesFilterOnlyLabel;
+        public string noMatchingFavoritesLabel;
     }
 }

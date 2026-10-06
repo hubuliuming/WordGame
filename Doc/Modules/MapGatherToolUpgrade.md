@@ -1,6 +1,6 @@
 # 采集工具升级与效率提升
 
-返回[采集工具](MapGatherTools.md)、[工具修理](MapToolRepair.md)与[材料面板](MapInventoryPanel.md)。本专题负责 CombatPrototypeNetCode 的工具 Lv1～Lv3、B/6/7 升级、有效耐久上限与采集耗时；玩家文件完整契约归[资源与数据](DataResources.md)，人工清单归[运行入口](Runtime.md)。当前地图 schemaVersion=33/configRevision=36，玩家存档 Version=4；用户已确认本阶段人工 GamePlayer 通过，主线程结合既有静态核对判定通过，限 v21/revision24 及[运行入口](Runtime.md)二十二项清单，结论来自用户反馈。未实际触发的独立边界仍为 UNKNOWN。背包升级及更早用户通过仍限各自原版本/清单。
+返回[采集工具](MapGatherTools.md)、[工具修理](MapToolRepair.md)与[材料面板](MapInventoryPanel.md)。本专题负责 CombatPrototypeNetCode 的工具 Lv1～Lv3、B/6/7 升级、有效耐久上限与采集耗时；玩家文件完整契约归[资源与数据](DataResources.md)，人工清单归[运行入口](Runtime.md)。当前地图 schemaVersion=34/configRevision=37，玩家存档 Version=4；用户已确认本阶段人工 GamePlayer 通过，主线程结合既有静态核对判定通过，限 v21/revision24 及[运行入口](Runtime.md)二十二项清单，结论来自用户反馈。未实际触发的独立边界仍为 UNKNOWN。背包升级及更早用户通过仍限各自原版本/清单。
 
 ## 【FACT】入口与职责
 
@@ -108,4 +108,8 @@ v32/revision35详情阶段的[材料详情](MapInventoryDetails.md)沿原Require
 
 ## 【FACT】收藏显示边界
 
-当前v33/revision36的[收藏](MapInventoryFavorites.md)：收藏不修改工具等级/耐久/效率、原配方来源、6/7请求或升级事务；原工具升级用户通过范围保持。人工收藏十六项待验收，旧通过仍限各自版本/清单。
+v33/revision36收藏阶段的[收藏](MapInventoryFavorites.md)：收藏不修改工具等级/耐久/效率、原配方来源、6/7请求或升级事务；原工具升级用户通过范围保持。人工收藏十六项已获用户通过反馈，限CombatPrototypeNetCode、v33/revision36及运行入口十六项；未触发独立用例仍UNKNOWN，旧通过仍限各自版本/清单。
+
+## 【FACT】仅看收藏边界
+
+当前v34/revision37的[收藏筛选](MapInventoryFavoritesFilter.md)：筛选不参与工具有效等级/耐久/效率或配方/6/7请求，预览与服务端升级使用原完整数据。本阶段十六项待人工GamePlayer验收，旧通过范围保持。

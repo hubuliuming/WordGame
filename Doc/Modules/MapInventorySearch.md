@@ -1,6 +1,6 @@
 # 背包材料搜索
 
-返回[地图](Map.md)、[背包](Inventory.md)、[B面板](MapInventoryPanel.md)、[排序筛选](MapInventoryListView.md)、[容量](MapInventoryCapacity.md)、[丢弃](MapInventoryDrop.md)、[配置](DataResources.md)、[玩家输入](Player.md)与[运行入口](Runtime.md)。入口CombatPrototypeNetCode；Forest/Grassland Json/BuiltIn当前schemaVersion=33/configRevision=36；[本机偏好](MapInventoryPreferences.md)静态核对通过、人工已获用户通过反馈，限v30/revision33及运行入口偏好阶段十六项。主线程实现、正常编译、严格配置读取和隔离Editor Bake静态核对通过；用户已确认本阶段人工GamePlayer验收通过，主线程结合既有静态核对与用户反馈判定通过，限CombatPrototypeNetCode、v29/revision32及运行入口十六项清单；人工结论来自用户反馈。旧排序筛选用户通过限v28/revision31十六项，其他旧通过保持原版本/清单。
+返回[地图](Map.md)、[背包](Inventory.md)、[B面板](MapInventoryPanel.md)、[排序筛选](MapInventoryListView.md)、[容量](MapInventoryCapacity.md)、[丢弃](MapInventoryDrop.md)、[配置](DataResources.md)、[玩家输入](Player.md)与[运行入口](Runtime.md)。入口CombatPrototypeNetCode；Forest/Grassland Json/BuiltIn当前schemaVersion=34/configRevision=37；[本机偏好](MapInventoryPreferences.md)静态核对通过、人工已获用户通过反馈，限v30/revision33及运行入口偏好阶段十六项。主线程实现、正常编译、严格配置读取和隔离Editor Bake静态核对通过；用户已确认本阶段人工GamePlayer验收通过，主线程结合既有静态核对与用户反馈判定通过，限CombatPrototypeNetCode、v29/revision32及运行入口十六项清单；人工结论来自用户反馈。旧排序筛选用户通过限v28/revision31十六项，其他旧通过保持原版本/清单。
 
 ## 【FACT】文件与配置
 
@@ -71,4 +71,8 @@ v32/revision35详情阶段的[详情](MapInventoryDetails.md)位于搜索控件�
 
 ## 【FACT】收藏显示边界
 
-当前v33/revision36的[收藏](MapInventoryFavorites.md)：分类/查询先产生可见行，再稳定分组置顶；隐藏收藏不强制出现，清词不清收藏，原SearchField位置/焦点及键盘隔离保持。人工收藏十六项待验收，旧通过仍限各自版本/清单。
+v33/revision36收藏阶段的[收藏](MapInventoryFavorites.md)：分类/查询先产生可见行，再稳定分组置顶；隐藏收藏不强制出现，清词不清收藏，原SearchField位置/焦点及键盘隔离保持。人工收藏十六项已获用户通过反馈，限CombatPrototypeNetCode、v33/revision36及运行入口十六项；未触发独立用例仍UNKNOWN，旧通过仍限各自版本/清单。
+
+## 【FACT】仅看收藏边界
+
+当前v34/revision37的[收藏筛选](MapInventoryFavoritesFilter.md)：新增全宽收藏筛选位于分类之后、搜索之前，ControlRowCount同时用于绘制高度和ContainsSearchField，开启时文本框下移一行；分类/查询/收藏取交集，原焦点/IME/键盘及指针隔离保持。本阶段十六项待人工GamePlayer验收，旧通过范围保持。

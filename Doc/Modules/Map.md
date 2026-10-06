@@ -15,11 +15,11 @@
 
 ## 【FACT】当前默认配置
 
-v33/36；[收藏](MapInventoryFavorites.md)待验收；详情通过限v32/35十六项。
+v34/37；[收藏筛选](MapInventoryFavoritesFilter.md)待验收；收藏通过限v33/36十六项。
 
 | 配置字段 | 当前值与用途 |
 |---|---|
-| schemaVersion / configRevision | 33 / 36 |
+| schemaVersion / configRevision | 34 / 37 |
 | inventoryCapacity | 默认总量300、单种200，完整契约归[容量](MapInventoryCapacity.md) |
 | defaultSeed | 12345，用于确定性布置 |
 | geometry.cellSizeMeters | 2 米 |
@@ -64,7 +64,7 @@ gather_apple 的 footprintRadiusMeters=0.3、minimumSameTypeSpacingMeters=1.5、
 | GroundsJson | [grounds.json](../../Assets/Config/CombatPrototype/Map/grounds.json) | GroundDefinitionConfig 数组 |
 | ObjectsJson | [objects.json](../../Assets/Config/CombatPrototype/Map/objects.json) | MapObjectDefinitionConfig 数组 |
 
-SourceMode=BuiltIn 时明确使用内置来源，SourceMode=Json 时使用选中地图 JSON 和三份共享 JSON；Json 来源失败不自动回退 BuiltIn。Preset=Grassland 要求地图 ID 为 battle_grassland_01，Preset=Forest 要求 battle_forest_01。schemaVersion=33为契约版本，configRevision须为正整数；旧v1～v32或缺少必填字段明确失败，不补字段或回退来源。
+SourceMode=BuiltIn 时明确使用内置来源，SourceMode=Json 时使用选中地图 JSON 和三份共享 JSON；Json 来源失败不自动回退 BuiltIn。Preset=Grassland 要求地图 ID 为 battle_grassland_01，Preset=Forest 要求 battle_forest_01。schemaVersion=34为契约版本，configRevision须为正整数；旧v1～v33或缺少必填字段明确失败，不补字段或回退来源。
 
 [MapMovementConfig.cs](../../Assets/Scripts/CombatPrototype/Map/MapMovementConfig.cs) 是地图定义的必填 movement 段：
 

@@ -1,6 +1,6 @@
 # 背包容量扩展与升级
 
-返回[背包](Inventory.md)、[地图](Map.md)与[材料容量](MapInventoryCapacity.md)。本专题负责 CombatPrototypeNetCode 的个人永久容量等级、升级配方、所属反馈和 B/5 输入。玩家文件的唯一契约归[资源与数据](DataResources.md)，人工清单归[运行入口](Runtime.md)。当前地图 schemaVersion=33/configRevision=36；用户已确认人工GamePlayer通过，限v20/revision23升级十六项。
+返回[背包](Inventory.md)、[地图](Map.md)与[材料容量](MapInventoryCapacity.md)。本专题负责 CombatPrototypeNetCode 的个人永久容量等级、升级配方、所属反馈和 B/5 输入。玩家文件的唯一契约归[资源与数据](DataResources.md)，人工清单归[运行入口](Runtime.md)。当前地图 schemaVersion=34/configRevision=37；用户已确认人工GamePlayer通过，限v20/revision23升级十六项。
 
 ## 【FACT】入口与职责
 
@@ -98,4 +98,8 @@ v32/revision35详情阶段的[材料详情](MapInventoryDetails.md)沿原Require
 
 ## 【FACT】收藏显示边界
 
-当前v33/revision36的[收藏](MapInventoryFavorites.md)：收藏不参与容量统计或等级/配方/5请求，完整库存与原升级事务保持；原扩容用户通过范围保持。人工收藏十六项待验收，旧通过仍限各自版本/清单。
+v33/revision36收藏阶段的[收藏](MapInventoryFavorites.md)：收藏不参与容量统计或等级/配方/5请求，完整库存与原升级事务保持；原扩容用户通过范围保持。人工收藏十六项已获用户通过反馈，限CombatPrototypeNetCode、v33/revision36及运行入口十六项；未触发独立用例仍UNKNOWN，旧通过仍限各自版本/清单。
+
+## 【FACT】仅看收藏边界
+
+当前v34/revision37的[收藏筛选](MapInventoryFavoritesFilter.md)：筛选不影响全量容量统计、扩容配方/等级或5输入及服务器事务。本阶段十六项待人工GamePlayer验收，旧通过范围保持。

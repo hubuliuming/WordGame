@@ -21,6 +21,7 @@ namespace Code_01.CombatPrototype.Map
         public bool Enabled { get; private set; }
         public bool HasPending => _pending;
         public uint Revision { get; private set; }
+        public bool IsFavorite(FixedString64Bytes name) => Enabled && _names.Contains(name);
 
         public void Configure(CombatPrototypeMapInventoryPanelSettings settings)
         {

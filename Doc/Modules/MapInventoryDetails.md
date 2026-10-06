@@ -1,6 +1,6 @@
 # 背包材料详情与用途提示
 
-返回[地图](Map.md)、[B面板](MapInventoryPanel.md)、[背包](Inventory.md)、[排序筛选](MapInventoryListView.md)、[搜索](MapInventorySearch.md)、[偏好](MapInventoryPreferences.md)、[配置与存档](DataResources.md)及[运行验收](Runtime.md)。入口CombatPrototypeNetCode，原B面板；Forest/Grassland Json/BuiltIn当前v33/revision36，[收藏](MapInventoryFavorites.md)人工待验收。主线程按已确认方案完成代码、配置和静态核对，用户已确认本阶段人工GamePlayer验收通过，主线程结合既有静态核对与用户反馈判定通过，限CombatPrototypeNetCode、v32/revision35及运行入口十六项清单，人工结论来自用户反馈；重置用户通过仍限v31/revision34十六项，保存/搜索与其他旧通过保持各自原版本/清单。
+返回[地图](Map.md)、[B面板](MapInventoryPanel.md)、[背包](Inventory.md)、[排序筛选](MapInventoryListView.md)、[搜索](MapInventorySearch.md)、[偏好](MapInventoryPreferences.md)、[配置与存档](DataResources.md)及[运行验收](Runtime.md)。入口CombatPrototypeNetCode，原B面板；Forest/Grassland Json/BuiltIn当前v34/revision37，[收藏](MapInventoryFavorites.md)人工已获用户通过反馈，限CombatPrototypeNetCode、v33/revision36及运行入口十六项；未触发独立用例仍UNKNOWN。主线程按已确认方案完成代码、配置和静态核对，用户已确认本阶段人工GamePlayer验收通过，主线程结合既有静态核对与用户反馈判定通过，限CombatPrototypeNetCode、v32/revision35及运行入口十六项清单，人工结论来自用户反馈；重置用户通过仍限v31/revision34十六项，保存/搜索与其他旧通过保持各自原版本/清单。
 
 ## 【FACT】入口与职责
 
@@ -34,7 +34,7 @@ v32详情阶段仅八现有脚本、一新普通Details类及正常Unity生成me
 | meatDescriptionLabel | Supply from enemy rewards |
 | meatUsageLabel | E: Restore power |
 
-原详情十四字段保留，另有[收藏](MapInventoryFavorites.md)六字段；当前完整DTO十一bool、六float、三int、两模式string、54文案string及一文件ID，共77；Settings十一byte、六float、三int、两byte枚举及55 FixedString64Bytes，共77，零GhostField/无GhostComponent。新开关必填严格bool→byte，十三文案必填非空白、无控制字符、最多61 UTF-8字节→FixedString64Bytes；关闭详情/面板/原能力仍完整验证。地图schema33/revision36，各端同版，旧v1～v32拒绝；无补默认、来源回退或热重载，正常导入/烘焙生效。
+原详情十四字段保留，另有[收藏](MapInventoryFavorites.md)六字段与[收藏筛选](MapInventoryFavoritesFilter.md)六字段；当前完整DTO十三bool、六float、三int、两模式string、58文案string及一文件ID，共83；Settings十三byte、六float、三int、两byte枚举及59 FixedString64Bytes，共83，零GhostField/无GhostComponent。新开关必填严格bool→byte，十三文案必填非空白、无控制字符、最多61 UTF-8字节→FixedString64Bytes；关闭详情/面板/原能力仍完整验证。地图schema34/revision37，各端同版，旧v1～v33拒绝；无补默认、来源回退或热重载，正常导入/烘焙生效。
 
 类别复用原Resources/Supplies/Other文案，类别标题复用TypeOrderLabel；容量关闭或未受管材料复用Unlimited。默认英文，中文配置接口保留，实际字形/分辨率覆盖UNKNOWN。
 
@@ -59,7 +59,7 @@ v32详情阶段仅八现有脚本、一新普通Details类及正常Unity生成me
 - 工具与升级开关启用且持有未满级工具：按ToolId+Level读下一档UpgradeDefinition木/石需求；未持有或Lv3不列升级项，定义数组顺序不影响匹配。
 - 容量与升级开关启用且未满级：读取下一档InventoryCapacityUpgradeDefinition需求；Lv3不列扩容项。
 
-小块肉只显示可配置E用途说明，不触发E或修改体力。苹果没有在本阶段新增使用动作，显示No listed uses；其他合法材料显示配置的通用简介/无用途记录。原配方按钮、业务资格、扣料/发物/工具耐久、输入/Ghost及玩家v4/世界v2保存保持；当前偏好v2六字段兼容v1五字段，详情选择仍不保存。
+小块肉只显示可配置E用途说明，不触发E或修改体力。苹果没有在本阶段新增使用动作，显示No listed uses；其他合法材料显示配置的通用简介/无用途记录。原配方按钮、业务资格、扣料/发物/工具耐久、输入/Ghost及玩家v4/世界v2保存保持；当前偏好v3七字段兼容v1五字段/v2六字段，详情选择仍不保存。
 
 ## 【KNOWN ISSUES】静态证据与人工边界
 
@@ -73,4 +73,8 @@ v32详情阶段仅八现有脚本、一新普通Details类及正常Unity生成me
 
 ## 【CURRENT STRATEGY】收藏后的详情选择
 
-当前v33/revision36只将收藏标记后的显示文字传入DrawItemLabel，详情身份仍按真实Name匹配；收藏重排保持同名详情，分类/搜索隐藏或数量归零仍关闭，收藏状态本身继续保留。展开位置跟随所选材料收藏行，当前77配置/Settings及146次隔离Bake静态通过，人工收藏十六项待验收，范围归[收藏](MapInventoryFavorites.md)；详情既有通过仍限v32/revision35十六项。
+v33/revision36收藏阶段只将收藏标记后的显示文字传入DrawItemLabel，详情身份仍按真实Name匹配；收藏重排保持同名详情，分类/搜索隐藏或数量归零仍关闭，收藏状态本身继续保留。展开位置跟随所选材料收藏行，v33阶段77配置/Settings及146次隔离Bake静态通过，人工收藏十六项已获用户通过反馈，限CombatPrototypeNetCode、v33/revision36及运行入口十六项；未触发独立用例仍UNKNOWN，范围归[收藏](MapInventoryFavorites.md)；详情既有通过仍限v32/revision35十六项。
+
+## 【CURRENT STRATEGY】收藏筛选后的详情
+
+当前v34/revision37复用原Details.Capture：切到仅看收藏后所选真实Name不再可见即关闭详情；仅看收藏中取消所选收藏，在同一次有效刷新先移除行，再关闭详情，不恢复隐藏选择。详情代码、选择身份及高度测量沿原；新控制行高度由Panel/ListView统一计入。完整交集/鼠标许可与人工边界归[收藏筛选](MapInventoryFavoritesFilter.md)，当前阶段待验收；旧详情/收藏通过保持各自版本/清单。

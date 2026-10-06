@@ -82,5 +82,11 @@ namespace Code_01.CombatPrototype.Map
         public FixedString64Bytes UnfavoriteButtonLabel;
         public FixedString64Bytes FavoriteTagLabel;
         public FixedString64Bytes FavoritesFullLabel;
+        public byte FavoritesFilterEnabled;
+        public byte DefaultFavoritesOnly;
+        public FixedString64Bytes FavoritesFilterLabel;
+        public FixedString64Bytes FavoritesFilterAllLabel;
+        public FixedString64Bytes FavoritesFilterOnlyLabel;
+        public FixedString64Bytes NoMatchingFavoritesLabel;
     }
 }

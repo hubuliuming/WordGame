@@ -21,7 +21,7 @@
 
 ## 【FACT】JSON契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=33/configRevision=36。inventoryDrop全部字段必填，沿原严格UTF-8/缺失/未知/重复字段及类型检查；旧v1～v32明确失败，不补段或回退来源。disabled仍校验全部字段与资源绑定；正常导入/烘焙后生效，没有运行热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=34/configRevision=37。inventoryDrop全部字段必填，沿原严格UTF-8/缺失/未知/重复字段及类型检查；旧v1～v33明确失败，不补段或回退来源。disabled仍校验全部字段与资源绑定；正常导入/烘焙后生效，没有运行热重载。
 
 | 字段 | 默认值 | 契约 |
 |---|---|---|
@@ -98,7 +98,7 @@ v26/revision29的[地面合并](MapDropMerge.md)只处理已登记Landed物，�
 
 ## 【FACT】丢弃堆的按容量领取
 
-当前v33/revision36的[部分拾取](MapDropPartialPickup.md)适用于原Drop/All落地物；默认G只领取当前总量/单种余量可容纳的部分，原大堆不按99钳制或新建拆分实体，剩余量保留原身份/期限。丢弃数量、保存/激活/回滚与反馈保持；partialPickupEnabled独立于丢弃及敌人掉落开关，静态及用户人工通过限v27/revision30十六项，未触发独立用例UNKNOWN。
+当前v34/revision37的[部分拾取](MapDropPartialPickup.md)适用于原Drop/All落地物；默认G只领取当前总量/单种余量可容纳的部分，原大堆不按99钳制或新建拆分实体，剩余量保留原身份/期限。丢弃数量、保存/激活/回滚与反馈保持；partialPickupEnabled独立于丢弃及敌人掉落开关，静态及用户人工通过限v27/revision30十六项，未触发独立用例UNKNOWN。
 
 搜索仅改变可见行，原DrawRow继续按真实Row.Name解析Kind/Mode；搜索变化引起身份/顺序/数目变化时沿原许可取消未完成行点击，已排队/已消费请求保持。搜索静态及用户人工GamePlayer通过，限v29/revision32及运行入口十六项，结论来自用户反馈；未实际触发的独立点击/丢弃用例UNKNOWN，服务端丢弃事务保持。
 

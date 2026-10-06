@@ -21,7 +21,7 @@
 
 ## 【FACT】JSON 契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 当前一致为 schemaVersion=33/configRevision=36。必填 inventoryPanel 共77字段，原30字段加[排序筛选](MapInventoryListView.md)十四、[搜索](MapInventorySearch.md)七、[本机偏好与重置](MapInventoryPreferences.md)六、[材料详情](MapInventoryDetails.md)十四及[收藏](MapInventoryFavorites.md)六字段，沿原严格UTF-8、完整字段/类型及未知/重复键检查；即使关闭面板也校验全部字段。旧地图v1～v32明确失败，不补段/默认值或回退来源；正常导入/烘焙后生效，无运行热重载。Lv1配方/定义仍从gatherTools读取，当前级上限/倍率归[gatherToolUpgrade](MapGatherToolUpgrade.md)，面板不复制配置真值。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 当前一致为 schemaVersion=34/configRevision=37。必填 inventoryPanel 共83字段，原30字段加[排序筛选](MapInventoryListView.md)十四、[搜索](MapInventorySearch.md)七、[本机偏好与重置](MapInventoryPreferences.md)六、[材料详情](MapInventoryDetails.md)十四、[收藏](MapInventoryFavorites.md)六及[收藏筛选](MapInventoryFavoritesFilter.md)六字段，沿原严格UTF-8、完整字段/类型及未知/重复键检查；即使关闭面板也校验全部字段。旧地图v1～v33明确失败，不补段/默认值或回退来源；正常导入/烘焙后生效，无运行热重载。Lv1配方/定义仍从gatherTools读取，当前级上限/倍率归[gatherToolUpgrade](MapGatherToolUpgrade.md)，面板不复制配置真值。
 
 | 字段 | 默认值 | 契约 |
 |---|---|---|
@@ -56,7 +56,7 @@
 | repairButtonLabel | Repair |
 | fullDurabilityLabel | Full durability |
 
-全部54文案（上表原22项、排序筛选十项、搜索四项、重置一项、[材料详情](MapInventoryDetails.md)十三项及[收藏](MapInventoryFavorites.md)四项）须非空白、无控制字符且最多61个UTF-8字节，烘焙为FixedString64Bytes。内置GUI字体和白色纹理复用；当前英文文案，中文接口保留，字体/字形覆盖为UNKNOWN，没有读取图片或界面截图。
+全部58文案（上表原22项、排序筛选十项、搜索四项、重置一项、[材料详情](MapInventoryDetails.md)十三项、[收藏](MapInventoryFavorites.md)四项及[收藏筛选](MapInventoryFavoritesFilter.md)四项）须非空白、无控制字符且最多61个UTF-8字节，烘焙为FixedString64Bytes。内置GUI字体和白色纹理复用；当前英文文案，中文接口保留，字体/字形覆盖为UNKNOWN，没有读取图片或界面截图。
 
 ## 【CURRENT STRATEGY】库存、工具与配方显示
 
@@ -66,7 +66,7 @@ Snapshot缓存完整显示文本/数量，行内容、数量/顺序或容量等�
 
 两条配方直接读取原definitions：斧头木3/石2、镐子木2/石3；分别列出现有/需要与max(需要-现有,0)缺少数量。只有工具开关启用、库存展示快照合法、材料充足且工具未持有或耐久小于单次成本时按钮可用。Ready仅是当前客户端材料/耐久预览，连接、生命、静止、无攻击、近战Ready、资源预约互斥及同tick优先仍由原服务端制作系统决定；网络快照滞后时服务器可拒绝，不按客户端预览扣料/发工具。工具功能关闭保留已有耐久/等级并禁用按钮；制作/重做满耐久Lv1，损坏高等级工具的按钮明确显示Recraft at Lv1。
 
-面板右上，按min(屏幕宽/1920,屏幕高/1080)等比缩放。标题和共享反馈/关闭按钮固定，中间列表滚动；背景alpha=0.85。缓存条目/配方/按钮文本和GUI样式；GUI绘制后恢复matrix/color/enabled。按钮/滚动参与正常GUI事件，原F提示/进度仍仅Repaint且保持底部320×104。排序、筛选两个完整宽度控制行位于材料标题/容量行之后，搜索开启再追加标题及文本框/清空按钮两行，同处原滚动区；其后有可配置重置按钮一行，规则归[偏好](MapInventoryPreferences.md)。内容高度计入可见行与全部启用控制行。无库存沿原Empty；完整库存有条目且有效搜索无可见行显示No search results，仅分类无匹配显示No matching items。完整容量统计、工具及制作/修理/升级区不受筛选或搜索影响。
+面板右上，按min(屏幕宽/1920,屏幕高/1080)等比缩放。标题和共享反馈/关闭按钮固定，中间列表滚动；背景alpha=0.85。缓存条目/配方/按钮文本和GUI样式；GUI绘制后恢复matrix/color/enabled。按钮/滚动参与正常GUI事件，原F提示/进度仍仅Repaint且保持底部320×104。排序、分类及启用的收藏筛选共0～3个完整宽度控制行位于材料标题/容量行之后，默认Sort: Type、Filter: All、Favorites: All items；搜索开启再追加标题及文本框/清空按钮两行，同处原滚动区；其后有可配置重置按钮一行，规则归[偏好](MapInventoryPreferences.md)。内容高度计入可见行与全部启用控制行。完整库存为空沿原Empty；库存有条目但仅看收藏交集为空显示No matching favorites；全部材料模式中有效搜索无可见行显示No search results，仅分类无匹配显示No matching items。完整容量统计、工具及制作/修理/升级区不受筛选或搜索影响。
 
 排序/筛选按钮仅记录客户端布尔切换，在Show捕获库存后应用一次并滚动归零；无输入/RPC或存档新增字段。可见行身份/顺序/数目变化只清本次行丢弃的鼠标按下许可，防止按下至抬起间重排丢错行；已排队Kind/Mode保持，制作/修理/升级沿原完整Snapshot资格。详细规则与v28静态/人工边界归[排序筛选](MapInventoryListView.md)。
 
@@ -140,6 +140,12 @@ v32/revision35详情阶段在原材料名称行右侧绘制Details按钮；GUI�
 
 ## 【CURRENT STRATEGY】收藏与置顶
 
-当前v33/revision36在每个可见材料的Drop/All之后增加一行全宽Favorite/Unfavorite；详情在该行之后展开，收藏关闭则沿原两行布局。GUI按真实Name排队，下一有效Show先捕获完整库存及分类/搜索可见行，再应用收藏，原排序后稳定分为收藏/普通两组，组内保持原顺序；名称仅追加配置标记。实际收藏变化归零滚动并取消旧面板/行按下许可；原排序/搜索许可规则及已排队业务保持。内容基础材料行数为可见数×3（关闭收藏×2），实际详情高度另计。
+v33/revision36收藏阶段在每个可见材料的Drop/All之后增加一行全宽Favorite/Unfavorite；详情在该行之后展开，收藏关闭则沿原两行布局。GUI按真实Name排队，下一有效Show先捕获完整库存及分类/搜索可见行，再应用收藏，原排序后稳定分为收藏/普通两组，组内保持原顺序；名称仅追加配置标记。实际收藏变化归零滚动并取消旧面板/行按下许可；原排序/搜索许可规则及已排队业务保持。内容基础材料行数为可见数×3（关闭收藏×2），实际详情高度另计。
 
-Panel先配置Favorites再恢复Preferences，ListView使用收藏Revision/待请求刷新缓存，Preferences仅观察已应用值。重置清启用的收藏；Close/无效输入清待请求，同一绑定已应用收藏保留，绑定Reset先提交已观察值再清缓存。完整规则、77字段及本机偏好v2兼容v1归[收藏](MapInventoryFavorites.md)，人工十六项待验收；原详情通过仍限v32/revision35十六项。
+Panel先配置Favorites再恢复Preferences，ListView使用收藏Revision/待请求刷新缓存，Preferences仅观察已应用值。重置清启用的收藏；Close/无效输入清待请求，同一绑定已应用收藏保留，绑定Reset先提交已观察值再清缓存。收藏阶段77字段及当时本机偏好v2兼容v1归[收藏](MapInventoryFavorites.md)，人工十六项已获用户通过反馈，限CombatPrototypeNetCode、v33/revision36及运行入口十六项；未触发独立用例仍UNKNOWN；原详情通过仍限v32/revision35十六项。
+
+## 【CURRENT STRATEGY】仅看收藏筛选
+
+当前v34/revision37在原排序/分类之后、搜索之前接入全宽Favorites控制行，由ListView管理已应用布尔模式与待切换；分类×搜索×收藏条件取交集后沿原排序。仅看收藏取消当前Name的收藏，在同一有效刷新中移除该行并关闭被隐藏详情；完整Snapshot及业务请求仍沿原链。实际新模式变化归零滚动并取消旧面板/行按下许可，原排序/搜索行为保持。Close/无效输入只清待切换，同一绑定已应用模式保留；Reset view恢复DefaultFavoritesOnly并沿原清启用收藏。
+
+FavoritesEnabled和FavoritesFilterEnabled须同时开启，新控制独立于原FilterEnabled；关闭新能力时收藏条件退回全部，分类/搜索仍有效。ControlRowCount及SearchField共享几何纳入新增控制行；偏好v3七字段严格兼容v1/v2，只观察已应用值，关闭功能保留已读favoritesOnly。完整六字段、配置及人工十六项待验收边界归[收藏筛选](MapInventoryFavoritesFilter.md)，旧收藏用户通过仍限v33/revision36清单。

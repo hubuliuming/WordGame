@@ -1121,7 +1121,9 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 
 入口CombatPrototypeNetCode，原B面板；Forest/Grassland Json/BuiltIn v33/revision36，原71配置/Settings追加六收藏字段至77，零GhostField；普通Favorites类/正常生成meta、偏好v2六实例字段及原协议元数据已正常Unity编译/核对。2692份非法地图配置拒绝、146组合法读取、146次隔离Editor Bake通过；全部77Settings、原Settings/零反馈/Prefab引用/完整布置与兼容签名匹配，输入19/Tools3/原反馈和玩家v4/世界v2保持。只读源SubScene、临时资源释放，主场景干净、3根对象、单场景、未Play。烘焙后仅限定收藏变化取消按下许可，正常编译/字段再次核对，配置/烘焙契约保持。
 
-执行前Console[0 Error,5 Warning,106 Log]，五条已有NetCode Server Tick Batching Warning；Bake前后和最终编译核对均[0 Error,7 Warning,106 Log]，另两条为MCP WebSocket未初始化及既有PEListener源码序列化Warning。未清空Console，不将旧运行日志视为本阶段性能结论。原467项人工内容/编号逐字保留，以下追加十六项待人工GamePlayer验收；详情用户通过仍限v32/revision35十六项及其他旧阶段原范围。
+执行前Console[0 Error,5 Warning,106 Log]，五条已有NetCode Server Tick Batching Warning；Bake前后和最终编译核对均[0 Error,7 Warning,106 Log]，另两条为MCP WebSocket未初始化及既有PEListener源码序列化Warning。未清空Console，不将旧运行日志视为本阶段性能结论。原467项人工内容/编号逐字保留，本阶段十六项人工GamePlayer已获用户通过反馈；详情用户通过仍限v32/revision35十六项及其他旧阶段原范围。
+
+用户明确反馈“我已验收通过，接下来下一阶段”；主线程结合既有静态核对与用户反馈判定收藏阶段通过，限CombatPrototypeNetCode、v33/revision36及下述十六项人工清单，人工结论来自用户反馈；未实际触发的独立用例仍UNKNOWN。原483项内容/编号与其他旧通过范围保持，各端同版代码/配置并正常导入/烘焙。
 
 1. 两地图Json/BuiltIn均v33/revision36，六新增字段采用收藏专题默认值；DTO/Settings各77、零GhostField。严格收藏上限1～256、四文案61 UTF-8字节及完整字段检查，旧v1～v32拒绝；关闭收藏/面板仍验证，未触发独立配置分支UNKNOWN。
 2. 原B面板每个可见材料Drop/All之后显示全宽Favorite/Unfavorite，收藏标记使用配置tag，详情在收藏控制行之后展开；收藏关闭恢复两行材料布局。默认尺寸/滚动/页脚/指针隔离保持，未遍历命中边界UNKNOWN。
@@ -1140,4 +1142,33 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 15. 收藏重排保留同Name详情，分类隐藏/数量归零仍关闭详情，收藏仍保留；新增行/标记与标题/正文换行、默认/最小尺寸及ASCII/UTF-8 61字节/中文字形/缩放、页脚/搜索几何正确。未遍历布局分支UNKNOWN。
 16. 原F/G/B/E/R/F5、Drop/All、采集再生/掉落合并/部分拾取、制作/修理/两升级及战斗镜头/阻挡/SavePrepared回归；输入19/Tools3/全部反馈及玩家v4/世界v2保持，各端同版导入/烘焙。多人/预测/延迟/故障及性能/平台/线上未触发UNKNOWN。
 
-共483项；完整规则归[收藏](MapInventoryFavorites.md)，本机偏好v2/严格v1兼容归[偏好](MapInventoryPreferences.md)，原业务/输入归[B面板](MapInventoryPanel.md)，配置/协议归[资源与数据](DataResources.md)。主线程静态范围核对通过，人工收藏待验收；AI未执行收藏/列表/面板/偏好/GUI业务、真实偏好/游戏存档I/O、GamePlayer/PlayMode、逻辑单元测试、命令行构建/发布、采样/图片或子Agent/暂存/提交Git；未实际触发的独立交互/生命周期/文件/故障/联网用例及性能/平台/线上仍UNKNOWN。
+共483项；完整规则归[收藏](MapInventoryFavorites.md)，本机偏好v2/严格v1兼容归[偏好](MapInventoryPreferences.md)，原业务/输入归[B面板](MapInventoryPanel.md)，配置/协议归[资源与数据](DataResources.md)。本阶段人工十六项已获用户通过反馈，主线程结合既有静态核对判定通过，限上述版本/清单；AI未执行收藏/列表/面板/偏好/GUI业务、真实偏好/游戏存档I/O、GamePlayer/PlayMode、逻辑单元测试、命令行构建/发布、采样/图片或子Agent/暂存/提交Git；未实际触发的独立交互/生命周期/文件/故障/联网用例及性能/平台/线上仍UNKNOWN。
+
+## 【KNOWN ISSUES】背包仅看收藏筛选验收边界
+
+入口CombatPrototypeNetCode、原B面板；Forest/Grassland Json/BuiltIn v34/revision37，六新增配置接入，原77面板字段至83，偏好v3七字段严格兼容v1/v2。本阶段静态范围核对通过，以下十六项待人工GamePlayer验收；原483项内容/编号逐字保留，收藏旧通过仍限v33/revision36十六项及其他旧阶段原范围。
+
+正常Unity编译/重载及元数据核对通过：DTO十三bool、六float、三int、两模式string、58文案string与一文件ID，共83；Settings十三byte、六float、三int、两byte枚举、59 FixedString64Bytes，共83，零GhostField。偏好CurrentVersion=3/Data七实例字段、严格FavoritesOnly布尔类型已反射核对；原普通类身份和GUID保持。2986份非法配置全部拒绝（每地图1493），174组合法读取（每地图87）通过，含两地图Json/BuiltIn等价、83字段完整/类型/重复键、两新严格bool、四文案边界及关闭仍校验、旧v1～v33/未来版本与全部原规则。仅配置Reader/Validator及元数据检查，不执行列表/GUI/偏好业务或I/O。
+
+两地图各87次、共174次隔离Editor Bake通过；保留原73变体，新增筛选关闭/默认仅看收藏/收藏或面板关闭且默认true、四文案ASCII61/UTF-8 61/中文、原分类/搜索/偏好关闭仍开启筛选、全部原控件关闭、详情关闭及自定义默认模式组合。全部83Settings和原Settings/零反馈/Prefab引用、布置及兼容签名匹配：Forest89树/36采集/20矿/109阻挡，Grassland53/38/18/71。源SubScene只读，临时克隆/TextAsset/Scene/World/BlobAssetStore释放；主场景干净、3根对象、单场景、未Play。
+
+执行前Console[0 Error,7 Warning,106 Log]；正常编译后及Bake前后均[0 Error,8 Warning,106 Log]，新增一条既有DOTween编辑器代码的FindObjectsOfType弃用CS0618警告，原五条NetCode Tick Batching、MCP WebSocket与PEListener UAC1001警告保留。未清空Console，不将旧运行日志作为当前性能结论。原输入19、DropGhost4、Tools3、F4/G7/资源状态4/世界保存3和全部反馈、玩家v4根7/工具项3、世界v2根9/掉落项8及业务事务保持。
+
+1. 两地图Json/BuiltIn均v34/revision37，六新增字段采用收藏筛选专题默认值；DTO/Settings各83、零GhostField。两开关严格bool、四文案非空白/无控制且61 UTF-8字节；旧v1～v33拒绝，关闭仍完整验证，独立配置分支未触发UNKNOWN。
+2. 原B面板排序/分类之后、搜索之前出现全宽Favorites: All items，点击切为Favorites only，再点击返回；不增加快捷键。默认/最小几何与关闭控件布局、滚动及固定页脚命中未遍历UNKNOWN。
+3. 全部材料模式沿原分类×搜索交集，仅看收藏再增加真实Name收藏条件；分别覆盖资源/补给/其他、空词/有词/无匹配，分类关闭仍可独立仅看收藏，未遍历交集UNKNOWN。
+4. 三种排序中仅看收藏保持原组内顺序；切回全部仍收藏置顶、普通组按原模式排列，隐藏Name不强制显示，不改变完整库存顺序或数量，模式组合未遍历UNKNOWN。
+5. 仅看收藏时取消当前行收藏，下一有效Show在同一次刷新移除该行，收藏剩余行与按钮状态正确；同Name详情被隐藏即关闭，最后一行取消后显示空交集文案，独立事件时序未触发UNKNOWN。
+6. 完整库存为空显示原Empty；库存非空且仅看收藏交集为空显示No matching favorites；全部模式保留No search results/No matching items原优先级，空库存/隐藏收藏组合未触发UNKNOWN。
+7. 收藏数量归零/消失仍保留Name，再获同名且符合分类/搜索时在仅看收藏出现；完整容量、木石配方和修理/两升级资格不由可见行决定，快照时序/未知材料未触发UNKNOWN。
+8. GUI只排队新模式，下一有效Show应用一次；模式实际变化归零滚动、取消旧面板/行按下许可，沿旧位置不误点材料或后续按钮。原排序/搜索许可、已排队真实Name业务保持，按下/抬起时序未触发UNKNOWN。
+9. 同时存在待收藏和模式/分类/搜索变化时只允许最新可见交集中的同Name请求；隐藏/消失待Name丢弃，仅看收藏取消后不残留旧行，未遍历同帧顺序UNKNOWN。
+10. favoritesEnabled=false或favoritesFilterEnabled=false隐藏新控制、收藏条件强制全部，其他分类/搜索仍生效；原filterEnabled=false不关闭新筛选，关闭组合与导入重绑未触发UNKNOWN。
+11. 无文件按defaultFavoritesOnly=false（自定义true也合法）初始化；Reset view恢复当前配置DefaultFavoritesOnly并沿原清启用收藏/查询/详情/焦点，关闭能力强制false。重复默认状态不制造写入，组合未触发UNKNOWN。
+12. 合法偏好v3恰七字段、favoritesOnly为严格bool，应用模式变化默认0.5秒合并、B关闭/绑定Reset提交；回到已写布尔值取消待写，加载/库存刷新/未应用GUI请求不保存，实际文件时序未触发UNKNOWN。
+13. 严格v1五字段保留模式/搜索、空收藏、favoritesOnly=false；严格v2六字段保留模式/搜索/收藏、favoritesOnly=false，均内存迁移v3。读取本身不写盘，下一实际已应用偏好变化写v3，实际迁移/I/O未触发UNKNOWN。
+14. v3缺失/null/字符串或数字favoritesOnly、额外字段、重复键/错误版本/非法收藏等整档失败，原文件保留、本绑定I/O暂停且不自动重试。功能关闭时其他偏好保存保留原布尔值，偏好关闭或I/O暂停仅临时模式，故障用例未触发UNKNOWN。
+15. B/关闭按钮/无效ReadInput清未应用新模式，同一绑定已应用模式关闭重开保留；逐帧Clear只隐藏，死亡/重连、地图源/玩家/World/Scene释放按原提交/清缓存，新绑定按配置/合法偏好恢复，生命周期未触发UNKNOWN。
+16. 新增控制行纳入ControlRowCount、滚动内容和SearchField命中；原搜索焦点/IME/键盘隔离、详情换行/高度、Drop/All及F/G/B/E/R/F5/1～7、采集/掉落/制作/修理/升级/战斗镜头回归。各端同版导入/烘焙，实际字形/分辨率/多人/预测/延迟及性能/平台/线上未触发UNKNOWN。
+
+共499项；完整配置/交集/生命周期与偏好规则归[收藏筛选](MapInventoryFavoritesFilter.md)，收藏容量归[收藏](MapInventoryFavorites.md)，业务入口归[B面板](MapInventoryPanel.md)。AI未执行列表/收藏/面板/偏好/GUI业务、实际偏好或游戏存档I/O、GamePlayer/PlayMode、逻辑单元测试、命令行构建/发布、采样/图片，未创建子Agent、暂存或提交Git；未实际触发的独立用例和性能/平台/线上仍UNKNOWN。

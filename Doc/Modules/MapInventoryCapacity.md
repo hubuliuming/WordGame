@@ -20,7 +20,7 @@
 
 ## 【FACT】JSON 契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为 schemaVersion=33/configRevision=36。新增必填 inventoryCapacity：
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为 schemaVersion=34/configRevision=37。新增必填 inventoryCapacity：
 
 ```json
 "inventoryCapacity": {
@@ -95,6 +95,6 @@ v26/revision29的[地面合并](MapDropMerge.md)只改原地面数量/期限；G
 
 ## 【FACT】列表筛选与完整容量统计
 
-当前v33/revision36的[排序筛选](MapInventoryListView.md)只改变B材料列表可见行/顺序。Snapshot仍先校验全部原库存并统计受管苹果/木材/石材总量及当前等级上限，筛选资源时隐藏的苹果仍占容量；非法独立库存条目照原记录/跳过并置InventoryValid=false，筛选不能放开制作/修理/丢弃/升级资格。服务器F/G接收、部分拾取与容量等级/玩家保存链保持；静态及用户人工通过限v28/revision31十六项，人工结论来自用户反馈；未触发的独立用例UNKNOWN。
+当前v34/revision37的[排序筛选](MapInventoryListView.md)只改变B材料列表可见行/顺序。Snapshot仍先校验全部原库存并统计受管苹果/木材/石材总量及当前等级上限，筛选资源时隐藏的苹果仍占容量；非法独立库存条目照原记录/跳过并置InventoryValid=false，筛选不能放开制作/修理/丢弃/升级资格。服务器F/G接收、部分拾取与容量等级/玩家保存链保持；静态及用户人工通过限v28/revision31十六项，人工结论来自用户反馈；未触发的独立用例UNKNOWN。
 
 当前[搜索](MapInventorySearch.md)与分类取交集后再排序，仍只投影B材料可见行；完整Snapshot先校验全部库存并统计容量，隐藏材料继续参与受管总量与原配方/业务资格。搜索静态及用户人工GamePlayer通过，限v29/revision32及运行入口十六项，结论来自用户反馈；未实际触发的独立用例UNKNOWN。

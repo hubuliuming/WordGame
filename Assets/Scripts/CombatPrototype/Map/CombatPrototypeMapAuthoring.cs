@@ -339,7 +339,13 @@ namespace Code_01.CombatPrototype.Map
                     FavoriteButtonLabel = new FixedString64Bytes(inventoryPanel.favoriteButtonLabel),
                     UnfavoriteButtonLabel = new FixedString64Bytes(inventoryPanel.unfavoriteButtonLabel),
                     FavoriteTagLabel = new FixedString64Bytes(inventoryPanel.favoriteTagLabel),
-                    FavoritesFullLabel = new FixedString64Bytes(inventoryPanel.favoritesFullLabel)
+                    FavoritesFullLabel = new FixedString64Bytes(inventoryPanel.favoritesFullLabel),
+                    FavoritesFilterEnabled = (byte)(inventoryPanel.favoritesFilterEnabled ? 1 : 0),
+                    DefaultFavoritesOnly = (byte)(inventoryPanel.defaultFavoritesOnly ? 1 : 0),
+                    FavoritesFilterLabel = new FixedString64Bytes(inventoryPanel.favoritesFilterLabel),
+                    FavoritesFilterAllLabel = new FixedString64Bytes(inventoryPanel.favoritesFilterAllLabel),
+                    FavoritesFilterOnlyLabel = new FixedString64Bytes(inventoryPanel.favoritesFilterOnlyLabel),
+                    NoMatchingFavoritesLabel = new FixedString64Bytes(inventoryPanel.noMatchingFavoritesLabel)
                 });
                 var inventoryDrop = config.map.inventoryDrop;
                 AddComponent(entity, new CombatPrototypeMapInventoryDropSettings

@@ -14,7 +14,8 @@ namespace Code_01.CombatPrototype.Map
         private readonly HashSet<string> _writtenFavorites = new HashSet<string>(StringComparer.Ordinal);
         private uint _observedFavoritesRevision;
         private float _delay, _changedAt;
-        private bool _active, _dirty, _sortEnabled, _filterEnabled, _saveSearch, _saveFavorites;
+        private bool _active, _dirty, _sortEnabled, _filterEnabled, _saveSearch, _saveFavorites, _saveFavoritesFilter;
+        private bool _observedFavoritesOnly, _writtenFavoritesOnly;
 
         public void Configure(CombatPrototypeMapInventoryPanelSettings settings, string mapId,
             CombatPrototypeMapInventoryPanelListView view, CombatPrototypeMapInventoryPanelSearch search, CombatPrototypeMapInventoryPanelFavorites favorites)
@@ -26,6 +27,7 @@ namespace Code_01.CombatPrototype.Map
             _filterEnabled = view.FilterEnabled;
             _saveSearch = settings.PreferencesSaveSearch != 0 && search.Enabled;
             _saveFavorites = favorites.Enabled;
+            _saveFavoritesFilter = view.FavoritesFilterEnabled;
             _delay = settings.PreferencesSaveDelaySeconds;
             try
             {
@@ -38,23 +40,27 @@ namespace Code_01.CombatPrototype.Map
                         MapDefinitionId = mapId,
                         SortMode = settings.DefaultSortMode,
                         FilterMode = settings.DefaultFilterMode,
-                        SearchText = string.Empty
+                        SearchText = string.Empty,
+                        FavoritesOnly = settings.DefaultFavoritesOnly != 0
                     };
                 else
                 {
                     view.Restore(_data.SortMode, _data.FilterMode);
                     if (_saveSearch) search.Restore(_data.SearchText);
                     if (_saveFavorites) favorites.Restore(_data.FavoriteItemNames);
+                    if (_saveFavoritesFilter) view.RestoreFavoritesOnly(_data.FavoritesOnly);
                 }
                 _writtenSort = _data.SortMode;
                 _writtenFilter = _data.FilterMode;
                 _writtenSearch = _data.SearchText;
+                _writtenFavoritesOnly = _data.FavoritesOnly;
                 _writtenFavorites.Clear();
                 _writtenFavorites.UnionWith(_data.FavoriteItemNames);
                 _observedSort = view.SortMode;
                 _observedFilter = view.FilterMode;
                 _observedSearch = search.AppliedText;
                 _observedFavoritesRevision = favorites.Revision;
+                _observedFavoritesOnly = view.FavoritesOnly;
                 _active = true;
             }
             catch (Exception exception) { Disable("Load", exception); }
@@ -85,10 +91,15 @@ namespace Code_01.CombatPrototype.Map
                 _observedFavoritesRevision = favorites.Revision;
                 changed = true;
             }
+            if (_saveFavoritesFilter && _observedFavoritesOnly != view.FavoritesOnly)
+            {
+                _data.FavoritesOnly = _observedFavoritesOnly = view.FavoritesOnly;
+                changed = true;
+            }
             if (changed)
             {
                 _changedAt = Time.unscaledTime;
-                _dirty = _data.SortMode != _writtenSort || _data.FilterMode != _writtenFilter || _data.SearchText != _writtenSearch || FavoritesDiffer();
+                _dirty = _data.SortMode != _writtenSort || _data.FilterMode != _writtenFilter || _data.SearchText != _writtenSearch || _data.FavoritesOnly != _writtenFavoritesOnly || FavoritesDiffer();
             }
             if (_dirty && Time.unscaledTime - _changedAt >= _delay) Flush();
         }
@@ -102,6 +113,7 @@ namespace Code_01.CombatPrototype.Map
                 _writtenSort = _data.SortMode;
                 _writtenFilter = _data.FilterMode;
                 _writtenSearch = _data.SearchText;
+                _writtenFavoritesOnly = _data.FavoritesOnly;
                 _writtenFavorites.Clear();
                 _writtenFavorites.UnionWith(_data.FavoriteItemNames);
                 _dirty = false;
@@ -126,7 +138,8 @@ namespace Code_01.CombatPrototype.Map
 
         public void Reset()
         {
-            _active = _dirty = _sortEnabled = _filterEnabled = _saveSearch = _saveFavorites = false;
+            _active = _dirty = _sortEnabled = _filterEnabled = _saveSearch = _saveFavorites = _saveFavoritesFilter = false;
+            _observedFavoritesOnly = _writtenFavoritesOnly = false;
             _data = null;
             _writtenFavorites.Clear();
             _observedFavoritesRevision = 0;

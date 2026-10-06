@@ -21,7 +21,7 @@
 
 ## 【FACT】配置与文件
 
-Forest/Grassland Json与BuiltIn当前schemaVersion=39/configRevision=42。resourcePersistence六字段必填：enabled=true、saveSlotId=default_world、saveIntervalSeconds=10、saveGroundDrops=true、manualSaveEnabled=true及manualSaveCooldownSeconds=5；手动规则归[F5](MapWorldSaveHud.md)。saveGroundDrops严格布尔，旧地图v1～v38拒绝；关闭仍完整校验，正常导入/烘焙后生效，无热重载。Map Baker写七字段Settings：Enabled/SaveGroundDrops/SaveSlotId/SaveIntervalSeconds/LayoutSignature/ManualSaveEnabled/ManualSaveCooldownSeconds，恢复状态仍一字段Pending/Ready/Failed；当前输入19、Drop Ghost4、F4/G7/资源状态4及原反馈保持。
+Forest/Grassland Json与BuiltIn当前schemaVersion=40/configRevision=43。resourcePersistence六字段必填：enabled=true、saveSlotId=default_world、saveIntervalSeconds=10、saveGroundDrops=true、manualSaveEnabled=true及manualSaveCooldownSeconds=5；手动规则归[F5](MapWorldSaveHud.md)。saveGroundDrops严格布尔，旧地图v1～v39拒绝；关闭仍完整校验，正常导入/烘焙后生效，无热重载。Map Baker写七字段Settings：Enabled/SaveGroundDrops/SaveSlotId/SaveIntervalSeconds/LayoutSignature/ManualSaveEnabled/ManualSaveCooldownSeconds，恢复状态仍一字段Pending/Ready/Failed；当前输入19、Drop Ghost4、F4/G7/资源状态4及原反馈保持。
 
 两个开关同时开启才恢复/保存掉落。仅saveGroundDrops=false时，资源照常恢复，地面物沿旧规则重启清空；下一成功世界快照写Drops=[]/LastDropId=0，会替换旧地面快照。enabled=false时不读写任何世界档、保留原文件。drops.enabled只控制敌人新掉落，inventoryDrop.enabled只控制新丢弃，不决定已有地面物的持久化；关闭这两功能仍保留原绑定。
 
@@ -49,9 +49,9 @@ Restore仍在三类资源生成后、玩家准入前等待有效ServerTick。先
 
 仅初始化并登记成功的实例计入本批有效列表；一项创建/初始化/登记失败时清理本批已恢复掉落、保留原异常及独立清理错误，整体Failed拒绝准入，不部分Ready。编号不复用，达到int上限后的新分配沿原checked溢出错误；原DropSpawn继续拥有/清理实例，原DropCleanup/ECB处理G消耗和到期。恢复本身不扣材料/工具、发奖励或直接入包；之后G、目标文字与高亮沿原编号/身份链。
 
-## 【CURRENT STRATEGY】配方分类关联
+## 【CURRENT STRATEGY】配方分类与搜索关联
 
-当前v39/revision42的[配方筛选](MapInventoryRecipeFilter.md)只控制B配方显示、切换取消及行数；材料与工具状态、原输入/事务/存档链保持。分类不写偏好v3，完整契约与本阶段待人工范围归专题；既有通过限原版本/清单。
+当前v40/revision43的[配方搜索](MapInventoryRecipeSearch.md)在原分类上按配置名称/操作文案匹配七项配方，复用独立搜索实例与焦点隔离；单项显隐及高度、文本变化清七请求/待确认归专题。材料与工具状态、原输入/事务/存档链保持；关键词仅本绑定内存，不入偏好v3。本阶段待人工，分类已通过仍限v39/revision42原清单，其他旧通过保持原范围。
 
 ## 【KNOWN ISSUES】失败及验收边界
 
@@ -71,4 +71,4 @@ v26/revision29接入的[地面合并](MapDropMerge.md)沿原Owner集合转移数
 
 ## 【FACT】部分拾取后的剩余堆
 
-当前v39/revision42的[部分拾取](MapDropPartialPickup.md)在玩家候选保存成功后仅减原堆Quantity，余量为正仍Landed且保留DropId/落点/ExpiresAt；原快照已比较Quantity，因此沿原世界保存点写剩余量，领空Consumed排除。世界v2九根/八掉落字段、LastDropId、资源签名、离线暂停与保存失败规则保持，没有新增跨文件事务；静态及用户人工通过限v27/revision30十六项，未触发独立用例UNKNOWN。
+当前v40/revision43的[部分拾取](MapDropPartialPickup.md)在玩家候选保存成功后仅减原堆Quantity，余量为正仍Landed且保留DropId/落点/ExpiresAt；原快照已比较Quantity，因此沿原世界保存点写剩余量，领空Consumed排除。世界v2九根/八掉落字段、LastDropId、资源签名、离线暂停与保存失败规则保持，没有新增跨文件事务；静态及用户人工通过限v27/revision30十六项，未触发独立用例UNKNOWN。

@@ -105,5 +105,12 @@ namespace Code_01.CombatPrototype.Map
         public string craftRecipesLabel;
         public string repairRecipesLabel;
         public string upgradeRecipesLabel;
+        public bool recipeSearchEnabled;
+        public bool recipeSearchIgnoreCase;
+        public int recipeSearchMaxLength;
+        public string recipeSearchLabel;
+        public string recipeSearchPlaceholderLabel;
+        public string clearRecipeSearchLabel;
+        public string noRecipeSearchResultsLabel;
     }
 }

@@ -97,11 +97,17 @@ namespace Code_01.CombatPrototype.Map
 
         private static string Seconds(float duration) => duration.ToString("0.###", CultureInfo.InvariantCulture) + " s";
 
-        public void Draw(float width, ref float y, float rowHeight, GUIStyle labelStyle, GUIStyle buttonStyle, bool mousePressAccepted, CombatPrototypeMapInventoryConsumptionConfirmation confirmation)
+        public static int VisibleRowCount(bool axe, bool pickaxe) => !axe && !pickaxe ? 0 : 2 + (axe ? 6 : 0) + (pickaxe ? 6 : 0);
+        public int VisibleConsumptionHintRowCount(bool axe, bool pickaxe) =>
+            (axe && _axe.ConsumptionHint.Length != 0 ? 1 : 0) + (pickaxe && _pickaxe.ConsumptionHint.Length != 0 ? 1 : 0);
+
+        public void Draw(float width, ref float y, float rowHeight, GUIStyle labelStyle, GUIStyle buttonStyle, bool mousePressAccepted,
+            CombatPrototypeMapInventoryConsumptionConfirmation confirmation, bool axe, bool pickaxe)
         {
+            if (!axe && !pickaxe) return;
             Label(width, ref y, rowHeight, labelStyle, _heading);
-            DrawTool(_axe, width, ref y, rowHeight, labelStyle, buttonStyle, mousePressAccepted, confirmation, ConsumptionOperation.UpgradeAxe);
-            DrawTool(_pickaxe, width, ref y, rowHeight, labelStyle, buttonStyle, mousePressAccepted, confirmation, ConsumptionOperation.UpgradePickaxe);
+            if (axe) DrawTool(_axe, width, ref y, rowHeight, labelStyle, buttonStyle, mousePressAccepted, confirmation, ConsumptionOperation.UpgradeAxe);
+            if (pickaxe) DrawTool(_pickaxe, width, ref y, rowHeight, labelStyle, buttonStyle, mousePressAccepted, confirmation, ConsumptionOperation.UpgradePickaxe);
             Label(width, ref y, rowHeight, labelStyle, _feedback.Feedback);
         }
 

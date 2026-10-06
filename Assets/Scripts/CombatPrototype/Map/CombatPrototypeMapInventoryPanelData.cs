@@ -105,5 +105,12 @@ namespace Code_01.CombatPrototype.Map
         public FixedString64Bytes CraftRecipesLabel;
         public FixedString64Bytes RepairRecipesLabel;
         public FixedString64Bytes UpgradeRecipesLabel;
+        public byte RecipeSearchEnabled;
+        public byte RecipeSearchIgnoreCase;
+        public int RecipeSearchMaxLength;
+        public FixedString64Bytes RecipeSearchLabel;
+        public FixedString64Bytes RecipeSearchPlaceholderLabel;
+        public FixedString64Bytes ClearRecipeSearchLabel;
+        public FixedString64Bytes NoRecipeSearchResultsLabel;
     }
 }

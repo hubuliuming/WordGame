@@ -1032,3 +1032,16 @@
 - 六现有C#及两地图JSON修改；inventoryPanel追加七必填字段，schema38/revision41→schema39/revision42、93→100字段/69文案。分类开关严格bool，默认模式逐字all/craft/repair/upgrade，五文案沿非空白/控制字符/61 UTF-8字节验证；关闭仍验证。新C# meta由正常Unity导入生成，GUID=b11ee8ac85c058e4884416ea3c754db6；三预览/确认、原输入/Ghost/服务器、偏好v3/玩家v4/世界v2及所有资源结构保持。
 - 正常Unity编译、100字段/零GhostField/元数据核对通过；4034份非法配置拒绝、418组合法读取及两地图各209次、共418次隔离Editor Bake完成，原Settings/反馈/引用/布局/签名保持，临时资源释放，主场景干净/3根对象/单场景/未Play。初次自动导入旧DTO读新JSON产生两条未知字段异常，重载后重新导入两JSON/源SubScene无新增Error；另有Unity账号Token Exchange异常，三条历史Error保留。Console前[0,0,0]、编译/Bake前[3,2,0]、Bake及源重导入后[3,4,0]；保留原两编译警告及两MCP连接工具警告，空失败返回已核实完整落盘结果与释放。
 - 同步专题、关联Doc、导航、策划模板第7节Forest完整JSON与第48节；原563项人工内容/编号保留，追加十六项后579项。主线程实现/静态范围核对通过，人工GamePlayer待验收；旧确认用户通过限v38/revision41原清单。AI未执行GUI业务/真实偏好或游戏保存I/O、GamePlayer/PlayMode、逻辑单元测试、命令行构建/发布、性能或图片，未创建子Agent、暂存或提交Git。
+
+## 2026-10-07 制作配方分类与筛选验收通过
+
+- 用户明确反馈“我已验收通过，接下来下一阶段”；主线程结合既有编译/配置/元数据/隔离Editor Bake静态证据判定本阶段通过，限CombatPrototypeNetCode、v39/revision42及运行入口十六项清单，人工结论来自用户反馈；未实际触发的独立用例仍UNKNOWN。
+- 同步专题、关联文档、导航、运行入口与策划模板第48节验收状态；原579项人工内容/编号及各旧阶段原版本/清单保持。代码、JSON、meta与资源结构保持；没有重新执行逻辑单元测试、GamePlayer/PlayMode、编译、Bake、构建/发布、I/O或图片核对，未创建子Agent、暂存或提交Git。
+
+## 2026-10-07 制作配方搜索
+
+- 按用户已确认方案在CombatPrototypeNetCode原B面板接入独立配方搜索两行，原七项配置名称/操作文案包含匹配并与四分类取交集；空词恢复当前分类、无匹配提示一行。材料/容量摘要/工具状态与全部候选Capture保持，修理及工具升级Draw/高度支持单项显隐。
+- 修改九现有C#、两地图JSON，新增普通RecipeSearch及正常Unity导入meta，GUID=cd0debd2968f78246bd4595564ced2a6。复用第二个Search实例/独立GUI控制名及原输入法焦点规则，输入屏蔽取两者并集；文本应用/分类变化清七未消费B请求/待确认/旧鼠标许可并滚动归零。Close保留同绑定词，Reset view/新绑定清词，逐帧Clear只隐藏；配方查询不入偏好/新I/O。
+- schema39/revision42→schema40/revision43，inventoryPanel100→107字段；追加二严格bool、长度1～64的int和四61 UTF-8字节文案，显式BuiltIn及根Baker映射，关闭仍完整验证。原100字段/顺序/值及输入/Ghost/服务端事务、偏好v3/玩家v4/世界v2与Scene/SubScene/Prefab/Animator/旧meta/资源/字体/包/构建结构保持。
+- 正常Unity编译/重载、107字段类型/零GhostField/新类GUID与原协议元数据核对通过；4336份非法配置拒绝、502组合法读取及两地图各251次共502次隔离Editor Bake完成，原Settings/反馈/引用/布局/签名保持、临时资源释放，主场景干净/3根对象/单场景/未Play。Console前/Bake前后/结束均[3,4,0]，历史三Error/四Warning保持、本次未新增Error；Bake工具空失败返回已核实完整落盘结果与结束状态，未重跑业务。结束核对脚本LINQ枚举不兼容改为原生foreach后通过，未修改生产代码处理该工具错误。
+- 同步受影响Doc、AI导航、配方搜索专题与外部模板第7节JSON/第49节，当前字段/版本及旧验收范围分开；原579项人工内容/编号保留，新增十六项后595项。主线程实现/静态范围核对通过，人工GamePlayer待验收，分类已验收限v39/revision42及原清单，独立运行/GUI/真实I/O/联网/性能用例UNKNOWN。未执行逻辑单元测试、GUI业务、GamePlayer/PlayMode、命令行构建/发布、采样或图片，未创建子Agent、暂存或提交Git。

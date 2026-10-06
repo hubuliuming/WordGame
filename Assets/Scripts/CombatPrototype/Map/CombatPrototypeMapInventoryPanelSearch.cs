@@ -39,6 +39,19 @@ namespace Code_01.CombatPrototype.Map
             NoResultsText = settings.NoSearchResultsLabel.ToString();
         }
 
+        public void ConfigureRecipeSearch(CombatPrototypeMapInventoryPanelSettings settings)
+        {
+            Reset();
+            Enabled = settings.RecipeSearchEnabled != 0;
+            _comparison = settings.RecipeSearchIgnoreCase != 0 ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+            _maximum = settings.RecipeSearchMaxLength;
+            _fontSize = settings.FontSize;
+            Label = settings.RecipeSearchLabel.ToString();
+            _placeholder = settings.RecipeSearchPlaceholderLabel.ToString();
+            _clearLabel = settings.ClearRecipeSearchLabel.ToString();
+            NoResultsText = settings.NoRecipeSearchResultsLabel.ToString();
+        }
+
         // Sample geometry before GUI callbacks so a focus-changing click blocks this frame's keys.
         public void ReadInput(Keyboard keyboard, Mouse mouse, bool insideField, bool insidePanel)
         {
@@ -137,6 +150,8 @@ namespace Code_01.CombatPrototype.Map
 
         public bool Matches(CombatPrototypeMapInventoryPanelSnapshot.Row row) => !HasQuery ||
             row.OriginalName.IndexOf(_query, _comparison) >= 0 || row.DisplayName.IndexOf(_query, _comparison) >= 0;
+
+        public bool Matches(string text) => !HasQuery || text.IndexOf(_query, _comparison) >= 0;
 
         // External text can include pasted controls or a surrogate cut by the native length limit.
         private string CleanInput(string text)

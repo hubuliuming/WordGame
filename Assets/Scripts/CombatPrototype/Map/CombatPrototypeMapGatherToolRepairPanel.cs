@@ -94,12 +94,18 @@ namespace Code_01.CombatPrototype.Map
             _missing + ": " + _woodLabel + " " + Math.Max(0, definition.RepairWoodQuantity - _wood) + "   " +
             _stoneLabel + " " + Math.Max(0, definition.RepairStoneQuantity - _stone);
 
-        public void Draw(float width, ref float y, float rowHeight, GUIStyle labelStyle, GUIStyle buttonStyle, bool mousePressAccepted, CombatPrototypeMapInventoryConsumptionConfirmation confirmation)
+        public static int VisibleRowCount(bool axe, bool pickaxe) => !axe && !pickaxe ? 0 : 1 + (axe ? 5 : 0) + (pickaxe ? 5 : 0);
+        public int VisibleConsumptionHintRowCount(bool axe, bool pickaxe) =>
+            (axe && _axeConsumptionHint.Length != 0 ? 1 : 0) + (pickaxe && _pickaxeConsumptionHint.Length != 0 ? 1 : 0);
+
+        public void Draw(float width, ref float y, float rowHeight, GUIStyle labelStyle, GUIStyle buttonStyle, bool mousePressAccepted,
+            CombatPrototypeMapInventoryConsumptionConfirmation confirmation, bool axe, bool pickaxe)
         {
+            if (!axe && !pickaxe) return;
             Label(width, ref y, rowHeight, labelStyle, _heading);
-            DrawTool(width, ref y, rowHeight, labelStyle, buttonStyle, mousePressAccepted,
+            if (axe) DrawTool(width, ref y, rowHeight, labelStyle, buttonStyle, mousePressAccepted,
                 _axeTitle, _axePreview, _axeRecipe, _axeConsumptionHint, _axeMissing, _axeButton, _canAxe, true, confirmation);
-            DrawTool(width, ref y, rowHeight, labelStyle, buttonStyle, mousePressAccepted,
+            if (pickaxe) DrawTool(width, ref y, rowHeight, labelStyle, buttonStyle, mousePressAccepted,
                 _pickaxeTitle, _pickaxePreview, _pickaxeRecipe, _pickaxeConsumptionHint, _pickaxeMissing, _pickaxeButton, _canPickaxe, false, confirmation);
         }
 

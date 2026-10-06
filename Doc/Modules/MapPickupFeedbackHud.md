@@ -1,6 +1,6 @@
 # 掉落物拾取成功与失败反馈
 
-返回[地图](Map.md)、[掉落与拾取](MapDrops.md)、[G目标及寿命](MapPickupHud.md)与[运行入口](Runtime.md)。入口CombatPrototypeNetCode；Forest/Grassland Json与BuiltIn当前schemaVersion=39/configRevision=42。本专题负责实际G请求结果的所属快照与原G面板显示。静态及用户人工GamePlayer通过；范围限v25/revision28十六项，详见下述人工边界；旧F完成/中断通过限v24/revision27十六项，其他旧通过保持原版本/清单。
+返回[地图](Map.md)、[掉落与拾取](MapDrops.md)、[G目标及寿命](MapPickupHud.md)与[运行入口](Runtime.md)。入口CombatPrototypeNetCode；Forest/Grassland Json与BuiltIn当前schemaVersion=40/configRevision=43。本专题负责实际G请求结果的所属快照与原G面板显示。静态及用户人工GamePlayer通过；范围限v25/revision28十六项，详见下述人工边界；旧F完成/中断通过限v24/revision27十六项，其他旧通过保持原版本/清单。
 
 ## 【FACT】文件与接入
 
@@ -81,9 +81,9 @@ CombatPrototypeMapPickupFeedback恰四GhostField，OwnerSendType=SendToOwner：
 
 pickupFeedbackHud.enabled=false仅隐藏新结果；pickupHud.enabled=false隐藏整个G文字，实际G与高亮仍沿原开关。新enabled不强制创建或维持HUD，全部原显示关闭时沿原绑定退出。F及B继续原反馈/优先级，资源状态和世界保存显示保持独立。Clear逐帧只收起可见状态，不清结果观察序号/期限；Reset/Configure、死亡、断线、无本地玩家/地图、源/玩家变化、World/Scene停止与释放清新增配置、标签、序号、观察标记、结果、期限、文字、颜色及显示选择，不保留上一局消息。
 
-## 【CURRENT STRATEGY】配方分类关联
+## 【CURRENT STRATEGY】配方分类与搜索关联
 
-当前v39/revision42的[配方筛选](MapInventoryRecipeFilter.md)只控制B配方显示、切换取消及行数；材料与工具状态、原输入/事务/存档链保持。分类不写偏好v3，完整契约与本阶段待人工范围归专题；既有通过限原版本/清单。
+当前v40/revision43的[配方搜索](MapInventoryRecipeSearch.md)在原分类上按配置名称/操作文案匹配七项配方，复用独立搜索实例与焦点隔离；单项显隐及高度、文本变化清七请求/待确认归专题。材料与工具状态、原输入/事务/存档链保持；关键词仅本绑定内存，不入偏好v3。本阶段待人工，分类已通过仍限v39/revision42原清单，其他旧通过保持原范围。
 
 ## 【KNOWN ISSUES】静态证据与人工边界
 

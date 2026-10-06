@@ -21,7 +21,7 @@
 
 ## 【FACT】JSON契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=39/configRevision=42。inventoryDrop全部字段必填，沿原严格UTF-8/缺失/未知/重复字段及类型检查；旧v1～v38明确失败，不补段或回退来源。disabled仍校验全部字段与资源绑定；正常导入/烘焙后生效，没有运行热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=40/configRevision=43。inventoryDrop全部字段必填，沿原严格UTF-8/缺失/未知/重复字段及类型检查；旧v1～v39明确失败，不补段或回退来源。disabled仍校验全部字段与资源绑定；正常导入/烘焙后生效，没有运行热重载。
 
 | 字段 | 默认值 | 契约 |
 |---|---|---|
@@ -64,9 +64,9 @@ DropPhase追加Prepared=3，原Airborne/Landed/Consumed值0/1/2保持。Prefab�
 
 [掉落存档](MapDropPersistence.md)开启时恢复已提交且未到期的丢弃物；Prepared不保存，关闭时沿旧规则重启清空。丢弃扣减仍先保存，恢复不返还原库存；G继续独立保存入包。没有新增容量/堆叠、物品使用或工具丢弃。
 
-## 【CURRENT STRATEGY】配方分类关联
+## 【CURRENT STRATEGY】配方分类与搜索关联
 
-当前v39/revision42的[配方筛选](MapInventoryRecipeFilter.md)只控制B配方显示、切换取消及行数；材料与工具状态、原输入/事务/存档链保持。分类不写偏好v3，完整契约与本阶段待人工范围归专题；既有通过限原版本/清单。
+当前v40/revision43的[配方搜索](MapInventoryRecipeSearch.md)在原分类上按配置名称/操作文案匹配七项配方，复用独立搜索实例与焦点隔离；单项显隐及高度、文本变化清七请求/待确认归专题。材料与工具状态、原输入/事务/存档链保持；关键词仅本绑定内存，不入偏好v3。本阶段待人工，分类已通过仍限v39/revision42原清单，其他旧通过保持原范围。
 
 ## 【KNOWN ISSUES】验证与人工边界
 
@@ -102,7 +102,7 @@ v26/revision29的[地面合并](MapDropMerge.md)只处理已登记Landed物，�
 
 ## 【FACT】丢弃堆的按容量领取
 
-当前v39/revision42的[部分拾取](MapDropPartialPickup.md)适用于原Drop/All落地物；默认G只领取当前总量/单种余量可容纳的部分，原大堆不按99钳制或新建拆分实体，剩余量保留原身份/期限。丢弃数量、保存/激活/回滚与反馈保持；partialPickupEnabled独立于丢弃及敌人掉落开关，静态及用户人工通过限v27/revision30十六项，未触发独立用例UNKNOWN。
+当前v40/revision43的[部分拾取](MapDropPartialPickup.md)适用于原Drop/All落地物；默认G只领取当前总量/单种余量可容纳的部分，原大堆不按99钳制或新建拆分实体，剩余量保留原身份/期限。丢弃数量、保存/激活/回滚与反馈保持；partialPickupEnabled独立于丢弃及敌人掉落开关，静态及用户人工通过限v27/revision30十六项，未触发独立用例UNKNOWN。
 
 搜索仅改变可见行，原DrawRow继续按真实Row.Name解析Kind/Mode；搜索变化引起身份/顺序/数目变化时沿原许可取消未完成行点击，搜索不清已排队请求；未消费请求另按[收藏保护](MapInventoryFavoritesDropProtection.md)复核，已消费到PlayerInput的请求保持。搜索静态及用户人工GamePlayer通过，限v29/revision32及运行入口十六项，结论来自用户反馈；未实际触发的独立点击/丢弃用例UNKNOWN，服务端丢弃事务保持。
 
@@ -118,4 +118,4 @@ v37/revision40提示阶段的[收藏材料消耗提示](MapInventoryFavoritesCon
 
 ## 【CURRENT STRATEGY】收藏材料消耗确认
 
-当前v39/revision42的[收藏材料消耗确认](MapInventoryFavoritesConsumptionConfirm.md)仅处理原B七个制作/修理/容量与工具升级按钮。首次有效按钮请求命中已应用收藏木石的正成本时暂存一个操作，在配方内显示数量提示，以Confirm/Cancel替换原按钮行；确认按最新已捕获候选和本地Revision复核后沿原请求提交一次，取消/关闭B/相关数量、等级、耐久、配方或已应用收藏变化/绑定失效清待确认。逐帧Clear仅隐藏，确认目标或高度变化清旧面板与行鼠标许可。确认独立于原消耗提示开关；数字1～7保持原直达链，偏好v3七字段、输入19、Ghost/服务器与保存入口保持。本阶段十六项人工GamePlayer已获用户通过反馈，主线程结合既有静态核对判定通过，限CombatPrototypeNetCode、v38/revision41及运行入口清单，人工结论来自用户反馈；未实际触发的独立用例仍UNKNOWN，已验收提示仍限v37/revision40，全部旧通过保持原版本/清单。
+当前v40/revision43的[收藏材料消耗确认](MapInventoryFavoritesConsumptionConfirm.md)仅处理原B七个制作/修理/容量与工具升级按钮。首次有效按钮请求命中已应用收藏木石的正成本时暂存一个操作，在配方内显示数量提示，以Confirm/Cancel替换原按钮行；确认按最新已捕获候选和本地Revision复核后沿原请求提交一次，取消/关闭B/相关数量、等级、耐久、配方或已应用收藏变化/绑定失效清待确认。逐帧Clear仅隐藏，确认目标或高度变化清旧面板与行鼠标许可。确认独立于原消耗提示开关；数字1～7保持原直达链，偏好v3七字段、输入19、Ghost/服务器与保存入口保持。本阶段十六项人工GamePlayer已获用户通过反馈，主线程结合既有静态核对判定通过，限CombatPrototypeNetCode、v38/revision41及运行入口清单，人工结论来自用户反馈；未实际触发的独立用例仍UNKNOWN，已验收提示仍限v37/revision40，全部旧通过保持原版本/清单。

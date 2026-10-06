@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 39,
-  "configRevision": 42,
+  "schemaVersion": 40,
+  "configRevision": 43,
   "mapDefinitionId": "battle_forest_01",
   "defaultSeed": 12345,
   "resourcePersistence": {
@@ -380,7 +380,14 @@
     "allRecipesLabel": "All",
     "craftRecipesLabel": "Craft",
     "repairRecipesLabel": "Repair",
-    "upgradeRecipesLabel": "Upgrade"
+    "upgradeRecipesLabel": "Upgrade",
+    "recipeSearchEnabled": true,
+    "recipeSearchIgnoreCase": true,
+    "recipeSearchMaxLength": 32,
+    "recipeSearchLabel": "Recipe search",
+    "recipeSearchPlaceholderLabel": "Name or action",
+    "clearRecipeSearchLabel": "Clear",
+    "noRecipeSearchResultsLabel": "No matching recipes"
   },
   "inventoryCapacity": {
     "enabled": true,

@@ -54,8 +54,8 @@ namespace Code_01.CombatPrototype.Map
             ValidateInventoryCapacityUpgrade(map.inventoryCapacityUpgrade, map.inventoryCapacity);
             ValidateInventoryDrop(map.inventoryDrop);
             Id(map.mapDefinitionId, "mapDefinitionId");
-            if (map.schemaVersion != 39 || map.configRevision < 1 || map.defaultSeed < 1)
-                throw new InvalidOperationException("Map requires schemaVersion=39, positive revision and seed.");
+            if (map.schemaVersion != 40 || map.configRevision < 1 || map.defaultSeed < 1)
+                throw new InvalidOperationException("Map requires schemaVersion=40, positive revision and seed.");
             var drops = map.drops;
             Id(drops.itemId, "drops.itemId");
             Id(drops.visualResourceKey, "drops.visualResourceKey");
@@ -643,6 +643,12 @@ namespace Code_01.CombatPrototype.Map
             HudLabel(panel.craftRecipesLabel, "inventoryPanel.craftRecipesLabel");
             HudLabel(panel.repairRecipesLabel, "inventoryPanel.repairRecipesLabel");
             HudLabel(panel.upgradeRecipesLabel, "inventoryPanel.upgradeRecipesLabel");
+            if (panel.recipeSearchMaxLength < 1 || panel.recipeSearchMaxLength > 64)
+                throw new InvalidOperationException("inventoryPanel.recipeSearchMaxLength requires an integer from 1 to 64.");
+            HudLabel(panel.recipeSearchLabel, "inventoryPanel.recipeSearchLabel");
+            HudLabel(panel.recipeSearchPlaceholderLabel, "inventoryPanel.recipeSearchPlaceholderLabel");
+            HudLabel(panel.clearRecipeSearchLabel, "inventoryPanel.clearRecipeSearchLabel");
+            HudLabel(panel.noRecipeSearchResultsLabel, "inventoryPanel.noRecipeSearchResultsLabel");
         }
 
         private static void HudLabel(string value, string field)

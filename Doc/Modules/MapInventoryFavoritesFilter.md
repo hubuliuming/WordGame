@@ -1,6 +1,6 @@
 # 背包仅看收藏筛选
 
-返回[地图](Map.md)、[背包](Inventory.md)、[B面板](MapInventoryPanel.md)、[列表](MapInventoryListView.md)、[收藏](MapInventoryFavorites.md)、[搜索](MapInventorySearch.md)、[详情](MapInventoryDetails.md)、[本机偏好](MapInventoryPreferences.md)、[配置](DataResources.md)与[运行验收](Runtime.md)。入口CombatPrototypeNetCode、原B面板；两地图Json/BuiltIn当前v39/revision42。主线程按已确认方案完成接入及静态范围核对；用户已确认本阶段十六项人工GamePlayer验收通过，主线程结合既有静态核对与用户反馈判定通过，限CombatPrototypeNetCode、v34/revision37及运行入口清单，人工结论来自用户反馈；收藏旧通过限v33/revision36十六项，其他旧阶段保持各自版本/清单。
+返回[地图](Map.md)、[背包](Inventory.md)、[B面板](MapInventoryPanel.md)、[列表](MapInventoryListView.md)、[收藏](MapInventoryFavorites.md)、[搜索](MapInventorySearch.md)、[详情](MapInventoryDetails.md)、[本机偏好](MapInventoryPreferences.md)、[配置](DataResources.md)与[运行验收](Runtime.md)。入口CombatPrototypeNetCode、原B面板；两地图Json/BuiltIn当前v40/revision43。主线程按已确认方案完成接入及静态范围核对；用户已确认本阶段十六项人工GamePlayer验收通过，主线程结合既有静态核对与用户反馈判定通过，限CombatPrototypeNetCode、v34/revision37及运行入口清单，人工结论来自用户反馈；收藏旧通过限v33/revision36十六项，其他旧阶段保持各自版本/清单。
 
 ## 【FACT】入口与文件
 
@@ -27,7 +27,7 @@
 | favoritesFilterOnlyLabel | Favorites only | 必填文案→FixedString64Bytes |
 | noMatchingFavoritesLabel | No matching favorites | 必填文案→FixedString64Bytes |
 
-原83字段保留，[收藏计数](MapInventoryFavoritesCount.md)、[收藏保护](MapInventoryFavoritesDropProtection.md)与[收藏提示](MapInventoryFavoritesConsumptionHint.md)各追加两字段，另有[消耗确认](MapInventoryFavoritesConsumptionConfirm.md)四字段及[配方筛选](MapInventoryRecipeFilter.md)七字段，当前100：DTO十八bool、六float、三int、三模式string、69文案string及一文件ID；Settings十八byte、六float、三int、三byte枚举及70 FixedString64Bytes，零GhostField/无GhostComponent。四文案非空白、无控制字符、最多61 UTF-8字节；关闭收藏/新筛选/面板仍全量验证。仅地图schema39、正revision/seed；默认revision41，旧地图v1～v38、缺失/null/错类型/未知或重复键拒绝，无补默认/来源回退/热重载，正常导入/烘焙生效，各端同版。
+原83字段保留，[收藏计数](MapInventoryFavoritesCount.md)、[收藏保护](MapInventoryFavoritesDropProtection.md)与[收藏提示](MapInventoryFavoritesConsumptionHint.md)各追加两字段，另有[消耗确认](MapInventoryFavoritesConsumptionConfirm.md)四字段及[配方筛选](MapInventoryRecipeFilter.md)七字段及[配方搜索](MapInventoryRecipeSearch.md)七字段，当前107：DTO二十bool、六float、四int、三模式string、73文案string及一文件ID；Settings二十byte、六float、四int、三byte枚举及74 FixedString64Bytes，零GhostField/无GhostComponent。四文案非空白、无控制字符、最多61 UTF-8字节；关闭收藏/新筛选/面板仍全量验证。仅地图schema40、正revision/seed；默认revision43，旧地图v1～v39、缺失/null/错类型/未知或重复键拒绝，无补默认/来源回退/热重载，正常导入/烘焙生效，各端同版。
 
 ## 【CURRENT STRATEGY】显示交集与点击
 
@@ -51,9 +51,9 @@ Close/原无效ReadInput额外清未应用新模式，已应用模式同一绑�
 
 协调类只在有效新能力开启时恢复/观察已应用布尔值，与上次成功写入值比较，连续变化复用0.5秒unscaledTime合并，Close/Reset提交。返回已写值取消对应待写；未应用GUI请求、库存刷新或载入不写盘。新功能关闭时其他偏好保存保留已读flag；preferencesEnabled=false或本绑定I/O暂停仅临时生效。UTF-8严格读可带BOM、写无BOM的.json.tmp、Flush(true)、Replace或首次Move及失败暂停本绑定I/O保持；不自动重试/修坏档，不改玩家v4/世界v2路径、字段或事务。
 
-## 【CURRENT STRATEGY】配方分类关联
+## 【CURRENT STRATEGY】配方分类与搜索关联
 
-当前v39/revision42的[配方筛选](MapInventoryRecipeFilter.md)只控制B配方显示、切换取消及行数；材料与工具状态、原输入/事务/存档链保持。分类不写偏好v3，完整契约与本阶段待人工范围归专题；既有通过限原版本/清单。
+当前v40/revision43的[配方搜索](MapInventoryRecipeSearch.md)在原分类上按配置名称/操作文案匹配七项配方，复用独立搜索实例与焦点隔离；单项显隐及高度、文本变化清七请求/待确认归专题。材料与工具状态、原输入/事务/存档链保持；关键词仅本绑定内存，不入偏好v3。本阶段待人工，分类已通过仍限v39/revision42原清单，其他旧通过保持原范围。
 
 ## 【KNOWN ISSUES】静态核对与人工边界
 
@@ -81,4 +81,4 @@ v37/revision40提示阶段的[收藏材料消耗提示](MapInventoryFavoritesCon
 
 ## 【CURRENT STRATEGY】收藏材料消耗确认
 
-当前v39/revision42的[收藏材料消耗确认](MapInventoryFavoritesConsumptionConfirm.md)仅处理原B七个制作/修理/容量与工具升级按钮。首次有效按钮请求命中已应用收藏木石的正成本时暂存一个操作，在配方内显示数量提示，以Confirm/Cancel替换原按钮行；确认按最新已捕获候选和本地Revision复核后沿原请求提交一次，取消/关闭B/相关数量、等级、耐久、配方或已应用收藏变化/绑定失效清待确认。逐帧Clear仅隐藏，确认目标或高度变化清旧面板与行鼠标许可。确认独立于原消耗提示开关；数字1～7保持原直达链，偏好v3七字段、输入19、Ghost/服务器与保存入口保持。本阶段十六项人工GamePlayer已获用户通过反馈，主线程结合既有静态核对判定通过，限CombatPrototypeNetCode、v38/revision41及运行入口清单，人工结论来自用户反馈；未实际触发的独立用例仍UNKNOWN，已验收提示仍限v37/revision40，全部旧通过保持原版本/清单。
+当前v40/revision43的[收藏材料消耗确认](MapInventoryFavoritesConsumptionConfirm.md)仅处理原B七个制作/修理/容量与工具升级按钮。首次有效按钮请求命中已应用收藏木石的正成本时暂存一个操作，在配方内显示数量提示，以Confirm/Cancel替换原按钮行；确认按最新已捕获候选和本地Revision复核后沿原请求提交一次，取消/关闭B/相关数量、等级、耐久、配方或已应用收藏变化/绑定失效清待确认。逐帧Clear仅隐藏，确认目标或高度变化清旧面板与行鼠标许可。确认独立于原消耗提示开关；数字1～7保持原直达链，偏好v3七字段、输入19、Ghost/服务器与保存入口保持。本阶段十六项人工GamePlayer已获用户通过反馈，主线程结合既有静态核对判定通过，限CombatPrototypeNetCode、v38/revision41及运行入口清单，人工结论来自用户反馈；未实际触发的独立用例仍UNKNOWN，已验收提示仍限v37/revision40，全部旧通过保持原版本/清单。

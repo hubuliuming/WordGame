@@ -362,7 +362,14 @@ namespace Code_01.CombatPrototype.Map
                     AllRecipesLabel = new FixedString64Bytes(inventoryPanel.allRecipesLabel),
                     CraftRecipesLabel = new FixedString64Bytes(inventoryPanel.craftRecipesLabel),
                     RepairRecipesLabel = new FixedString64Bytes(inventoryPanel.repairRecipesLabel),
-                    UpgradeRecipesLabel = new FixedString64Bytes(inventoryPanel.upgradeRecipesLabel)
+                    UpgradeRecipesLabel = new FixedString64Bytes(inventoryPanel.upgradeRecipesLabel),
+                    RecipeSearchEnabled = (byte)(inventoryPanel.recipeSearchEnabled ? 1 : 0),
+                    RecipeSearchIgnoreCase = (byte)(inventoryPanel.recipeSearchIgnoreCase ? 1 : 0),
+                    RecipeSearchMaxLength = inventoryPanel.recipeSearchMaxLength,
+                    RecipeSearchLabel = new FixedString64Bytes(inventoryPanel.recipeSearchLabel),
+                    RecipeSearchPlaceholderLabel = new FixedString64Bytes(inventoryPanel.recipeSearchPlaceholderLabel),
+                    ClearRecipeSearchLabel = new FixedString64Bytes(inventoryPanel.clearRecipeSearchLabel),
+                    NoRecipeSearchResultsLabel = new FixedString64Bytes(inventoryPanel.noRecipeSearchResultsLabel)
                 });
                 var inventoryDrop = config.map.inventoryDrop;
                 AddComponent(entity, new CombatPrototypeMapInventoryDropSettings

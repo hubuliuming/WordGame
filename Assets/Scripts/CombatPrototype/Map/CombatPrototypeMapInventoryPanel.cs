@@ -21,6 +21,7 @@ namespace Code_01.CombatPrototype.Map
         private readonly CombatPrototypeMapGatherToolUpgradePanel _toolUpgrade = new CombatPrototypeMapGatherToolUpgradePanel();
         private readonly CombatPrototypeMapInventoryConsumptionConfirmation _confirmation = new CombatPrototypeMapInventoryConsumptionConfirmation();
         private readonly CombatPrototypeMapInventoryRecipeFilter _recipeFilter = new CombatPrototypeMapInventoryRecipeFilter();
+        private readonly CombatPrototypeMapInventoryRecipeSearch _recipeSearch = new CombatPrototypeMapInventoryRecipeSearch();
         private uint _confirmationRevision;
         private string _levelLabel, _recraftLabel;
         private int _axeLevel = -1, _pickaxeLevel = -1;
@@ -90,6 +91,7 @@ namespace Code_01.CombatPrototype.Map
             _favorites.Configure(settings);
             _confirmation.Configure(settings);
             _recipeFilter.Configure(settings);
+            _recipeSearch.Configure(settings, axe, pickaxe, upgradeSettings, toolUpgradeSettings);
             _preferences.Configure(settings, mapId, _listView, _search, _favorites);
             _details.Configure(settings, toolSettings, axe, pickaxe, capacity, upgradeSettings, upgradeDefinitions,
                 toolUpgradeSettings, toolUpgradeDefinitions);
@@ -115,7 +117,8 @@ namespace Code_01.CombatPrototype.Map
             {
                 _preferencesResetPending = false;
                 _listView.ResetDisplay(_settings.DefaultSortMode, _settings.DefaultFilterMode, _settings.DefaultFavoritesOnly != 0);
-                recipeFilterChanged = _recipeFilter.ResetDisplay();
+                recipeFilterChanged = _recipeFilter.ResetDisplay() | (_recipeSearch.Editor.AppliedText.Length != 0);
+                _recipeSearch.Editor.ResetDisplay();
                 _search.ResetDisplay();
                 _favorites.ResetDisplay();
                 _details.Close();
@@ -123,6 +126,8 @@ namespace Code_01.CombatPrototype.Map
                 _mousePressAccepted = _rowMousePressAccepted = false;
             }
             recipeFilterChanged |= _recipeFilter.ApplyPending();
+            recipeFilterChanged |= _recipeSearch.Editor.ApplyPending();
+            _recipeSearch.Capture(_recipeFilter);
             if (recipeFilterChanged)
             {
                 _scroll = Vector2.zero;
@@ -169,9 +174,11 @@ namespace Code_01.CombatPrototype.Map
                 _pickaxeButton = "2: " + (pickaxeDurability >= 0 && pickaxeDurability < _pickaxe.DurabilityCostPerCompletion ? _recraftLabel : _craftButton) + " " + _pickaxeName;
                 _pickaxeCraftTitle = _pickaxeName + "  " + Availability(_pickaxe, pickaxeDurability);
             }
-            var hintRows = (_recipeFilter.ShowCraft ? (_axeConsumptionHint.Length != 0 ? 1 : 0) + (_pickaxeConsumptionHint.Length != 0 ? 1 : 0) : 0) +
-                (_recipeFilter.ShowRepair ? _repair.ConsumptionHintRowCount : 0) +
-                (_recipeFilter.ShowUpgrade ? _upgrade.ConsumptionHintRowCount + _toolUpgrade.ConsumptionHintRowCount : 0);
+            var hintRows = (_recipeSearch.CraftAxe && _axeConsumptionHint.Length != 0 ? 1 : 0) +
+                (_recipeSearch.CraftPickaxe && _pickaxeConsumptionHint.Length != 0 ? 1 : 0) +
+                _repair.VisibleConsumptionHintRowCount(_recipeSearch.RepairAxe, _recipeSearch.RepairPickaxe) +
+                (_recipeSearch.CapacityUpgrade ? _upgrade.ConsumptionHintRowCount : 0) +
+                _toolUpgrade.VisibleConsumptionHintRowCount(_recipeSearch.UpgradeAxe, _recipeSearch.UpgradePickaxe);
             if (_consumptionHintRows != hintRows) _mousePressAccepted = _rowMousePressAccepted = false;
             _consumptionHintRows = hintRows;
             _confirmation.Capture(ConsumptionOperation.CraftAxe, _canCraftAxe, _axe.CraftWoodQuantity, _axe.CraftStoneQuantity,
@@ -224,6 +231,7 @@ namespace Code_01.CombatPrototype.Map
             {
                 _craftAxe = _craftPickaxe = _mousePressAccepted = _rowMousePressAccepted = _preferencesResetPending = false;
                 _search.ReleaseFocus();
+                _recipeSearch.Editor.ReleaseFocus();
                 _details.Close();
                 _favorites.ClearPending();
                 _listView.ClearFavoritesFilterPending();
@@ -241,7 +249,8 @@ namespace Code_01.CombatPrototype.Map
             {
                 _lastInputFrame = Time.frameCount;
                 _search.ReadInput(keyboard, mouse, ContainsSearchField(mouse), wasInside);
-                if (!_search.BlocksKeyboard && keyboard != null && keyboard.bKey.wasPressedThisFrame)
+                _recipeSearch.Editor.ReadInput(keyboard, mouse, ContainsRecipeSearchField(mouse), wasInside);
+                if (!_search.BlocksKeyboard && !_recipeSearch.Editor.BlocksKeyboard && keyboard != null && keyboard.bKey.wasPressedThisFrame)
                 {
                     if (_open) Close();
                     else _open = true;
@@ -249,7 +258,7 @@ namespace Code_01.CombatPrototype.Map
                 if (mouse != null && mouse.leftButton.wasPressedThisFrame)
                     _mousePressAccepted = _rowMousePressAccepted = ContainsMouse(mouse);
             }
-            blocksKeyboard = _search.BlocksKeyboard;
+            blocksKeyboard = _search.BlocksKeyboard || _recipeSearch.Editor.BlocksKeyboard;
             var inside = ContainsMouse(mouse);
             if (_open)
             {
@@ -280,7 +289,7 @@ namespace Code_01.CombatPrototype.Map
             }
             _craftAxe = _craftPickaxe = false;
             // Closing by B must also consume the mouse press that began over this panel.
-            return wasInside || inside || _search.BlocksMouse;
+            return wasInside || inside || _search.BlocksMouse || _recipeSearch.Editor.BlocksMouse;
         }
 
         private void ObserveConfirmationChange()
@@ -297,15 +306,21 @@ namespace Code_01.CombatPrototype.Map
             return Rect(scale).Contains(new Vector2(point.x / scale, (Screen.height - point.y) / scale));
         }
 
-        private bool ContainsSearchField(Mouse mouse)
+        private bool ContainsSearchField(Mouse mouse) => _search.Enabled &&
+            ContainsSearchField(mouse, 3 + _favorites.CountRowCount + _listView.ControlRowCount);
+
+        private bool ContainsRecipeSearchField(Mouse mouse) => _recipeSearch.Editor.Enabled &&
+            ContainsSearchField(mouse, 3 + _favorites.CountRowCount + _listView.ControlRowCount + _search.RowCount);
+
+        private bool ContainsSearchField(Mouse mouse, int fieldRow)
         {
-            if (!_search.Enabled || !ContainsMouse(mouse)) return false;
+            if (!ContainsMouse(mouse)) return false;
             var scale = Scale();
             var viewport = Viewport(Rect(scale));
             var point = mouse.position.ReadValue();
             var local = new Vector2(point.x / scale, (Screen.height - point.y) / scale);
             var field = CombatPrototypeMapInventoryPanelSearch.FieldRect(viewport.width - 18f,
-                (3 + _favorites.CountRowCount + _listView.ControlRowCount) * _settings.RowHeightPixels, _settings.RowHeightPixels);
+                fieldRow * _settings.RowHeightPixels, _settings.RowHeightPixels);
             field.position += viewport.position - _scroll;
             return viewport.Contains(local) && field.Contains(local);
         }
@@ -320,6 +335,7 @@ namespace Code_01.CombatPrototype.Map
         public void Draw()
         {
             _search.FlushGUIFocus();
+            _recipeSearch.Editor.FlushGUIFocus();
             if (!_configured || !_ready || !_open || Screen.width <= 0 || Screen.height <= 0) return;
             if (_labelStyle == null)
             {
@@ -343,9 +359,11 @@ namespace Code_01.CombatPrototype.Map
                 GUI.Label(new Rect(panel.x + 12f, panel.y + 12f, panel.width - 24f, _settings.RowHeightPixels), _title, _labelStyle);
                 var viewport = Viewport(panel);
                 var rows = Mathf.Max(_listView.Items.Count * (_favorites.Enabled ? 3 : 2), 1) + _favorites.CountRowCount +
-                    _listView.ControlRowCount + _search.RowCount + (PreferencesResetEnabled ? 1 : 0) + 5 + _recipeFilter.RowCount +
-                    (_recipeFilter.ShowCraft ? 9 : 0) + (_recipeFilter.ShowRepair ? CombatPrototypeMapGatherToolRepairPanel.RowCount : 0) +
-                    (_recipeFilter.ShowUpgrade ? CombatPrototypeMapInventoryCapacityUpgradePanel.RowCount + CombatPrototypeMapGatherToolUpgradePanel.RowCount : 0) +
+                    _listView.ControlRowCount + _search.RowCount + _recipeSearch.Editor.RowCount + (PreferencesResetEnabled ? 1 : 0) + 5 + _recipeFilter.RowCount +
+                    _recipeSearch.CraftRowCount + CombatPrototypeMapGatherToolRepairPanel.VisibleRowCount(_recipeSearch.RepairAxe, _recipeSearch.RepairPickaxe) +
+                    (_recipeSearch.CapacityUpgrade ? CombatPrototypeMapInventoryCapacityUpgradePanel.RowCount : 0) +
+                    CombatPrototypeMapGatherToolUpgradePanel.VisibleRowCount(_recipeSearch.UpgradeAxe, _recipeSearch.UpgradePickaxe) +
+                    (_recipeSearch.HasResults ? 0 : 1) +
                     (_durabilityEnabled ? 2 : 0) + _consumptionHintRows + _confirmation.RowCount;
                 var contentWidth = viewport.width - 18f;
                 var content = new Rect(0f, 0f, contentWidth, rows * _settings.RowHeightPixels +
@@ -380,6 +398,7 @@ namespace Code_01.CombatPrototype.Map
                 _search.Draw(width, y, _settings.RowHeightPixels, _labelStyle, _buttonStyle, _mousePressAccepted);
                 y += _settings.RowHeightPixels;
             }
+            _recipeSearch.Draw(width, ref y, _settings.RowHeightPixels, _labelStyle, _buttonStyle, _mousePressAccepted);
             DrawPreferencesReset(width, ref y);
             if (_listView.Items.Count == 0)
                 Label(width, ref y, _snapshot.Items.Count == 0 ? _empty : _listView.FavoritesOnly ? _listView.NoMatchingFavoritesText : _search.HasQuery ? _search.NoResultsText : _listView.NoMatchingItemsText);
@@ -393,23 +412,26 @@ namespace Code_01.CombatPrototype.Map
                 _details.DrawExpanded(width, ref y, _settings.RowHeightPixels, _labelStyle, _buttonStyle, item.Name, _mousePressAccepted);
             }
             DrawRecipeFilter(width, ref y);
-            if (_recipeFilter.ShowUpgrade)
+            if (!_recipeSearch.HasResults) Label(width, ref y, _recipeSearch.Editor.NoResultsText);
+            if (_recipeSearch.CapacityUpgrade)
                 _upgrade.Draw(width, ref y, _settings.RowHeightPixels, _labelStyle, _buttonStyle, _mousePressAccepted, _confirmation);
             Label(width, ref y, _tools);
             ToolLabel(width, ref y, _axeStatus, _axeDurabilityStatus.TextColor);
             if (_durabilityEnabled) Label(width, ref y, _axeDurabilityStatus.Detail);
             ToolLabel(width, ref y, _pickaxeStatus, _pickaxeDurabilityStatus.TextColor);
             if (_durabilityEnabled) Label(width, ref y, _pickaxeDurabilityStatus.Detail);
-            if (_recipeFilter.ShowCraft)
+            if (_recipeSearch.ShowCraft)
             {
                 Label(width, ref y, _craft);
-                DrawRecipe(width, ref y, _axeCraftTitle, _axeButton, _axeRecipe, _axeConsumptionHint, _axeMissing, _canCraftAxe, true);
-                DrawRecipe(width, ref y, _pickaxeCraftTitle, _pickaxeButton, _pickaxeRecipe, _pickaxeConsumptionHint, _pickaxeMissing, _canCraftPickaxe, false);
+                if (_recipeSearch.CraftAxe) DrawRecipe(width, ref y, _axeCraftTitle, _axeButton, _axeRecipe, _axeConsumptionHint, _axeMissing, _canCraftAxe, true);
+                if (_recipeSearch.CraftPickaxe) DrawRecipe(width, ref y, _pickaxeCraftTitle, _pickaxeButton, _pickaxeRecipe, _pickaxeConsumptionHint, _pickaxeMissing, _canCraftPickaxe, false);
             }
-            if (_recipeFilter.ShowRepair)
-                _repair.Draw(width, ref y, _settings.RowHeightPixels, _labelStyle, _buttonStyle, _mousePressAccepted, _confirmation);
-            if (_recipeFilter.ShowUpgrade)
-                _toolUpgrade.Draw(width, ref y, _settings.RowHeightPixels, _labelStyle, _buttonStyle, _mousePressAccepted, _confirmation);
+            if (_recipeSearch.ShowRepair)
+                _repair.Draw(width, ref y, _settings.RowHeightPixels, _labelStyle, _buttonStyle, _mousePressAccepted, _confirmation,
+                    _recipeSearch.RepairAxe, _recipeSearch.RepairPickaxe);
+            if (_recipeSearch.ShowToolUpgrade)
+                _toolUpgrade.Draw(width, ref y, _settings.RowHeightPixels, _labelStyle, _buttonStyle, _mousePressAccepted, _confirmation,
+                    _recipeSearch.UpgradeAxe, _recipeSearch.UpgradePickaxe);
         }
 
         private void DrawRecipeFilter(float width, ref float y)
@@ -508,6 +530,7 @@ namespace Code_01.CombatPrototype.Map
             _open = _craftAxe = _craftPickaxe = _mousePressAccepted = _rowMousePressAccepted = _preferencesResetPending = false;
             _listView.ClearPending();
             _search.Close();
+            _recipeSearch.Editor.Close();
             _details.Close();
             _favorites.ClearPending();
             _drop.ClearPending();
@@ -539,6 +562,7 @@ namespace Code_01.CombatPrototype.Map
             _toolUpgrade.Reset();
             _confirmation.Reset(); _confirmationRevision = 0;
             _recipeFilter.Reset();
+            _recipeSearch.Reset();
             _labelStyle = _buttonStyle = null;
             _feedback = _preferencesResetLabel = string.Empty;
             _woodQuantity = _stoneQuantity = -1;

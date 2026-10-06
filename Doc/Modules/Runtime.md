@@ -1273,9 +1273,9 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 
 当前共563项；完整JSON、单待确认/复核/取消、绘制/鼠标和数字直达边界及静态证据归[消耗确认](MapInventoryFavoritesConsumptionConfirm.md)。3492份非法配置拒绝/334组合法读取及334次隔离Bake通过，93字段/零GhostField与原元数据保持，主场景干净/3根对象/单场景/未Play；工具空失败返回后核实完整落盘结果与释放。AI未执行确认/收藏/面板/GUI业务、真实偏好或游戏存档I/O、GamePlayer/PlayMode、逻辑单元测试、命令行构建/发布、性能采样或图片。
 
-## 【KNOWN ISSUES】制作配方分类与筛选人工GamePlayer清单（v39/revision42，待验收）
+## 【KNOWN ISSUES】制作配方分类与筛选人工GamePlayer清单（v39/revision42，用户已确认通过）
 
-入口CombatPrototypeNetCode、原B面板。实现与正常编译/配置/元数据/隔离Editor Bake静态范围核对通过，人工GamePlayer待用户验收。原563项内容/编号逐字保留；已验收确认仍限v38/revision41十六项，所有旧通过保持原版本/清单，未实际触发的独立用例UNKNOWN。
+入口CombatPrototypeNetCode、原B面板。实现与正常编译/配置/元数据/隔离Editor Bake静态范围核对通过；本阶段十六项人工GamePlayer已获用户通过反馈，主线程结合既有静态核对判定通过，限CombatPrototypeNetCode、v39/revision42及运行入口清单，人工结论来自用户反馈；未实际触发的独立用例仍UNKNOWN。原563项内容/编号逐字保留；已验收确认仍限v38/revision41十六项，所有旧通过保持原版本/清单，未实际触发的独立用例UNKNOWN。
 
 1. 两地图Json/BuiltIn一致v39/revision42、inventoryPanel100字段；原93字段/顺序/值保持，七新字段必填且类型严格，四模式逐字匹配all/craft/repair/upgrade，五文案非空白/无控制/最多61 UTF-8字节；缺失/null/错类型/未知/重复键、旧v1～v38/未来版本失败，关闭仍校验，各端同版导入/烘焙。
 2. 默认All，材料列表之后、原容量升级块之前出现全宽Recipes: All；单次点击依次Craft→Repair→Upgrade→All，下一有效Show只应用一次并滚动归零，实际事件/多次绘制未触发UNKNOWN。
@@ -1295,3 +1295,26 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 16. 四类别及关闭分类检查滚动内容只计可见组和对应提示/待确认行，详情展开、耐久两行、材料控制与固定页脚完整；无隐藏空白或截断。搜索原命中Y、GUI状态恢复、分辨率/中文字形/按下抬起/重复事件/性能未遍历UNKNOWN。
 
 当前共579项；完整契约、行数/取消/生命周期、4034份非法配置拒绝/418组合法读取与418次隔离Bake证据归[配方筛选](MapInventoryRecipeFilter.md)。100字段/零GhostField与原元数据/布局保持；主场景干净、3根对象、单场景、未Play。初次导入旧DTO异常经重导入及完整Bake复核，Console三条历史Error保留；工具空状态已核实落盘结果及释放。AI未执行分类/面板/预览/GUI业务、真实偏好或游戏保存I/O、GamePlayer/PlayMode、逻辑单元测试、命令行构建/发布、性能采样或图片。
+
+## 【KNOWN ISSUES】制作配方搜索人工GamePlayer清单（v40/revision43，待验收）
+
+入口CombatPrototypeNetCode、原B面板。实现与正常Unity编译、配置/元数据及隔离Editor Bake静态范围核对通过，人工GamePlayer待用户验收。原579项内容/编号逐字保留；配方分类已验收仍限v39/revision42十六项，各旧通过保持原版本/清单；未实际触发的独立用例UNKNOWN。
+
+1. 两地图Json/BuiltIn一致v40/revision43，inventoryPanel107字段，原100字段/顺序/值保持；七字段必填严格类型，长度1～64和四文案61 UTF-8字节边界、关闭仍校验，旧v1～v39/未来版本拒绝，各端同版导入/烘焙。
+2. B面板材料搜索后、Reset view之前出现Recipe search及文本框/Clear两行；关闭配方搜索不占行，原材料输入框位置保持，缩放/滚动/viewport裁切命中一致；真实GUI事件未触发UNKNOWN。
+3. All下输入Pickaxe匹配制作/修理/升级三个镐子项，材料/容量摘要及两工具状态保持；Axe按子串规则也匹配Pickaxe，配置名称变更按对应文本匹配；实际输入未触发UNKNOWN。
+4. Repair匹配两修理，Crafting或Recraft匹配两制作，Upgrade匹配三升级，Capacity匹配背包升级；数量、材料成本、资格/反馈状态不参与搜索，独立动态显示未触发UNKNOWN。
+5. 默认忽略大小写，关闭后按Ordinal区分；关键词首尾空白Trim，整个词做包含匹配、不拆词/增加别名，实际中英文输入/字形未触发UNKNOWN。
+6. 空查询或全空白恢复当前分类全部配方，Clear排队空文本，下一有效Show应用一次、滚动归零并清旧点击；重复绘制/同帧时序未触发UNKNOWN。
+7. 分类与查询取交集；Pickaxe+Upgrade只显示镐子升级，切类别保留关键词，分类关闭按All允许组且搜索独立有效；实际循环/组合未触发UNKNOWN。
+8. 无匹配只显示一行No matching recipes，隐藏空配方组标题/提示，工具状态和材料区保持；恢复关键词后行高/滚动正确，真实裁切/分辨率未触发UNKNOWN。
+9. 匹配的未持有、缺材料、满耐久、满级、功能关闭项保留原文案和按钮资格；隐藏项仍捕获最新候选、数量/耐久/等级及所属反馈，真实更新未触发UNKNOWN。
+10. 材料与配方输入互不覆盖；材料查询/排序/筛选/收藏筛选及原偏好v3保持，配方词仅本绑定内存且不新增保存字段/I/O；真实文件读写/故障未触发UNKNOWN。
+11. 点击两输入框及获得/释放焦点同帧屏蔽B/WASD/空格/E/R/F/G/F5/1～7和镜头键盘，面板外释放焦点左键被消费；未编辑时原数字直达、鼠标与镜头规则保持，实际焦点切换未触发UNKNOWN。
+12. Enter/小键盘Enter/Esc在IME候选活跃时交给输入法，候选结束再释放焦点；长度32按UTF-16，合法代理对占两单位、粘贴控制及截断破损代理按原清洗，实际IME/粘贴边界未触发UNKNOWN。
+13. 应用新文本、清空或类别改变取消七个未消费B请求、待收藏消耗确认/决定及两种旧鼠标许可，即使匹配/高度不变；已提交服务器事务保持，实际按下抬起/请求顺序未触发UNKNOWN。
+14. Reset view清草稿/已应用配方词/待编辑并恢复配置默认类别，原材料/收藏/详情/偏好重置保持；实际取消、文件故障与操作时序未触发UNKNOWN。
+15. Close保留同绑定已应用词，丢弃未应用草稿、不自动聚焦；逐帧Clear只隐藏；死亡/断线/源、玩家、World或Scene失效沿Reset清词，新绑定为空，无效ReadInput释放焦点；独立生命周期未触发UNKNOWN。
+16. 只计可见配方/提示/确认：Craft一个5、两个9，Repair一个6、两个11，ToolUpgrade一个8、两个14，空组0，容量整块10；耐久/材料详情和全显示开关组合回归，原F/G/B、材料事务/存档/多人/预测未实际触发UNKNOWN；性能/平台/线上未验收。
+
+当前共595项；完整搜索配置、文本/交集/双焦点/几何/取消/生命周期与静态证据归[配方搜索](MapInventoryRecipeSearch.md)。4336份非法配置拒绝/502组合法读取及502次隔离Bake通过，107Settings与原布局/引用/签名/反馈保持，主场景干净/3根对象/单场景/未Play；工具空失败返回已核实完整结果与释放，Console保持三条历史Error。本阶段人工GamePlayer待验收，AI未执行GUI业务/真实偏好或游戏存档I/O、GamePlayer/PlayMode、逻辑单元测试、构建/发布、性能采样或图片。

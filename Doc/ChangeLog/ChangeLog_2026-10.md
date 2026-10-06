@@ -854,3 +854,16 @@
 - 两地图Json/BuiltIn升级schema26/revision29，新增必填dropMerge四字段与根Baker四仅Server/0 GhostField Settings，关闭仍严格校验、旧v1～v25拒绝。原四掉落同步字段、输入19、Tools3、原所属反馈、玩家v4/世界v2格式/路径与资源布局/签名保持；G仍整堆容量/保存，世界快照沿原数量/期限/条目比较，恢复Ready后参与，无新增玩家保存、反馈或场景资源结构。
 - 正常脚本编译及四新类型、系统排序/过滤元数据通过；194份非法配置拒绝、28组合法读取与64次隔离Editor Bake通过，四Settings及原反馈/配置/资源引用/布局/签名保持。Bake Console前后[2 Error,5 Warning,53 Log]相同；先行JSON导入用到旧程序集留下两条未知dropMerge记录，新程序集加载后重导两JSON，后续校验/烘焙通过，未清空历史错误。数值检查脚本的float最大值文本舍入曾越过原Reader上界，改用精确double检查数据后通过，Reader/业务代码未因此改动。
 - 增量同步合并专题、相关文档/导航及策划模板；原355项人工内容/编号逐字保留，新16项后共371项，静态通过、本阶段v26/revision29人工待验收；旧G用户通过仍限v25/revision28十六项。主场景干净、未Play、临时Editor烘焙资源释放；未执行合并工具/游戏/显示或GUI回调、GamePlayer/PlayMode、逻辑单元测试、真实存档业务I/O、命令行构建/发布、采样/图片、子Agent或Git提交。实际数量守恒/配对临界/寿命/争抢/容量/失败隔离/恢复生命周期与性能/平台/线上UNKNOWN。
+
+## 2026-10-06：同类地面掉落物合并人工验收通过
+
+- 用户反馈“我已验收通过，接下来下一阶段”；主线程结合既有正常脚本编译、系统排序/服务端元数据、194份非法配置拒绝/28组合法读取及64次隔离Editor Bake判定本阶段通过，限CombatPrototypeNetCode、schemaVersion26/configRevision29及Runtime十六项清单，人工结论来自用户反馈。
+- 增量同步合并专题、地图/掉落/存档/丢弃/容量/G提示与结果/HUD/B面板/背包/资源数据、导航、Runtime及策划模板的验收状态；原371项内容/编号逐字保留，旧阶段通过保持原版本/清单。地图总览默认值表及JSON入口摘要的两处旧v25/28版本记录已按已确认v26/29和当前Json/BuiltIn纠正。
+- 本次仅更新十五份仓库文档与策划模板；代码、JSON及Scene/SubScene/Prefab/Animator/meta/资源/包/构建配置保持。未运行Unity、合并工具/游戏/显示系统或GUI回调、GamePlayer/PlayMode、逻辑单元测试、真实存档业务I/O、命令行构建/发布、采样或图片检查，未创建子Agent或提交Git。未实际触发的独立数量/配对临界/寿命/争抢/容量/保存与错误隔离/恢复联网生命周期用例仍UNKNOWN，结论不扩大到意外ECS恢复、跨文件事务、同槽并发、性能/带宽、平台或线上联调。
+
+## 2026-10-06：掉落物按背包余量部分拾取落地
+
+- 按用户确认由主线程在CombatPrototypeNetCode原G链接入实际可接收量，十个现有脚本与两JSON；GetRejection/F整批行为保持，新增共用只读GetPickupQuantity只在开启且整堆放不下时计算本人等级总量/单种余量最小值。最近目标/NetworkId顺序保持，零余量与旧超限拒绝，不自动换远物或预占容量。
+- 两地图Json/BuiltIn升schema27/revision30，drops新增必填partialPickupEnabled=true、DTO12/Server Settings14且新增byte/0 GhostField；false恢复整堆，容量关闭仍沿原整堆/checked，旧v1～v26严格拒绝。先准备库存增量及原堆余量并SavePrepared，成功才库存/Quantity提交，领空Consumed；剩余身份/位置/期限保持，无新实体或编号，原世界快照保存剩余量与玩家v4/世界v2/资源签名保持。
+- G目标增加int PickupQuantity，七GhostField SendToOwner，真实Quantity保持；部分Ready显示可领量/地面量、零余量NoSpace及成功实际增量，原寿命/高亮/结果优先级与布局保持；采样/缓存/非法快照边界包含新字段。正常编译、258非法拒绝/42合法读取、40次隔离Bake与Serializer七字段/7 mask bits/88字节结构静态通过。Bake前后[0 Error,5 Warning,3 Log]一致，新增编译/桥接警告来自未修改PEListener/DOTween与MCP WebSocket，原Package/Input Manager警告保留，未清Console。
+- 增量同步新部分拾取专题、相关模块/玩家/导航/Runtime及策划模板；原371项人工内容/编号逐字保留，新16项后共387项，静态通过、本阶段v27/revision30人工待验收。旧合并用户通过仍限v26/revision29十六项、G结果v25/revision28十六项及其他旧范围。未新增脚本或修改Scene/SubScene/Prefab/Animator/meta/资源/包/构建配置，临时烘焙资源释放且主场景干净未Play；未执行接收数量/G/HUD/GUI逻辑、GamePlayer/PlayMode、逻辑单元测试、真实存档业务I/O、命令行构建/发布、采样/图片，未创建子Agent/提交Git。实际容量/时序/保存错误/合并寿命/恢复/多人展示与生命周期、意外ECS及跨文件、性能/平台/线上仍UNKNOWN。

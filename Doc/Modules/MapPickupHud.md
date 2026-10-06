@@ -7,7 +7,7 @@
 | 文件 | 当前职责 |
 |---|---|
 | [MapPickupHudConfig](../../Assets/Scripts/CombatPrototype/Map/MapPickupHudConfig.cs) | pickupHud 的18个必填 JSON 字段 |
-| [PickupHudData](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapPickupHudData.cs) | 原地图根18字段Settings与玩家所属六字段快照 |
+| [PickupHudData](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapPickupHudData.cs) | 原地图根18字段Settings与玩家所属七字段快照 |
 | [DropTargetSelector](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapDropTargetSelector.cs) | 原 G 与新提示共用的只读最近掉落选择 |
 | [PickupHudStateSystem](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapPickupHudStateSystem.cs) | 服务端在 PlayerRespawn 后采样资格/目标，只提交显示状态 |
 | [PickupHudClient](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapPickupHudClient.cs) | 原G行及双行布局；读取错误在显示边界记录并收起 |
@@ -21,7 +21,7 @@ v11/14阶段五个新脚本及meta、v17/20寿命接入两个普通助手及meta
 
 ## 【FACT】当前 JSON 契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为 schemaVersion=26/configRevision=29，pickupHud段及全部18字段必填，[interactionHighlight](MapInteractionHighlight.md)亦为必填地图段。沿原严格 UTF-8/缺失/未知/重复字段/类型和语义校验；旧 v1～v25 明确失败，不迁移、补默认段或回退来源。正常导入/烘焙后生效，没有运行热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为 schemaVersion=27/configRevision=30，pickupHud段及全部18字段必填，[interactionHighlight](MapInteractionHighlight.md)亦为必填地图段。沿原严格 UTF-8/缺失/未知/重复字段/类型和语义校验；旧 v1～v26 明确失败，不迁移、补默认段或回退来源。正常导入/烘焙后生效，没有运行热重载。
 
 | 字段 | 当前默认值 | 契约 |
 |---|---|---|
@@ -47,7 +47,7 @@ v11/14阶段五个新脚本及meta、v17/20寿命接入两个普通助手及meta
 
 原 G 的在线请求、资格和目标逻辑只抽出只读函数，没有改变保存/提交、请求排序或系统次序。GetPickupHintRejection 沿原顺序检查所属 NetworkId、存活、无 Attack 请求且近战 Ready、有限零 Move，原拒绝原因保持。连接须 Connected、InGame、未请求断线，CommandTarget 指向当前启用 Simulate 玩家。新采样不要求本 tick 按 G，错误归属连接不覆盖真实所属玩家快照；当前 G 不检查 F 预约，新提示也不新增此限制。
 
-DropTargetSelector 沿原算法遍历 Landed 且未到期掉落，按本人 X/Z 中心距离筛选，距离<=原 PickupDistance，取最近一个；精确同距选较小 DropId。Prepared、Airborne、Consumed、到期和超范围物体排除，lifetime=0 的原永不到期规则保持。按 G 仍由实际处理 tick 重新选择，不上传客户端目标，也不锁定/预约正在显示的物体；选中目标后按[容量](MapInventoryCapacity.md)检查，拒绝不部分领取或改选较远目标；多人请求仍按 NetworkId 升序，保存成功才库存提交/Consumed。
+DropTargetSelector 沿原算法遍历 Landed 且未到期掉落，按本人 X/Z 中心距离筛选，距离<=原 PickupDistance，取最近一个；精确同距选较小 DropId。Prepared、Airborne、Consumed、到期和超范围物体排除，lifetime=0 的原永不到期规则保持。按 G 仍由实际处理 tick 重新选择，不上传客户端目标，也不锁定/预约正在显示的物体；选中目标后按[部分拾取](MapDropPartialPickup.md)共用容量接口计算可领取量；零余量或开关关闭且整堆放不下时拒绝，不改选较远目标。多人请求仍按NetworkId升序，保存成功才提交库存/原堆余量，领空才Consumed。
 
 PickupHudStateSystem 在服务端 PredictedSimulation、PlayerRespawn 后执行，读取本 tick 原掉落运动/拾取/到期处理后的状态及服务端模拟时间。每 tick 重建所属玩家显示帧，只有字段变化才写入；无目标、资格拒绝、G文字与G高亮均关闭、连接失效、未采样和系统停止时清为Hidden；采样条件为pickupHud.enabled或interactionHighlight.enabled且gTargetsEnabled。单个玩家采样异常记录地图、NetworkId、玩家、DropId、阶段和原异常，继续其他玩家，未形成有效帧者清空。必需组件/配置缺失明确暴露，不创建默认数据或替代服务。
 
@@ -55,24 +55,25 @@ PickupHudStateSystem 在服务端 PredictedSimulation、PlayerRespawn 后执行�
 
 ## 【FACT】所属 Ghost 快照
 
-CombatPrototypeMapPickupHudState使用OwnerSendType=SendToOwner，六个GhostField仅发送给所属玩家；实际生成Serializer/Snapshot已包含新增两字段：
+CombatPrototypeMapPickupHudState使用OwnerSendType=SendToOwner，七个GhostField仅发送给所属玩家；当前Serializer/Snapshot已包含PickupQuantity：
 
 | 字段 | 当前含义 |
 |---|---|
 | Mode | byte 枚举：0 Hidden、1 Ready、2 NoSpace |
 | DropId | int，Ready/NoSpace 为原正数 ID；Hidden 为0 |
 | ItemId | FixedString64Bytes，原 vitality_apple/wood/stone；Hidden 为空 |
-| Quantity | int，Ready/NoSpace 为目标实际正数量；Hidden 为0 |
+| Quantity | int，Ready/NoSpace为目标地面实际正数量；Hidden为0 |
+| PickupQuantity | int，本次容量可接收量；Ready为1～Quantity，NoSpace/Hidden为0；G实际处理时重新计算 |
 | LifetimeMode | byte枚举：0 None、1 Timed、2 ExpiringSoon、3 Permanent；Hidden或G文字/寿命关闭时None |
 | RemainingSeconds | float、Quantization=0；Timed/ExpiringSoon为有限正整数秒，Permanent/None/Hidden为0 |
 
-不发送世界位置或绝对ExpiresAt；仅投影目标余时，不新增工作计时器。原F及资源状态各四字段、Drop Ghost四字段保持；当前19输入的SaveWorld归[F5](MapWorldSaveHud.md)；G布局由四变六，各端须同版重新烘焙。新状态不是输入/结算依据；网络延迟可能使提示滞后，显示后目标也可能被其他玩家取走或到期。当前位置下的 G 实际目标始终由服务端决定。
+不发送世界位置或绝对ExpiresAt；仅投影目标余时，不新增工作计时器。原F及资源状态各四字段、Drop Ghost四字段保持；当前19输入的SaveWorld归[F5](MapWorldSaveHud.md)；当前G布局由六变七，各端须同版重新烘焙。新状态不是输入/结算依据；网络延迟可能使提示滞后，显示后目标也可能被其他玩家取走或到期。当前位置下的 G 实际目标始终由服务端决定。
 
 ## 【CURRENT STRATEGY】显示、开关与释放
 
 沿原绑定枚举启用 GhostOwnerIsLocal 并核对所属 Connected/InGame 连接，只取本地存活玩家快照；不在含可启用组件的查询上调用单例 API。PickupHudClient只读取烘焙Settings和显示快照，不读PlayerView/世界坐标，不修改玩家或服务端数据。原绑定另委托[高亮解析](MapInteractionHighlight.md)读取对应客户端掉落位置；Main Camera原宿主先画G/F圆环，再走原B、G、F面板路径，原输入和制作/丢弃反馈保持。
 
-NoSpace第一行将Pick up替换为noSpaceLabel，保留原物品/实际数量与寿命第二行；Ready第一行继续显示“G  Pick up  物品文案 ×实际数量”，寿命开启时第二行显示“Expires in 120s”；真实余时≤30秒且预警开启时显示橙色“Expiring soon 30s”；ExpiresAt=0显示白色“Permanent”。服务端按当前目标的实际ExpiresAt减模拟时间、向上取整投影秒数，预警使用未取整余时；不从drops.lifetimeSeconds重新计算、不在客户端用墙钟递减。到期仍由原G选择/清理链处理，合法未到期物不提前显示0秒；保存恢复后显示原恢复期限，离线暂停规则保持。状态变化才写六字段，平稳同秒不因时间推进重复改快照；网络延迟可使文字滞后，实际到期/拾取以服务端为准。
+NoSpace第一行将Pick up替换为noSpaceLabel，保留原物品/实际数量与寿命第二行；Ready全量显示“G  Pick up  物品文案 ×地面数量”，部分可领取时显示“×本次可领量/地面量”；寿命开启时第二行显示“Expires in 120s”；真实余时≤30秒且预警开启时显示橙色“Expiring soon 30s”；ExpiresAt=0显示白色“Permanent”。服务端按当前目标的实际ExpiresAt减模拟时间、向上取整投影秒数，预警使用未取整余时；不从drops.lifetimeSeconds重新计算、不在客户端用墙钟递减。到期仍由原G选择/清理链处理，合法未到期物不提前显示0秒；保存恢复后显示原恢复期限，离线暂停规则保持。状态变化才写七字段，平稳同秒不因时间推进重复改快照；网络延迟可使文字滞后，实际到期/拾取以服务端为准。
 
 默认G为400×84、底距168、字号20；资源状态行400×52的底距由236改268，保持与G间隔16像素，F仍320×104/底48。两行各字号+4高、间隔8，整体垂直居中；寿命关闭沿单行G路径，默认配置高度仍84，可显式配置52并同步状态底距236。Hidden收起原目标与寿命；有效[拾取反馈](MapPickupFeedbackHud.md)仍按其期限显示。沿1920×1080参考像素等比缩放、黑底alpha0.7、普通白字、内置GUI字体和Texture2D.whiteTexture、richText=false；只在父G面板的Repaint委托绘制，缓存稳定文案/样式并恢复GUI.matrix/color，不消费键鼠事件。
 
@@ -114,4 +115,4 @@ v25/revision28阶段接入必填[拾取反馈](MapPickupFeedbackHud.md)九字段
 
 ## 【FACT】合并后的真实G目标
 
-v26/revision29的[合并](MapDropMerge.md)在G前更新原掉落数量/期限并Consumed来源，服务端六字段采样继续读取当前真实目标及最早余时；来源不再可选，编号/位置保留的目标沿原高亮解析。G仍整堆容量检查，放不下保留原NoSpace数量/寿命；没有新客户端控制或Ghost字段。新链静态通过、人工待验收，旧G提示/寿命及v25拾取反馈通过限原版本/清单。
+v26/revision29的[合并](MapDropMerge.md)在G前更新原掉落数量/期限并Consumed来源，服务端七字段采样读取当前真实地面Quantity、容量可领PickupQuantity及最早余时；来源不再可选，编号/位置保留的目标沿原高亮解析。G按[部分拾取](MapDropPartialPickup.md)开关结算，零余量NoSpace仍保留地面数量/寿命；新增所属PickupQuantity，目标仍由服务端重选。合并链静态及用户人工通过限v26/revision29十六项，部分拾取人工待验收；未触发独立用例UNKNOWN，旧G提示/寿命及v25拾取反馈通过限原版本/清单。

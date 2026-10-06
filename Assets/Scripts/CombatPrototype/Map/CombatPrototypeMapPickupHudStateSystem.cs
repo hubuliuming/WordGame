@@ -86,12 +86,12 @@ namespace Code_01.CombatPrototype.Map
                                 ItemId = drop.ItemId, Quantity = drop.Quantity
                             };
                             stage = "CheckCapacity";
-                            if (CombatPrototypeMapInventoryCapacityUtility.GetRejection(capacity, capacityDefinitions,
+                            frame.PickupQuantity = CombatPrototypeMapInventoryCapacityUtility.GetPickupQuantity(capacity, capacityDefinitions,
                                 upgradeDefinitions, EntityManager.GetComponentData<CombatPrototypeMapInventoryCapacityLevel>(player).Level,
                                 EntityManager.GetBuffer<CombatPrototypeInventoryItem>(player, true),
                                 CombatPrototypeMapInventoryCapacityUtility.RequireItemDefinition(capacityDefinitions, drop.ItemId).ItemName,
-                                drop.Quantity) != null)
-                                frame.Mode = CombatPrototypeMapPickupHudMode.NoSpace;
+                                drop.Quantity, dropSettings.PartialPickupEnabled != 0, out var capacityRejection);
+                            if (capacityRejection != null) frame.Mode = CombatPrototypeMapPickupHudMode.NoSpace;
                             stage = "ReadLifetime";
                             CombatPrototypeMapPickupLifetimeHudSnapshot.Apply(ref frame, settings,
                                 progresses[target].ExpiresAt, time);
@@ -117,7 +117,7 @@ namespace Code_01.CombatPrototype.Map
                 var next = _frames.TryGetValue(entity, out var frame) ? frame : CombatPrototypeMapPickupHudState.Hidden;
                 var old = current.ValueRO;
                 if (old.Mode != next.Mode || old.DropId != next.DropId || !old.ItemId.Equals(next.ItemId) ||
-                    old.Quantity != next.Quantity || old.LifetimeMode != next.LifetimeMode ||
+                    old.Quantity != next.Quantity || old.PickupQuantity != next.PickupQuantity || old.LifetimeMode != next.LifetimeMode ||
                     old.RemainingSeconds != next.RemainingSeconds) current.ValueRW = next;
             }
         }

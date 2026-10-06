@@ -1,6 +1,6 @@
 # 同类地面掉落物合并
 
-返回[地图](Map.md)、[掉落与拾取](MapDrops.md)、[掉落存档](MapDropPersistence.md)、[背包丢弃](MapInventoryDrop.md)与[运行入口](Runtime.md)。入口CombatPrototypeNetCode；Forest/Grassland Json与BuiltIn当前schemaVersion=26/configRevision=29。主线程代码、配置及隔离烘焙静态核对通过，本阶段人工GamePlayer待验收；旧G结果通过仍限v25/revision28十六项，其他旧通过保持原版本/清单。
+返回[地图](Map.md)、[掉落与拾取](MapDrops.md)、[掉落存档](MapDropPersistence.md)、[背包丢弃](MapInventoryDrop.md)与[运行入口](Runtime.md)。入口CombatPrototypeNetCode；Forest/Grassland Json与BuiltIn当前schemaVersion=27/configRevision=30。用户已确认本阶段人工GamePlayer通过，主线程结合既有代码、配置及隔离烘焙静态核对判定通过，限v26/revision29及运行入口十六项；人工结论来自用户反馈；旧G结果通过仍限v25/revision28十六项，其他旧通过保持原版本/清单。
 
 ## 【FACT】入口与文件
 
@@ -15,7 +15,7 @@
 | 原G与清理 | [Pickup](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapDropPickupSystem.cs)、[Cleanup](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapDropCleanupSystem.cs) |
 | 显式来源 | [Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) |
 
-四个新脚本为普通代码，meta由Unity正常导入生成；没有新增MonoBehaviour、Scene/SubScene/Prefab/Animator结构或绑定。五个原脚本的改动限地图DTO、校验、BuiltIn、根Baker及非到期清理日志；Motion/Spawn/Pickup、三类资源/工具、玩家输入/保存、客户端HUD/高亮与世界保存/恢复代码保持。
+四个新脚本为普通代码，meta由Unity正常导入生成；没有新增MonoBehaviour、Scene/SubScene/Prefab/Animator结构或绑定。合并代码仍限地图DTO/校验/BuiltIn/根Baker及非到期清理，Motion/Spawn、三类资源/工具、玩家输入/保存、高亮与世界保存/恢复保持；当前G结算及所属HUD按[部分拾取](MapDropPartialPickup.md)接收规则执行。
 
 ## 【FACT】JSON契约与建议默认值
 
@@ -39,7 +39,7 @@
 | maxStackQuantity | 正32位int | 单对合计不能超过上限；不改库存容量或原生成数量 |
 | scanIntervalSeconds | 有限正float | 服务端模拟时间的扫描间隔；到时间才扫描，每次最多执行一轮 |
 
-原JsonReader严格检查UTF-8、完整形状、缺失/null/未知/重复键、标量类型及float可表示范围；Positive验证距离/间隔，数量必须大于0。关闭仍完整校验，旧地图v1～v25明确拒绝，没有迁移、补默认、来源回退或运行热重载。正常导入/烘焙后生效，各端使用同版代码/配置并重新烘焙。
+原JsonReader严格检查UTF-8、完整形状、缺失/null/未知/重复键、标量类型及float可表示范围；Positive验证距离/间隔，数量必须大于0。关闭仍完整校验，旧地图v1～v26明确拒绝，没有迁移、补默认、来源回退或运行热重载。正常导入/烘焙后生效，各端使用同版代码/配置并重新烘焙。
 
 根Baker写Enabled(byte)、MergeDistance(float)、MaxStackQuantity(int)、ScanInterval(float)四Settings。标注GhostPrefabType.Server且没有GhostField；地图根不是Ghost。原掉落DropId/ItemId/Quantity/Phase四GhostField及LocalTransform同步保持，没有新输入、RPC、玩家反馈、玩家/世界存档字段或联网配置协议。
 
@@ -59,7 +59,7 @@ DropMergeSystem仅ServerSimulation，在PredictedSimulationSystemGroup中UpdateA
 
 ## 【FACT】G、显示与存档边界
 
-G仍由服务端按玩家距离/同距小DropId选择当前真实目标，NetworkId升序、移动/攻击/死亡资格及SavePrepared先于库存/Consumed提交保持。一次G整堆入包，放不下仍NoSpace，不部分领取或改选较远物；合并可能使原来小份可领取的材料变为容量不足。原G六字段目标/数量/寿命、高亮与四字段[拾取结果](MapPickupFeedbackHud.md)使用合并后的真实状态；成功反馈携带本次实际合计增量。F/B、世界保存HUD及显示关闭条件没有新接入。
+G仍由服务端按玩家距离/同距小DropId选择当前真实目标，NetworkId升序、移动/攻击/死亡资格及SavePrepared先于库存及地面余量或Consumed提交保持。当前G按[部分拾取](MapDropPartialPickup.md)开关接收：默认领取容量可容纳的数量，零余量NoSpace，关闭恢复整堆判定，仍不改选较远物。G七字段含真实地面量与可领量；高亮及四字段[拾取结果](MapPickupFeedbackHud.md)沿原真实身份，成功反馈携带本次实际领取增量。F/B、世界保存HUD及显示关闭条件没有新接入。
 
 世界保存沿原完整快照：Consumed来源排除，保留目标的新数量、原位置/编号及最早期限；原比较能检测数量/期限/条目数变化。LastDropId保留原分配上限和被吸收编号空号，不回退或复用。世界v2路径、根9字段、掉落项8字段、资源布局/再生签名与玩家v4格式保持。成功恢复物仍先按旧档原数量/编号/余时Landed恢复，Ready后才参与新扫描；合法超99旧堆不拒绝、不拆分，离线暂停计时规则保持。
 
@@ -69,7 +69,7 @@ G仍由服务端按玩家距离/同距小DropId选择当前真实目标，Networ
 
 整批地图/Settings/恢复状态/Owner依赖失效记录Drop merge batch failed及ReadMap/ReadSettings/ReadOwner、map/source/原异常，停止本轮。单项读取错误记录ReadCandidate、map/DropId/itemId/ownerIndex/entity/原异常，继续后续项；单对选择/准备提交/完成日志错误记录SelectPair/CommitPair/LogMerge、map/sourceDropId/targetDropId/itemId/quantity/entity/原异常，继续后续来源。准备失败不开始写入；没有兜底服务、组件、默认值、配对回退或自动恢复。意外部分ECS写入故障恢复仍UNKNOWN。
 
-正常脚本编译完成，四新类型及4字段DTO/Settings已加载；元数据确认ServerSimulation、Motion之后/Pickup之前、Settings仅Server且0 GhostField。原输入19、DropGhost4、Tools3、F4/G6/资源4/世界保存3/F失败2/F结果3/G结果4、玩家v4根7/Tools项3与世界v2根9/掉落项8保持。
+正常脚本编译完成，四新类型及4字段DTO/Settings已加载；元数据确认ServerSimulation、Motion之后/Pickup之前、Settings仅Server且0 GhostField。合并v26阶段核对输入19、DropGhost4、Tools3、F4/G6/资源4/世界保存3/F失败2/F结果3/G结果4、玩家v4根7/Tools项3与世界v2根9/掉落项8保持。
 
 194份非法配置全部拒绝（每地图97），28组合法读取通过（每地图14）：根/四字段形状、缺失/null/类型、未知/重复键、非有限或非正距离/间隔、非正/越界/非整数数量、关闭仍校验、旧v1～v25及额外内容；合法覆盖Json/BuiltIn一致、新/原功能关闭、永久新掉落、自定义1.5米/7份/0.35秒和float/int边界。最大float检查数据使用精确double数值写JSON，避免float文本舍入越过原Reader上界；Reader代码保持。
 
@@ -79,6 +79,6 @@ Console在早期新JSON导入时留下两条旧程序集未知dropMerge字段记
 
 ## 【KNOWN ISSUES】人工验收边界
 
-原355项人工内容/编号逐字保留，本阶段追加16项后共371项，归[运行入口](Runtime.md)。主线程静态通过，本阶段v26/revision29人工GamePlayer待验收；实际合并数量守恒/身份选择、距离与数量临界、寿命/永久混合、多人争抢、容量及保存失败、所属集合/恢复/生命周期、时序与客户端展示尚未获得用户通过反馈，未实际触发的独立用例仍UNKNOWN。旧G反馈通过保持v25/revision28十六项及旧阶段原版本/清单。
+原355项人工内容/编号逐字保留，本阶段追加16项后共371项，归[运行入口](Runtime.md)。用户已确认本阶段人工GamePlayer通过，主线程结合既有静态核对与用户反馈判定通过，限CombatPrototypeNetCode、v26/revision29及运行入口十六项；人工结论来自用户反馈。未实际触发的数量守恒/身份选择、距离与数量临界、寿命/永久混合、多人争抢、容量及保存失败、所属集合/恢复/生命周期、时序与客户端展示独立用例仍UNKNOWN。旧G反馈通过保持v25/revision28十六项及旧阶段原版本/清单。
 
 AI未执行合并工具或游戏/显示系统、GUI回调、GamePlayer/PlayMode、逻辑单元测试、真实玩家/世界存档业务I/O、命令行构建/发布、性能/带宽采样或图片检查，未创建子Agent或提交Git。双层候选遍历与原Owner历史引用的实际规模成本、平台和线上联调仍UNKNOWN。

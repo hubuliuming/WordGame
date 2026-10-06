@@ -6,6 +6,7 @@ namespace Code_01.CombatPrototype.Map
     public sealed class MapDropConfig
     {
         public bool enabled;
+        public bool partialPickupEnabled;
         public string itemId;
         public int quantity;
         public string visualResourceKey;

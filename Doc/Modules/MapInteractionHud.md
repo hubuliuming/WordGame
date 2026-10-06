@@ -20,7 +20,7 @@
 
 ## 【FACT】当前 JSON 契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 为 schemaVersion=26/configRevision=29，interactionHud、[高亮](MapInteractionHighlight.md)、[G提示](MapPickupHud.md)、[工具配置](MapGatherTools.md)与[面板配置](MapInventoryPanel.md)均必填；interactionHud全部十个字段必填，沿原严格 UTF-8/字段/类型/重复键检查。旧 v1～v25 明确失败，不补默认段或回退来源；JSON 只在正常导入和烘焙后生效，无运行热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 为 schemaVersion=27/configRevision=30，interactionHud、[高亮](MapInteractionHighlight.md)、[G提示](MapPickupHud.md)、[工具配置](MapGatherTools.md)与[面板配置](MapInventoryPanel.md)均必填；interactionHud全部十个字段必填，沿原严格 UTF-8/字段/类型/重复键检查。旧 v1～v26 明确失败，不补默认段或回退来源；JSON 只在正常导入和烘焙后生效，无运行热重载。
 
 | 字段 | 默认值 | 契约 |
 |---|---|---|
@@ -116,4 +116,8 @@ v25/revision28的[拾取反馈](MapPickupFeedbackHud.md)经原绑定/宿主传�
 
 ## 【FACT】合并与原F/G显示边界
 
-v26/revision29的[地面合并](MapDropMerge.md)通过原掉落Quantity/Phase及服务端期限改变G真实目标/数量/余时，不接入本宿主、绑定或新增显示通道。原G目标/NoSpace/高亮及实际拾取结果读取原快照，F完成/失败优先级、B反馈/输入、布局和原全部显示关闭条件保持；合并开关不会强制HUD。新链静态通过、人工待验收，旧显示通过保持各自原版本/清单。
+v26/revision29的[地面合并](MapDropMerge.md)通过原掉落Quantity/Phase及服务端期限改变G真实目标/数量/余时，不接入本宿主、绑定或新增显示通道。原G目标/NoSpace/高亮及实际拾取结果读取原快照，F完成/失败优先级、B反馈/输入、布局和原全部显示关闭条件保持；合并开关不会强制HUD。新链静态及用户人工通过限v26/revision29十六项，未触发独立用例UNKNOWN，旧显示通过保持各自原版本/清单。
+
+## 【FACT】G可领取量投影
+
+当前v27/revision30的[部分拾取](MapDropPartialPickup.md)在原G所属快照增加PickupQuantity；原绑定整体传递该struct，宿主/高亮/面板布局与F/B优先级保持。G显示本次可领量/地面量或零余量NoSpace，实际结果仍暂时覆盖Ready目标；全部显示关闭只关闭展示。输入19、F4/资源状态4及原结果字段保持，静态通过、人工待验收。

@@ -17,7 +17,7 @@ namespace Code_01.CombatPrototype.Map
             {
                 map = new MapDefinitionConfig
                 {
-                    schemaVersion = 26, configRevision = 29,
+                    schemaVersion = 27, configRevision = 30,
                     mapDefinitionId = mapDefinitionId, defaultSeed = 12345,
                     resourcePersistence = new MapResourcePersistenceConfig
                     {
@@ -43,7 +43,7 @@ namespace Code_01.CombatPrototype.Map
                     population = new MapPopulationConfig { initialEnemyCount = 32 },
                     drops = new MapDropConfig
                     {
-                        enabled = true, itemId = CombatPrototypeMapYieldItemResolver.VitalityAppleId,
+                        enabled = true, partialPickupEnabled = true, itemId = CombatPrototypeMapYieldItemResolver.VitalityAppleId,
                         quantity = 1, visualResourceKey = "drop_apple", pickupDistanceMeters = 2f,
                         flightDurationSeconds = 0.4f, scatterRadiusMeters = 0.6f, arcHeightMeters = 0.6f,
                         groundOffsetMeters = 0.05f, visualScale = 0.5f, lifetimeSeconds = 600f

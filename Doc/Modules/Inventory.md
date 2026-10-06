@@ -177,4 +177,4 @@ v25/revision28的[拾取反馈](MapPickupFeedbackHud.md)在原候选保存、库
 
 ## 【FACT】地面合并与库存边界
 
-v26/revision29的[合并](MapDropMerge.md)不入包、不扣材料/工具或发奖励，地面保留目标的新数量与最早期限；实际G继续整堆PrepareReward→SavePrepared→库存/Consumed，容量不足不部分领取。合并可能使原可领取小份变为NoSpace，新上限99与库存总量/单种容量独立。原F直接入包、B操作/反馈及玩家v4保存格式保持；新链静态通过、人工待验收，旧G反馈通过仍限v25/revision28十六项。
+v26/revision29的[合并](MapDropMerge.md)不入包、不扣材料/工具或发奖励，地面保留目标的新数量与最早期限；实际G按[部分拾取](MapDropPartialPickup.md)开关计算本次量，沿PrepareReward→SavePrepared→库存/地面余量或Consumed；零余量或关闭开关后整堆放不下才NoSpace，新上限99与库存总量/单种容量独立。原F直接入包、B操作/反馈及玩家v4保存格式保持；合并链静态及用户人工通过限v26/revision29十六项，部分拾取人工待验收；未触发独立用例UNKNOWN，旧G反馈通过仍限v25/revision28十六项。

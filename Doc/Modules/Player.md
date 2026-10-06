@@ -288,3 +288,7 @@ v13/16的[资源状态](MapResourceStatusHud.md)由Player Baker追加所属Mode/
 ## 【FACT】实际G拾取的所属结果
 
 原Player Baker为[拾取反馈](MapPickupFeedbackHud.md)追加Sequence(uint)=0、Result(byte枚举)=None、ItemId(FixedString64Bytes)为空、Quantity(int)=0四GhostField，仅SendToOwner。成功携带原物品ID与本次正增量，其他结果空ItemId/0；写入核实GhostOwner/NetworkId与存活，归属错误/死亡不写新结果，错误独立隔离。客户端首次仅观察序号，死亡/断线/源或玩家失效Reset清缓存，只有最新结果无事件队列。Player Ghost布局追加组件，须各端同版重新烘焙；原输入19、Tools3、F4/G6/资源4/世界保存3/F失败2/F结果3、生命/体力/R、Prefab及玩家v4存档保持。v25/revision28静态及用户人工通过限十六项，未触发独立用例UNKNOWN；F完成/中断通过仍限v24/revision27十六项，旧通过保持原版本/清单。
+
+## 【FACT】G目标可领取数量
+
+当前v27/revision30的[部分拾取](MapDropPartialPickup.md)在原CombatPrototypeMapPickupHudState增加int PickupQuantity，第七个GhostField仍SendToOwner；Player Baker继续添加原Hidden默认值，七字段均零/空初态，组件挂载与Player Prefab保持。实际G读取本人的容量Level/库存决定本次量，所属结果仍原四字段且成功数量为实际增量。输入19、Tools3、F4/资源状态4/世界保存3及原反馈、生命/体力/R、玩家v4/世界v2保持；各端同版重新烘焙。编译、Serializer七字段/7 mask bits/88字节结构与40次隔离Bake静态通过；人工待验收，旧通过仍限原版本/清单。

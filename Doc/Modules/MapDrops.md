@@ -21,11 +21,12 @@
 
 ## 【FACT】JSON 契约与当前默认值
 
-[battle_forest_01.json](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[battle_grassland_01.json](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn来源](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)均为schemaVersion=26/configRevision=29，drops必填，工具配置归[采集工具](MapGatherTools.md)。原空间、移动、出生及drops/grounds值保持；mining与生态矿点字段归采矿专题，tree_normal/gather_apple/mine_rock均默认600秒再生。配置只在烘焙时读取，不支持热重载；各端须相同版本、输入布局与资源，未新增一致性协议。
+[battle_forest_01.json](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[battle_grassland_01.json](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn来源](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)均为schemaVersion=27/configRevision=30，drops必填，工具配置归[采集工具](MapGatherTools.md)。原空间、移动、出生及drops/grounds值保持；mining与生态矿点字段归采矿专题，tree_normal/gather_apple/mine_rock均默认600秒再生。配置只在烘焙时读取，不支持热重载；各端须相同版本、输入布局与资源，未新增一致性协议。
 
 | 字段 | 默认值 | 校验/行为 |
 |---|---|---|
 | enabled | true | false 禁止敌人新掉落；树木/矿点开关独立，字段/绑定仍必填 |
+| partialPickupEnabled | true | 必填严格布尔；仅决定G容量不足时是否领取可装下的部分，关闭恢复整堆判定 |
 | itemId | vitality_apple | 稳定 ID；白名单 vitality_apple/wood/stone，分别映射活力苹果/木材/石材 |
 | quantity | 1 | 正整数；一份 Ghost 承载配置数量 |
 | visualResourceKey | drop_apple | 稳定键，须显式绑定独立掉落 Prefab |
@@ -37,7 +38,7 @@
 | visualScale | 0.5 | 有限正数，实例 LocalTransform 的统一缩放 |
 | lifetimeSeconds | 600 | 有限非负数；从生成时刻计时，0 关闭自动到期 |
 
-全部字段显式填写。字符串遵循原小写ASCII/数字/下划线及最长61字符；缺失/未知/重复字段、错类型或非法值沿严格UTF-8 JSON边界报错。旧地图v1～v25不迁移或补字段，Json失败不回退BuiltIn。资源键由原MapAuthoring.DecorationPrefabs解析，不查找或临时创建兜底。
+全部字段显式填写。字符串遵循原小写ASCII/数字/下划线及最长61字符；缺失/未知/重复字段、错类型或非法值沿严格UTF-8 JSON边界报错。旧地图v1～v26不迁移或补字段，Json失败不回退BuiltIn。资源键由原MapAuthoring.DecorationPrefabs解析，不查找或临时创建兜底。
 
 ## 【CURRENT STRATEGY】死亡、生成与飞行
 
@@ -53,7 +54,7 @@ Pickup 为原 IInputComponentData 的新增 InputEvent，客户端只对 GhostOw
 
 目标仅为本人 X/Z 距离内的 Landed、尚未到期掉落。选最近一个，精确同距取较小 DropId；一次请求只提交一份，任何合格玩家均可拾取。没有合格目标时日志 NoLandedTarget，持续按住 G 不持续发放。即使移动被树木阻挡，非零移动输入仍拒绝。
 
-提交前按目标DropState.ItemId解析实际物品名，取得库存与状态可写引用，checked合并同名数量，新条目先预留容量。PrepareReward投影保持当前金币/经验/Tools的完整库存v2候选，SavePrepared成功才提交库存及Consumed；提交不做结构变更、分配或第二次查找。同次后续请求读取Consumed，不能重复入包；读取v1迁移，临时文件与正式档替换规则保持。
+提交前按目标DropState.ItemId解析实际物品名，取得库存与状态可写引用，checked合并同名数量，新条目先预留容量。按[部分拾取](MapDropPartialPickup.md)计算本次实际接收数量并准备余量；PrepareReward投影保持金币/经验/Tools及容量Level的完整玩家v4候选，SavePrepared成功才提交库存与原堆剩余Quantity，余量为0才Consumed；提交不做结构变更、分配或第二次查找。后续请求读取最新剩余堆或Consumed，不能重复发放已领取数量；合法旧档内存迁移与原文件替换规则保持。
 
 准备/保存失败记录 NetworkId、DropId、物品、阶段及原异常，不提交库存数量或未到期掉落消耗，继续其他玩家请求；恢复后须新 G，不自动重试。到期规则仍生效，不为失败拾取延长寿命。背包沿原 Ghost 缓冲及每 2 秒日志同步观察；苹果/木材/石材没有新增使用效果，库存显示归[网络面板](MapInventoryPanel.md)，E 仍只用小块肉。F 预约、取消、保存后耗尽及 600 秒原点再生保持。
 
@@ -139,4 +140,4 @@ v25/revision28阶段的[拾取反馈](MapPickupFeedbackHud.md)仅发布原G实�
 
 ## 【FACT】同类地面合并接入
 
-当前v26/revision29必填[合并](MapDropMerge.md)四字段，默认开启/0.8米/99份/0.2秒；服务端在Motion后、G前只扫描当前源已登记Landed未到期物，按编号升序合入较小编号的最近合格同物品堆。保留目标编号/位置，整份数量相加，超限不拆分，有限寿命取最早到期、永久仅与永久合并；新物可能更早到期。来源Consumed沿原Cleanup释放，非到期清理日志为Consumed，实际G日志保持。G整堆容量/保存、原四GhostField、世界v2快照/编号上限及客户端原数量/寿命/高亮保持；合并不入包或发布拾取结果。编译/194份非法配置拒绝/28组合法读取/64次隔离Bake静态通过，人工待验收；旧G结果通过仍限v25/revision28十六项。
+当前v27/revision30必填[合并](MapDropMerge.md)四字段，默认开启/0.8米/99份/0.2秒；服务端在Motion后、G前只扫描当前源已登记Landed未到期物，按编号升序合入较小编号的最近合格同物品堆。保留目标编号/位置，整份数量相加，超限不拆分，有限寿命取最早到期、永久仅与永久合并；新物可能更早到期。来源Consumed沿原Cleanup释放，非到期清理日志为Consumed，G日志包含实际领取量及地面余量。G接收数量按[部分拾取](MapDropPartialPickup.md)开关计算，原四掉落GhostField、世界v2快照/编号上限及原寿命/高亮保持；合并不入包或发布拾取结果。合并v26阶段编译/194份非法配置拒绝/28组合法读取/64次隔离Bake静态通过；用户已确认合并人工GamePlayer通过，主线程结合既有静态核对判定通过，限v26/revision29十六项，未触发独立用例UNKNOWN；旧G结果通过仍限v25/revision28十六项。

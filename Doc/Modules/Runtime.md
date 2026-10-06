@@ -950,7 +950,7 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 
 ## 【KNOWN ISSUES】同类地面掉落物合并验收边界
 
-入口CombatPrototypeNetCode，当前Forest/Grassland Json/BuiltIn为v26/revision29。脚本编译/系统排序与服务端属性元数据、194份非法配置拒绝/28组合法读取、64次隔离Editor Bake静态通过；实际Bake Console前后[2 Error,5 Warning,53 Log]相同，两条旧程序集未知dropMerge导入记录保留，新JSON重导后没有新增Bake记录。以下十六项为本阶段人工GamePlayer清单，尚未获得用户通过反馈；原355项内容/编号逐字保留，各端同版重新烘焙，旧v1～v25拒绝。
+入口CombatPrototypeNetCode，合并阶段Forest/Grassland Json/BuiltIn为v26/revision29。脚本编译/系统排序与服务端属性元数据、194份非法配置拒绝/28组合法读取、64次隔离Editor Bake静态通过；实际Bake Console前后[2 Error,5 Warning,53 Log]相同，两条旧程序集未知dropMerge导入记录保留，新JSON重导后没有新增Bake记录。用户已确认本阶段人工GamePlayer通过，主线程结合既有静态核对与用户反馈判定通过，限CombatPrototypeNetCode、v26/revision29及以下十六项；人工结论来自用户反馈。原371项内容/编号逐字保留，各端同版重新烘焙，旧v1～v25拒绝。
 
 1. 两地图Json/BuiltIn均v26/revision29，必填dropMerge四Settings为true/0.8米/99份/0.2秒，正常导入/烘焙后进入；ServerSimulation在Motion之后/G之前，地图Ready前不合并。原生成数量、位置和玩家初值保持。
 2. 分别使敌人苹果、树木木材、矿点石材及玩家丢弃的同ItemId物落地并接近，按整份数量合并；地面存活总量守恒，保留目标位置/编号/旋转/缩放，来源Consumed隐藏并沿原ECB释放。合并本身不入包、不扣工具或发奖励/拾取成功。
@@ -969,4 +969,27 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 15. 新段/四字段缺失/null/错类型/未知或重复键、非有限/非正距离或间隔、非正/越界/非整数上限及旧v1～v25明确拒绝，关闭仍校验，无补齐/回退/热重载。实际坏候选/缺组件记录ReadCandidate并继续其他项，坏配对记录SelectPair/CommitPair/LogMerge及双方编号/原异常；共用依赖失效明确停止该轮，无兜底、部分ECS故障恢复或额外保存保证。未触发独立异常隔离UNKNOWN。
 16. 地图源失效/更换、停止、World销毁与重新进入清源/下一扫描期限/候选和编号集合，原Owner继续释放实例，恢复成功后仅新有效集合参与，不残留上一局配对；回归原F/G、1～7/B、E/R/F5、三类产出/600秒再生、容量/工具升级及保存顺序。输入19、DropGhost4、Tools3及原反馈/存档字段保持，未触发生命周期分支UNKNOWN。
 
-完整规则归[地面合并](MapDropMerge.md)，拾取归[掉落](MapDrops.md)/[G结果](MapPickupFeedbackHud.md)，持久化归[掉落存档](MapDropPersistence.md)。共371项，主线程静态通过，本阶段人工GamePlayer待验收；旧G结果用户通过保持v25/revision28十六项，旧通过保持各自原范围。AI未执行合并工具/游戏/显示系统或GUI回调、GamePlayer/PlayMode、逻辑单元测试、真实存档业务I/O、命令行构建/发布、采样/图片，未创建子Agent/提交Git。未触发运行/临界/异常/联网/生命周期及意外ECS恢复、跨文件事务、同槽并发、性能/平台/线上仍UNKNOWN。
+完整规则归[地面合并](MapDropMerge.md)，拾取归[掉落](MapDrops.md)/[G结果](MapPickupFeedbackHud.md)，持久化归[掉落存档](MapDropPersistence.md)。共371项，本阶段静态及用户人工通过限v26/revision29十六项；旧G结果用户通过保持v25/revision28十六项，旧通过保持各自原范围。AI未执行合并工具/游戏/显示系统或GUI回调、GamePlayer/PlayMode、逻辑单元测试、真实存档业务I/O、命令行构建/发布、采样/图片，未创建子Agent/提交Git。未触发运行/临界/异常/联网/生命周期及意外ECS恢复、跨文件事务、同槽并发、性能/平台/线上仍UNKNOWN。
+
+## 【KNOWN ISSUES】掉落物按背包余量部分拾取验收边界
+
+入口CombatPrototypeNetCode，Forest/Grassland Json/BuiltIn本阶段v27/revision30。正常脚本编译、258份非法配置拒绝/42组合法读取、40次隔离Editor Bake及G七字段Serializer静态通过；Bake Console前后[0 Error,5 Warning,3 Log]一致。以下十六项为新增人工GamePlayer清单，尚未获得用户通过反馈；原371项内容/编号逐字保留，各端同版重新烘焙，旧v1～v26明确拒绝。
+
+1. 两地图Json/BuiltIn均v27/revision30，drops.partialPickupEnabled默认true，原Server Settings映射byte1；Player G七字段Hidden/零/空含PickupQuantity0，原输入19、DropGhost4、F/资源/结果及玩家v4/世界v2字段保持。
+2. 分别活力苹果/木材/石材，整堆可装下时一次G完整入包，实际增量等于原量，Consumed隐藏并沿原清理；PrepareReward/SavePrepared仍先于库存和地面提交，成功反馈显示实际增量而非累计库存。
+3. 最近wood×10且总余量3、木材余量至少3时一次G只+3，原堆余量7、仍Landed，编号/ItemId/位置/旋转/缩放与StartedAt/ExpiresAt保持，不新建实体或分配编号；保存/日志和Picked up量为3。
+4. 总余量足够但目标材料余量2时只领取2；分别苹果/木材/石材均读本人对应上限，其他材料不误计为当前材料余量，小块肉/Tools/金币/经验不计入受管总容量。
+5. 总量与单种同时限制时取较小余量，剩1与恰好填满边界不超收；成功后新G重新计算，零余量NoSpace，释放容量后新G可继续取同堆，按住G不持续领取。
+6. 总余量0、当前材料余量0及任一旧受管材料/总量超限均拒绝，不保存/改变库存或原堆；旧超限档正常恢复、丢弃/制作/修理保留，降至全部不超限后再尝试。未触发的独立超限/配置降低用例UNKNOWN。
+7. PlayMode前关闭partialPickupEnabled并正常导入/烘焙：目标整堆放不下时沿原拒绝，能装下仍全领；容量关闭时两种开关均全领，原checked/数据错误边界保持，不按99钳制已有大堆。未触发极值/异常数量UNKNOWN。
+8. Lv1/2/3使用本人实际总量与单种定义，升级后即使地面数量未变，PickupQuantity和提示及时刷新；升级关闭保留已得等级。自定义总13/苹果5木7石9、各上限1及定义/等级换序正常烘焙生效，未触发独立等级/配置分支UNKNOWN。
+9. 最近目标仍按原2米X/Z与精确同距小DropId选择，容量0不改选较远可装下物；客户端显示目标/数量不是实际锁定，按G由服务端重选及重算，移动/攻击/死亡/归属资格与原F/B同tick优先级保持。未触发临界/时序UNKNOWN。
+10. Prepared/Airborne/Consumed/到期或超距离目标仍排除；部分剩余堆真实期限继续，不重置600秒，永久仍Permanent。剩余堆按原整份合并/最早期限规则再次合并或到期清理，不重复增加/领取数量，未触发寿命/合并临界UNKNOWN。
+11. 多玩家同tick请求沿NetworkId升序，后续玩家只能基于最新剩余量领取本人可装部分；多人实际增量加地面余量等于原量，不把合法共享剩余误作重复发放。本人G七字段与实际四结果互不串玩家，晚加入同步保持；未触发延迟/预测/争抢分支UNKNOWN。
+12. 可控PrepareReward/checked或SavePrepared失败时，不增加库存或减少原堆数量/改身份期限，沿原日志和Pickup failed，继续其他玩家请求，恢复后须新G。保存成功后意外部分ECS提交只保留原错误/UNKNOWN，不声称回滚或成功反馈；未触发独立异常隔离UNKNOWN。
+13. 保存开启时世界原快照写实际剩余量、原编号/位置/余时，领空排除，LastDropId不回退；正常关闭/重启原数量和离线暂停恢复，Ready后再参与合并。保存关闭、世界写失败保留旧正式档与当前局行为沿原规则；未触发异常中断/跨文件一致/同槽并发UNKNOWN。
+14. G全量Ready仍×地面量，部分Ready显示×可领量/地面量，例如×3/10；NoSpace显示完整地面量及原寿命，成功结果显示实际+3并按原期限/优先级恢复目标。PickupQuantity独立变化也刷新，非法字段/Mode不补默认；未实际触发字形/排版/缩放和快照错误UNKNOWN。
+15. 单独关闭G文字/高亮通道/拾取结果、F/B/全部显示不改变服务器部分拾取；死亡/断线、无本地玩家、源/玩家/World/Scene变化沿原Hidden/Reset清新数量与缓存。回归F植物整批、砍树/采矿产出、工具扣耐久与再生、B制作/修理/Drop/All/等级、E/R/F5/战斗/镜头/阻挡，未触发生命周期UNKNOWN。
+16. 新bool缺失/null/错类型/重复未知键、drops根错误、旧v1～v26以及开关关闭仍非法配置明确失败，无补齐/来源回退/热重载；各端同版重新烘焙。新接收函数沿原库存/等级/定义错误日志边界隔离，无兜底服务或自动恢复，未实际触发独立配置/数据故障及性能/平台/线上UNKNOWN。
+
+完整事实归[部分拾取](MapDropPartialPickup.md)，数量/资格归[掉落](MapDrops.md)/[容量](MapInventoryCapacity.md)，展示归[G提示](MapPickupHud.md)/[结果](MapPickupFeedbackHud.md)，剩余量保存归[掉落存档](MapDropPersistence.md)。共387项，主线程静态通过，本阶段人工GamePlayer待验收；旧合并用户通过保持v26/revision29十六项、旧G结果v25/revision28十六项及其他旧范围。AI未执行接收数量/G/HUD/GUI逻辑、GamePlayer/PlayMode、逻辑单元测试、真实存档业务I/O、命令行构建/发布、采样/图片，未创建子Agent/提交Git。未触发运行/临界/异常/展示/联网/生命周期及意外ECS恢复、跨文件事务、同槽并发、性能/平台/线上仍UNKNOWN。

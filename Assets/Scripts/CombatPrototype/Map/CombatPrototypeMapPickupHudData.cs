@@ -15,6 +15,7 @@ namespace Code_01.CombatPrototype.Map
         [GhostField] public int DropId;
         [GhostField] public FixedString64Bytes ItemId;
         [GhostField] public int Quantity;
+        [GhostField] public int PickupQuantity;
         [GhostField] public CombatPrototypeMapPickupLifetimeHudMode LifetimeMode;
         [GhostField(Quantization = 0)] public float RemainingSeconds;
 

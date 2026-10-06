@@ -89,5 +89,39 @@ namespace Code_01.CombatPrototype.Map
             if (currentQuantity + quantity > incomingMaximum) return "MaterialItemCapacityExceeded";
             return null;
         }
+
+        // G may receive the available part; the original whole-batch decision remains the authority for F.
+        internal static int GetPickupQuantity(CombatPrototypeMapInventoryCapacitySettings settings,
+            DynamicBuffer<CombatPrototypeMapInventoryCapacityDefinition> definitions,
+            DynamicBuffer<CombatPrototypeMapInventoryCapacityUpgradeDefinition> upgradeDefinitions, int capacityLevel,
+            DynamicBuffer<CombatPrototypeInventoryItem> inventory, FixedString64Bytes itemName, int quantity,
+            bool partialPickupEnabled, out string rejection)
+        {
+            rejection = GetRejection(settings, definitions, upgradeDefinitions, capacityLevel, inventory, itemName, quantity);
+            if (rejection == null) return quantity;
+            if (!partialPickupEnabled || rejection == "InventoryAlreadyOverCapacity") return 0;
+
+            // Only a whole-stack capacity rejection reaches here; the first pass has validated this inventory.
+            var incoming = RequireDefinition(definitions, itemName);
+            var upgrade = capacityLevel == 1 ? default : RequireUpgradeDefinition(upgradeDefinitions, capacityLevel);
+            var totalMaximum = capacityLevel == 1 ? settings.MaxTotalQuantity : upgrade.MaxTotalQuantity;
+            var incomingMaximum = capacityLevel == 1 ? incoming.MaxQuantity : Maximum(upgrade, incoming.ItemId);
+            long total = 0;
+            long currentQuantity = 0;
+            foreach (var item in inventory)
+            {
+                foreach (var definition in definitions)
+                {
+                    if (!definition.ItemName.Equals(item.ItemName)) continue;
+                    total += item.Quantity;
+                    if (item.ItemName.Equals(itemName)) currentQuantity = item.Quantity;
+                    break;
+                }
+            }
+            var remaining = Math.Min((long)totalMaximum - total, (long)incomingMaximum - currentQuantity);
+            var received = (int)Math.Min((long)quantity, remaining);
+            if (received > 0) rejection = null;
+            return received;
+        }
     }
 }

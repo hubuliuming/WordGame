@@ -298,4 +298,10 @@ v10/13接入的[背包丢弃](MapInventoryDrop.md)复用原PrepareItemConsumptio
 
 ## 【FACT】地面合并配置与原快照
 
-当前v26/revision29根新增必填[dropMerge](MapDropMerge.md)四字段，Json/BuiltIn默认true/0.8米/99份/0.2秒；原严格UTF-8/形状/完整字段/类型与语义检查保持，距离/间隔有限正float、上限正int，关闭仍校验，旧v1～v25拒绝，无补齐/回退/热重载。根Baker写四字段仅Server的Settings、0 GhostField；原掉落四同步字段、输入19、Tools3及所有所属反馈、玩家v4/世界v2路径/字段和资源布局/签名保持。世界快照沿原数量/期限/条目比较保存合并结果，来源Consumed排除、LastDropId不回退；Ready后的恢复物可参与，合法大堆不拒绝/拆分。编译/元数据、194份非法配置拒绝、28组合法读取与64次隔离Bake静态通过，人工待验收；旧通过保持原范围。
+当前v27/revision30根必填[dropMerge](MapDropMerge.md)四字段，Json/BuiltIn默认true/0.8米/99份/0.2秒；原严格UTF-8/形状/完整字段/类型与语义检查保持，距离/间隔有限正float、上限正int，关闭仍校验，旧v1～v26拒绝，无补齐/回退/热重载。根Baker写四字段仅Server的Settings、0 GhostField；原掉落四同步字段、输入19、Tools3及所有所属反馈、玩家v4/世界v2路径/字段和资源布局/签名保持。世界快照沿原数量/期限/条目比较保存合并结果，来源Consumed排除、LastDropId不回退；Ready后的恢复物可参与，合法大堆不拒绝/拆分。合并v26阶段编译/元数据、194份非法配置拒绝、28组合法读取与64次隔离Bake静态通过；用户已确认合并人工GamePlayer通过，主线程结合既有静态核对判定通过，限v26/revision29十六项，未触发独立用例UNKNOWN；旧通过保持原范围。
+
+## 【FACT】部分拾取配置与G布局
+
+当前v27/revision30在drops新增必填严格bool partialPickupEnabled=true，drops共12字段、原Server Settings共14字段，新增byte PartialPickupEnabled且0 GhostField；false恢复整堆规则，drops.enabled只控制敌人新物，容量关闭沿原整堆接收/checked边界。旧v1～v26、缺失/null/错类型/重复或未知键拒绝，关闭仍完整校验，无补默认/回退/热重载。两地图Json/BuiltIn一致，正常导入/烘焙后生效。
+
+G目标增加int PickupQuantity，当前七个SendToOwner GhostField，真实地面Quantity保持；生成Serializer/Snapshot七字段、7 mask bits/88字节结构已静态核对，实际收发/带宽不由结构大小推断。输入19、DropGhost4、Tools3/F4/资源状态4/世界保存3及原结果、玩家v4/世界v2字段和资源签名保持。258份非法配置拒绝、42组合法读取、40次隔离Bake通过；完整接收/提交规则归[部分拾取](MapDropPartialPickup.md)，人工待验收。

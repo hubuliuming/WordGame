@@ -51,7 +51,7 @@ namespace Code_01.CombatPrototype.Map
             {
                 if (state.Mode == CombatPrototypeMapPickupHudMode.Hidden)
                 {
-                    if (state.DropId != 0 || state.Quantity != 0 || state.ItemId.Length != 0) InvalidSnapshot(state);
+                    if (state.DropId != 0 || state.Quantity != 0 || state.PickupQuantity != 0 || state.ItemId.Length != 0) InvalidSnapshot(state);
                     _lifetimeHud.Show(state);
                     if (hasFeedback)
                     {
@@ -62,7 +62,9 @@ namespace Code_01.CombatPrototype.Map
                     return;
                 }
                 if ((state.Mode != CombatPrototypeMapPickupHudMode.Ready && state.Mode != CombatPrototypeMapPickupHudMode.NoSpace) ||
-                    state.DropId <= 0 || state.Quantity <= 0)
+                    state.DropId <= 0 || state.Quantity <= 0 || state.PickupQuantity < 0 || state.PickupQuantity > state.Quantity ||
+                    (state.Mode == CombatPrototypeMapPickupHudMode.Ready && state.PickupQuantity == 0) ||
+                    (state.Mode == CombatPrototypeMapPickupHudMode.NoSpace && state.PickupQuantity != 0))
                     InvalidSnapshot(state);
                 string label;
                 if (state.ItemId.Equals(_appleId)) label = _appleLabel;
@@ -70,9 +72,15 @@ namespace Code_01.CombatPrototype.Map
                 else if (state.ItemId.Equals(_stoneId)) label = _stoneLabel;
                 else { InvalidSnapshot(state); return; }
                 _lifetimeHud.Show(state);
-                if (_state.Mode != state.Mode || !_state.ItemId.Equals(state.ItemId) || _state.Quantity != state.Quantity)
+                if (_state.Mode != state.Mode || !_state.ItemId.Equals(state.ItemId) || _state.Quantity != state.Quantity ||
+                    _state.PickupQuantity != state.PickupQuantity)
+                {
+                    var quantityText = state.Quantity.ToString(CultureInfo.InvariantCulture);
+                    if (state.Mode == CombatPrototypeMapPickupHudMode.Ready && state.PickupQuantity < state.Quantity)
+                        quantityText = state.PickupQuantity.ToString(CultureInfo.InvariantCulture) + "/" + quantityText;
                     _text = "G  " + (state.Mode == CombatPrototypeMapPickupHudMode.NoSpace ? _noSpaceLabel : _pickupLabel) +
-                        "  " + label + " ×" + state.Quantity.ToString(CultureInfo.InvariantCulture);
+                        "  " + label + " ×" + quantityText;
+                }
                 _state = state;
                 _visible = true;
                 if (state.Mode == CombatPrototypeMapPickupHudMode.NoSpace)
@@ -98,7 +106,8 @@ namespace Code_01.CombatPrototype.Map
         private static void InvalidSnapshot(CombatPrototypeMapPickupHudState state)
         {
             throw new InvalidOperationException("[CombatPrototype.Map] Invalid owner pickup HUD snapshot; mode=" +
-                state.Mode + ", DropId=" + state.DropId + ", itemId=" + state.ItemId + ", quantity=" + state.Quantity + ".");
+                state.Mode + ", DropId=" + state.DropId + ", itemId=" + state.ItemId + ", quantity=" + state.Quantity +
+                ", pickupQuantity=" + state.PickupQuantity + ".");
         }
 
         internal void Clear()

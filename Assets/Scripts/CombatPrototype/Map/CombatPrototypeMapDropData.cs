@@ -19,6 +19,7 @@ namespace Code_01.CombatPrototype.Map
     public struct CombatPrototypeMapDropSettings : IComponentData
     {
         public byte Enabled;
+        public byte PartialPickupEnabled;
         public Entity Prefab;
         public FixedString64Bytes ResourceKey;
         public FixedString64Bytes ItemId;

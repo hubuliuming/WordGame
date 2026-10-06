@@ -476,6 +476,7 @@ namespace Code_01.CombatPrototype.Map
                 AddComponent(entity, new CombatPrototypeMapDropSettings
                 {
                     Enabled = (byte)(drops.enabled ? 1 : 0),
+                    PartialPickupEnabled = (byte)(drops.partialPickupEnabled ? 1 : 0),
                     Prefab = GetEntity(dropPrefab, TransformUsageFlags.Dynamic), ResourceKey = drops.visualResourceKey,
                     ItemId = drops.itemId, ItemName = CombatPrototypeMapYieldItemResolver.Resolve(drops.itemId),
                     Quantity = drops.quantity, PickupDistance = drops.pickupDistanceMeters,

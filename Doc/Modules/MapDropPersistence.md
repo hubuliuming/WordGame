@@ -21,7 +21,7 @@
 
 ## 【FACT】配置与文件
 
-Forest/Grassland Json与BuiltIn当前schemaVersion=26/configRevision=29。resourcePersistence六字段必填：enabled=true、saveSlotId=default_world、saveIntervalSeconds=10、saveGroundDrops=true、manualSaveEnabled=true及manualSaveCooldownSeconds=5；手动规则归[F5](MapWorldSaveHud.md)。saveGroundDrops严格布尔，旧地图v1～v25拒绝；关闭仍完整校验，正常导入/烘焙后生效，无热重载。Map Baker写七字段Settings：Enabled/SaveGroundDrops/SaveSlotId/SaveIntervalSeconds/LayoutSignature/ManualSaveEnabled/ManualSaveCooldownSeconds，恢复状态仍一字段Pending/Ready/Failed；当前输入19、Drop Ghost4、F4/G6/资源状态4及原反馈保持。
+Forest/Grassland Json与BuiltIn当前schemaVersion=27/configRevision=30。resourcePersistence六字段必填：enabled=true、saveSlotId=default_world、saveIntervalSeconds=10、saveGroundDrops=true、manualSaveEnabled=true及manualSaveCooldownSeconds=5；手动规则归[F5](MapWorldSaveHud.md)。saveGroundDrops严格布尔，旧地图v1～v26拒绝；关闭仍完整校验，正常导入/烘焙后生效，无热重载。Map Baker写七字段Settings：Enabled/SaveGroundDrops/SaveSlotId/SaveIntervalSeconds/LayoutSignature/ManualSaveEnabled/ManualSaveCooldownSeconds，恢复状态仍一字段Pending/Ready/Failed；当前输入19、Drop Ghost4、F4/G7/资源状态4及原反馈保持。
 
 两个开关同时开启才恢复/保存掉落。仅saveGroundDrops=false时，资源照常恢复，地面物沿旧规则重启清空；下一成功世界快照写Drops=[]/LastDropId=0，会替换旧地面快照。enabled=false时不读写任何世界档、保留原文件。drops.enabled只控制敌人新掉落，inventoryDrop.enabled只控制新丢弃，不决定已有地面物的持久化；关闭这两功能仍保留原绑定。
 
@@ -63,4 +63,8 @@ Restore仍在三类资源生成后、玩家准入前等待有效ServerTick。先
 
 ## 【FACT】合并数量与期限的持久化
 
-当前v26/revision29的[地面合并](MapDropMerge.md)沿原Owner集合转移数量/最早期限并将来源Consumed；原快照排除来源、比较目标新数量/期限/条目数，LastDropId保留分配上限与空号。世界v2根9/掉落8、路径、资源签名及玩家v4保持，无新文件/迁移/玩家保存。恢复物成功Landed且Ready后才参与合并，合法超99旧堆不拒绝或拆分，有限/永久不混合，离线暂停保持；关闭保存与写失败沿原规则，失败不回滚本局合并。新链静态通过、人工待验收，跨文件一致/意外ECS恢复/同槽并发仍UNKNOWN；原掉落存档通过限v16/revision19十二项。
+v26/revision29接入的[地面合并](MapDropMerge.md)沿原Owner集合转移数量/最早期限并将来源Consumed；原快照排除来源、比较目标新数量/期限/条目数，LastDropId保留分配上限与空号。世界v2根9/掉落8、路径、资源签名及玩家v4保持，无新文件/迁移/玩家保存。恢复物成功Landed且Ready后才参与合并，合法超99旧堆不拒绝或拆分，有限/永久不混合，离线暂停保持；关闭保存与写失败沿原规则，失败不回滚本局合并。新链静态及用户人工通过限v26/revision29十六项，未触发独立用例UNKNOWN，跨文件一致/意外ECS恢复/同槽并发仍UNKNOWN；原掉落存档通过限v16/revision19十二项。
+
+## 【FACT】部分拾取后的剩余堆
+
+当前v27/revision30的[部分拾取](MapDropPartialPickup.md)在玩家候选保存成功后仅减原堆Quantity，余量为正仍Landed且保留DropId/落点/ExpiresAt；原快照已比较Quantity，因此沿原世界保存点写剩余量，领空Consumed排除。世界v2九根/八掉落字段、LastDropId、资源签名、离线暂停与保存失败规则保持，没有新增跨文件事务；静态通过，本阶段人工待验收。

@@ -15,11 +15,11 @@
 
 ## 【FACT】当前默认配置
 
-v26/29；旧通过限原范围；F/G反馈已验收，范围见[G结果](MapPickupFeedbackHud.md)；[合并](MapDropMerge.md)待验收。
+v27/30；旧通过限原范围；[合并](MapDropMerge.md)已验收；[部分拾取](MapDropPartialPickup.md)待验收。
 
 | 配置字段 | 当前值与用途 |
 |---|---|
-| schemaVersion / configRevision | 25 / 28 |
+| schemaVersion / configRevision | 27 / 30 |
 | inventoryCapacity | 默认总量300、单种200，完整契约归[容量](MapInventoryCapacity.md) |
 | defaultSeed | 12345，用于确定性布置 |
 | geometry.cellSizeMeters | 2 米 |
@@ -54,7 +54,7 @@ gather_apple 的 footprintRadiusMeters=0.3、minimumSameTypeSpacingMeters=1.5、
 
 ## 【FACT】JSON 文件与配置入口
 
-五份UTF-8无BOM JSON，地图v25/28；[存档](MapResourcePersistence.md)含[掉落](MapDropPersistence.md)；v15/18、v16/19各通过十二项。生态含treeObjectId/gatherObjectId/mineObjectId、mineDensityPer100m2，物体含mine_rock；原地表、空间、种子和出生保持。
+五份UTF-8无BOM JSON，地图v27/30；[存档](MapResourcePersistence.md)含[掉落](MapDropPersistence.md)；v15/18、v16/19各通过十二项。生态含treeObjectId/gatherObjectId/mineObjectId、mineDensityPer100m2，物体含mine_rock；原地表、空间、种子和出生保持。
 
 | MapAuthoring 字段 | 显式绑定文件 | JSON 根类型 |
 |---|---|---|

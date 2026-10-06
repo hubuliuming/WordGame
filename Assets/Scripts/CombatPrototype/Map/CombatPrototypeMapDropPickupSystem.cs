@@ -111,15 +111,15 @@ namespace Code_01.CombatPrototype.Map
                         stage = "PrepareReward";
                         var current = states.GetRefRW(target);
                         dropId = current.ValueRO.DropId;
-                        var quantity = current.ValueRO.Quantity;
+                        var dropQuantity = current.ValueRO.Quantity;
                         itemId = current.ValueRO.ItemId;
                         var itemName = CombatPrototypeMapYieldItemResolver.Resolve(itemId.ToString());
                         var playerId = identities[player.Entity].PlayerId;
                         var inventory = inventories[player.Entity];
                         stage = "CheckCapacity";
-                        var capacityReason = CombatPrototypeMapInventoryCapacityUtility.GetRejection(capacity, capacityDefinitions,
-                                upgradeDefinitions, EntityManager.GetComponentData<CombatPrototypeMapInventoryCapacityLevel>(player.Entity).Level,
-                            inventory, itemName, quantity);
+                        var quantity = CombatPrototypeMapInventoryCapacityUtility.GetPickupQuantity(capacity, capacityDefinitions,
+                            upgradeDefinitions, EntityManager.GetComponentData<CombatPrototypeMapInventoryCapacityLevel>(player.Entity).Level,
+                            inventory, itemName, dropQuantity, settings.PartialPickupEnabled != 0, out var capacityReason);
                         if (capacityReason != null)
                         {
                             Reject(map.MapDefinitionId, player, capacityReason + ", DropId=" + dropId + ", itemId=" + itemId);
@@ -128,6 +128,7 @@ namespace Code_01.CombatPrototype.Map
                             continue;
                         }
                         stage = "PrepareReward";
+                        var remainingQuantity = checked(dropQuantity - quantity);
                         var itemIndex = -1;
                         for (var i = 0; i < inventory.Length; i++)
                             if (inventory[i].ItemName.Equals(itemName)) { itemIndex = i; break; }
@@ -146,11 +147,12 @@ namespace Code_01.CombatPrototype.Map
                         stage = "CommitPickup";
                         if (itemIndex >= 0) inventory[itemIndex] = next;
                         else inventory.Add(next);
-                        current.ValueRW.Phase = CombatPrototypeMapDropPhase.Consumed;
+                        if (remainingQuantity > 0) current.ValueRW.Quantity = remainingQuantity;
+                        else current.ValueRW.Phase = CombatPrototypeMapDropPhase.Consumed;
                         Debug.Log("[CombatPrototype.Map] Pickup granted and saved; map=" + map.MapDefinitionId +
                             ", DropId=" + dropId + ", NetworkId=" + player.NetworkId + ", PlayerId=" + playerId +
                             ", item=" + itemName + ", quantity=+" + quantity +
-                            ", totalItemQuantity=" + next.Quantity + ".");
+                            ", totalItemQuantity=" + next.Quantity + ", remainingGroundQuantity=" + remainingQuantity + ".");
                         CombatPrototypeMapPickupFeedbackUtility.WriteSuccess(EntityManager, map.MapDefinitionId,
                             player.Entity, player.NetworkId, dropId, itemId, quantity);
                     }

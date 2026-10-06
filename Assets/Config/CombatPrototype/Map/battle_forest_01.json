@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 26,
-  "configRevision": 29,
+  "schemaVersion": 27,
+  "configRevision": 30,
   "mapDefinitionId": "battle_forest_01",
   "defaultSeed": 12345,
   "resourcePersistence": {
@@ -35,6 +35,7 @@
   },
   "drops": {
     "enabled": true,
+    "partialPickupEnabled": true,
     "itemId": "vitality_apple",
     "quantity": 1,
     "visualResourceKey": "drop_apple",

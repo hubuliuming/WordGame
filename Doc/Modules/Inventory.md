@@ -181,7 +181,7 @@ v26/revision29的[合并](MapDropMerge.md)不入包、不扣材料/工具或发�
 
 ## 【FACT】B材料列表排序与筛选
 
-当前v37/revision40的[排序筛选](MapInventoryListView.md)通过原所属库存Snapshot建立客户端可见行，默认type/all，支持原顺序/类型/数量降序与全部/资源/补给/其他。原库存顺序/数量不变，完整统计仍决定容量、配方/修理/升级与全局合法性；丢弃按真实ItemName解析原稳定Kind，行身份改变取消未完成点击，已经提交请求保持。仅本地展示与选择，不改变服务端事务、输入/Ghost布局或玩家v4/世界v2保存。静态核对及用户人工GamePlayer通过，限v28/revision31及运行入口十六项；人工结论来自用户反馈，未触发的独立用例仍UNKNOWN。旧部分拾取用户通过仍限v27/revision30十六项及其他旧范围。
+当前v38/revision41的[排序筛选](MapInventoryListView.md)通过原所属库存Snapshot建立客户端可见行，默认type/all，支持原顺序/类型/数量降序与全部/资源/补给/其他。原库存顺序/数量不变，完整统计仍决定容量、配方/修理/升级与全局合法性；丢弃按真实ItemName解析原稳定Kind，行身份改变取消未完成点击，已经提交请求保持。仅本地展示与选择，不改变服务端事务、输入/Ghost布局或玩家v4/世界v2保存。静态核对及用户人工GamePlayer通过，限v28/revision31及运行入口十六项；人工结论来自用户反馈，未触发的独立用例仍UNKNOWN。旧部分拾取用户通过仍限v27/revision30十六项及其他旧范围。
 
 v29/revision32阶段新增[材料搜索](MapInventorySearch.md)，原名/显示名子串、默认忽略大小写与32 UTF-16长度、分类交集后排序；只过滤B可见行。编辑搜索框及焦点切换同帧屏蔽游戏键盘，退出编辑恢复；原十九输入字段、真实库存/容量/配方/丢弃/工具/保存保持。本阶段静态及用户人工GamePlayer通过，限v29/revision32及运行入口十六项，结论来自用户反馈；未实际触发的独立用例UNKNOWN，旧排序筛选通过仍限v28/revision31原清单。
 
@@ -211,4 +211,8 @@ v36/revision39保护阶段的[收藏保护](MapInventoryFavoritesDropProtection.
 
 ## 【CURRENT STRATEGY】收藏材料消耗提示
 
-当前v37/revision40的[收藏材料消耗提示](MapInventoryFavoritesConsumptionHint.md)复用原B面板七份木石配方和已应用Favorites.IsFavorite真实Name；只在对应操作有有效配方且正成本材料已收藏时，于配方下加一行缓存只读文字，材料不足仍提示。隐藏/数量归零/仅看收藏/搜索不改变配方提示，取消或Reset实际应用后下一有效Show刷新。共0～7行计入原滚动高度，提示总高度变化清旧鼠标许可，不清已排队业务请求；原按钮资格、1～7/E/F/G、服务端扣料/保存及全部反馈保持。本阶段人工GamePlayer待验收，旧保护通过限v36/revision39十六项，其他旧阶段保持原版本/清单。
+v37/revision40提示阶段的[收藏材料消耗提示](MapInventoryFavoritesConsumptionHint.md)复用原B面板七份木石配方和已应用Favorites.IsFavorite真实Name；只在对应操作有有效配方且正成本材料已收藏时，于配方下加一行缓存只读文字，材料不足仍提示。隐藏/数量归零/仅看收藏/搜索不改变配方提示，取消或Reset实际应用后下一有效Show刷新。共0～7行计入原滚动高度，提示总高度变化清旧鼠标许可，不清已排队业务请求；原按钮资格、1～7/E/F/G、服务端扣料/保存及全部反馈保持。本阶段十六项人工GamePlayer已获用户通过反馈，主线程结合既有静态核对判定通过，限CombatPrototypeNetCode、v37/revision40及运行入口清单，人工结论来自用户反馈；未实际触发的独立用例仍UNKNOWN，旧保护通过限v36/revision39十六项，其他旧阶段保持原版本/清单。
+
+## 【CURRENT STRATEGY】收藏材料消耗确认
+
+当前v38/revision41的[收藏材料消耗确认](MapInventoryFavoritesConsumptionConfirm.md)仅处理原B七个制作/修理/容量与工具升级按钮。首次有效按钮请求命中已应用收藏木石的正成本时暂存一个操作，在配方内显示数量提示，以Confirm/Cancel替换原按钮行；确认按最新已捕获候选和本地Revision复核后沿原请求提交一次，取消/关闭B/相关数量、等级、耐久、配方或已应用收藏变化/绑定失效清待确认。逐帧Clear仅隐藏，确认目标或高度变化清旧面板与行鼠标许可。确认独立于原消耗提示开关；数字1～7保持原直达链，偏好v3七字段、输入19、Ghost/服务器与保存入口保持。本阶段十六项人工GamePlayer待验收，已验收提示仍限v37/revision40，全部旧通过保持原版本/清单。

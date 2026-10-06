@@ -1,6 +1,6 @@
 # 背包材料搜索
 
-返回[地图](Map.md)、[背包](Inventory.md)、[B面板](MapInventoryPanel.md)、[排序筛选](MapInventoryListView.md)、[容量](MapInventoryCapacity.md)、[丢弃](MapInventoryDrop.md)、[配置](DataResources.md)、[玩家输入](Player.md)与[运行入口](Runtime.md)。入口CombatPrototypeNetCode；Forest/Grassland Json/BuiltIn当前schemaVersion=37/configRevision=40；[本机偏好](MapInventoryPreferences.md)静态核对通过、人工已获用户通过反馈，限v30/revision33及运行入口偏好阶段十六项。主线程实现、正常编译、严格配置读取和隔离Editor Bake静态核对通过；用户已确认本阶段人工GamePlayer验收通过，主线程结合既有静态核对与用户反馈判定通过，限CombatPrototypeNetCode、v29/revision32及运行入口十六项清单；人工结论来自用户反馈。旧排序筛选用户通过限v28/revision31十六项，其他旧通过保持原版本/清单。
+返回[地图](Map.md)、[背包](Inventory.md)、[B面板](MapInventoryPanel.md)、[排序筛选](MapInventoryListView.md)、[容量](MapInventoryCapacity.md)、[丢弃](MapInventoryDrop.md)、[配置](DataResources.md)、[玩家输入](Player.md)与[运行入口](Runtime.md)。入口CombatPrototypeNetCode；Forest/Grassland Json/BuiltIn当前schemaVersion=38/configRevision=41；[本机偏好](MapInventoryPreferences.md)静态核对通过、人工已获用户通过反馈，限v30/revision33及运行入口偏好阶段十六项。主线程实现、正常编译、严格配置读取和隔离Editor Bake静态核对通过；用户已确认本阶段人工GamePlayer验收通过，主线程结合既有静态核对与用户反馈判定通过，限CombatPrototypeNetCode、v29/revision32及运行入口十六项清单；人工结论来自用户反馈。旧排序筛选用户通过限v28/revision31十六项，其他旧通过保持原版本/清单。
 
 ## 【FACT】文件与配置
 
@@ -27,7 +27,7 @@ inventoryPanel原44字段保留，新增七项均必填：
 | clearSearchLabel | Clear | 清空按钮文案 |
 | noSearchResultsLabel | No search results | 全部材料模式下完整库存非空且有效搜索无可见行时显示 |
 
-当前DTO共89字段：十六bool、六float、三int、两模式string、61文案string及一偏好文件ID；原Settings对应十六byte、六float、三int、两byte枚举、62 FixedString64Bytes，0 GhostField且无GhostComponent。四新文案沿非空白、无控制字符与最多61 UTF-8字节规则；即使关闭搜索、面板或全部显示仍校验所有字段。原Reader保留UTF-8/形状/缺失/null/错类型/未知或重复键检查，当前只接受schema37和正revision/seed，旧v1～v36拒绝，无补默认、来源回退或热重载。正常导入/烘焙后生效，各端同版代码/配置并重新烘焙。
+当前DTO共93字段：十七bool、六float、三int、两模式string、64文案string及一偏好文件ID；原Settings对应十七byte、六float、三int、两byte枚举、65 FixedString64Bytes，0 GhostField且无GhostComponent。四新文案沿非空白、无控制字符与最多61 UTF-8字节规则；即使关闭搜索、面板或全部显示仍校验所有字段。原Reader保留UTF-8/形状/缺失/null/错类型/未知或重复键检查，当前只接受schema38和正revision/seed，旧v1～v37拒绝，无补默认、来源回退或热重载。正常导入/烘焙后生效，各端同版代码/配置并重新烘焙。
 
 ## 【CURRENT STRATEGY】本地文本与列表投影
 
@@ -87,4 +87,8 @@ v36/revision39保护阶段的[收藏保护](MapInventoryFavoritesDropProtection.
 
 ## 【CURRENT STRATEGY】收藏材料消耗提示
 
-当前v37/revision40的[收藏材料消耗提示](MapInventoryFavoritesConsumptionHint.md)复用原B面板七份木石配方和已应用Favorites.IsFavorite真实Name；只在对应操作有有效配方且正成本材料已收藏时，于配方下加一行缓存只读文字，材料不足仍提示。隐藏/数量归零/仅看收藏/搜索不改变配方提示，取消或Reset实际应用后下一有效Show刷新。共0～7行计入原滚动高度，提示总高度变化清旧鼠标许可，不清已排队业务请求；原按钮资格、1～7/E/F/G、服务端扣料/保存及全部反馈保持。本阶段人工GamePlayer待验收，旧保护通过限v36/revision39十六项，其他旧阶段保持原版本/清单。
+v37/revision40提示阶段的[收藏材料消耗提示](MapInventoryFavoritesConsumptionHint.md)复用原B面板七份木石配方和已应用Favorites.IsFavorite真实Name；只在对应操作有有效配方且正成本材料已收藏时，于配方下加一行缓存只读文字，材料不足仍提示。隐藏/数量归零/仅看收藏/搜索不改变配方提示，取消或Reset实际应用后下一有效Show刷新。共0～7行计入原滚动高度，提示总高度变化清旧鼠标许可，不清已排队业务请求；原按钮资格、1～7/E/F/G、服务端扣料/保存及全部反馈保持。本阶段十六项人工GamePlayer已获用户通过反馈，主线程结合既有静态核对判定通过，限CombatPrototypeNetCode、v37/revision40及运行入口清单，人工结论来自用户反馈；未实际触发的独立用例仍UNKNOWN，旧保护通过限v36/revision39十六项，其他旧阶段保持原版本/清单。
+
+## 【CURRENT STRATEGY】收藏材料消耗确认
+
+当前v38/revision41的[收藏材料消耗确认](MapInventoryFavoritesConsumptionConfirm.md)仅处理原B七个制作/修理/容量与工具升级按钮。首次有效按钮请求命中已应用收藏木石的正成本时暂存一个操作，在配方内显示数量提示，以Confirm/Cancel替换原按钮行；确认按最新已捕获候选和本地Revision复核后沿原请求提交一次，取消/关闭B/相关数量、等级、耐久、配方或已应用收藏变化/绑定失效清待确认。逐帧Clear仅隐藏，确认目标或高度变化清旧面板与行鼠标许可。确认独立于原消耗提示开关；数字1～7保持原直达链，偏好v3七字段、输入19、Ghost/服务器与保存入口保持。本阶段十六项人工GamePlayer待验收，已验收提示仍限v37/revision40，全部旧通过保持原版本/清单。

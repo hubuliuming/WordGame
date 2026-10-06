@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 37,
-  "configRevision": 40,
+  "schemaVersion": 38,
+  "configRevision": 41,
   "mapDefinitionId": "battle_grassland_01",
   "defaultSeed": 12345,
   "resourcePersistence": {
@@ -369,7 +369,11 @@
     "favoritesDropProtectionEnabled": true,
     "favoritesProtectedLabel": "Favorite protected",
     "favoritesConsumptionHintEnabled": true,
-    "favoritesConsumptionHintLabel": "Uses favorites"
+    "favoritesConsumptionHintLabel": "Uses favorites",
+    "favoritesConsumptionConfirmationEnabled": true,
+    "favoritesConsumptionConfirmationLabel": "Use favorites?",
+    "favoritesConsumptionConfirmLabel": "Confirm",
+    "favoritesConsumptionCancelLabel": "Cancel"
   },
   "inventoryCapacity": {
     "enabled": true,

@@ -1,6 +1,6 @@
 # 收藏材料消耗提示
 
-返回[地图](Map.md)、[背包](Inventory.md)、[B面板](MapInventoryPanel.md)、[收藏](MapInventoryFavorites.md)、[收藏保护](MapInventoryFavoritesDropProtection.md)、[修理](MapToolRepair.md)、[容量升级](MapInventoryCapacityUpgrade.md)、[工具升级](MapGatherToolUpgrade.md)、[配置](DataResources.md)与[运行入口](Runtime.md)。入口CombatPrototypeNetCode、原B面板；两地图Json/BuiltIn当前v37/revision40。主线程按用户已确认方案完成代码、配置及静态范围核对，本阶段十六项人工GamePlayer待验收。保护用户通过仍限v36/revision39十六项，所有旧阶段保持各自原版本/清单；未实际触发的独立用例为UNKNOWN。
+返回[地图](Map.md)、[背包](Inventory.md)、[B面板](MapInventoryPanel.md)、[收藏](MapInventoryFavorites.md)、[收藏保护](MapInventoryFavoritesDropProtection.md)、[修理](MapToolRepair.md)、[容量升级](MapInventoryCapacityUpgrade.md)、[工具升级](MapGatherToolUpgrade.md)、[配置](DataResources.md)与[运行入口](Runtime.md)。入口CombatPrototypeNetCode、原B面板；两地图Json/BuiltIn当前v38/revision41。主线程按用户已确认方案完成代码、配置及静态范围核对，本阶段十六项人工GamePlayer已获用户通过反馈，主线程结合既有静态核对判定通过，限CombatPrototypeNetCode、v37/revision40及运行入口清单，人工结论来自用户反馈；未实际触发的独立用例仍UNKNOWN。保护用户通过仍限v36/revision39十六项，所有旧阶段保持各自原版本/清单；未实际触发的独立用例为UNKNOWN。
 
 ## 【FACT】文件与调用关系
 
@@ -12,20 +12,20 @@
 | [CapacityUpgradePanel](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapInventoryCapacityUpgradePanel.cs) | 原实际下一容量级配方、收藏Revision及一提示缓存/可选行 |
 | [ToolUpgradePanel](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapGatherToolUpgradePanel.cs) | 原两ToolPreview下一工具级配方、收藏Revision及两提示缓存/可选行 |
 | [DTO](../../Assets/Scripts/CombatPrototype/Map/MapInventoryPanelConfig.cs)、[Settings](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapInventoryPanelData.cs) | 原结构尾部追加两必填显示字段，无新组件 |
-| [Validator](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapConfigValidator.cs)、[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)、[Baker](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapAuthoring.cs) | schema37/revision40、显式默认值、严格文案及原根映射 |
+| [Validator](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapConfigValidator.cs)、[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)、[Baker](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapAuthoring.cs) | schema38/revision41、显式默认值、严格文案及原根映射 |
 
-共十现有C#、两JSON；没有新脚本/类/meta/组件/挂载或Scene/SubScene/Prefab/Animator/资源/字体/包/构建结构变更。原Snapshot/ListView/Search/Details、DropClient、Preferences/Data/Store、HUD/Binding、PlayerInput与服务端代码保持。Favorites仍普通C#类、GUID=fce8d766a3a6f334286842eb7f4d86a8；DropClient和Details原GUID保持。
+v37提示阶段共十现有C#、两JSON，未新增脚本/类/meta/组件或资源结构；当前[消耗确认](MapInventoryFavoritesConsumptionConfirm.md)另接一个普通C#辅助类及正常导入meta。原Snapshot/ListView/Search/Details、DropClient、Preferences/Data/Store、HUD/Binding、PlayerInput与服务端代码保持。Favorites仍普通C#类、GUID=fce8d766a3a6f334286842eb7f4d86a8；DropClient和Details原GUID保持。
 
 ## 【FACT】JSON契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)及BuiltIn一致为schemaVersion=37/configRevision=40，原inventoryPanel87字段原顺序/值保留，尾部追加：
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)及BuiltIn一致为schemaVersion=38/configRevision=41，原87字段与下列提示两字段保留，另有[消耗确认](MapInventoryFavoritesConsumptionConfirm.md)四字段，当前共93字段：
 
 | 字段 | 建议值 | 校验/映射 |
 |---|---|---|
 | favoritesConsumptionHintEnabled | true | 严格bool→原Settings的FavoritesConsumptionHintEnabled byte |
 | favoritesConsumptionHintLabel | Uses favorites | 非空白、无控制字符、最多61 UTF-8字节→FavoritesConsumptionHintLabel FixedString64Bytes |
 
-DTO/Settings各89字段：DTO十六bool、六float、三int、两模式string、61文案string及一偏好文件ID；Settings十六byte、六float、三int、两byte枚举及62 FixedString64Bytes，零GhostField/无GhostComponent。沿原严格UTF-8、对象完整/类型及缺失/null/未知/重复键校验，关闭提示/收藏/面板或原能力仍完整验证。旧地图v1～v36、未来版本拒绝，不补默认或回退来源，正常导入/烘焙后生效、无热重载，各端同版。
+DTO/Settings各93字段：DTO十七bool、六float、三int、两模式string、64文案string及一偏好文件ID；Settings十七byte、六float、三int、两byte枚举及65 FixedString64Bytes，零GhostField/无GhostComponent。沿原严格UTF-8、对象完整/类型及缺失/null/未知/重复键校验，关闭提示/收藏/面板或原能力仍完整验证。旧地图v1～v37、未来版本拒绝，不补默认或回退来源，正常导入/烘焙后生效、无热重载，各端同版。
 
 ## 【CURRENT STRATEGY】真实材料与七份配方
 
@@ -50,18 +50,22 @@ Panel累计两制作、两修理、一容量、两工具升级的ConsumptionHint
 
 ## 【CURRENT STRATEGY】业务边界
 
-仅原B面板七份配方提示，数字1～7/E/F/G沿原输入，不增加弹窗、二次确认、拦截请求或失败/成功反馈。收藏丢弃保护仍按其原行与消费前检查独立生效；提示不解除保护，也不阻止原制作、修理或两升级消耗收藏木石，数量归零仍保留原收藏Name。
+提示仍仅绘制原B面板七份配方，数字1～7/E/F/G沿原输入；v38的[B按钮消耗确认](MapInventoryFavoritesConsumptionConfirm.md)独立读取已应用收藏及正成本，关闭提示仍可确认。提示本身只读，不决定请求或失败/成功反馈。收藏丢弃保护仍按其原行与消费前检查独立生效；提示不解除保护，也不阻止原制作、修理或两升级消耗收藏木石，数量归零仍保留原收藏Name。
 
 原输入19、DropGhost4/请求2、Tools3、F4/G7/资源状态4/世界保存3及全部反馈保持；玩家v4根7/工具项3、世界v2根9/掉落项8、本机偏好CurrentVersion=3/Data七字段兼容v1/v2均保持。没有服务器收藏同步/新RPC/新输入/Ghost字段，原SavePrepared、库存候选/提交/失败行为及本机偏好提交路径保持，无新文件I/O入口。
 
 ## 【KNOWN ISSUES】静态证据与人工边界
 
-正常Unity编译/重载完成，89字段/类型构成、零GhostField、普通类/GUID及ConsumptionHint返回string/两int参数、三预览Capture末参同一Favorites和可选行int属性核对通过。DropClient仍DrawRow九参数/ReadRequest一个Favorites参数/请求两字段，原偏好/输入/保存元数据保持。3280份非法配置全部拒绝（每地图1640），276组合法读取通过（每地图138），覆盖完整89字段/形状/类型/重复键、严格bool、文案UTF-8 61字节/关闭仍验证、旧v1～v36/未来版本与全部原规则；只验证配置和反射元数据，没有调用格式化/收藏/面板/GUI业务。
+以下静态与人工通过证据限v37/revision40提示阶段。该阶段正常Unity编译/重载完成，89字段/类型构成、零GhostField、普通类/GUID及ConsumptionHint返回string/两int参数、三预览Capture末参同一Favorites和可选行int属性核对通过。DropClient仍DrawRow九参数/ReadRequest一个Favorites参数/请求两字段，原偏好/输入/保存元数据保持。3280份非法配置全部拒绝（每地图1640），276组合法读取通过（每地图138），覆盖完整89字段/形状/类型/重复键、严格bool、文案UTF-8 61字节/关闭仍验证、旧v1～v36/未来版本与全部原规则；只验证配置和反射元数据，没有调用格式化/收藏/面板/GUI业务。
 
 两地图各138次、共276次隔离Editor Bake完成；保留原117变体，追加提示/收藏/面板关闭、文案ASCII61/UTF-8 61/中文、计数/收藏筛选/丢弃保护/排序/分类/搜索/详情/偏好/重置关闭、提示与收藏同时关闭、工具/容量/容量升级/工具升级关闭及修理关闭共21变体。全部89Settings、原Settings/零反馈/Prefab引用、布置与兼容签名符合检查；Forest89树/36采集/20矿/109阻挡，Grassland53/38/18/71。源SubScene只读，临时克隆/TextAssets/Scene/World/BlobAssetStore释放，最终主场景干净、3根对象、单场景、未Play。
 
 Console执行前[0 Error,3 Warning,53 Log]、正常编译后/Bake前[0 Error,5 Warning,53 Log]、Bake后/最终[0 Error,7 Warning,53 Log]。编译重新报告原PEListener UAC1001/DOTween CS0618，原三条NetCode Tick Batching保留；Bake期间另有MCP WebSocket keep-alive/connection closed两工具警告。工具返回空失败状态，之后核实完整276条落盘结果、零Error及资源释放后确认静态完成；没有重跑业务或更改生产代码补工具状态。没有新增本阶段项目编译错误/警告，未清Console，不用既有运行日志推导性能。
 
-原531项人工内容/编号逐字保留，追加十六项后共547项，归[运行入口](Runtime.md)“收藏材料消耗提示”章节。本阶段人工GamePlayer待验收；GUI命中/滚动/裁切/中文字形/分辨率、收藏应用/取消/重置/预览状态时序、真实偏好I/O/故障、材料消耗/事务、多人与预测、性能/平台/线上未实际触发为UNKNOWN，旧阶段通过不覆盖新提示。
+提示阶段原531项人工内容/编号逐字保留，追加十六项后当时共547项，归[运行入口](Runtime.md)“收藏材料消耗提示”章节。本阶段十六项人工GamePlayer已获用户通过反馈，主线程结合既有静态核对判定通过，限CombatPrototypeNetCode、v37/revision40及运行入口清单，人工结论来自用户反馈；未实际触发的独立用例仍UNKNOWN；未实际触发的独立GUI命中/滚动/裁切/中文字形/分辨率、收藏应用/取消/重置/预览状态时序、真实偏好I/O/故障、材料消耗/事务、多人与预测、性能/平台/线上未实际触发为UNKNOWN，旧阶段通过不覆盖新提示。
 
 AI未执行Favorites/Panel/各预览/GUI业务、实际偏好或游戏存档I/O、GamePlayer/PlayMode、逻辑单元测试、命令行构建/发布、性能采样或图片读取；未创建子Agent、暂存或提交Git。
+
+## 【CURRENT STRATEGY】收藏材料消耗确认
+
+当前v38/revision41的[收藏材料消耗确认](MapInventoryFavoritesConsumptionConfirm.md)仅处理原B七个制作/修理/容量与工具升级按钮。首次有效按钮请求命中已应用收藏木石的正成本时暂存一个操作，在配方内显示数量提示，以Confirm/Cancel替换原按钮行；确认按最新已捕获候选和本地Revision复核后沿原请求提交一次，取消/关闭B/相关数量、等级、耐久、配方或已应用收藏变化/绑定失效清待确认。逐帧Clear仅隐藏，确认目标或高度变化清旧面板与行鼠标许可。确认独立于原消耗提示开关；数字1～7保持原直达链，偏好v3七字段、输入19、Ghost/服务器与保存入口保持。本阶段十六项人工GamePlayer待验收，已验收提示仍限v37/revision40，全部旧通过保持原版本/清单。

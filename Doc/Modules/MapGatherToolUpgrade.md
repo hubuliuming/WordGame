@@ -1,6 +1,6 @@
 # 采集工具升级与效率提升
 
-返回[采集工具](MapGatherTools.md)、[工具修理](MapToolRepair.md)与[材料面板](MapInventoryPanel.md)。本专题负责 CombatPrototypeNetCode 的工具 Lv1～Lv3、B/6/7 升级、有效耐久上限与采集耗时；玩家文件完整契约归[资源与数据](DataResources.md)，人工清单归[运行入口](Runtime.md)。当前地图 schemaVersion=37/configRevision=40，玩家存档 Version=4；用户已确认本阶段人工 GamePlayer 通过，主线程结合既有静态核对判定通过，限 v21/revision24 及[运行入口](Runtime.md)二十二项清单，结论来自用户反馈。未实际触发的独立边界仍为 UNKNOWN。背包升级及更早用户通过仍限各自原版本/清单。
+返回[采集工具](MapGatherTools.md)、[工具修理](MapToolRepair.md)与[材料面板](MapInventoryPanel.md)。本专题负责 CombatPrototypeNetCode 的工具 Lv1～Lv3、B/6/7 升级、有效耐久上限与采集耗时；玩家文件完整契约归[资源与数据](DataResources.md)，人工清单归[运行入口](Runtime.md)。当前地图 schemaVersion=38/configRevision=41，玩家存档 Version=4；用户已确认本阶段人工 GamePlayer 通过，主线程结合既有静态核对判定通过，限 v21/revision24 及[运行入口](Runtime.md)二十二项清单，结论来自用户反馈。未实际触发的独立边界仍为 UNKNOWN。背包升级及更早用户通过仍限各自原版本/清单。
 
 ## 【FACT】入口与职责
 
@@ -124,4 +124,8 @@ v36/revision39保护阶段的[收藏保护](MapInventoryFavoritesDropProtection.
 
 ## 【CURRENT STRATEGY】升级配方的收藏提示
 
-[收藏提示](MapInventoryFavoritesConsumptionHint.md)沿原ToolUpgradePanel两份ToolPreview缓存，Capture传入同一已应用Favorites；工具及升级启用、已持有且未满级时，读取当前级对应下一定义WoodQuantity/StoneQuantity的正成本，缺材料仍显示。未持有/满级/关闭隐藏；原6/7请求、等级/耐久/效率与CanUpgrade保持。随原数量/等级/耐久及Favorites.Revision刷新，GUI仅读缓存，两条可选行计入原总高度；没有服务端收藏状态或新反馈。本阶段v37/revision40人工GamePlayer待验收，工具升级旧通过仍限v21/revision24二十二项。
+[收藏提示](MapInventoryFavoritesConsumptionHint.md)沿原ToolUpgradePanel两份ToolPreview缓存，Capture传入同一已应用Favorites；工具及升级启用、已持有且未满级时，读取当前级对应下一定义WoodQuantity/StoneQuantity的正成本，缺材料仍显示。未持有/满级/关闭隐藏；原6/7请求、等级/耐久/效率与CanUpgrade保持。随原数量/等级/耐久及Favorites.Revision刷新，GUI仅读缓存，两条可选行计入原总高度；没有服务端收藏状态或新反馈。本阶段十六项人工GamePlayer已获用户通过反馈，主线程结合既有静态核对判定通过，限CombatPrototypeNetCode、v37/revision40及运行入口清单，人工结论来自用户反馈；未实际触发的独立用例仍UNKNOWN，工具升级旧通过仍限v21/revision24二十二项。
+
+## 【CURRENT STRATEGY】配方消耗确认
+
+原ToolUpgradePanel两ToolPreview在有效预览更新时，按实际当前级下一配方、材料数、等级、耐久、有效上限和同一Favorites捕获对应确认候选。原6/7面板按钮行可替换为Confirm/Cancel，数字6/7直达；原未持有/满级资格、升级保留绝对耐久和效率倍率、所属反馈/保存保持。 单个待确认、取消条件与滚动/点击许可归[消耗确认](MapInventoryFavoritesConsumptionConfirm.md)。当前v38/revision41人工GamePlayer待验收；本专题旧通过及v37提示通过均保持各自原版本/清单。

@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using ConsumptionOperation = Code_01.CombatPrototype.Map.CombatPrototypeMapInventoryConsumptionConfirmation.Operation;
 
 namespace Code_01.CombatPrototype.Map
 {
@@ -37,7 +38,7 @@ namespace Code_01.CombatPrototype.Map
 
         public void Capture(int wood, int stone, bool inventoryValid, int axeDurability, int pickaxeDurability,
             int axeLevel, int pickaxeLevel, CombatPrototypeMapGatherToolDefinition axe, CombatPrototypeMapGatherToolDefinition pickaxe,
-            CombatPrototypeMapInventoryPanelFavorites favorites)
+            CombatPrototypeMapInventoryPanelFavorites favorites, CombatPrototypeMapInventoryConsumptionConfirmation confirmation)
         {
             if (_wood == wood && _stone == stone && _inventoryValid == inventoryValid &&
                 _axeDurability == axeDurability && _pickaxeDurability == pickaxeDurability && _axeLevel == axeLevel && _pickaxeLevel == pickaxeLevel &&
@@ -54,6 +55,10 @@ namespace Code_01.CombatPrototype.Map
             _pickaxeConsumptionHint = _settings.Enabled != 0 && _settings.RepairEnabled != 0 && pickaxeDurability >= 0 &&
                 pickaxeDurability < _pickaxe.MaxDurability ? favorites.ConsumptionHint(_pickaxe.RepairWoodQuantity, _pickaxe.RepairStoneQuantity) : string.Empty;
             _canAxe = CanRepair(_axe, axeDurability); _canPickaxe = CanRepair(_pickaxe, pickaxeDurability);
+            confirmation.Capture(ConsumptionOperation.RepairAxe, _canAxe, _axe.RepairWoodQuantity, _axe.RepairStoneQuantity,
+                wood, stone, axeLevel, axeDurability, _axe.MaxDurability, favorites);
+            confirmation.Capture(ConsumptionOperation.RepairPickaxe, _canPickaxe, _pickaxe.RepairWoodQuantity, _pickaxe.RepairStoneQuantity,
+                wood, stone, pickaxeLevel, pickaxeDurability, _pickaxe.MaxDurability, favorites);
             _axeTitle = _axeName + (axeLevel > 0 ? " " + _levelLabel + " " + axeLevel : string.Empty) + "  " + Availability(_axe, axeDurability);
             _pickaxeTitle = _pickaxeName + (pickaxeLevel > 0 ? " " + _levelLabel + " " + pickaxeLevel : string.Empty) + "  " + Availability(_pickaxe, pickaxeDurability);
             _axePreview = Preview(_axe, axeDurability); _pickaxePreview = Preview(_pickaxe, pickaxeDurability);
@@ -89,23 +94,30 @@ namespace Code_01.CombatPrototype.Map
             _missing + ": " + _woodLabel + " " + Math.Max(0, definition.RepairWoodQuantity - _wood) + "   " +
             _stoneLabel + " " + Math.Max(0, definition.RepairStoneQuantity - _stone);
 
-        public void Draw(float width, ref float y, float rowHeight, GUIStyle labelStyle, GUIStyle buttonStyle, bool mousePressAccepted)
+        public void Draw(float width, ref float y, float rowHeight, GUIStyle labelStyle, GUIStyle buttonStyle, bool mousePressAccepted, CombatPrototypeMapInventoryConsumptionConfirmation confirmation)
         {
             Label(width, ref y, rowHeight, labelStyle, _heading);
             DrawTool(width, ref y, rowHeight, labelStyle, buttonStyle, mousePressAccepted,
-                _axeTitle, _axePreview, _axeRecipe, _axeConsumptionHint, _axeMissing, _axeButton, _canAxe, true);
+                _axeTitle, _axePreview, _axeRecipe, _axeConsumptionHint, _axeMissing, _axeButton, _canAxe, true, confirmation);
             DrawTool(width, ref y, rowHeight, labelStyle, buttonStyle, mousePressAccepted,
-                _pickaxeTitle, _pickaxePreview, _pickaxeRecipe, _pickaxeConsumptionHint, _pickaxeMissing, _pickaxeButton, _canPickaxe, false);
+                _pickaxeTitle, _pickaxePreview, _pickaxeRecipe, _pickaxeConsumptionHint, _pickaxeMissing, _pickaxeButton, _canPickaxe, false, confirmation);
         }
 
         private void DrawTool(float width, ref float y, float rowHeight, GUIStyle labelStyle, GUIStyle buttonStyle,
-            bool mousePressAccepted, string title, string preview, string recipe, string consumptionHint, string missing, string button, bool enabled, bool axe)
+            bool mousePressAccepted, string title, string preview, string recipe, string consumptionHint, string missing, string button, bool enabled, bool axe, CombatPrototypeMapInventoryConsumptionConfirmation confirmation)
         {
             Label(width, ref y, rowHeight, labelStyle, title);
             Label(width, ref y, rowHeight, labelStyle, preview);
             Label(width, ref y, rowHeight, labelStyle, recipe);
             if (consumptionHint.Length != 0) Label(width, ref y, rowHeight, labelStyle, consumptionHint);
+            var operation = axe ? ConsumptionOperation.RepairAxe : ConsumptionOperation.RepairPickaxe;
+            confirmation.DrawPrompt(operation, width, ref y, rowHeight, labelStyle);
             Label(width, ref y, rowHeight, labelStyle, missing);
+            if (confirmation.DrawButtons(operation, width, y, rowHeight, buttonStyle, mousePressAccepted))
+            {
+                y += rowHeight;
+                return;
+            }
             var oldEnabled = GUI.enabled;
             try
             {

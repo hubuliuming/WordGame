@@ -2,6 +2,7 @@ using System;
 using Unity.Collections;
 using Unity.Entities;
 using UnityEngine;
+using ConsumptionOperation = Code_01.CombatPrototype.Map.CombatPrototypeMapInventoryConsumptionConfirmation.Operation;
 
 namespace Code_01.CombatPrototype.Map
 {
@@ -40,7 +41,7 @@ namespace Code_01.CombatPrototype.Map
         }
 
         public void Capture(CombatPrototypeMapInventoryPanelSnapshot snapshot, int level,
-            CombatPrototypeMapInventoryCapacityUpgradeFeedback feedback, CombatPrototypeMapInventoryPanelFavorites favorites)
+            CombatPrototypeMapInventoryCapacityUpgradeFeedback feedback, CombatPrototypeMapInventoryPanelFavorites favorites, CombatPrototypeMapInventoryConsumptionConfirmation confirmation)
         {
             _feedback.Observe(feedback);
             if (_level == level && _wood == snapshot.WoodQuantity && _stone == snapshot.StoneQuantity &&
@@ -54,6 +55,8 @@ namespace Code_01.CombatPrototype.Map
                 favorites.ConsumptionHint(next.WoodQuantity, next.StoneQuantity) : string.Empty;
             _canUpgrade = !max && _capacityEnabled && _upgradeEnabled && _inventoryValid &&
                 _wood >= next.WoodQuantity && _stone >= next.StoneQuantity;
+            confirmation.Capture(ConsumptionOperation.CapacityUpgrade, _canUpgrade, next.WoodQuantity, next.StoneQuantity,
+                _wood, _stone, level, 0, 0, favorites);
             var state = !_capacityEnabled || !_upgradeEnabled || !_inventoryValid ? _disabledLabel :
                 max ? _maxLevel : _canUpgrade ? _readyLabel : _missingLabel;
             _levelText = _levelLabel + " " + level + (max ? string.Empty : " -> " + _levelLabel + " " + next.Level) + "  " + state;
@@ -71,7 +74,7 @@ namespace Code_01.CombatPrototype.Map
         private string Limit(string label, int current, int next, bool max) =>
             label + "  " + (!_capacityEnabled ? _unlimited : current + (max ? string.Empty : " -> " + next));
 
-        public void Draw(float width, ref float y, float rowHeight, GUIStyle labelStyle, GUIStyle buttonStyle, bool mousePressAccepted)
+        public void Draw(float width, ref float y, float rowHeight, GUIStyle labelStyle, GUIStyle buttonStyle, bool mousePressAccepted, CombatPrototypeMapInventoryConsumptionConfirmation confirmation)
         {
             Label(width, ref y, rowHeight, labelStyle, _heading);
             Label(width, ref y, rowHeight, labelStyle, _levelText);
@@ -81,14 +84,18 @@ namespace Code_01.CombatPrototype.Map
             Label(width, ref y, rowHeight, labelStyle, _stoneText);
             Label(width, ref y, rowHeight, labelStyle, _recipeText);
             if (_consumptionHint.Length != 0) Label(width, ref y, rowHeight, labelStyle, _consumptionHint);
+            confirmation.DrawPrompt(ConsumptionOperation.CapacityUpgrade, width, ref y, rowHeight, labelStyle);
             Label(width, ref y, rowHeight, labelStyle, _missingText);
-            var oldEnabled = GUI.enabled;
-            try
+            if (!confirmation.DrawButtons(ConsumptionOperation.CapacityUpgrade, width, y, rowHeight, buttonStyle, mousePressAccepted))
             {
-                GUI.enabled = oldEnabled && _canUpgrade;
-                if (GUI.Button(new Rect(0f, y, width, rowHeight - 4f), _button, buttonStyle) && mousePressAccepted) _request = true;
+                var oldEnabled = GUI.enabled;
+                try
+                {
+                    GUI.enabled = oldEnabled && _canUpgrade;
+                    if (GUI.Button(new Rect(0f, y, width, rowHeight - 4f), _button, buttonStyle) && mousePressAccepted) _request = true;
+                }
+                finally { GUI.enabled = oldEnabled; }
             }
-            finally { GUI.enabled = oldEnabled; }
             y += rowHeight;
             Label(width, ref y, rowHeight, labelStyle, _feedback.Feedback);
         }

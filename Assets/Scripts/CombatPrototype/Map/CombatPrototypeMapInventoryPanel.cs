@@ -2,6 +2,7 @@ using Code_01.CombatPrototype.Networking;
 using Unity.Entities;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using ConsumptionOperation = Code_01.CombatPrototype.Map.CombatPrototypeMapInventoryConsumptionConfirmation.Operation;
 
 namespace Code_01.CombatPrototype.Map
 {
@@ -18,6 +19,8 @@ namespace Code_01.CombatPrototype.Map
         private readonly CombatPrototypeMapGatherToolRepairPanel _repair = new CombatPrototypeMapGatherToolRepairPanel();
         private readonly CombatPrototypeMapInventoryCapacityUpgradePanel _upgrade = new CombatPrototypeMapInventoryCapacityUpgradePanel();
         private readonly CombatPrototypeMapGatherToolUpgradePanel _toolUpgrade = new CombatPrototypeMapGatherToolUpgradePanel();
+        private readonly CombatPrototypeMapInventoryConsumptionConfirmation _confirmation = new CombatPrototypeMapInventoryConsumptionConfirmation();
+        private uint _confirmationRevision;
         private string _levelLabel, _recraftLabel;
         private int _axeLevel = -1, _pickaxeLevel = -1;
         private bool _durabilityEnabled;
@@ -84,6 +87,7 @@ namespace Code_01.CombatPrototype.Map
             _listView.Configure(settings);
             _search.Configure(settings);
             _favorites.Configure(settings);
+            _confirmation.Configure(settings);
             _preferences.Configure(settings, mapId, _listView, _search, _favorites);
             _details.Configure(settings, toolSettings, axe, pickaxe, capacity, upgradeSettings, upgradeDefinitions,
                 toolUpgradeSettings, toolUpgradeDefinitions);
@@ -122,12 +126,12 @@ namespace Code_01.CombatPrototype.Map
             if (_details.Capture(_snapshot, _listView, axeLevel, pickaxeLevel, effectiveAxe, effectivePickaxe, capacityLevel))
                 _mousePressAccepted = _rowMousePressAccepted = false;
             _preferences.Capture(_listView, _search, _favorites);
-            _upgrade.Capture(_snapshot, capacityLevel, upgradeFeedback, _favorites);
+            _upgrade.Capture(_snapshot, capacityLevel, upgradeFeedback, _favorites, _confirmation);
             _canCraftAxe = CanCraft(_axe, axeDurability);
             _canCraftPickaxe = CanCraft(_pickaxe, pickaxeDurability);
             _repair.Capture(_snapshot.WoodQuantity, _snapshot.StoneQuantity, _snapshot.InventoryValid, axeDurability, pickaxeDurability,
-                axeLevel, pickaxeLevel, effectiveAxe, effectivePickaxe, _favorites);
-            _toolUpgrade.Capture(_snapshot, axeLevel, pickaxeLevel, effectiveAxe, effectivePickaxe, toolUpgradeFeedback, _favorites);
+                axeLevel, pickaxeLevel, effectiveAxe, effectivePickaxe, _favorites, _confirmation);
+            _toolUpgrade.Capture(_snapshot, axeLevel, pickaxeLevel, effectiveAxe, effectivePickaxe, toolUpgradeFeedback, _favorites, _confirmation);
             if (_woodQuantity != _snapshot.WoodQuantity || _stoneQuantity != _snapshot.StoneQuantity ||
                 _axeDurability != axeDurability || _pickaxeDurability != pickaxeDurability ||
                 _axeLevel != axeLevel || _pickaxeLevel != pickaxeLevel || _lastInventoryValid != _snapshot.InventoryValid ||
@@ -159,6 +163,11 @@ namespace Code_01.CombatPrototype.Map
                 _repair.ConsumptionHintRowCount + _upgrade.ConsumptionHintRowCount + _toolUpgrade.ConsumptionHintRowCount;
             if (_consumptionHintRows != hintRows) _mousePressAccepted = _rowMousePressAccepted = false;
             _consumptionHintRows = hintRows;
+            _confirmation.Capture(ConsumptionOperation.CraftAxe, _canCraftAxe, _axe.CraftWoodQuantity, _axe.CraftStoneQuantity,
+                _snapshot.WoodQuantity, _snapshot.StoneQuantity, axeLevel, axeDurability, _axe.MaxDurability, _favorites);
+            _confirmation.Capture(ConsumptionOperation.CraftPickaxe, _canCraftPickaxe, _pickaxe.CraftWoodQuantity, _pickaxe.CraftStoneQuantity,
+                _snapshot.WoodQuantity, _snapshot.StoneQuantity, pickaxeLevel, pickaxeDurability, _pickaxe.MaxDurability, _favorites);
+            ObserveConfirmationChange();
             _drop.Observe(dropFeedback);
             _feedback = string.IsNullOrEmpty(_drop.Feedback) ? feedback : _drop.Feedback;
             _ready = true;
@@ -211,6 +220,8 @@ namespace Code_01.CombatPrototype.Map
                 _repair.ClearPending();
                 _upgrade.ClearPending();
                 _toolUpgrade.ClearPending();
+                _confirmation.ClearPending();
+                ObserveConfirmationChange();
                 return false;
             }
             var wasInside = ContainsMouse(mouse);
@@ -236,10 +247,34 @@ namespace Code_01.CombatPrototype.Map
                 _repair.ReadRequest(out repairAxe, out repairPickaxe);
                 upgrade = _upgrade.ReadRequest();
                 _toolUpgrade.ReadRequest(out upgradeAxe, out upgradePickaxe);
+                craftAxe = _confirmation.ReadRequest(ConsumptionOperation.CraftAxe, craftAxe);
+                craftPickaxe = _confirmation.ReadRequest(ConsumptionOperation.CraftPickaxe, craftPickaxe);
+                repairAxe = _confirmation.ReadRequest(ConsumptionOperation.RepairAxe, repairAxe);
+                repairPickaxe = _confirmation.ReadRequest(ConsumptionOperation.RepairPickaxe, repairPickaxe);
+                upgrade = _confirmation.ReadRequest(ConsumptionOperation.CapacityUpgrade, upgrade);
+                upgradeAxe = _confirmation.ReadRequest(ConsumptionOperation.UpgradeAxe, upgradeAxe);
+                upgradePickaxe = _confirmation.ReadRequest(ConsumptionOperation.UpgradePickaxe, upgradePickaxe);
+                switch (_confirmation.ReadDecision())
+                {
+                    case ConsumptionOperation.CraftAxe: craftAxe = true; break;
+                    case ConsumptionOperation.CraftPickaxe: craftPickaxe = true; break;
+                    case ConsumptionOperation.RepairAxe: repairAxe = true; break;
+                    case ConsumptionOperation.RepairPickaxe: repairPickaxe = true; break;
+                    case ConsumptionOperation.CapacityUpgrade: upgrade = true; break;
+                    case ConsumptionOperation.UpgradeAxe: upgradeAxe = true; break;
+                    case ConsumptionOperation.UpgradePickaxe: upgradePickaxe = true; break;
+                }
+                ObserveConfirmationChange();
             }
             _craftAxe = _craftPickaxe = false;
             // Closing by B must also consume the mouse press that began over this panel.
             return wasInside || inside || _search.BlocksMouse;
+        }
+
+        private void ObserveConfirmationChange()
+        {
+            if (_confirmationRevision != _confirmation.Revision) _mousePressAccepted = _rowMousePressAccepted = false;
+            _confirmationRevision = _confirmation.Revision;
         }
 
         private bool ContainsMouse(Mouse mouse)
@@ -295,7 +330,7 @@ namespace Code_01.CombatPrototype.Map
                 GUI.color = Color.white;
                 GUI.Label(new Rect(panel.x + 12f, panel.y + 12f, panel.width - 24f, _settings.RowHeightPixels), _title, _labelStyle);
                 var viewport = Viewport(panel);
-                var rows = Mathf.Max(_listView.Items.Count * (_favorites.Enabled ? 3 : 2), 1) + _favorites.CountRowCount + _listView.ControlRowCount + _search.RowCount + (PreferencesResetEnabled ? 1 : 0) + 14 + CombatPrototypeMapGatherToolRepairPanel.RowCount + CombatPrototypeMapInventoryCapacityUpgradePanel.RowCount + CombatPrototypeMapGatherToolUpgradePanel.RowCount + (_durabilityEnabled ? 2 : 0) + _consumptionHintRows;
+                var rows = Mathf.Max(_listView.Items.Count * (_favorites.Enabled ? 3 : 2), 1) + _favorites.CountRowCount + _listView.ControlRowCount + _search.RowCount + (PreferencesResetEnabled ? 1 : 0) + 14 + CombatPrototypeMapGatherToolRepairPanel.RowCount + CombatPrototypeMapInventoryCapacityUpgradePanel.RowCount + CombatPrototypeMapGatherToolUpgradePanel.RowCount + (_durabilityEnabled ? 2 : 0) + _consumptionHintRows + _confirmation.RowCount;
                 var contentWidth = viewport.width - 18f;
                 var content = new Rect(0f, 0f, contentWidth, rows * _settings.RowHeightPixels +
                     _details.ExtraHeight(contentWidth, _settings.RowHeightPixels, _labelStyle));
@@ -341,7 +376,7 @@ namespace Code_01.CombatPrototype.Map
                 _favorites.DrawRow(width, ref y, _settings.RowHeightPixels, _buttonStyle, item, _rowMousePressAccepted);
                 _details.DrawExpanded(width, ref y, _settings.RowHeightPixels, _labelStyle, _buttonStyle, item.Name, _mousePressAccepted);
             }
-            _upgrade.Draw(width, ref y, _settings.RowHeightPixels, _labelStyle, _buttonStyle, _mousePressAccepted);
+            _upgrade.Draw(width, ref y, _settings.RowHeightPixels, _labelStyle, _buttonStyle, _mousePressAccepted, _confirmation);
             Label(width, ref y, _tools);
             ToolLabel(width, ref y, _axeStatus, _axeDurabilityStatus.TextColor);
             if (_durabilityEnabled) Label(width, ref y, _axeDurabilityStatus.Detail);
@@ -350,8 +385,8 @@ namespace Code_01.CombatPrototype.Map
             Label(width, ref y, _craft);
             DrawRecipe(width, ref y, _axeCraftTitle, _axeButton, _axeRecipe, _axeConsumptionHint, _axeMissing, _canCraftAxe, true);
             DrawRecipe(width, ref y, _pickaxeCraftTitle, _pickaxeButton, _pickaxeRecipe, _pickaxeConsumptionHint, _pickaxeMissing, _canCraftPickaxe, false);
-            _repair.Draw(width, ref y, _settings.RowHeightPixels, _labelStyle, _buttonStyle, _mousePressAccepted);
-            _toolUpgrade.Draw(width, ref y, _settings.RowHeightPixels, _labelStyle, _buttonStyle, _mousePressAccepted);
+            _repair.Draw(width, ref y, _settings.RowHeightPixels, _labelStyle, _buttonStyle, _mousePressAccepted, _confirmation);
+            _toolUpgrade.Draw(width, ref y, _settings.RowHeightPixels, _labelStyle, _buttonStyle, _mousePressAccepted, _confirmation);
         }
 
         private void DrawListControls(float width, ref float y)
@@ -403,7 +438,14 @@ namespace Code_01.CombatPrototype.Map
             Label(width, ref y, title);
             Label(width, ref y, recipe);
             if (consumptionHint.Length != 0) Label(width, ref y, consumptionHint);
+            var operation = axe ? ConsumptionOperation.CraftAxe : ConsumptionOperation.CraftPickaxe;
+            _confirmation.DrawPrompt(operation, width, ref y, _settings.RowHeightPixels, _labelStyle);
             Label(width, ref y, missing);
+            if (_confirmation.DrawButtons(operation, width, y, _settings.RowHeightPixels, _buttonStyle, _mousePressAccepted))
+            {
+                y += _settings.RowHeightPixels;
+                return;
+            }
             var oldEnabled = GUI.enabled;
             try
             {
@@ -431,6 +473,8 @@ namespace Code_01.CombatPrototype.Map
             _repair.ClearPending();
             _upgrade.ClearPending();
             _toolUpgrade.ClearPending();
+            _confirmation.ClearPending();
+            ObserveConfirmationChange();
             _scroll = Vector2.zero;
         }
 
@@ -451,6 +495,7 @@ namespace Code_01.CombatPrototype.Map
             _repair.Reset();
             _upgrade.Reset();
             _toolUpgrade.Reset();
+            _confirmation.Reset(); _confirmationRevision = 0;
             _labelStyle = _buttonStyle = null;
             _feedback = _preferencesResetLabel = string.Empty;
             _woodQuantity = _stoneQuantity = -1;

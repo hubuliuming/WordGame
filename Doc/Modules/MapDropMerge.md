@@ -1,6 +1,6 @@
 # 同类地面掉落物合并
 
-返回[地图](Map.md)、[掉落与拾取](MapDrops.md)、[掉落存档](MapDropPersistence.md)、[背包丢弃](MapInventoryDrop.md)与[运行入口](Runtime.md)。入口CombatPrototypeNetCode；Forest/Grassland Json与BuiltIn当前schemaVersion=37/configRevision=40。用户已确认本阶段人工GamePlayer通过，主线程结合既有代码、配置及隔离烘焙静态核对判定通过，限v26/revision29及运行入口十六项；人工结论来自用户反馈；旧G结果通过仍限v25/revision28十六项，其他旧通过保持原版本/清单。
+返回[地图](Map.md)、[掉落与拾取](MapDrops.md)、[掉落存档](MapDropPersistence.md)、[背包丢弃](MapInventoryDrop.md)与[运行入口](Runtime.md)。入口CombatPrototypeNetCode；Forest/Grassland Json与BuiltIn当前schemaVersion=38/configRevision=41。用户已确认本阶段人工GamePlayer通过，主线程结合既有代码、配置及隔离烘焙静态核对判定通过，限v26/revision29及运行入口十六项；人工结论来自用户反馈；旧G结果通过仍限v25/revision28十六项，其他旧通过保持原版本/清单。
 
 ## 【FACT】入口与文件
 

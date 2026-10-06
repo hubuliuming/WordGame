@@ -1005,3 +1005,17 @@
 - 临时Bake检查代码生成超过工具50000字符上限，在运行前仅缩短检查脚本的局部变量/诊断与输出后再执行，所有校验保留，未因此改生产代码。Bake工具连接返回空失败状态，随后核实完整276条落盘结果、零Error与临时资源释放，未重跑业务。Console执行前[0,3,53]，编译后/Bake前[0,5,53]、Bake后/最终[0,7,53]；原PEListener/DOTween编译警告及三条NetCode警告保留，Bake新增两MCP WebSocket工具连接警告，无本阶段项目编译错误/警告，未清Console。
 - 新增收藏消耗提示专题，增量同步相关模块/导航与策划模板第7节完整JSON/第46节。原531项人工内容/编号逐字保留，追加十六项后547项；既有v36/revision39保护静态证据/人工通过及所有旧阶段原范围保持。本阶段人工GamePlayer待验收。
 - 没有新脚本/类/meta/组件/挂载或Scene/SubScene/Prefab/Animator/资源/字体/包/构建结构变更；源SubScene只读，临时克隆/TextAssets/Scene/World/BlobAssetStore释放，主场景干净未Play。未执行Favorites/Panel/各预览/GUI业务、实际偏好或游戏存档I/O、GamePlayer/PlayMode、逻辑单元测试、命令行构建/发布、性能采样或图片，未创建子Agent、暂存或提交Git。
+
+## 2026-10-06 收藏材料消耗提示人工验收确认
+
+- 用户明确反馈“我已验收通过，接下来下一阶段”；主线程结合既有静态核对与用户反馈判定本阶段通过，限CombatPrototypeNetCode、v37/revision40及运行入口十六项人工GamePlayer清单，人工结论来自用户反馈。
+- 增量同步收藏消耗提示专题、相关模块/导航/运行入口和策划模板第46节的验收状态；547项人工内容/编号、3280份非法配置拒绝/276组合法读取/276次隔离Editor Bake等既有静态证据、代码/JSON/资源结构及所有旧阶段原版本/清单保持。
+- 未实际触发的独立收藏/配方/取消/重置/生命周期时序、GUI命中/滚动/裁切/字形/分辨率、真实偏好I/O/故障、材料事务、多人与预测用例仍UNKNOWN；性能、平台构建及线上未获单独验收结论。本次只记录用户反馈并核对文档，未执行游戏/GUI/偏好读写、GamePlayer/PlayMode、逻辑单元测试、构建/发布、采样或图片检查，未创建子Agent、暂存或提交Git。
+
+## 2026-10-06 收藏材料消耗确认
+
+- 按用户已确认方案，由主线程在CombatPrototypeNetCode原B七个制作/修理/容量与工具升级按钮接入单待确认；首次合格请求命中正成本已应用收藏木石时暂存，原配方显示数量提示、原按钮行替换Confirm/Cancel。有效ReadInput复核最新已捕获候选与本地Revision后沿原请求提交一次，取消/相关状态变化/B关闭或绑定失效清状态，逐帧Clear仅隐藏。
+- 修改九现有C#、两地图JSON，新增一个普通CombatPrototypeMapInventoryConsumptionConfirmation.cs及正常Unity导入meta；原Favorites/Preferences/HUD/Binding/PlayerInput/服务器与存档代码保持，数字1～7直达路径保持。确认独立于消耗提示开关，内容高度新增0～1行，目标/高度变化清两种旧鼠标许可。
+- schemaVersion38/configRevision41、inventoryPanel89→93字段，追加一个严格bool与三条61 UTF-8字节文案，显式BuiltIn默认值及原根Baker映射；原89字段/顺序/值保持，关闭仍完整验证，无新输入/RPC/Ghost/保存字段或I/O入口，原资源结构保持。
+- 正常Unity编译/重载及93字段/类型/零GhostField/新普通类GUID/原协议元数据通过；3492份非法配置全部拒绝、334组合法读取与两地图各167次、共334次隔离Editor Bake完成，全部93Settings/原Settings/零反馈/引用/布局/签名符合检查。Console[0,7,53]→[0,5,53]→[0,7,53]，原警告保留、本次未重报原两编译警告，Bake新增两MCP连接工具警告；工具空失败返回后核实完整落盘结果和资源释放，未重跑业务。主场景干净、3根对象、单场景、未Play。
+- 增量同步相关模块、AI导航、消耗确认专题及外部模板第7节JSON/第47节；原547项人工内容与编号逐字保留，追加十六项后共563项。本阶段人工GamePlayer待验收；已验收提示限v37/revision40，各旧通过保持原范围，独立运行/GUI/真实I/O/联网/性能用例UNKNOWN。未执行逻辑单元测试、PlayMode/业务调用、命令行构建/发布或图片读取，未创建子Agent、暂存或提交Git。

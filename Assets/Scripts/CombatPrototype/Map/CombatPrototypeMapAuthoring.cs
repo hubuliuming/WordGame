@@ -351,7 +351,11 @@ namespace Code_01.CombatPrototype.Map
                     FavoritesDropProtectionEnabled = (byte)(inventoryPanel.favoritesDropProtectionEnabled ? 1 : 0),
                     FavoritesProtectedLabel = new FixedString64Bytes(inventoryPanel.favoritesProtectedLabel),
                     FavoritesConsumptionHintEnabled = (byte)(inventoryPanel.favoritesConsumptionHintEnabled ? 1 : 0),
-                    FavoritesConsumptionHintLabel = new FixedString64Bytes(inventoryPanel.favoritesConsumptionHintLabel)
+                    FavoritesConsumptionHintLabel = new FixedString64Bytes(inventoryPanel.favoritesConsumptionHintLabel),
+                    FavoritesConsumptionConfirmationEnabled = (byte)(inventoryPanel.favoritesConsumptionConfirmationEnabled ? 1 : 0),
+                    FavoritesConsumptionConfirmationLabel = new FixedString64Bytes(inventoryPanel.favoritesConsumptionConfirmationLabel),
+                    FavoritesConsumptionConfirmLabel = new FixedString64Bytes(inventoryPanel.favoritesConsumptionConfirmLabel),
+                    FavoritesConsumptionCancelLabel = new FixedString64Bytes(inventoryPanel.favoritesConsumptionCancelLabel)
                 });
                 var inventoryDrop = config.map.inventoryDrop;
                 AddComponent(entity, new CombatPrototypeMapInventoryDropSettings

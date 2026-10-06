@@ -1227,9 +1227,9 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 
 共531项；完整配置/行绘制/消费前检查/生命周期归[收藏保护](MapInventoryFavoritesDropProtection.md)，原丢弃事务归[丢弃](MapInventoryDrop.md)。本阶段十六项人工GamePlayer已获用户通过反馈，主线程结合既有静态核对判定通过，限CombatPrototypeNetCode、v36/revision39及运行入口清单，人工结论来自用户反馈；未实际触发的独立用例仍UNKNOWN；AI未执行保护/收藏/列表/面板/偏好/GUI业务、实际偏好或游戏存档I/O、GamePlayer/PlayMode、逻辑单元测试、命令行构建/发布、采样或图片，未创建子Agent、暂存或提交Git。
 
-## 【KNOWN ISSUES】收藏材料消耗提示人工GamePlayer清单（v37/revision40，待验收）
+## 【KNOWN ISSUES】收藏材料消耗提示人工GamePlayer清单（v37/revision40，用户已确认通过）
 
-入口CombatPrototypeNetCode、原B面板；本阶段十六项尚未获人工通过结论。原531项内容/编号及各阶段用户通过范围保持，收藏保护通过仍限v36/revision39十六项；未实际触发的独立用例UNKNOWN。
+入口CombatPrototypeNetCode、原B面板；本阶段十六项人工GamePlayer已获用户通过反馈，主线程结合既有静态核对判定通过，限CombatPrototypeNetCode、v37/revision40及运行入口清单，人工结论来自用户反馈；未实际触发的独立用例仍UNKNOWN。原531项内容/编号及各阶段用户通过范围保持，收藏保护通过仍限v36/revision39十六项；未实际触发的独立用例UNKNOWN。
 
 1. 两地图Json/BuiltIn一致v37/revision40、inventoryPanel89字段；提示开关严格bool、文案非空白/无控制且最多61 UTF-8字节，缺失/null/错类型/未知或重复键、旧v1～v36/未来版本失败，关闭仍全量验证；各端同版导入/烘焙。
 2. 仅收藏木材时，七份适用配方中正木材成本显示Uses favorites: Wood；仅收藏石材显示Stone、两者均收藏显示Wood, Stone；真实Name决定匹配，显示别名/同显示标签不串材料，实际组合未触发UNKNOWN。
@@ -1248,4 +1248,27 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 15. B关闭/逐帧Clear/死亡/断线/地图源或所属玩家变化/World或Scene释放沿原生命周期处理，新绑定清缓存后按合法配置/偏好重建；默认/最小面板、字号/行高/ASCII61/UTF-8 61/中文文案、字形/裁切/分辨率未遍历UNKNOWN。
 16. 原B/1～7/E/F/G/R/F5、采集/砍树/采矿/再生、掉落合并/部分拾取、战斗/镜头回归；提示只覆盖B七份配方，无新弹窗/二次确认/RPC/输入/Ghost/保存字段。输入19/Tools3/Drop请求2/偏好v3七字段/玩家v4/世界v2保持，多人/预测/延迟与性能/平台/线上未触发UNKNOWN。
 
-共547项；完整当前契约、缓存/行数/业务边界及静态证据归[收藏提示](MapInventoryFavoritesConsumptionHint.md)，本阶段十六项人工GamePlayer待验收。AI未执行收藏/配方/面板/GUI业务、实际偏好或游戏存档I/O、GamePlayer/PlayMode、逻辑单元测试、命令行构建/发布、性能采样或图片，未创建子Agent、暂存或提交Git。
+共547项；完整当前契约、缓存/行数/业务边界及静态证据归[收藏提示](MapInventoryFavoritesConsumptionHint.md)，本阶段十六项人工GamePlayer已获用户通过反馈，主线程结合既有静态核对判定通过，限CombatPrototypeNetCode、v37/revision40及运行入口清单，人工结论来自用户反馈；未实际触发的独立用例仍UNKNOWN。AI未执行收藏/配方/面板/GUI业务、实际偏好或游戏存档I/O、GamePlayer/PlayMode、逻辑单元测试、命令行构建/发布、性能采样或图片，未创建子Agent、暂存或提交Git。
+
+## 【KNOWN ISSUES】收藏材料消耗确认人工GamePlayer清单（v38/revision41，待验收）
+
+入口CombatPrototypeNetCode、原B七按钮；实施及编译/配置/元数据/隔离Editor Bake静态核对通过，人工GamePlayer待用户验收。原547项内容/编号与全部旧用户通过范围保持，已验收消耗提示仍限v37/revision40十六项；旧通过不覆盖新确认，未实际触发的独立用例UNKNOWN。
+
+1. 两地图Json/BuiltIn一致v38/revision41、inventoryPanel93字段，原89字段/顺序/值保持；新bool严格、三文案非空白/无控制且最多61 UTF-8字节，缺失/null/错类型/未知/重复键、旧v1～v37/未来版本失败，关闭仍验证，各端同版导入/烘焙。
+2. B点击合格斧头/镐子制作或重做，配方存在正成本已应用收藏木石时首次不扣材料/发工具，原行变Confirm/Cancel，提示准确列该Lv1成本；Wood、Stone、两者及零成本收藏分支分别核对，未触发UNKNOWN。
+3. 制作/重做Confirm提交原请求一次，取消不提交；未持有、损坏、可用工具、材料不足、非法库存和工具关闭资格沿原规则，反复GUI/帧/点击不重复扣料，未触发独立时序UNKNOWN。
+4. B两修理按钮按当前实际级成本/最大耐久确认，Confirm沿原修理恢复且只扣一次；未持有/满耐久/修理关闭/缺材料不进入，取消无消费；Lv1～Lv3及耐久0独立分支未触发UNKNOWN。
+5. B容量升级按实际下一等级成本确认，Confirm沿原保存后升级一次；满级/容量或升级关闭/缺材料保持原资格，取消保留等级与材料，原所属成功/失败反馈保持，未触发UNKNOWN。
+6. B两工具升级按实际下一工具级配方确认，Confirm沿原保留绝对耐久及效率提升；未持有/满级/关闭/缺材料不进入，取消无扣料，Lv1→Lv2/Lv2→Lv3与两工具独立分支未触发UNKNOWN。
+7. 最多一个待确认；点击另一有效配方替换当前操作，即使高度相同也清旧许可与决定，不串配方/工具。点无收藏成本的有效操作沿原提交并取消旧待确认，交错事件未触发UNKNOWN。
+8. 待确认期间木石数量、相关工具等级/耐久/上限、配方或原资格变化，下一有效Show取消；Confirm复核最新已捕获候选及Revision，不使用旧数量，未实际构造边界时序UNKNOWN。
+9. 收藏取消/新增/合法恢复及Reset view实际应用后的Revision变化取消待确认；尚未应用的收藏请求读取原集合。真实Name、重复显示别名/隐藏/零库存保留Name分支正确，未触发UNKNOWN。
+10. Confirm/Cancel只排本地决定；ReadInput有效绑定内消费一次，关闭B、无效输入、死亡/断线/源或所属玩家改变/World或Scene释放取消，逐帧Clear仅隐藏且有效下一Show保留，完整生命周期未触发UNKNOWN。
+11. favoritesConsumptionHintEnabled=false仍独立确认；确认关闭或favoritesEnabled=false恢复原B按钮路径，无正成本收藏直接原提交，全部字段仍校验；丢弃保护独立，组合未触发UNKNOWN。
+12. 计数/收藏筛选/排序/分类/搜索/详情/偏好/重置按钮显示开关及材料交集不改变真实成本与资格；preferences关闭或I/O暂停时本绑定临时收藏仍确认，真实偏好恢复/故障未触发UNKNOWN。
+13. 单待确认新增0～1固定行与原提示0～7共用内容高度，原按钮行替换为同高两按钮；首次/替换/取消/消费及原几何变化清旧面板和行许可，按下抬起/快速切换/滚动独立时序未触发UNKNOWN。
+14. 默认/最小面板尺寸、字号/行高、长三文案ASCII61/UTF-8 61/中文、双收藏提示、固定页脚、详情与滚动显示/命中正确，搜索原Y/焦点/IME与指针隔离保持；字形/裁切/分辨率未遍历UNKNOWN。
+15. 数字1～7保持原直达路径，仅B七按钮确认；无新增Enter/Esc/键盘封锁或暂停，原B/E/F/G/R/F5、移动/攻击/镜头、采集再生/掉落合并及部分拾取回归，独立组合未触发UNKNOWN。
+16. 原输入19/Tools3/Drop请求2/偏好v3七字段/玩家v4/世界v2、Ghost/RPC/服务器保存事务保持；确认消费后服务端忙碌/拒绝/保存失败沿原反馈及新请求，无自动重试或本地扣料，多人/预测/延迟与性能/平台/线上未触发UNKNOWN。
+
+当前共563项；完整JSON、单待确认/复核/取消、绘制/鼠标和数字直达边界及静态证据归[消耗确认](MapInventoryFavoritesConsumptionConfirm.md)。3492份非法配置拒绝/334组合法读取及334次隔离Bake通过，93字段/零GhostField与原元数据保持，主场景干净/3根对象/单场景/未Play；工具空失败返回后核实完整落盘结果与释放。AI未执行确认/收藏/面板/GUI业务、真实偏好或游戏存档I/O、GamePlayer/PlayMode、逻辑单元测试、命令行构建/发布、性能采样或图片。

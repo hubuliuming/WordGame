@@ -94,5 +94,9 @@ namespace Code_01.CombatPrototype.Map
         public FixedString64Bytes FavoritesProtectedLabel;
         public byte FavoritesConsumptionHintEnabled;
         public FixedString64Bytes FavoritesConsumptionHintLabel;
+        public byte FavoritesConsumptionConfirmationEnabled;
+        public FixedString64Bytes FavoritesConsumptionConfirmationLabel;
+        public FixedString64Bytes FavoritesConsumptionConfirmLabel;
+        public FixedString64Bytes FavoritesConsumptionCancelLabel;
     }
 }

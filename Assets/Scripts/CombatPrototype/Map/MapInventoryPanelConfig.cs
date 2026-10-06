@@ -94,5 +94,9 @@ namespace Code_01.CombatPrototype.Map
         public string favoritesProtectedLabel;
         public bool favoritesConsumptionHintEnabled;
         public string favoritesConsumptionHintLabel;
+        public bool favoritesConsumptionConfirmationEnabled;
+        public string favoritesConsumptionConfirmationLabel;
+        public string favoritesConsumptionConfirmLabel;
+        public string favoritesConsumptionCancelLabel;
     }
 }

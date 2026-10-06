@@ -2,6 +2,7 @@ using System;
 using System.Globalization;
 using Unity.Entities;
 using UnityEngine;
+using ConsumptionOperation = Code_01.CombatPrototype.Map.CombatPrototypeMapInventoryConsumptionConfirmation.Operation;
 
 namespace Code_01.CombatPrototype.Map
 {
@@ -53,15 +54,15 @@ namespace Code_01.CombatPrototype.Map
 
         public void Capture(CombatPrototypeMapInventoryPanelSnapshot snapshot, int axeLevel, int pickaxeLevel,
             CombatPrototypeMapGatherToolDefinition axe, CombatPrototypeMapGatherToolDefinition pickaxe,
-            CombatPrototypeMapToolUpgradeFeedback feedback, CombatPrototypeMapInventoryPanelFavorites favorites)
+            CombatPrototypeMapToolUpgradeFeedback feedback, CombatPrototypeMapInventoryPanelFavorites favorites, CombatPrototypeMapInventoryConsumptionConfirmation confirmation)
         {
             _feedback.Observe(feedback);
-            CaptureTool(_axe, snapshot, axeLevel, snapshot.AxeDurability, axe, favorites);
-            CaptureTool(_pickaxe, snapshot, pickaxeLevel, snapshot.PickaxeDurability, pickaxe, favorites);
+            CaptureTool(_axe, snapshot, axeLevel, snapshot.AxeDurability, axe, favorites, confirmation, ConsumptionOperation.UpgradeAxe);
+            CaptureTool(_pickaxe, snapshot, pickaxeLevel, snapshot.PickaxeDurability, pickaxe, favorites, confirmation, ConsumptionOperation.UpgradePickaxe);
         }
 
         private void CaptureTool(ToolPreview preview, CombatPrototypeMapInventoryPanelSnapshot snapshot, int level, int durability,
-            CombatPrototypeMapGatherToolDefinition current, CombatPrototypeMapInventoryPanelFavorites favorites)
+            CombatPrototypeMapGatherToolDefinition current, CombatPrototypeMapInventoryPanelFavorites favorites, CombatPrototypeMapInventoryConsumptionConfirmation confirmation, ConsumptionOperation operation)
         {
             if (preview.Level == level && preview.Durability == durability && preview.Wood == snapshot.WoodQuantity &&
                 preview.Stone == snapshot.StoneQuantity && preview.InventoryValid == snapshot.InventoryValid &&
@@ -76,6 +77,8 @@ namespace Code_01.CombatPrototype.Map
                 favorites.ConsumptionHint(next.WoodQuantity, next.StoneQuantity) : string.Empty;
             preview.CanUpgrade = owned && !max && _enabled && snapshot.InventoryValid &&
                 preview.Wood >= next.WoodQuantity && preview.Stone >= next.StoneQuantity;
+            confirmation.Capture(operation, preview.CanUpgrade, next.WoodQuantity, next.StoneQuantity, preview.Wood, preview.Stone,
+                level, durability, current.MaxDurability, favorites);
             var state = !_enabled || !snapshot.InventoryValid ? _disabled : !owned ? _notOwned :
                 max ? _maxLevel : preview.CanUpgrade ? _ready : _missing;
             preview.Title = preview.Name + (owned ? " " + _levelLabel + " " + level +
@@ -94,23 +97,29 @@ namespace Code_01.CombatPrototype.Map
 
         private static string Seconds(float duration) => duration.ToString("0.###", CultureInfo.InvariantCulture) + " s";
 
-        public void Draw(float width, ref float y, float rowHeight, GUIStyle labelStyle, GUIStyle buttonStyle, bool mousePressAccepted)
+        public void Draw(float width, ref float y, float rowHeight, GUIStyle labelStyle, GUIStyle buttonStyle, bool mousePressAccepted, CombatPrototypeMapInventoryConsumptionConfirmation confirmation)
         {
             Label(width, ref y, rowHeight, labelStyle, _heading);
-            DrawTool(_axe, width, ref y, rowHeight, labelStyle, buttonStyle, mousePressAccepted);
-            DrawTool(_pickaxe, width, ref y, rowHeight, labelStyle, buttonStyle, mousePressAccepted);
+            DrawTool(_axe, width, ref y, rowHeight, labelStyle, buttonStyle, mousePressAccepted, confirmation, ConsumptionOperation.UpgradeAxe);
+            DrawTool(_pickaxe, width, ref y, rowHeight, labelStyle, buttonStyle, mousePressAccepted, confirmation, ConsumptionOperation.UpgradePickaxe);
             Label(width, ref y, rowHeight, labelStyle, _feedback.Feedback);
         }
 
         private static void DrawTool(ToolPreview preview, float width, ref float y, float rowHeight, GUIStyle labelStyle,
-            GUIStyle buttonStyle, bool mousePressAccepted)
+            GUIStyle buttonStyle, bool mousePressAccepted, CombatPrototypeMapInventoryConsumptionConfirmation confirmation, ConsumptionOperation operation)
         {
             Label(width, ref y, rowHeight, labelStyle, preview.Title);
             Label(width, ref y, rowHeight, labelStyle, preview.DurabilityText);
             Label(width, ref y, rowHeight, labelStyle, preview.DurationText);
             Label(width, ref y, rowHeight, labelStyle, preview.Recipe);
             if (preview.ConsumptionHint.Length != 0) Label(width, ref y, rowHeight, labelStyle, preview.ConsumptionHint);
+            confirmation.DrawPrompt(operation, width, ref y, rowHeight, labelStyle);
             Label(width, ref y, rowHeight, labelStyle, preview.Missing);
+            if (confirmation.DrawButtons(operation, width, y, rowHeight, buttonStyle, mousePressAccepted))
+            {
+                y += rowHeight;
+                return;
+            }
             var oldEnabled = GUI.enabled;
             try
             {

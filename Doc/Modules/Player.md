@@ -291,7 +291,7 @@ v13/16的[资源状态](MapResourceStatusHud.md)由Player Baker追加所属Mode/
 
 ## 【FACT】G目标可领取数量
 
-当前v37/revision40的[部分拾取](MapDropPartialPickup.md)在原CombatPrototypeMapPickupHudState增加int PickupQuantity，第七个GhostField仍SendToOwner；Player Baker继续添加原Hidden默认值，七字段均零/空初态，组件挂载与Player Prefab保持。实际G读取本人的容量Level/库存决定本次量，所属结果仍原四字段且成功数量为实际增量。输入19、Tools3、F4/资源状态4/世界保存3及原反馈、生命/体力/R、玩家v4/世界v2保持；各端同版重新烘焙。部分拾取v27阶段编译、Serializer七字段/7 mask bits/88字节结构与40次隔离Bake静态通过；用户人工通过限v27/revision30十六项，未触发独立用例UNKNOWN；旧通过仍限原版本/清单。
+当前v38/revision41的[部分拾取](MapDropPartialPickup.md)在原CombatPrototypeMapPickupHudState增加int PickupQuantity，第七个GhostField仍SendToOwner；Player Baker继续添加原Hidden默认值，七字段均零/空初态，组件挂载与Player Prefab保持。实际G读取本人的容量Level/库存决定本次量，所属结果仍原四字段且成功数量为实际增量。输入19、Tools3、F4/资源状态4/世界保存3及原反馈、生命/体力/R、玩家v4/世界v2保持；各端同版重新烘焙。部分拾取v27阶段编译、Serializer七字段/7 mask bits/88字节结构与40次隔离Bake静态通过；用户人工通过限v27/revision30十六项，未触发独立用例UNKNOWN；旧通过仍限原版本/清单。
 
 ## 【CURRENT STRATEGY】B材料搜索的本地键盘采样
 
@@ -325,4 +325,8 @@ v36/revision39保护阶段的[收藏保护](MapInventoryFavoritesDropProtection.
 
 ## 【CURRENT STRATEGY】收藏材料消耗提示
 
-当前v37/revision40的[收藏材料消耗提示](MapInventoryFavoritesConsumptionHint.md)复用原B面板七份木石配方和已应用Favorites.IsFavorite真实Name；只在对应操作有有效配方且正成本材料已收藏时，于配方下加一行缓存只读文字，材料不足仍提示。隐藏/数量归零/仅看收藏/搜索不改变配方提示，取消或Reset实际应用后下一有效Show刷新。共0～7行计入原滚动高度，提示总高度变化清旧鼠标许可，不清已排队业务请求；原按钮资格、1～7/E/F/G、服务端扣料/保存及全部反馈保持。本阶段人工GamePlayer待验收，旧保护通过限v36/revision39十六项，其他旧阶段保持原版本/清单。
+v37/revision40提示阶段的[收藏材料消耗提示](MapInventoryFavoritesConsumptionHint.md)复用原B面板七份木石配方和已应用Favorites.IsFavorite真实Name；只在对应操作有有效配方且正成本材料已收藏时，于配方下加一行缓存只读文字，材料不足仍提示。隐藏/数量归零/仅看收藏/搜索不改变配方提示，取消或Reset实际应用后下一有效Show刷新。共0～7行计入原滚动高度，提示总高度变化清旧鼠标许可，不清已排队业务请求；原按钮资格、1～7/E/F/G、服务端扣料/保存及全部反馈保持。本阶段十六项人工GamePlayer已获用户通过反馈，主线程结合既有静态核对判定通过，限CombatPrototypeNetCode、v37/revision40及运行入口清单，人工结论来自用户反馈；未实际触发的独立用例仍UNKNOWN，旧保护通过限v36/revision39十六项，其他旧阶段保持原版本/清单。
+
+## 【CURRENT STRATEGY】收藏材料消耗确认
+
+当前v38/revision41的[收藏材料消耗确认](MapInventoryFavoritesConsumptionConfirm.md)仅处理原B七个制作/修理/容量与工具升级按钮。首次有效按钮请求命中已应用收藏木石的正成本时暂存一个操作，在配方内显示数量提示，以Confirm/Cancel替换原按钮行；确认按最新已捕获候选和本地Revision复核后沿原请求提交一次，取消/关闭B/相关数量、等级、耐久、配方或已应用收藏变化/绑定失效清待确认。逐帧Clear仅隐藏，确认目标或高度变化清旧面板与行鼠标许可。确认独立于原消耗提示开关；数字1～7保持原直达链，偏好v3七字段、输入19、Ghost/服务器与保存入口保持。本阶段十六项人工GamePlayer待验收，已验收提示仍限v37/revision40，全部旧通过保持原版本/清单。

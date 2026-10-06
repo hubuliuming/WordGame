@@ -1,6 +1,6 @@
 # 背包仅看收藏筛选
 
-返回[地图](Map.md)、[背包](Inventory.md)、[B面板](MapInventoryPanel.md)、[列表](MapInventoryListView.md)、[收藏](MapInventoryFavorites.md)、[搜索](MapInventorySearch.md)、[详情](MapInventoryDetails.md)、[本机偏好](MapInventoryPreferences.md)、[配置](DataResources.md)与[运行验收](Runtime.md)。入口CombatPrototypeNetCode、原B面板；两地图Json/BuiltIn当前v35/revision38。主线程按已确认方案完成接入及静态范围核对；用户已确认本阶段十六项人工GamePlayer验收通过，主线程结合既有静态核对与用户反馈判定通过，限CombatPrototypeNetCode、v34/revision37及运行入口清单，人工结论来自用户反馈；收藏旧通过限v33/revision36十六项，其他旧阶段保持各自版本/清单。
+返回[地图](Map.md)、[背包](Inventory.md)、[B面板](MapInventoryPanel.md)、[列表](MapInventoryListView.md)、[收藏](MapInventoryFavorites.md)、[搜索](MapInventorySearch.md)、[详情](MapInventoryDetails.md)、[本机偏好](MapInventoryPreferences.md)、[配置](DataResources.md)与[运行验收](Runtime.md)。入口CombatPrototypeNetCode、原B面板；两地图Json/BuiltIn当前v36/revision39。主线程按已确认方案完成接入及静态范围核对；用户已确认本阶段十六项人工GamePlayer验收通过，主线程结合既有静态核对与用户反馈判定通过，限CombatPrototypeNetCode、v34/revision37及运行入口清单，人工结论来自用户反馈；收藏旧通过限v33/revision36十六项，其他旧阶段保持各自版本/清单。
 
 ## 【FACT】入口与文件
 
@@ -27,7 +27,7 @@
 | favoritesFilterOnlyLabel | Favorites only | 必填文案→FixedString64Bytes |
 | noMatchingFavoritesLabel | No matching favorites | 必填文案→FixedString64Bytes |
 
-原83字段保留，[收藏计数](MapInventoryFavoritesCount.md)追加两字段，当前85：DTO十四bool、六float、三int、两模式string、59文案string及一文件ID；Settings十四byte、六float、三int、两byte枚举及60 FixedString64Bytes，零GhostField/无GhostComponent。四文案非空白、无控制字符、最多61 UTF-8字节；关闭收藏/新筛选/面板仍全量验证。仅地图schema35、正revision/seed；默认revision38，旧地图v1～v34、缺失/null/错类型/未知或重复键拒绝，无补默认/来源回退/热重载，正常导入/烘焙生效，各端同版。
+原83字段保留，[收藏计数](MapInventoryFavoritesCount.md)与[收藏保护](MapInventoryFavoritesDropProtection.md)各追加两字段，当前87：DTO十五bool、六float、三int、两模式string、60文案string及一文件ID；Settings十五byte、六float、三int、两byte枚举及61 FixedString64Bytes，零GhostField/无GhostComponent。四文案非空白、无控制字符、最多61 UTF-8字节；关闭收藏/新筛选/面板仍全量验证。仅地图schema36、正revision/seed；默认revision39，旧地图v1～v35、缺失/null/错类型/未知或重复键拒绝，无补默认/来源回退/热重载，正常导入/烘焙生效，各端同版。
 
 ## 【CURRENT STRATEGY】显示交集与点击
 
@@ -35,7 +35,7 @@
 
 可见行建立后消费原待收藏Name；不在最新交集/消失的请求丢弃。仅看收藏中取消当前Name，随后原地移除不再收藏的行，在同一次有效刷新关闭被隐藏的详情，再观察已应用偏好。完整库存空沿原Empty；库存非空但仅看收藏交集为空优先No matching favorites；全部模式保留原搜索/分类无匹配文案。隐藏材料仍计容量、木石配方与原业务资格，数量归零的收藏记录保留，再获同名按当前交集显示。
 
-新模式实际变化归零滚动并取消旧面板/行鼠标按下许可，原排序/搜索许可规则保持；收藏实际变化、行身份及详情高度检查继续沿原。已排队真实Name丢弃/制作/修理/两升级及服务器动作不撤回；不增加快捷键、RPC/Ghost或服务端条件。ControlRowCount纳入筛选行（总0～3）；绘制内容高度与ContainsSearchField还共用计数CountRowCount0～1，收藏筛选和计数各自开启时分别使搜索文本框下移一行。面板矩形、固定标题/页脚、Drop/All与焦点/键盘隔离代码保持。
+新模式实际变化归零滚动并取消旧面板/行鼠标按下许可，原排序/搜索许可规则保持；收藏实际变化、行身份及详情高度检查继续沿原。筛选切换不清已排队业务；未消费丢弃请求另按[收藏保护](MapInventoryFavoritesDropProtection.md)复核，制作/修理/两升级及已提交服务器动作保持；不增加快捷键、RPC/Ghost或服务端条件。ControlRowCount纳入筛选行（总0～3）；绘制内容高度与ContainsSearchField还共用计数CountRowCount0～1，收藏筛选和计数各自开启时分别使搜索文本框下移一行。面板矩形、固定标题/页脚、原操作行高度与焦点/键盘隔离代码保持，收藏保护行内容及消费前复核归保护专题。
 
 ## 【CURRENT STRATEGY】开关、重置与生命周期
 
@@ -65,4 +65,8 @@ AI未执行ListView/Favorites/Panel/Preferences/GUI业务、真实偏好或游�
 
 ## 【FACT】当前收藏计数边界
 
-当前v35/revision38的[收藏计数](MapInventoryFavoritesCount.md)独立于FavoritesOnly/FavoritesFilterEnabled；切换分类/搜索/仅看收藏不修改全量_names计数。仅看收藏中取消收藏，在原ApplyPending实际变化后更新计数，同次Capture仍移除行并关闭隐藏详情。ListView及Preferences代码/协议保持，当前计数十六项待人工GamePlayer验收；本专题筛选通过仍限v34/revision37清单。
+v35/revision38计数阶段的[收藏计数](MapInventoryFavoritesCount.md)独立于FavoritesOnly/FavoritesFilterEnabled；切换分类/搜索/仅看收藏不修改全量_names计数。仅看收藏中取消收藏，在原ApplyPending实际变化后更新计数，同次Capture仍移除行并关闭隐藏详情。ListView及Preferences代码/协议保持，本阶段十六项人工GamePlayer已获用户通过反馈，主线程结合既有静态核对判定通过，限CombatPrototypeNetCode、v35/revision38及运行入口清单，人工结论来自用户反馈；未实际触发的独立用例仍UNKNOWN；本专题筛选通过仍限v34/revision37清单。
+
+## 【FACT】收藏保护与仅看收藏
+
+当前v36/revision39的[收藏保护](MapInventoryFavoritesDropProtection.md)：收藏筛选所用ListView与本机偏好代码保持；仅看收藏不自动解锁Drop/All。过滤/隐藏不删Name，当前已应用集合由DropClient共享查询；取消收藏仍按原同次移除行与关闭隐藏详情，之后消费未提交丢弃按更新后的集合复核。 本阶段十六项人工GamePlayer待验收，完整静态证据与边界归保护专题及[运行入口](Runtime.md)；既有用户通过保持各自原版本/清单，未实际触发的独立用例仍UNKNOWN。

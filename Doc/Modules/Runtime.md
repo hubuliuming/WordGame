@@ -1177,7 +1177,7 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 
 ## 【KNOWN ISSUES】背包收藏数量与上限提示验收边界
 
-入口CombatPrototypeNetCode、原B面板；两地图Json/BuiltIn v35/revision38，inventoryPanel83→85、两必填字段接入，原收藏上限64与Favorite limit复用。主线程静态范围核对通过，以下十六项待人工GamePlayer验收；原499项内容/编号逐字保留，筛选用户通过限v34/revision37十六项及其他旧范围。
+入口CombatPrototypeNetCode、原B面板；两地图Json/BuiltIn v35/revision38，inventoryPanel83→85、两必填字段接入，原收藏上限64与Favorite limit复用。用户明确反馈“我已验收通过，接下来下一阶段”；主线程结合既有静态核对与用户反馈判定本阶段通过，限CombatPrototypeNetCode、v35/revision38及以下十六项人工GamePlayer清单，人工结论来自用户反馈；未实际触发的独立用例仍UNKNOWN；原499项内容/编号逐字保留，筛选用户通过限v34/revision37十六项及其他旧范围。
 
 正常Unity编译/重载及元数据核对通过：DTO十四bool、六float、三int、两模式string、59文案string及一文件ID，共85；Settings十四byte、六float、三int、两byte枚举及60 FixedString64Bytes，共85、零GhostField。原Favorites普通类/GUID、CountText字符串和CountRowCount整数元数据、偏好CurrentVersion=3/Data七字段及原协议保持。3084份非法配置全部拒绝（每地图1542），202组合法读取（每地图101）通过，包含85字段完整/形状/类型/重复键、计数严格bool、文案空白/控制/61字节与关闭仍校验、旧v1～v34/未来版本及全部原规则；只配置读取和元数据，不调用计数/GUI/偏好业务。
 
@@ -1202,4 +1202,27 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 15. 偏好仍v3七字段且严格兼容v1/v2，无独立计数字段；库存刷新/模式切换不因计数新增写入，实际收藏变化沿原延迟/Close提交与失败暂停规则，文件故障/并发/断电未触发UNKNOWN。
 16. 原F/G/B/E/R/F5/1～7、采集/砍树/采矿/再生、掉落/合并/部分拾取、制作/修理/两升级与战斗镜头/指针隔离回归，各端同版导入/烘焙。多人/预测/延迟及性能/平台/线上未触发UNKNOWN。
 
-共515项；完整计数/配置/生命周期归[收藏计数](MapInventoryFavoritesCount.md)，收藏容量归[收藏](MapInventoryFavorites.md)，交集归[收藏筛选](MapInventoryFavoritesFilter.md)，业务入口归[B面板](MapInventoryPanel.md)。当前计数十六项待人工GamePlayer验收；AI未执行计数/Favorites/ListView/Panel/Preferences/GUI业务、真实偏好或游戏存档I/O、GamePlayer/PlayMode、逻辑单元测试、命令行构建/发布、采样或图片，未创建子Agent、暂存或提交Git；独立交互/生命周期/文件/故障/字形/联网用例及性能/平台/线上仍UNKNOWN。
+共515项；完整计数/配置/生命周期归[收藏计数](MapInventoryFavoritesCount.md)，收藏容量归[收藏](MapInventoryFavorites.md)，交集归[收藏筛选](MapInventoryFavoritesFilter.md)，业务入口归[B面板](MapInventoryPanel.md)。本阶段十六项人工GamePlayer已获用户通过反馈，主线程结合既有静态核对判定通过，限CombatPrototypeNetCode、v35/revision38及运行入口清单，人工结论来自用户反馈；未实际触发的独立用例仍UNKNOWN；AI未执行计数/Favorites/ListView/Panel/Preferences/GUI业务、真实偏好或游戏存档I/O、GamePlayer/PlayMode、逻辑单元测试、命令行构建/发布、采样或图片，未创建子Agent、暂存或提交Git；独立交互/生命周期/文件/故障/字形/联网用例及性能/平台/线上仍UNKNOWN。
+
+## 【KNOWN ISSUES】收藏材料丢弃保护人工GamePlayer清单（v36/revision39，待验收）
+
+入口CombatPrototypeNetCode、原B面板；本阶段十六项尚未获人工通过结论。此前515项内容/编号及用户通过范围保持，收藏计数通过仍限v35/revision38十六项；未实际触发的独立用例为UNKNOWN。
+
+1. 两地图Json/BuiltIn一致v36/revision39，inventoryPanel87字段；新保护开关严格bool、文案非空白/无控制且最多61 UTF-8字节，旧v1～v35/未来版本及缺失/错类型失败，关闭仍完整验证；各端同版导入/烘焙。
+2. 默认收藏支持的活力苹果/木材/石材，在收藏实际应用后的有效Show以只读Favorite protected替代原Drop/All行，不排队丢弃、不扣库存或新增地面物；不支持或丢弃关闭优先沿Unavailable，未触发UNKNOWN。
+3. 实际取消收藏后下一有效Show恢复原Drop x数量/All按钮，单次数量不足、All关闭与InventoryValid=false仍沿原禁用；取消尚未应用时读取旧集合，时序未触发UNKNOWN。
+4. 保护按真实Row.Name关联；显示别名/重复显示文案、原顺序/类型/数量排序及重排不串保护，按下至抬起身份变化沿原取消行点击许可，独立事件分支未触发UNKNOWN。
+5. 未消费丢弃请求按稳定Kind映射当前Definition.ItemName复核已应用收藏；受保护请求只清一次并返回空，无自动重试/新反馈；已经写入PlayerInput的不撤回，未实际构造各时序UNKNOWN。
+6. 分类×搜索×仅看收藏交集只改可见行，隐藏/数量归零/暂不存在Name仍沿原集合保存，重新获得同名后保护；完整库存统计、全量计数与行身份保持，未触发UNKNOWN。
+7. 关闭计数/收藏筛选/排序/分类/搜索/详情/偏好/重置按钮各能力，收藏与保护仍启用时继续按真实Name保护；原搜索焦点与几何不因保护变化，独立组合未遍历UNKNOWN。
+8. favoritesDropProtectionEnabled=false恢复原收藏材料Drop/All规则；favoritesEnabled=false或两者同时关闭不保护，但仍完整验证两字段；开启/关闭导入重绑分支未触发UNKNOWN。
+9. 合法偏好v2/v3恢复同一已应用Name后保护，包含暂不在库存而后恢复的Name；v1沿空收藏迁移，正常读取不因保护新增写盘，真实迁移/文件I/O未触发UNKNOWN。
+10. preferencesEnabled=false或原I/O失败暂停时，本绑定临时收藏仍保护；无效偏好沿原明确失败/暂停且不通过保护兜底文件，真实故障/关闭组合未触发UNKNOWN。
+11. Reset view实际清启用收藏后下一有效Show解除保护，原计数归零、默认FavoritesOnly/空态和详情规则保持；按钮仅排队，不在GUI改库存/集合，原延迟提交/失败时序未触发UNKNOWN。
+12. B关闭/原无效ReadInput清未消费请求，逐帧Clear仅隐藏；死亡/断线/源或玩家变化及World/Scene释放沿Reset清保护配置/请求缓存，新绑定按合法配置/偏好恢复，生命周期未触发UNKNOWN。
+13. 保护拦截不产生新服务端请求或失败反馈；原未保护丢弃的忙碌/同tick优先级、保存失败、Prepared提交/回滚与成功反馈保持，原已有反馈按原期限显示，独立事务分支未触发UNKNOWN。
+14. 收藏木石仍供原制作/修理/工具升级/容量升级，收藏小块肉仍可原E使用；保护不扣料/返料或改变配方，数量归零仍保留收藏Name，独立业务组合未触发UNKNOWN。
+15. 原操作行固定高度、材料滚动/搜索IME/焦点/指针隔离、收藏/详情按钮与固定页脚正确；默认/最小面板、字号/行高及保护文案ASCII61/UTF-8 61/中文、真实字形/裁切/分辨率未遍历UNKNOWN。
+16. 原F/G/B/E/R/F5/1～7、采集/砍树/采矿/再生、掉落合并/部分拾取、制作/修理/两升级与战斗/镜头回归；输入19/Drop请求2/偏好v3七字段/玩家v4/世界v2保持，保护仅本机已应用集合，多人/预测/延迟与性能/平台/线上未触发UNKNOWN。
+
+共531项；完整配置/行绘制/消费前检查/生命周期归[收藏保护](MapInventoryFavoritesDropProtection.md)，原丢弃事务归[丢弃](MapInventoryDrop.md)。当前十六项人工GamePlayer待验收；AI未执行保护/收藏/列表/面板/偏好/GUI业务、实际偏好或游戏存档I/O、GamePlayer/PlayMode、逻辑单元测试、命令行构建/发布、采样或图片，未创建子Agent、暂存或提交Git。

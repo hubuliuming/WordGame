@@ -21,7 +21,7 @@
 
 ## 【FACT】JSON 契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 当前一致为 schemaVersion=35/configRevision=38。必填 inventoryPanel 共85字段，原30字段加[排序筛选](MapInventoryListView.md)十四、[搜索](MapInventorySearch.md)七、[本机偏好与重置](MapInventoryPreferences.md)六、[材料详情](MapInventoryDetails.md)十四、[收藏](MapInventoryFavorites.md)六、[收藏筛选](MapInventoryFavoritesFilter.md)六及[收藏计数](MapInventoryFavoritesCount.md)两字段，沿原严格UTF-8、完整字段/类型及未知/重复键检查；即使关闭面板也校验全部字段。旧地图v1～v34明确失败，不补段/默认值或回退来源；正常导入/烘焙后生效，无运行热重载。Lv1配方/定义仍从gatherTools读取，当前级上限/倍率归[gatherToolUpgrade](MapGatherToolUpgrade.md)，面板不复制配置真值。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 当前一致为 schemaVersion=36/configRevision=39。必填 inventoryPanel 共87字段，原30字段加[排序筛选](MapInventoryListView.md)十四、[搜索](MapInventorySearch.md)七、[本机偏好与重置](MapInventoryPreferences.md)六、[材料详情](MapInventoryDetails.md)十四、[收藏](MapInventoryFavorites.md)六、[收藏筛选](MapInventoryFavoritesFilter.md)六、[收藏计数](MapInventoryFavoritesCount.md)两及[收藏保护](MapInventoryFavoritesDropProtection.md)两字段，沿原严格UTF-8、完整字段/类型及未知/重复键检查；即使关闭面板也校验全部字段。旧地图v1～v35明确失败，不补段/默认值或回退来源；正常导入/烘焙后生效，无运行热重载。Lv1配方/定义仍从gatherTools读取，当前级上限/倍率归[gatherToolUpgrade](MapGatherToolUpgrade.md)，面板不复制配置真值。
 
 | 字段 | 默认值 | 契约 |
 |---|---|---|
@@ -56,7 +56,7 @@
 | repairButtonLabel | Repair |
 | fullDurabilityLabel | Full durability |
 
-全部59文案（上表原22项、排序筛选十项、搜索四项、重置一项、[材料详情](MapInventoryDetails.md)十三项、[收藏](MapInventoryFavorites.md)四项、[收藏筛选](MapInventoryFavoritesFilter.md)四项及[收藏计数](MapInventoryFavoritesCount.md)一项）须非空白、无控制字符且最多61个UTF-8字节，烘焙为FixedString64Bytes。内置GUI字体和白色纹理复用；当前英文文案，中文接口保留，字体/字形覆盖为UNKNOWN，没有读取图片或界面截图。
+全部60文案（上表原22项、排序筛选十项、搜索四项、重置一项、[材料详情](MapInventoryDetails.md)十三项、[收藏](MapInventoryFavorites.md)四项、[收藏筛选](MapInventoryFavoritesFilter.md)四项、[收藏计数](MapInventoryFavoritesCount.md)一项及[收藏保护](MapInventoryFavoritesDropProtection.md)一项）须非空白、无控制字符且最多61个UTF-8字节，烘焙为FixedString64Bytes。内置GUI字体和白色纹理复用；当前英文文案，中文接口保留，字体/字形覆盖为UNKNOWN，没有读取图片或界面截图。
 
 ## 【CURRENT STRATEGY】库存、工具与配方显示
 
@@ -68,7 +68,7 @@ Snapshot缓存完整显示文本/数量，行内容、数量/顺序或容量等�
 
 面板右上，按min(屏幕宽/1920,屏幕高/1080)等比缩放。标题和共享反馈/关闭按钮固定，中间列表滚动；背景alpha=0.85。缓存条目/配方/按钮文本和GUI样式；GUI绘制后恢复matrix/color/enabled。按钮/滚动参与正常GUI事件，原F提示/进度仍仅Repaint且保持底部320×104。排序、分类及启用的收藏筛选共0～3个完整宽度控制行位于材料标题/容量及启用收藏计数行之后，默认Sort: Type、Filter: All、Favorites: All items；搜索开启再追加标题及文本框/清空按钮两行，同处原滚动区；其后有可配置重置按钮一行，规则归[偏好](MapInventoryPreferences.md)。内容高度计入可见行、收藏计数行与全部启用控制行。完整库存为空沿原Empty；库存有条目但仅看收藏交集为空显示No matching favorites；全部材料模式中有效搜索无可见行显示No search results，仅分类无匹配显示No matching items。完整容量统计、工具及制作/修理/升级区不受筛选或搜索影响。
 
-排序/筛选按钮仅记录客户端布尔切换，在Show捕获库存后应用一次并滚动归零；无输入/RPC或存档新增字段。可见行身份/顺序/数目变化只清本次行丢弃的鼠标按下许可，防止按下至抬起间重排丢错行；已排队Kind/Mode保持，制作/修理/升级沿原完整Snapshot资格。详细规则与v28静态/人工边界归[排序筛选](MapInventoryListView.md)。
+排序/筛选按钮仅记录客户端布尔切换，在Show捕获库存后应用一次并滚动归零；无输入/RPC或存档新增字段。可见行身份/顺序/数目变化只清本次行丢弃的鼠标按下许可，防止按下至抬起间重排丢错行；显示切换不清已排队Kind/Mode；消费前另按[收藏保护](MapInventoryFavoritesDropProtection.md)复核，制作/修理/升级沿原完整Snapshot资格。详细规则与v28静态/人工边界归[排序筛选](MapInventoryListView.md)。
 
 ## 【CURRENT STRATEGY】输入、请求与生命周期
 
@@ -146,10 +146,14 @@ Panel先配置Favorites再恢复Preferences，ListView使用收藏Revision/待�
 
 ## 【CURRENT STRATEGY】仅看收藏筛选
 
-当前v35/revision38在原排序/分类之后、搜索之前接入全宽Favorites控制行，由ListView管理已应用布尔模式与待切换；分类×搜索×收藏条件取交集后沿原排序。仅看收藏取消当前Name的收藏，在同一有效刷新中移除该行并关闭被隐藏详情；完整Snapshot及业务请求仍沿原链。实际新模式变化归零滚动并取消旧面板/行按下许可，原排序/搜索行为保持。Close/无效输入只清待切换，同一绑定已应用模式保留；Reset view恢复DefaultFavoritesOnly并沿原清启用收藏。
+当前v36/revision39在原排序/分类之后、搜索之前接入全宽Favorites控制行，由ListView管理已应用布尔模式与待切换；分类×搜索×收藏条件取交集后沿原排序。仅看收藏取消当前Name的收藏，在同一有效刷新中移除该行并关闭被隐藏详情；完整Snapshot及业务请求仍沿原链。实际新模式变化归零滚动并取消旧面板/行按下许可，原排序/搜索行为保持。Close/无效输入只清待切换，同一绑定已应用模式保留；Reset view恢复DefaultFavoritesOnly并沿原清启用收藏。
 
 FavoritesEnabled和FavoritesFilterEnabled须同时开启，新控制独立于原FilterEnabled；关闭新能力时收藏条件退回全部，分类/搜索仍有效。ControlRowCount及SearchField共享几何纳入新增控制行；偏好v3七字段严格兼容v1/v2，只观察已应用值，关闭功能保留已读favoritesOnly。完整六字段、配置及用户确认人工十六项通过边界归[收藏筛选](MapInventoryFavoritesFilter.md)，旧收藏用户通过仍限v33/revision36清单。
 
 ## 【CURRENT STRATEGY】收藏计数行
 
-当前v35/revision38的[收藏计数](MapInventoryFavoritesCount.md)：容量之后、模式控件之前绘制原Favorites缓存CountText；CountRowCount固定为本绑定启用时1、关闭时0，共用于DrawBody、内容高度和ContainsSearchField。启用条件为FavoritesEnabled且FavoritesCountEnabled，独立于收藏筛选；数量按已应用Name集合，达到/超过原上限追加FavoritesFullLabel。计数不增加输入/业务请求或保存字段，配置/生命周期与十六项人工待验收归计数专题。
+v35/revision38计数阶段的[收藏计数](MapInventoryFavoritesCount.md)：容量之后、模式控件之前绘制原Favorites缓存CountText；CountRowCount固定为本绑定启用时1、关闭时0，共用于DrawBody、内容高度和ContainsSearchField。启用条件为FavoritesEnabled且FavoritesCountEnabled，独立于收藏筛选；数量按已应用Name集合，达到/超过原上限追加FavoritesFullLabel。计数不增加输入/业务请求或保存字段，配置/生命周期与用户确认人工十六项通过边界归计数专题，限CombatPrototypeNetCode、v35/revision38及运行入口清单，未实际触发的独立用例仍UNKNOWN。
+
+## 【CURRENT STRATEGY】收藏材料丢弃保护
+
+当前v36/revision39的[收藏保护](MapInventoryFavoritesDropProtection.md)：Panel.DrawBody将原Favorites传给DropClient.DrawRow，Panel.ReadInput将同一实例传给ReadRequest；行绘制按真实Row.Name，消费按稳定Kind映射Definition.ItemName读取当前已应用收藏。只替换原操作行内容，不增加行高/输入字段；ClearPending、Close及Reset沿原链，Reset同时清保护开关与文案缓存。 本阶段十六项人工GamePlayer待验收，完整静态证据与边界归保护专题及[运行入口](Runtime.md)；既有用户通过保持各自原版本/清单，未实际触发的独立用例仍UNKNOWN。

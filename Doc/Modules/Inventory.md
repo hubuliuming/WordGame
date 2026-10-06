@@ -181,7 +181,7 @@ v26/revision29的[合并](MapDropMerge.md)不入包、不扣材料/工具或发�
 
 ## 【FACT】B材料列表排序与筛选
 
-当前v35/revision38的[排序筛选](MapInventoryListView.md)通过原所属库存Snapshot建立客户端可见行，默认type/all，支持原顺序/类型/数量降序与全部/资源/补给/其他。原库存顺序/数量不变，完整统计仍决定容量、配方/修理/升级与全局合法性；丢弃按真实ItemName解析原稳定Kind，行身份改变取消未完成点击，已经提交请求保持。仅本地展示与选择，不改变服务端事务、输入/Ghost布局或玩家v4/世界v2保存。静态核对及用户人工GamePlayer通过，限v28/revision31及运行入口十六项；人工结论来自用户反馈，未触发的独立用例仍UNKNOWN。旧部分拾取用户通过仍限v27/revision30十六项及其他旧范围。
+当前v36/revision39的[排序筛选](MapInventoryListView.md)通过原所属库存Snapshot建立客户端可见行，默认type/all，支持原顺序/类型/数量降序与全部/资源/补给/其他。原库存顺序/数量不变，完整统计仍决定容量、配方/修理/升级与全局合法性；丢弃按真实ItemName解析原稳定Kind，行身份改变取消未完成点击，已经提交请求保持。仅本地展示与选择，不改变服务端事务、输入/Ghost布局或玩家v4/世界v2保存。静态核对及用户人工GamePlayer通过，限v28/revision31及运行入口十六项；人工结论来自用户反馈，未触发的独立用例仍UNKNOWN。旧部分拾取用户通过仍限v27/revision30十六项及其他旧范围。
 
 v29/revision32阶段新增[材料搜索](MapInventorySearch.md)，原名/显示名子串、默认忽略大小写与32 UTF-16长度、分类交集后排序；只过滤B可见行。编辑搜索框及焦点切换同帧屏蔽游戏键盘，退出编辑恢复；原十九输入字段、真实库存/容量/配方/丢弃/工具/保存保持。本阶段静态及用户人工GamePlayer通过，限v29/revision32及运行入口十六项，结论来自用户反馈；未实际触发的独立用例UNKNOWN，旧排序筛选通过仍限v28/revision31原清单。
 
@@ -203,4 +203,8 @@ v34/revision37筛选阶段的[收藏筛选](MapInventoryFavoritesFilter.md)：�
 
 ## 【FACT】收藏计数边界
 
-当前v35/revision38的[收藏计数](MapInventoryFavoritesCount.md)：显示全量已应用收藏Name数与原上限；完整库存数量、容量/配方和服务端事务沿原链。本阶段十六项待人工GamePlayer验收；筛选旧通过限v34/revision37及其他阶段原版本/清单。
+v35/revision38计数阶段的[收藏计数](MapInventoryFavoritesCount.md)：显示全量已应用收藏Name数与原上限；完整库存数量、容量/配方和服务端事务沿原链。本阶段十六项人工GamePlayer已获用户通过反馈，主线程结合既有静态核对判定通过，限CombatPrototypeNetCode、v35/revision38及运行入口清单，人工结论来自用户反馈；未实际触发的独立用例仍UNKNOWN；筛选旧通过限v34/revision37及其他阶段原版本/清单。
+
+## 【FACT】收藏材料丢弃保护
+
+当前v36/revision39的[收藏保护](MapInventoryFavoritesDropProtection.md)：只保护本机原B材料行及未消费Kind/Mode；真实ItemName匹配已应用收藏，不改变库存数量/完整容量、材料配方、E使用、服务端事务或玩家v4/世界v2保存。取消收藏或显示重置清集合后恢复原行。 本阶段十六项人工GamePlayer待验收，完整静态证据与边界归保护专题及[运行入口](Runtime.md)；既有用户通过保持各自原版本/清单，未实际触发的独立用例仍UNKNOWN。

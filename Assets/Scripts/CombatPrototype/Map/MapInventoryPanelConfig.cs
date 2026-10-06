@@ -90,5 +90,7 @@ namespace Code_01.CombatPrototype.Map
         public string noMatchingFavoritesLabel;
         public bool favoritesCountEnabled;
         public string favoritesCountLabel;
+        public bool favoritesDropProtectionEnabled;
+        public string favoritesProtectedLabel;
     }
 }

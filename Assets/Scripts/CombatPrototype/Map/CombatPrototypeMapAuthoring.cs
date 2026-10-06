@@ -347,7 +347,9 @@ namespace Code_01.CombatPrototype.Map
                     FavoritesFilterOnlyLabel = new FixedString64Bytes(inventoryPanel.favoritesFilterOnlyLabel),
                     NoMatchingFavoritesLabel = new FixedString64Bytes(inventoryPanel.noMatchingFavoritesLabel),
                     FavoritesCountEnabled = (byte)(inventoryPanel.favoritesCountEnabled ? 1 : 0),
-                    FavoritesCountLabel = new FixedString64Bytes(inventoryPanel.favoritesCountLabel)
+                    FavoritesCountLabel = new FixedString64Bytes(inventoryPanel.favoritesCountLabel),
+                    FavoritesDropProtectionEnabled = (byte)(inventoryPanel.favoritesDropProtectionEnabled ? 1 : 0),
+                    FavoritesProtectedLabel = new FixedString64Bytes(inventoryPanel.favoritesProtectedLabel)
                 });
                 var inventoryDrop = config.map.inventoryDrop;
                 AddComponent(entity, new CombatPrototypeMapInventoryDropSettings

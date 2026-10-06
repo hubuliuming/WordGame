@@ -1,6 +1,6 @@
 # 背包材料搜索
 
-返回[地图](Map.md)、[背包](Inventory.md)、[B面板](MapInventoryPanel.md)、[排序筛选](MapInventoryListView.md)、[容量](MapInventoryCapacity.md)、[丢弃](MapInventoryDrop.md)、[配置](DataResources.md)、[玩家输入](Player.md)与[运行入口](Runtime.md)。入口CombatPrototypeNetCode；Forest/Grassland Json/BuiltIn当前schemaVersion=35/configRevision=38；[本机偏好](MapInventoryPreferences.md)静态核对通过、人工已获用户通过反馈，限v30/revision33及运行入口偏好阶段十六项。主线程实现、正常编译、严格配置读取和隔离Editor Bake静态核对通过；用户已确认本阶段人工GamePlayer验收通过，主线程结合既有静态核对与用户反馈判定通过，限CombatPrototypeNetCode、v29/revision32及运行入口十六项清单；人工结论来自用户反馈。旧排序筛选用户通过限v28/revision31十六项，其他旧通过保持原版本/清单。
+返回[地图](Map.md)、[背包](Inventory.md)、[B面板](MapInventoryPanel.md)、[排序筛选](MapInventoryListView.md)、[容量](MapInventoryCapacity.md)、[丢弃](MapInventoryDrop.md)、[配置](DataResources.md)、[玩家输入](Player.md)与[运行入口](Runtime.md)。入口CombatPrototypeNetCode；Forest/Grassland Json/BuiltIn当前schemaVersion=36/configRevision=39；[本机偏好](MapInventoryPreferences.md)静态核对通过、人工已获用户通过反馈，限v30/revision33及运行入口偏好阶段十六项。主线程实现、正常编译、严格配置读取和隔离Editor Bake静态核对通过；用户已确认本阶段人工GamePlayer验收通过，主线程结合既有静态核对与用户反馈判定通过，限CombatPrototypeNetCode、v29/revision32及运行入口十六项清单；人工结论来自用户反馈。旧排序筛选用户通过限v28/revision31十六项，其他旧通过保持原版本/清单。
 
 ## 【FACT】文件与配置
 
@@ -27,7 +27,7 @@ inventoryPanel原44字段保留，新增七项均必填：
 | clearSearchLabel | Clear | 清空按钮文案 |
 | noSearchResultsLabel | No search results | 全部材料模式下完整库存非空且有效搜索无可见行时显示 |
 
-当前DTO共85字段：十四bool、六float、三int、两模式string、59文案string及一偏好文件ID；原Settings对应十四byte、六float、三int、两byte枚举、60 FixedString64Bytes，0 GhostField且无GhostComponent。四新文案沿非空白、无控制字符与最多61 UTF-8字节规则；即使关闭搜索、面板或全部显示仍校验所有字段。原Reader保留UTF-8/形状/缺失/null/错类型/未知或重复键检查，当前只接受schema35和正revision/seed，旧v1～v34拒绝，无补默认、来源回退或热重载。正常导入/烘焙后生效，各端同版代码/配置并重新烘焙。
+当前DTO共87字段：十五bool、六float、三int、两模式string、60文案string及一偏好文件ID；原Settings对应十五byte、六float、三int、两byte枚举、61 FixedString64Bytes，0 GhostField且无GhostComponent。四新文案沿非空白、无控制字符与最多61 UTF-8字节规则；即使关闭搜索、面板或全部显示仍校验所有字段。原Reader保留UTF-8/形状/缺失/null/错类型/未知或重复键检查，当前只接受schema36和正revision/seed，旧v1～v35拒绝，无补默认、来源回退或热重载。正常导入/烘焙后生效，各端同版代码/配置并重新烘焙。
 
 ## 【CURRENT STRATEGY】本地文本与列表投影
 
@@ -39,7 +39,7 @@ GUI.TextField仅写draft并记录pending；下一Panel.Show在完整Snapshot之�
 
 搜索开启在材料标题/完整容量行、启用的收藏计数行及模式控制之后追加标题、文本框+Clear两行，沿原380×640滚动区、字号18/行高32和缩放，不改变面板矩形或固定页脚。文本框约占内容宽75%减4间距，Clear占25%；未配置新字体。空态优先级归[B面板](MapInventoryPanel.md)与[收藏筛选](MapInventoryFavoritesFilter.md)，收藏计数不参与空态判断。容量/工具/业务区一直可见。
 
-Drop/All仍按真实Row.Name解析稳定Kind/Mode；搜索重建造成行身份/顺序/数目改变时只撤销尚未完成的行点击许可。已经排队/已消费请求沿原链路处理，搜索不撤回服务器动作；同身份纯数量/文字刷新沿原资格。
+Drop/All仍按真实Row.Name解析稳定Kind/Mode；搜索重建造成行身份/顺序/数目改变时只撤销尚未完成的行点击许可。搜索不清已排队请求；未消费请求另按[收藏保护](MapInventoryFavoritesDropProtection.md)复核，已写入PlayerInput的请求沿原服务端链，搜索不撤回服务器动作；同身份纯数量/文字刷新沿原资格。
 
 ## 【CURRENT STRATEGY】焦点、键盘与生命周期
 
@@ -79,4 +79,8 @@ v34/revision37筛选阶段的[收藏筛选](MapInventoryFavoritesFilter.md)：�
 
 ## 【FACT】收藏计数与搜索命中
 
-当前v35/revision38的[收藏计数](MapInventoryFavoritesCount.md)位于模式控件之前，CountRowCount0～1与原ControlRowCount共用于DrawBody、内容高度和ContainsSearchField，启用时搜索框另下移一行；计数行不接受输入。搜索/IME/键盘/指针与Search代码保持，交集不改变收藏总数。当前计数十六项待人工GamePlayer验收；旧搜索和筛选通过范围保持。
+v35/revision38计数阶段的[收藏计数](MapInventoryFavoritesCount.md)位于模式控件之前，CountRowCount0～1与原ControlRowCount共用于DrawBody、内容高度和ContainsSearchField，启用时搜索框另下移一行；计数行不接受输入。搜索/IME/键盘/指针与Search代码保持，交集不改变收藏总数。本阶段十六项人工GamePlayer已获用户通过反馈，主线程结合既有静态核对判定通过，限CombatPrototypeNetCode、v35/revision38及运行入口清单，人工结论来自用户反馈；未实际触发的独立用例仍UNKNOWN；旧搜索和筛选通过范围保持。
+
+## 【FACT】收藏保护与搜索
+
+当前v36/revision39的[收藏保护](MapInventoryFavoritesDropProtection.md)：Search代码、焦点/IME/键盘/指针隔离及ContainsSearchField几何保持；保护文案占原操作行，不增加搜索行偏移。搜索和分类不删除已应用收藏，DropClient按真实Name保护当前可见材料，并在消费前另按Kind映射复核。 本阶段十六项人工GamePlayer待验收，完整静态证据与边界归保护专题及[运行入口](Runtime.md)；既有用户通过保持各自原版本/清单，未实际触发的独立用例仍UNKNOWN。

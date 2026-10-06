@@ -975,3 +975,18 @@
 - 正常Unity编译/85字段/零GhostField和原GUID/协议元数据、3084份非法配置拒绝/202组合法读取、202次隔离Editor Bake静态通过；全部原Settings/零反馈/引用、资源布置与兼容签名、输入19/Tools3及全部所属状态/反馈保持。Console从[0,3,27]至编译后/Bake前后/最终[0,5,27]，新增既有PEListener UAC1001与DOTween CS0618警告；未清空，主场景干净未Play，临时资源释放。
 - 新增收藏计数专题，增量同步相关模块/导航与策划模板第7节完整JSON/第44节；搜索文档遗留的当前字段/版本摘要同步85/schema35，已有空态优先级改为引用B面板/收藏筛选主规则。原499项人工内容/编号、月志既有前缀与各旧阶段原版本静态证据/用户通过范围保留，追加十六项后515项，当前计数人工待验收。
 - Scene/SubScene/Prefab/Animator/全部meta/资源/字体/包/构建结构及方案外代码保持；未执行计数/Favorites/ListView/Panel/Preferences/GUI业务、实际偏好或游戏存档I/O、GamePlayer/PlayMode、逻辑单元测试、命令行构建/发布、采样或图片，未创建子Agent、暂存或提交Git。
+
+## 2026-10-06 背包收藏数量与上限提示人工验收确认
+
+- 用户明确反馈“我已验收通过，接下来下一阶段”；主线程结合既有静态核对与用户反馈判定本阶段通过，限CombatPrototypeNetCode、v35/revision38及运行入口十六项人工GamePlayer清单，人工结论来自用户反馈。
+- 增量同步收藏计数专题、相关模块/导航/运行入口及策划模板第44节的验收状态；原515项人工内容/编号、3084份非法配置/202组合法读取/202次隔离Editor Bake等既有静态证据、代码/JSON/资源结构和各旧阶段通过范围保持。
+- 未实际触发的独立计数/满额/超限/缓存时序、关闭/重绑、GUI搜索命中/布局/字形、偏好迁移/I/O/故障和多人/预测用例仍UNKNOWN；性能、平台构建及线上未获单独验收结论。本次只记录用户反馈并核对文档，未执行游戏/GUI/偏好读写、GamePlayer/PlayMode、逻辑单元测试、构建/发布或图片检查，未创建子Agent、暂存或提交Git。
+
+## 2026-10-06 收藏材料丢弃保护接入
+
+- 用户确认本阶段方案，主线程按CombatPrototypeNetCode原B面板实施：支持且已应用收藏的真实Name以Favorite protected替换原Drop/All操作行，固定行高；消费未提交Kind/Mode时再按定义ItemName检查当前收藏，命中清一次并返回空，不自动重试/新反馈。原不支持/丢弃关闭的Unavailable、已写入PlayerInput的服务端链保持。
+- 七现有C#与两JSON接入inventoryPanel必填favoritesDropProtectionEnabled=true/favoritesProtectedLabel=Favorite protected，地图schema36/revision39、85→87字段/60文案；开关严格bool、文案61 UTF-8字节与关闭仍验证。复用原Favorites.IsFavorite，原收藏/列表/偏好/详情/输入/HUD/Binding/服务器代码保持，原85字段顺序/值与资源边界保持。
+- 正常Unity编译/87字段/零GhostField、DrawRow九参数/ReadRequest一个Favorites参数/请求两字段、原GUID/协议元数据核对通过；3182份非法配置拒绝/234组合法读取及两地图各117次、共234次隔离Editor Bake通过。全部原Settings/零反馈/引用、资源布置和兼容签名、输入19/Tools3/偏好v3七字段/玩家v4/世界v2保持。一次临时元数据检查把DrawRow总参数写成8，修正检查为9后重跑通过，未因此改生产代码。
+- Console执行前[0,5,27]，编译后/Bake前后/最终[0,6,27]，新增一条MCP WebSocket未初始化工具警告，原NetCode/PEListener/DOTween警告保留，无新增项目编译错误/警告；未清空Console。源SubScene只读，临时烘焙资源释放，主场景干净未Play。
+- 新增收藏保护专题，增量同步相关模块/导航及策划模板第7节完整JSON/第45节；原515项人工内容/编号、月志与运行入口既有前缀、v35/revision38计数静态证据及各旧阶段验收范围保留，追加十六项后531项。本阶段人工GamePlayer待验收。
+- 没有新脚本/组件/挂载或Scene/SubScene/Prefab/Animator/meta/资源/字体/包/构建结构变更；未执行DropClient/Favorites/ListView/Panel/Preferences/GUI业务、实际偏好或游戏存档I/O、GamePlayer/PlayMode、逻辑单元测试、命令行构建/发布、性能采样或图片，未创建子Agent、暂存或提交Git。

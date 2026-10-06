@@ -219,7 +219,7 @@ namespace Code_01.CombatPrototype.Map
             {
                 craftAxe = _craftAxe;
                 craftPickaxe = _craftPickaxe;
-                dropRequest = _drop.ReadRequest();
+                dropRequest = _drop.ReadRequest(_favorites);
                 _repair.ReadRequest(out repairAxe, out repairPickaxe);
                 upgrade = _upgrade.ReadRequest();
                 _toolUpgrade.ReadRequest(out upgradeAxe, out upgradePickaxe);
@@ -323,7 +323,7 @@ namespace Code_01.CombatPrototype.Map
             {
                 _details.DrawItemLabel(width, ref y, _settings.RowHeightPixels, _labelStyle, _buttonStyle, item, _favorites.ItemText(item), _rowMousePressAccepted);
                 _drop.DrawRow(width, y, _settings.RowHeightPixels, _labelStyle, _buttonStyle, item,
-                    _snapshot.InventoryValid, _rowMousePressAccepted);
+                    _snapshot.InventoryValid, _rowMousePressAccepted, _favorites);
                 y += _settings.RowHeightPixels;
                 _favorites.DrawRow(width, ref y, _settings.RowHeightPixels, _buttonStyle, item, _rowMousePressAccepted);
                 _details.DrawExpanded(width, ref y, _settings.RowHeightPixels, _labelStyle, _buttonStyle, item.Name, _mousePressAccepted);

@@ -19,10 +19,10 @@ namespace Code_01.CombatPrototype.Map
         private readonly List<CombatPrototypeMapInventoryDropDefinition> _definitions = new List<CombatPrototypeMapInventoryDropDefinition>(3);
         private CombatPrototypeMapInventoryDropSettings _settings;
         private CombatPrototypeMapInventoryDropRequest _pending;
-        private string _single, _all, _unavailable, _success, _rejected, _failure, _feedback;
+        private string _single, _all, _unavailable, _success, _rejected, _failure, _feedback, _protected;
         private string _apple, _wood, _stone;
         private uint _sequence;
-        private bool _observed;
+        private bool _observed, _protectFavorites;
         private double _feedbackUntil;
 
         public string Feedback => Time.unscaledTimeAsDouble < _feedbackUntil ? _feedback : string.Empty;
@@ -42,6 +42,8 @@ namespace Code_01.CombatPrototype.Map
             _apple = panel.AppleLabel.ToString();
             _wood = panel.WoodLabel.ToString();
             _stone = panel.StoneLabel.ToString();
+            _protectFavorites = panel.FavoritesDropProtectionEnabled != 0;
+            _protected = panel.FavoritesProtectedLabel.ToString();
         }
 
         public void Observe(CombatPrototypeMapInventoryDropFeedback feedback)
@@ -66,7 +68,8 @@ namespace Code_01.CombatPrototype.Map
             kind == CombatPrototypeMapInventoryDropKind.Wood ? _wood : _stone;
 
         public void DrawRow(float width, float y, float height, GUIStyle labelStyle, GUIStyle buttonStyle,
-            CombatPrototypeMapInventoryPanelSnapshot.Row row, bool inventoryValid, bool mousePressAccepted)
+            CombatPrototypeMapInventoryPanelSnapshot.Row row, bool inventoryValid, bool mousePressAccepted,
+            CombatPrototypeMapInventoryPanelFavorites favorites)
         {
             var kind = CombatPrototypeMapInventoryDropKind.None;
             foreach (var definition in _definitions)
@@ -74,6 +77,11 @@ namespace Code_01.CombatPrototype.Map
             if (_settings.Enabled == 0 || kind == CombatPrototypeMapInventoryDropKind.None)
             {
                 GUI.Label(new Rect(0f, y, width, height), _unavailable, labelStyle);
+                return;
+            }
+            if (_protectFavorites && favorites.IsFavorite(row.Name))
+            {
+                GUI.Label(new Rect(0f, y, width, height), _protected, labelStyle);
                 return;
             }
             var oldEnabled = GUI.enabled;
@@ -95,10 +103,13 @@ namespace Code_01.CombatPrototype.Map
                 _pending = new CombatPrototypeMapInventoryDropRequest(kind, mode);
         }
 
-        public CombatPrototypeMapInventoryDropRequest ReadRequest()
+        public CombatPrototypeMapInventoryDropRequest ReadRequest(CombatPrototypeMapInventoryPanelFavorites favorites)
         {
             var request = _pending;
             ClearPending();
+            if (_protectFavorites && request.Mode != CombatPrototypeMapInventoryDropMode.None)
+                foreach (var definition in _definitions)
+                    if (definition.Kind == request.Kind && favorites.IsFavorite(definition.ItemName)) return default;
             return request;
         }
 
@@ -108,7 +119,8 @@ namespace Code_01.CombatPrototype.Map
         {
             ClearPending();
             _definitions.Clear();
-            _observed = false;
+            _observed = _protectFavorites = false;
+            _protected = string.Empty;
             _sequence = 0;
             _feedbackUntil = 0d;
             _feedback = string.Empty;

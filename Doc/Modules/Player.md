@@ -291,7 +291,7 @@ v13/16的[资源状态](MapResourceStatusHud.md)由Player Baker追加所属Mode/
 
 ## 【FACT】G目标可领取数量
 
-当前v35/revision38的[部分拾取](MapDropPartialPickup.md)在原CombatPrototypeMapPickupHudState增加int PickupQuantity，第七个GhostField仍SendToOwner；Player Baker继续添加原Hidden默认值，七字段均零/空初态，组件挂载与Player Prefab保持。实际G读取本人的容量Level/库存决定本次量，所属结果仍原四字段且成功数量为实际增量。输入19、Tools3、F4/资源状态4/世界保存3及原反馈、生命/体力/R、玩家v4/世界v2保持；各端同版重新烘焙。部分拾取v27阶段编译、Serializer七字段/7 mask bits/88字节结构与40次隔离Bake静态通过；用户人工通过限v27/revision30十六项，未触发独立用例UNKNOWN；旧通过仍限原版本/清单。
+当前v36/revision39的[部分拾取](MapDropPartialPickup.md)在原CombatPrototypeMapPickupHudState增加int PickupQuantity，第七个GhostField仍SendToOwner；Player Baker继续添加原Hidden默认值，七字段均零/空初态，组件挂载与Player Prefab保持。实际G读取本人的容量Level/库存决定本次量，所属结果仍原四字段且成功数量为实际增量。输入19、Tools3、F4/资源状态4/世界保存3及原反馈、生命/体力/R、玩家v4/世界v2保持；各端同版重新烘焙。部分拾取v27阶段编译、Serializer七字段/7 mask bits/88字节结构与40次隔离Bake静态通过；用户人工通过限v27/revision30十六项，未触发独立用例UNKNOWN；旧通过仍限原版本/清单。
 
 ## 【CURRENT STRATEGY】B材料搜索的本地键盘采样
 
@@ -317,4 +317,8 @@ v34/revision37筛选阶段的[收藏筛选](MapInventoryFavoritesFilter.md)：�
 
 ## 【FACT】收藏计数边界
 
-当前v35/revision38的[收藏计数](MapInventoryFavoritesCount.md)：计数仅在客户端原Favorites缓存中；输入19、Ghost/工具/反馈、玩家v4/世界v2及本机偏好v3七字段保持。本阶段十六项待人工GamePlayer验收；筛选旧通过限v34/revision37及其他阶段原版本/清单。
+v35/revision38计数阶段的[收藏计数](MapInventoryFavoritesCount.md)：计数仅在客户端原Favorites缓存中；输入19、Ghost/工具/反馈、玩家v4/世界v2及本机偏好v3七字段保持。本阶段十六项人工GamePlayer已获用户通过反馈，主线程结合既有静态核对判定通过，限CombatPrototypeNetCode、v35/revision38及运行入口清单，人工结论来自用户反馈；未实际触发的独立用例仍UNKNOWN；筛选旧通过限v34/revision37及其他阶段原版本/清单。
+
+## 【FACT】本机收藏丢弃保护边界
+
+当前v36/revision39的[收藏保护](MapInventoryFavoritesDropProtection.md)：PlayerInput代码与十九输入字段、Drop请求Kind/Mode两字段、原Ghost/反馈和玩家v4/世界v2保持。Binding.ReadPanelInput→HUD.ReadPanelInput→Panel.ReadInput→DropClient.ReadRequest复核本机已应用收藏；已写入PlayerInput的请求仍由原服务器处理，无服务器收藏同步或新RPC。 本阶段十六项人工GamePlayer待验收，完整静态证据与边界归保护专题及[运行入口](Runtime.md)；既有用户通过保持各自原版本/清单，未实际触发的独立用例仍UNKNOWN。

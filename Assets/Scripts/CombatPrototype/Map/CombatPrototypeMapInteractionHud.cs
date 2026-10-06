@@ -339,8 +339,8 @@ namespace Code_01.CombatPrototype.Map
         }
 
         internal bool ReadPanelInput(Keyboard keyboard, Mouse mouse, out bool craftAxe, out bool craftPickaxe, out bool repairAxe, out bool repairPickaxe,
-            out CombatPrototypeMapInventoryDropRequest dropRequest, out bool upgrade, out bool upgradeAxe, out bool upgradePickaxe) =>
-            _inventoryPanel.ReadInput(keyboard, mouse, out craftAxe, out craftPickaxe, out repairAxe, out repairPickaxe, out dropRequest, out upgrade, out upgradeAxe, out upgradePickaxe);
+            out CombatPrototypeMapInventoryDropRequest dropRequest, out bool upgrade, out bool upgradeAxe, out bool upgradePickaxe, out bool blocksKeyboard) =>
+            _inventoryPanel.ReadInput(keyboard, mouse, out craftAxe, out craftPickaxe, out repairAxe, out repairPickaxe, out dropRequest, out upgrade, out upgradeAxe, out upgradePickaxe, out blocksKeyboard);
 
         internal void Clear()
         {

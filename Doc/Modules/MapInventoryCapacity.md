@@ -20,7 +20,7 @@
 
 ## 【FACT】JSON 契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为 schemaVersion=28/configRevision=31。新增必填 inventoryCapacity：
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为 schemaVersion=29/configRevision=32。新增必填 inventoryCapacity：
 
 ```json
 "inventoryCapacity": {
@@ -43,7 +43,7 @@
 | items[].maxQuantity | 各为正整数 200；与总量上限同时生效，不要求小于总量上限 |
 | interactionHud.noSpaceLabel | 新增必填 Not enough space；F 配置/Settings 各10字段 |
 | pickupHud.noSpaceLabel | 新增必填 Not enough space；G 配置/Settings 各18字段 |
-| inventoryPanel.capacityLabel / unlimitedLabel | 新增必填 Capacity / Unlimited；面板配置/Settings 当前各44字段，含32文案及两模式ID；新增项归[排序筛选](MapInventoryListView.md) |
+| inventoryPanel.capacityLabel / unlimitedLabel | 新增必填 Capacity / Unlimited；面板配置/Settings 当前各51字段，含36文案及两模式ID；新增项归[排序筛选](MapInventoryListView.md)与[搜索](MapInventorySearch.md) |
 
 沿原严格 UTF-8、完整对象形状、字段/类型与未知/缺失/重复键校验；文案非空白、无控制字符、最多61个 UTF-8 字节。enabled=false 或显示关闭仍校验全部配置；旧地图 v1～v27 明确失败，没有补字段、来源回退或运行热重载。各端使用同版代码、配置并重新烘焙。
 
@@ -95,4 +95,6 @@ v26/revision29的[地面合并](MapDropMerge.md)只改原地面数量/期限；G
 
 ## 【FACT】列表筛选与完整容量统计
 
-当前v28/revision31的[排序筛选](MapInventoryListView.md)只改变B材料列表可见行/顺序。Snapshot仍先校验全部原库存并统计受管苹果/木材/石材总量及当前等级上限，筛选资源时隐藏的苹果仍占容量；非法独立库存条目照原记录/跳过并置InventoryValid=false，筛选不能放开制作/修理/丢弃/升级资格。服务器F/G接收、部分拾取与容量等级/玩家保存链保持；本阶段静态通过，人工待验收。
+当前v29/revision32的[排序筛选](MapInventoryListView.md)只改变B材料列表可见行/顺序。Snapshot仍先校验全部原库存并统计受管苹果/木材/石材总量及当前等级上限，筛选资源时隐藏的苹果仍占容量；非法独立库存条目照原记录/跳过并置InventoryValid=false，筛选不能放开制作/修理/丢弃/升级资格。服务器F/G接收、部分拾取与容量等级/玩家保存链保持；静态及用户人工通过限v28/revision31十六项，人工结论来自用户反馈；未触发的独立用例UNKNOWN。
+
+当前[搜索](MapInventorySearch.md)与分类取交集后再排序，仍只投影B材料可见行；完整Snapshot先校验全部库存并统计容量，隐藏材料继续参与受管总量与原配方/业务资格。搜索v29/revision32静态核对通过，人工十六项待验收。

@@ -1,6 +1,6 @@
 # 掉落物拾取成功与失败反馈
 
-返回[地图](Map.md)、[掉落与拾取](MapDrops.md)、[G目标及寿命](MapPickupHud.md)与[运行入口](Runtime.md)。入口CombatPrototypeNetCode；Forest/Grassland Json与BuiltIn当前schemaVersion=28/configRevision=31。本专题负责实际G请求结果的所属快照与原G面板显示。静态及用户人工GamePlayer通过；范围限v25/revision28十六项，详见下述人工边界；旧F完成/中断通过限v24/revision27十六项，其他旧通过保持原版本/清单。
+返回[地图](Map.md)、[掉落与拾取](MapDrops.md)、[G目标及寿命](MapPickupHud.md)与[运行入口](Runtime.md)。入口CombatPrototypeNetCode；Forest/Grassland Json与BuiltIn当前schemaVersion=29/configRevision=32。本专题负责实际G请求结果的所属快照与原G面板显示。静态及用户人工GamePlayer通过；范围限v25/revision28十六项，详见下述人工边界；旧F完成/中断通过限v24/revision27十六项，其他旧通过保持原版本/清单。
 
 ## 【FACT】文件与接入
 
@@ -35,7 +35,7 @@
 | noTargetLabel | No available drop | 同上 |
 | failedLabel | Pickup failed | 同上 |
 
-三物品名称与NoSpace直接复用pickupHud.appleLabel/woodLabel/stoneLabel/noSpaceLabel，没有第二份定义。原严格JsonReader沿DTO检查UTF-8、形状、缺失/null/未知/重复键及标量类型；语义复用Positive/HighlightColor/HudLabel。旧地图v1～v27明确拒绝，不迁移、不补默认段、不回退来源；正常导入/烘焙后生效，没有运行热重载。
+三物品名称与NoSpace直接复用pickupHud.appleLabel/woodLabel/stoneLabel/noSpaceLabel，没有第二份定义。原严格JsonReader沿DTO检查UTF-8、形状、缺失/null/未知/重复键及标量类型；语义复用Positive/HighlightColor/HudLabel。旧地图v1～v28明确拒绝，不迁移、不补默认段、不回退来源；正常导入/烘焙后生效，没有运行热重载。
 
 原地图根Baker写九字段Settings：Enabled(byte)、FeedbackSeconds(float)、SuccessColor/FailureColor(float3 RGB)及五个FixedString64Bytes。它不是Ghost；绑定在地图源/本地玩家变化时传给原G客户端。普通缓存只保存配置、物品标签、观察序号、结果、文字、颜色与期限，不跨帧持有DynamicBuffer。英文为默认值，可配置中文，实际字体/字形与排版UNKNOWN。
 

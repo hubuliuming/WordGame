@@ -306,7 +306,14 @@ namespace Code_01.CombatPrototype.Map
                     ResourcesFilterLabel = new FixedString64Bytes(inventoryPanel.resourcesFilterLabel),
                     SuppliesFilterLabel = new FixedString64Bytes(inventoryPanel.suppliesFilterLabel),
                     OtherFilterLabel = new FixedString64Bytes(inventoryPanel.otherFilterLabel),
-                    NoMatchingItemsLabel = new FixedString64Bytes(inventoryPanel.noMatchingItemsLabel)
+                    NoMatchingItemsLabel = new FixedString64Bytes(inventoryPanel.noMatchingItemsLabel),
+                    SearchEnabled = (byte)(inventoryPanel.searchEnabled ? 1 : 0),
+                    SearchIgnoreCase = (byte)(inventoryPanel.searchIgnoreCase ? 1 : 0),
+                    SearchMaxLength = inventoryPanel.searchMaxLength,
+                    SearchLabel = new FixedString64Bytes(inventoryPanel.searchLabel),
+                    SearchPlaceholderLabel = new FixedString64Bytes(inventoryPanel.searchPlaceholderLabel),
+                    ClearSearchLabel = new FixedString64Bytes(inventoryPanel.clearSearchLabel),
+                    NoSearchResultsLabel = new FixedString64Bytes(inventoryPanel.noSearchResultsLabel)
                 });
                 var inventoryDrop = config.map.inventoryDrop;
                 AddComponent(entity, new CombatPrototypeMapInventoryDropSettings

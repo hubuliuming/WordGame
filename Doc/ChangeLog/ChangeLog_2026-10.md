@@ -879,3 +879,15 @@
 - 完整Snapshot保留原顺序/合法性/容量及配方统计，仅追加本地行Revision；ListView缓存原顺序/类型/数量降序与全部/资源/补给/其他可见行。原B滚动区增加0～2控制行，本地切换在Show应用一次、滚动归零；行身份/顺序/数目变化取消未完成丢弃点击，已排队Kind/Mode和原业务事务保持。同绑定关闭保留已应用模式，原Reset/Configure重建默认与清缓存。
 - 正常Unity编译、1078份非法配置拒绝/62组合法读取、64次隔离Editor Bake及44字段/byte模式/0 GhostField元数据静态通过，原布局/资源签名/所有Settings与反馈/Prefab引用一致。初始Console[0,5,3]、Bake前后[0,4,3]一致且未主动清空；主场景干净未Play，临时资源释放。输入/Ghost/玩家v4与世界v2、宿主/绑定/服务器/存档及Scene/SubScene/Prefab/Animator/旧meta/资源/包/构建保持。
 - 增量同步新展示专题、直接受影响模块/导航/配置/运行及策划模板；原387人工项逐字保留，新增十六项后共403项，本阶段v28/revision31人工待验收。旧部分拾取用户通过仍限v27/revision30十六项及其他旧范围；AI未执行排序/筛选/Capture、面板/HUD/GUI、GamePlayer/PlayMode、逻辑单元测试、真实存档业务I/O、构建/发布、采样/图片，未创建子Agent或提交Git。实际交互/时序/字体/排版/联网/生命周期、异常存档一致/恢复与性能/平台/线上仍UNKNOWN。
+
+## 2026-10-06：背包材料排序与筛选人工验收同步
+
+- 用户反馈“我已验收通过，接下来下一阶段”；主线程结合既有静态核对与用户反馈判定通过，限CombatPrototypeNetCode、Forest/Grassland Json/BuiltIn v28/revision31及Runtime.md本阶段十六项清单，人工结论来自用户反馈。原403项人工内容/编号及其他旧阶段通过范围保持；未实际触发的独立用例、意外ECS恢复/跨文件事务/同槽并发、性能/平台/线上仍UNKNOWN。
+- 增量同步导航、地图、排序筛选及相关B面板/容量/库存/HUD/配置/运行文档与策划模板的验收状态；Map当前版本表同步为已确认的28/31。仅文档修改，未执行游戏/GUI逻辑、GamePlayer/PlayMode、逻辑单元测试、真实存档业务I/O、构建/发布、采样或图片检查，未创建子Agent或提交Git。
+
+## 2026-10-06 背包材料搜索（v29/revision32）
+
+- 按用户确认方案，由主线程在CombatPrototypeNetCode原B面板接入本地原名/显示名子串搜索、默认忽略大小写/32 UTF-16长度、清空及无结果文案；分类与搜索取交集后沿原排序。完整库存/容量/配方/业务资格与按真实Name丢弃、行重排点击许可保持。
+- inventoryPanel追加七必填字段，DTO/Settings44→51；Forest/Grassland Json与BuiltIn29/32一致，旧v1～v28拒绝，长度严格1～64、四文案沿61 UTF-8字节规则，关闭仍完整校验。十一现有脚本、一新普通Search类和Unity正常生成meta接入；编辑及焦点切换帧沿原Binding→HUD→Panel输出blocksKeyboard，隔离原游戏键盘采样，外部释放点击不写Attack。
+- 正常Unity编译、元数据及1410份非法配置拒绝/76组合法读取、82次隔离Editor Bake静态通过；51Settings、输入19/Drop4/Tools3及原反馈、玩家v4/世界v2布局、原布置/签名保持，Bake Console前后[0,9,47]相同，主场景干净、临时资源释放。
+- 同步搜索专题、受影响模块/导航与策划模板第7节完整JSON/新第38节；原403项人工内容/编号保留，追加十六项后419项。本阶段GamePlayer待验收，旧排序筛选通过仍限v28/revision31原十六项。未改Scene/SubScene/Prefab/Animator/旧meta/资源/包/构建结构，未运行搜索/库存/焦点/GUI业务测试、GamePlayer/PlayMode、逻辑单元测试、命令行构建/发布、真实存档业务I/O、性能/图片，未创建子Agent或提交Git。

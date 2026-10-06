@@ -49,5 +49,12 @@ namespace Code_01.CombatPrototype.Map
         public FixedString64Bytes SuppliesFilterLabel;
         public FixedString64Bytes OtherFilterLabel;
         public FixedString64Bytes NoMatchingItemsLabel;
+        public byte SearchEnabled;
+        public byte SearchIgnoreCase;
+        public int SearchMaxLength;
+        public FixedString64Bytes SearchLabel;
+        public FixedString64Bytes SearchPlaceholderLabel;
+        public FixedString64Bytes ClearSearchLabel;
+        public FixedString64Bytes NoSearchResultsLabel;
     }
 }

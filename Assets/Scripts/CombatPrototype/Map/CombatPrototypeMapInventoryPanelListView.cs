@@ -33,7 +33,7 @@ namespace Code_01.CombatPrototype.Map
         private readonly List<FixedString64Bytes> _previousNames = new List<FixedString64Bytes>();
         private CombatPrototypeMapInventorySortMode _sortMode;
         private CombatPrototypeMapInventoryFilterMode _filterMode;
-        private uint _revision;
+        private uint _revision, _searchRevision;
         private bool _hasSnapshot, _sortPending, _filterPending;
         private string _sortLabel, _originalLabel, _typeLabel, _quantityLabel;
         private string _filterLabel, _allLabel, _resourcesLabel, _suppliesLabel, _otherLabel;
@@ -89,9 +89,10 @@ namespace Code_01.CombatPrototype.Map
             UpdateLabels();
         }
 
-        public bool Capture(CombatPrototypeMapInventoryPanelSnapshot snapshot, out bool selectionChanged)
+        public bool Capture(CombatPrototypeMapInventoryPanelSnapshot snapshot, CombatPrototypeMapInventoryPanelSearch search, out bool selectionChanged)
         {
-            selectionChanged = _sortPending || _filterPending;
+            var searchChanged = search.ApplyPending();
+            selectionChanged = _sortPending || _filterPending || searchChanged;
             if (_sortPending)
                 _sortMode = _sortMode == CombatPrototypeMapInventorySortMode.Type ? CombatPrototypeMapInventorySortMode.Quantity :
                     _sortMode == CombatPrototypeMapInventorySortMode.Quantity ? CombatPrototypeMapInventorySortMode.Original :
@@ -103,13 +104,13 @@ namespace Code_01.CombatPrototype.Map
                     CombatPrototypeMapInventoryFilterMode.All;
             ClearPending();
             if (selectionChanged) UpdateLabels();
-            if (_hasSnapshot && _revision == snapshot.Revision && !selectionChanged) return false;
+            if (_hasSnapshot && _revision == snapshot.Revision && _searchRevision == search.Revision && !selectionChanged) return false;
 
             _previousNames.Clear();
             foreach (var row in _items) _previousNames.Add(row.Name);
             _items.Clear();
             foreach (var row in snapshot.Items)
-                if (Matches(row.Name)) _items.Add(row);
+                if (Matches(row.Name) && search.Matches(row)) _items.Add(row);
             if (_sortMode == CombatPrototypeMapInventorySortMode.Type) _items.Sort(TypeComparison);
             else if (_sortMode == CombatPrototypeMapInventorySortMode.Quantity) _items.Sort(QuantityComparison);
 
@@ -118,6 +119,7 @@ namespace Code_01.CombatPrototype.Map
                 for (var index = 0; index < _items.Count; index++)
                     if (!_previousNames[index].Equals(_items[index].Name)) { identitiesChanged = true; break; }
             _revision = snapshot.Revision;
+            _searchRevision = search.Revision;
             _hasSnapshot = true;
             return identitiesChanged;
         }
@@ -187,7 +189,7 @@ namespace Code_01.CombatPrototype.Map
             _previousNames.Clear();
             SortEnabled = FilterEnabled = _hasSnapshot = false;
             ClearPending();
-            _revision = 0;
+            _revision = _searchRevision = 0;
             _sortMode = CombatPrototypeMapInventorySortMode.Original;
             _filterMode = CombatPrototypeMapInventoryFilterMode.All;
             _sortLabel = _originalLabel = _typeLabel = _quantityLabel = string.Empty;

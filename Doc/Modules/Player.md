@@ -291,4 +291,10 @@ v13/16的[资源状态](MapResourceStatusHud.md)由Player Baker追加所属Mode/
 
 ## 【FACT】G目标可领取数量
 
-当前v28/revision31的[部分拾取](MapDropPartialPickup.md)在原CombatPrototypeMapPickupHudState增加int PickupQuantity，第七个GhostField仍SendToOwner；Player Baker继续添加原Hidden默认值，七字段均零/空初态，组件挂载与Player Prefab保持。实际G读取本人的容量Level/库存决定本次量，所属结果仍原四字段且成功数量为实际增量。输入19、Tools3、F4/资源状态4/世界保存3及原反馈、生命/体力/R、玩家v4/世界v2保持；各端同版重新烘焙。部分拾取v27阶段编译、Serializer七字段/7 mask bits/88字节结构与40次隔离Bake静态通过；用户人工通过限v27/revision30十六项，未触发独立用例UNKNOWN；旧通过仍限原版本/清单。
+当前v29/revision32的[部分拾取](MapDropPartialPickup.md)在原CombatPrototypeMapPickupHudState增加int PickupQuantity，第七个GhostField仍SendToOwner；Player Baker继续添加原Hidden默认值，七字段均零/空初态，组件挂载与Player Prefab保持。实际G读取本人的容量Level/库存决定本次量，所属结果仍原四字段且成功数量为实际增量。输入19、Tools3、F4/资源状态4/世界保存3及原反馈、生命/体力/R、玩家v4/世界v2保持；各端同版重新烘焙。部分拾取v27阶段编译、Serializer七字段/7 mask bits/88字节结构与40次隔离Bake静态通过；用户人工通过限v27/revision30十六项，未触发独立用例UNKNOWN；旧通过仍限原版本/清单。
+
+## 【CURRENT STRATEGY】B材料搜索的本地键盘采样
+
+[材料搜索](MapInventorySearch.md)沿原客户端Binding→HUD→Panel返回blocksKeyboard。输入系统先读取该值；编辑及获得/释放焦点同帧用null gameplayKeyboard采样，使Move归零且不写空格、E/R/F/G/F5、1～7的新键盘事件，B留作文本，镜头ReadMove接收同一隔离键盘而不新增Z/X转动。Enter/Esc结束编辑（活跃IME合成期间保留候选键），之后B可关闭。点击面板外释放焦点的当次左键不写Attack；其他原鼠标/按钮、已提交输入及服务端动作保持，不暂停战斗。
+
+输入仍十九实例字段，玩家Ghost/Tools/反馈与v4档案布局保持；搜索词/焦点不进网络或存档。当前v29/revision32编译、配置和隔离Bake静态通过；十六项人工GamePlayer待验收，原各阶段用户通过仍限原版本/清单。

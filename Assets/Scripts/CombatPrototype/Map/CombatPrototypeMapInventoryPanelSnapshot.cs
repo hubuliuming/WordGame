@@ -14,6 +14,7 @@ namespace Code_01.CombatPrototype.Map
         {
             public readonly FixedString64Bytes Name;
             public readonly string OriginalName;
+            public readonly string DisplayName;
             public readonly int Quantity;
             public readonly string Text;
 
@@ -21,6 +22,7 @@ namespace Code_01.CombatPrototype.Map
             {
                 Name = name;
                 OriginalName = originalName;
+                DisplayName = label;
                 Quantity = quantity;
                 Text = maximum > 0 ? label + "  " + quantity + "/" + maximum : label + "  x" + quantity;
             }

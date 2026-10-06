@@ -49,5 +49,12 @@ namespace Code_01.CombatPrototype.Map
         public string suppliesFilterLabel;
         public string otherFilterLabel;
         public string noMatchingItemsLabel;
+        public bool searchEnabled;
+        public bool searchIgnoreCase;
+        public int searchMaxLength;
+        public string searchLabel;
+        public string searchPlaceholderLabel;
+        public string clearSearchLabel;
+        public string noSearchResultsLabel;
     }
 }

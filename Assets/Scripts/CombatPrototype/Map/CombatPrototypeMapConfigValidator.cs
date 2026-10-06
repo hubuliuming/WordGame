@@ -54,8 +54,8 @@ namespace Code_01.CombatPrototype.Map
             ValidateInventoryCapacityUpgrade(map.inventoryCapacityUpgrade, map.inventoryCapacity);
             ValidateInventoryDrop(map.inventoryDrop);
             Id(map.mapDefinitionId, "mapDefinitionId");
-            if (map.schemaVersion != 28 || map.configRevision < 1 || map.defaultSeed < 1)
-                throw new InvalidOperationException("Map requires schemaVersion=28, positive revision and seed.");
+            if (map.schemaVersion != 29 || map.configRevision < 1 || map.defaultSeed < 1)
+                throw new InvalidOperationException("Map requires schemaVersion=29, positive revision and seed.");
             var drops = map.drops;
             Id(drops.itemId, "drops.itemId");
             Id(drops.visualResourceKey, "drops.visualResourceKey");
@@ -599,6 +599,12 @@ namespace Code_01.CombatPrototype.Map
             HudLabel(panel.suppliesFilterLabel, "inventoryPanel.suppliesFilterLabel");
             HudLabel(panel.otherFilterLabel, "inventoryPanel.otherFilterLabel");
             HudLabel(panel.noMatchingItemsLabel, "inventoryPanel.noMatchingItemsLabel");
+            if (panel.searchMaxLength < 1 || panel.searchMaxLength > 64)
+                throw new InvalidOperationException("inventoryPanel.searchMaxLength requires an integer from 1 to 64.");
+            HudLabel(panel.searchLabel, "inventoryPanel.searchLabel");
+            HudLabel(panel.searchPlaceholderLabel, "inventoryPanel.searchPlaceholderLabel");
+            HudLabel(panel.clearSearchLabel, "inventoryPanel.clearSearchLabel");
+            HudLabel(panel.noSearchResultsLabel, "inventoryPanel.noSearchResultsLabel");
         }
 
         private static void HudLabel(string value, string field)

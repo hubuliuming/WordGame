@@ -124,11 +124,11 @@ namespace Code_01.CombatPrototype.Map
         }
 
         internal bool ReadPanelInput(Keyboard keyboard, Mouse mouse, out bool craftAxe, out bool craftPickaxe, out bool repairAxe, out bool repairPickaxe,
-            out CombatPrototypeMapInventoryDropRequest dropRequest, out bool upgrade, out bool upgradeAxe, out bool upgradePickaxe)
+            out CombatPrototypeMapInventoryDropRequest dropRequest, out bool upgrade, out bool upgradeAxe, out bool upgradePickaxe, out bool blocksKeyboard)
         {
             craftAxe = craftPickaxe = repairAxe = repairPickaxe = false;
             dropRequest = default;
-            upgrade = upgradeAxe = upgradePickaxe = false;
+            upgrade = upgradeAxe = upgradePickaxe = blocksKeyboard = false;
             Dependency.Complete();
             if (_map.IsEmptyIgnoreFilter) { ResetBinding(); return false; }
             var source = _map.GetSingletonEntity();
@@ -143,7 +143,7 @@ namespace Code_01.CombatPrototype.Map
             if (_hud == null)
                 throw new InvalidOperationException("[CombatPrototype.Map] World=" + World.Name +
                     ", player=" + player + " requires the Main Camera HUD for panel input.");
-            return _hud.ReadPanelInput(keyboard, mouse, out craftAxe, out craftPickaxe, out repairAxe, out repairPickaxe, out dropRequest, out upgrade, out upgradeAxe, out upgradePickaxe);
+            return _hud.ReadPanelInput(keyboard, mouse, out craftAxe, out craftPickaxe, out repairAxe, out repairPickaxe, out dropRequest, out upgrade, out upgradeAxe, out upgradePickaxe, out blocksKeyboard);
         }
 
         private bool HasInGameConnection(Entity player)

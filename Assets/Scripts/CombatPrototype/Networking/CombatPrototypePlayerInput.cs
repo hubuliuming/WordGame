@@ -43,32 +43,33 @@ namespace Code_01.CombatPrototype.Networking
         {
             var keyboard = Keyboard.current;
             var mouse = Mouse.current;
-            var move = keyboard == null ? float2.zero : new float2(
-                (keyboard.dKey.isPressed ? 1f : 0f) - (keyboard.aKey.isPressed ? 1f : 0f),
-                (keyboard.wKey.isPressed ? 1f : 0f) - (keyboard.sKey.isPressed ? 1f : 0f));
-            move = math.normalizesafe(move);
             var panelBinding = state.World.GetExistingSystemManaged<CombatPrototypeMapInteractionHudBindingSystem>();
             if (panelBinding == null)
                 throw new InvalidOperationException("Client input requires CombatPrototypeMapInteractionHudBindingSystem.");
             var blocksMouse = panelBinding.ReadPanelInput(keyboard, mouse, out var panelCraftAxe, out var panelCraftPickaxe,
                 out var panelRepairAxe, out var panelRepairPickaxe, out var panelDrop, out var panelUpgrade,
-                out var panelUpgradeAxe, out var panelUpgradePickaxe);
+                out var panelUpgradeAxe, out var panelUpgradePickaxe, out var blocksKeyboard);
+            var gameplayKeyboard = blocksKeyboard ? null : keyboard;
+            var move = gameplayKeyboard == null ? float2.zero : new float2(
+                (gameplayKeyboard.dKey.isPressed ? 1f : 0f) - (gameplayKeyboard.aKey.isPressed ? 1f : 0f),
+                (gameplayKeyboard.wKey.isPressed ? 1f : 0f) - (gameplayKeyboard.sKey.isPressed ? 1f : 0f));
+            move = math.normalizesafe(move);
             var cameraBinding = state.World.GetExistingSystemManaged<CombatPrototypeCameraBindingSystem>();
-            move = cameraBinding.ReadMove(move, keyboard, blocksMouse ? null : mouse);
-            var attack = (keyboard != null && keyboard.spaceKey.wasPressedThisFrame) ||
+            move = cameraBinding.ReadMove(move, gameplayKeyboard, blocksMouse ? null : mouse);
+            var attack = (gameplayKeyboard != null && gameplayKeyboard.spaceKey.wasPressedThisFrame) ||
                          (mouse != null && mouse.leftButton.wasPressedThisFrame && !blocksMouse);
-            var respawn = keyboard != null && keyboard.rKey.wasPressedThisFrame;
-            var useItem = keyboard != null && keyboard.eKey.wasPressedThisFrame;
-            var gather = keyboard != null && keyboard.fKey.wasPressedThisFrame;
-            var pickup = keyboard != null && keyboard.gKey.wasPressedThisFrame;
-            var saveWorld = keyboard != null && keyboard.f5Key.wasPressedThisFrame;
-            var upgrade = panelUpgrade || (keyboard != null && keyboard.digit5Key.wasPressedThisFrame);
-            var upgradeAxe = panelUpgradeAxe || (keyboard != null && keyboard.digit6Key.wasPressedThisFrame);
-            var upgradePickaxe = panelUpgradePickaxe || (keyboard != null && keyboard.digit7Key.wasPressedThisFrame);
-            var craftAxe = panelCraftAxe || (keyboard != null && keyboard.digit1Key.wasPressedThisFrame);
-            var craftPickaxe = panelCraftPickaxe || (keyboard != null && keyboard.digit2Key.wasPressedThisFrame);
-            var repairAxe = panelRepairAxe || (keyboard != null && keyboard.digit3Key.wasPressedThisFrame);
-            var repairPickaxe = panelRepairPickaxe || (keyboard != null && keyboard.digit4Key.wasPressedThisFrame);
+            var respawn = gameplayKeyboard != null && gameplayKeyboard.rKey.wasPressedThisFrame;
+            var useItem = gameplayKeyboard != null && gameplayKeyboard.eKey.wasPressedThisFrame;
+            var gather = gameplayKeyboard != null && gameplayKeyboard.fKey.wasPressedThisFrame;
+            var pickup = gameplayKeyboard != null && gameplayKeyboard.gKey.wasPressedThisFrame;
+            var saveWorld = gameplayKeyboard != null && gameplayKeyboard.f5Key.wasPressedThisFrame;
+            var upgrade = panelUpgrade || (gameplayKeyboard != null && gameplayKeyboard.digit5Key.wasPressedThisFrame);
+            var upgradeAxe = panelUpgradeAxe || (gameplayKeyboard != null && gameplayKeyboard.digit6Key.wasPressedThisFrame);
+            var upgradePickaxe = panelUpgradePickaxe || (gameplayKeyboard != null && gameplayKeyboard.digit7Key.wasPressedThisFrame);
+            var craftAxe = panelCraftAxe || (gameplayKeyboard != null && gameplayKeyboard.digit1Key.wasPressedThisFrame);
+            var craftPickaxe = panelCraftPickaxe || (gameplayKeyboard != null && gameplayKeyboard.digit2Key.wasPressedThisFrame);
+            var repairAxe = panelRepairAxe || (gameplayKeyboard != null && gameplayKeyboard.digit3Key.wasPressedThisFrame);
+            var repairPickaxe = panelRepairPickaxe || (gameplayKeyboard != null && gameplayKeyboard.digit4Key.wasPressedThisFrame);
 
             foreach (var input in SystemAPI.Query<RefRW<CombatPrototypePlayerInput>>().WithAll<GhostOwnerIsLocal>())
             {

@@ -10,6 +10,7 @@ namespace Code_01.CombatPrototype.Map
     {
         private readonly CombatPrototypeMapInventoryPanelSnapshot _snapshot = new CombatPrototypeMapInventoryPanelSnapshot();
         private readonly CombatPrototypeMapInventoryPanelListView _listView = new CombatPrototypeMapInventoryPanelListView();
+        private readonly CombatPrototypeMapInventoryPanelSearch _search = new CombatPrototypeMapInventoryPanelSearch();
         private readonly CombatPrototypeMapInventoryDropClient _drop = new CombatPrototypeMapInventoryDropClient();
         private readonly CombatPrototypeMapGatherToolRepairPanel _repair = new CombatPrototypeMapGatherToolRepairPanel();
         private readonly CombatPrototypeMapInventoryCapacityUpgradePanel _upgrade = new CombatPrototypeMapInventoryCapacityUpgradePanel();
@@ -72,6 +73,7 @@ namespace Code_01.CombatPrototype.Map
             _pickaxeButton = "2: " + _craftButton + " " + _pickaxeName;
             _snapshot.Configure(settings, capacity, capacityDefinitions, upgradeDefinitions);
             _listView.Configure(settings);
+            _search.Configure(settings);
             _upgrade.Configure(settings, capacity, upgradeSettings, upgradeDefinitions, mapId);
             _drop.Configure(dropSettings, dropDefinitions, settings);
             _repair.Configure(settings, toolSettings, axe, pickaxe, _levelLabel);
@@ -89,7 +91,7 @@ namespace Code_01.CombatPrototype.Map
             if (_settings.Enabled == 0) return;
             _axeDurabilityStatus = axeStatus; _pickaxeDurabilityStatus = pickaxeStatus;
             _snapshot.Capture(inventory, axeDurability, pickaxeDurability, source, player, capacityLevel);
-            if (_listView.Capture(_snapshot, out var selectionChanged)) _rowMousePressAccepted = false;
+            if (_listView.Capture(_snapshot, _search, out var selectionChanged)) _rowMousePressAccepted = false;
             if (selectionChanged) _scroll = Vector2.zero;
             _upgrade.Capture(_snapshot, capacityLevel, upgradeFeedback);
             _canCraftAxe = CanCraft(_axe, axeDurability);
@@ -154,14 +156,15 @@ namespace Code_01.CombatPrototype.Map
 
         // Called once the binding has rechecked the current World/map/local living player.
         public bool ReadInput(Keyboard keyboard, Mouse mouse, out bool craftAxe, out bool craftPickaxe, out bool repairAxe, out bool repairPickaxe,
-            out CombatPrototypeMapInventoryDropRequest dropRequest, out bool upgrade, out bool upgradeAxe, out bool upgradePickaxe)
+            out CombatPrototypeMapInventoryDropRequest dropRequest, out bool upgrade, out bool upgradeAxe, out bool upgradePickaxe, out bool blocksKeyboard)
         {
             craftAxe = craftPickaxe = repairAxe = repairPickaxe = false;
             dropRequest = default;
-            upgrade = upgradeAxe = upgradePickaxe = false;
+            upgrade = upgradeAxe = upgradePickaxe = blocksKeyboard = false;
             if (!_configured || !_ready || _settings.Enabled == 0)
             {
                 _craftAxe = _craftPickaxe = _mousePressAccepted = _rowMousePressAccepted = false;
+                _search.ReleaseFocus();
                 _drop.ClearPending();
                 _repair.ClearPending();
                 _upgrade.ClearPending();
@@ -172,7 +175,8 @@ namespace Code_01.CombatPrototype.Map
             if (_lastInputFrame != Time.frameCount)
             {
                 _lastInputFrame = Time.frameCount;
-                if (keyboard != null && keyboard.bKey.wasPressedThisFrame)
+                _search.ReadInput(keyboard, mouse, ContainsSearchField(mouse), wasInside);
+                if (!_search.BlocksKeyboard && keyboard != null && keyboard.bKey.wasPressedThisFrame)
                 {
                     if (_open) Close();
                     else _open = true;
@@ -180,6 +184,7 @@ namespace Code_01.CombatPrototype.Map
                 if (mouse != null && mouse.leftButton.wasPressedThisFrame)
                     _mousePressAccepted = _rowMousePressAccepted = ContainsMouse(mouse);
             }
+            blocksKeyboard = _search.BlocksKeyboard;
             var inside = ContainsMouse(mouse);
             if (_open)
             {
@@ -192,7 +197,7 @@ namespace Code_01.CombatPrototype.Map
             }
             _craftAxe = _craftPickaxe = false;
             // Closing by B must also consume the mouse press that began over this panel.
-            return wasInside || inside;
+            return wasInside || inside || _search.BlocksMouse;
         }
 
         private bool ContainsMouse(Mouse mouse)
@@ -203,12 +208,29 @@ namespace Code_01.CombatPrototype.Map
             return Rect(scale).Contains(new Vector2(point.x / scale, (Screen.height - point.y) / scale));
         }
 
+        private bool ContainsSearchField(Mouse mouse)
+        {
+            if (!_search.Enabled || !ContainsMouse(mouse)) return false;
+            var scale = Scale();
+            var viewport = Viewport(Rect(scale));
+            var point = mouse.position.ReadValue();
+            var local = new Vector2(point.x / scale, (Screen.height - point.y) / scale);
+            var field = CombatPrototypeMapInventoryPanelSearch.FieldRect(viewport.width - 18f,
+                (3 + _listView.ControlRowCount) * _settings.RowHeightPixels, _settings.RowHeightPixels);
+            field.position += viewport.position - _scroll;
+            return viewport.Contains(local) && field.Contains(local);
+        }
+
+        private Rect Viewport(Rect panel) => new Rect(panel.x + 12f, panel.y + 12f + _settings.RowHeightPixels,
+            panel.width - 24f, panel.height - 3f * _settings.RowHeightPixels - 24f);
+
         private static float Scale() => Mathf.Min(Screen.width / 1920f, Screen.height / 1080f);
         private Rect Rect(float scale) => new Rect(Screen.width / scale - _settings.RightMarginPixels - _settings.PanelWidthPixels,
             _settings.TopMarginPixels, _settings.PanelWidthPixels, _settings.PanelHeightPixels);
 
         public void Draw()
         {
+            _search.FlushGUIFocus();
             if (!_configured || !_ready || !_open || Screen.width <= 0 || Screen.height <= 0) return;
             if (_labelStyle == null)
             {
@@ -230,9 +252,8 @@ namespace Code_01.CombatPrototype.Map
                 GUI.DrawTexture(panel, Texture2D.whiteTexture);
                 GUI.color = Color.white;
                 GUI.Label(new Rect(panel.x + 12f, panel.y + 12f, panel.width - 24f, _settings.RowHeightPixels), _title, _labelStyle);
-                var viewport = new Rect(panel.x + 12f, panel.y + 12f + _settings.RowHeightPixels,
-                    panel.width - 24f, panel.height - 3f * _settings.RowHeightPixels - 24f);
-                var rows = Mathf.Max(_listView.Items.Count * 2, 1) + _listView.ControlRowCount + 14 + CombatPrototypeMapGatherToolRepairPanel.RowCount + CombatPrototypeMapInventoryCapacityUpgradePanel.RowCount + CombatPrototypeMapGatherToolUpgradePanel.RowCount + (_durabilityEnabled ? 2 : 0);
+                var viewport = Viewport(panel);
+                var rows = Mathf.Max(_listView.Items.Count * 2, 1) + _listView.ControlRowCount + _search.RowCount + 14 + CombatPrototypeMapGatherToolRepairPanel.RowCount + CombatPrototypeMapInventoryCapacityUpgradePanel.RowCount + CombatPrototypeMapGatherToolUpgradePanel.RowCount + (_durabilityEnabled ? 2 : 0);
                 var content = new Rect(0f, 0f, viewport.width - 18f, rows * _settings.RowHeightPixels);
                 _scroll = GUI.BeginScrollView(viewport, _scroll, content);
                 try { DrawBody(content.width); }
@@ -257,8 +278,14 @@ namespace Code_01.CombatPrototype.Map
             Label(width, ref y, _materials);
             Label(width, ref y, _snapshot.CapacityText);
             DrawListControls(width, ref y);
+            if (_search.Enabled)
+            {
+                Label(width, ref y, _search.Label);
+                _search.Draw(width, y, _settings.RowHeightPixels, _labelStyle, _buttonStyle, _mousePressAccepted);
+                y += _settings.RowHeightPixels;
+            }
             if (_listView.Items.Count == 0)
-                Label(width, ref y, _snapshot.Items.Count == 0 ? _empty : _listView.NoMatchingItemsText);
+                Label(width, ref y, _snapshot.Items.Count == 0 ? _empty : _search.HasQuery ? _search.NoResultsText : _listView.NoMatchingItemsText);
             foreach (var item in _listView.Items)
             {
                 Label(width, ref y, item.Text);
@@ -333,6 +360,7 @@ namespace Code_01.CombatPrototype.Map
         {
             _open = _craftAxe = _craftPickaxe = _mousePressAccepted = _rowMousePressAccepted = false;
             _listView.ClearPending();
+            _search.Close();
             _drop.ClearPending();
             _repair.ClearPending();
             _upgrade.ClearPending();
@@ -349,6 +377,7 @@ namespace Code_01.CombatPrototype.Map
             _axeDurabilityStatus = _pickaxeDurabilityStatus = CombatPrototypeMapGatherToolDurabilityHudClient.ToolStatus.Plain;
             _snapshot.Reset();
             _listView.Reset();
+            _search.Reset();
             _drop.Reset();
             _repair.Reset();
             _upgrade.Reset();

@@ -996,7 +996,7 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 
 ## 【KNOWN ISSUES】背包材料排序与筛选验收边界
 
-入口CombatPrototypeNetCode，两地图Json/BuiltIn本阶段v28/revision31。正常Unity编译、1078份非法配置拒绝/62组合法读取、64次隔离Editor Bake及44配置/Settings、0 GhostField静态核对通过；Bake Console前后[0 Error,4 Warning,3 Log]相同。以下十六项为本阶段新增人工GamePlayer清单，尚未获得用户通过反馈；原387项内容/编号逐字保留，各端同版重新烘焙，旧v1～v27明确拒绝。
+入口CombatPrototypeNetCode，两地图Json/BuiltIn本阶段v28/revision31。正常Unity编译、1078份非法配置拒绝/62组合法读取、64次隔离Editor Bake及44配置/Settings、0 GhostField静态核对通过；Bake Console前后[0 Error,4 Warning,3 Log]相同。用户已确认本阶段人工GamePlayer通过，主线程结合既有静态核对与用户反馈判定通过，范围限CombatPrototypeNetCode、v28/revision31及以下十六项清单，人工结论来自用户反馈；原387项内容/编号逐字保留，各端同版重新烘焙，旧v1～v27明确拒绝。
 
 1. 两地图Json/BuiltIn均v28/revision31，十四新字段必填，默认sortEnabled/filterEnabled=true、defaultSortMode=type/defaultFilterMode=all；原Settings44字段、0 GhostField，两个模式为byte枚举，ListView普通类及原主场景/Prefab绑定保持。
 2. 库存原插入顺序不同于类型顺序时，B默认显示木/石/苹果/肉/其他；其他合法正数量行按原名Ordinal排列，改显示文案不改分类/顺序，零数量不列出。原服务器库存缓冲及保存条目顺序不因展示重排而改变；未触发其他合法名称来源UNKNOWN。
@@ -1015,4 +1015,27 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 15. 全部新字段及关闭能力/面板时缺失/null/错类型/重复未知键、非有限字面量、未知/大小写/空格模式、空白控制文案/超61字节，以及旧v1～v27明确失败，无补默认/回退或热重载；各端同版重新烘焙。未触发独立配置导入故障UNKNOWN。
 16. 不同客户端只改变本人的展示模式，原所属库存网络更新与G部分拾取/合并寿命/反馈/保存保持；回归F采集/砍伐/采矿/再生、B制作修理升级/丢弃、E/R/F5、战斗/镜头/阻挡和正常保存恢复。未触发多人/延迟/预测回放/异常保存/生命周期及性能/平台/线上UNKNOWN。
 
-完整显示规则归[排序筛选](MapInventoryListView.md)，完整统计/业务按钮归[B面板](MapInventoryPanel.md)/[容量](MapInventoryCapacity.md)，丢弃身份归[丢弃](MapInventoryDrop.md)，严格配置归[资源与数据](DataResources.md)。共403项，主线程实现及静态验收通过，本阶段人工GamePlayer待验收；旧部分拾取通过保持v27/revision30十六项及其他旧范围。AI未执行排序/筛选/Capture、面板/HUD/GUI、GamePlayer/PlayMode、逻辑单元测试、真实存档业务I/O、命令行构建/发布、采样/图片，未创建子Agent/提交Git。未触发交互/时序/字形/排版/联网/生命周期、意外ECS恢复/跨文件事务/同槽并发与性能/平台/线上仍UNKNOWN。
+完整显示规则归[排序筛选](MapInventoryListView.md)，完整统计/业务按钮归[B面板](MapInventoryPanel.md)/[容量](MapInventoryCapacity.md)，丢弃身份归[丢弃](MapInventoryDrop.md)，严格配置归[资源与数据](DataResources.md)。共403项，用户已确认本阶段人工GamePlayer通过，主线程结合既有静态核对与用户反馈判定通过，限CombatPrototypeNetCode、v28/revision31及十六项清单，人工结论来自用户反馈；旧部分拾取通过保持v27/revision30十六项及其他旧范围。AI未执行排序/筛选/Capture、面板/HUD/GUI、GamePlayer/PlayMode、逻辑单元测试、真实存档业务I/O、命令行构建/发布、采样/图片，未创建子Agent/提交Git。未触发交互/时序/字形/排版/联网/生命周期、意外ECS恢复/跨文件事务/同槽并发与性能/平台/线上仍UNKNOWN。
+
+## 【KNOWN ISSUES】背包材料搜索验收边界
+
+入口CombatPrototypeNetCode，两地图Json/BuiltIn本阶段v29/revision32。正常Unity编译、1410份非法配置拒绝/76组合法读取、82次隔离Editor Bake及51配置/Settings、0 GhostField静态核对通过；Bake Console前后[0 Error,9 Warning,47 Log]一致。以下十六项待人工GamePlayer验收，旧排序筛选用户通过仅限v28/revision31原十六项；原403项内容/编号保留，各端同版重新烘焙，旧v1～v28拒绝。
+
+1. 两地图Json/BuiltIn均v29/revision32，七搜索字段必填且默认true/true/32和Search/Name keyword/Clear/No search results；原Settings51字段、0 GhostField，Search普通类，十九输入及原Scene/Prefab绑定保持。
+2. B打开不自动聚焦，材料标题/容量/模式后追加搜索标题与文本框/Clear两行；原380×640、字号18/行32、缩放/固定页脚/滚动保持，空文本未编辑显示占位。精确几何/命中、裁剪、字形及不同分辨率未触发则UNKNOWN。
+3. 配置木材显示为Wood时原名“木”与显示名“ood”均匹配木材；石材/苹果/肉及实际可用的其他合法原名/显示名分别核对。数量/容量文本不作关键词，查询两端空白Trim但框内保留。未存在其他合法名称来源则该分支UNKNOWN。
+4. 默认ignoreCase=true时“WOOD”“wood”匹配同显示名；PlayMode前改false并正常导入/烘焙后按Ordinal大小写敏感。原中文、混合中英文子串与IME输入/候选分别核对；未触发IME/字形分支UNKNOWN。
+5. 清空与纯空白相当于无搜索；全库存空沿Empty，库存非空且有效关键词与分类交集空沿No search results；仅分类无匹配且无有效搜索沿No matching items。清空不重置已应用排序/分类。
+6. 分类与搜索取交集后排序，三排序×四分类结合关键词；切换类别/排序不清词，清空保留模式。其他分类不存在实际条目及未遍历组合分别UNKNOWN，原类型/同数量确定性及服务器原顺序保持。
+7. 文本改变在下一Show/Capture应用并滚动归零，同次GUI集合稳定，未改变不反复重建；清空释放焦点后下一Show恢复当前分类。未实际触发多GUI事件/滚动临界与快照时序UNKNOWN。
+8. 默认最多32 UTF-16单元；PlayMode前配置1/64正常导入/烘焙，粘贴超长/控制字符与合法代理对、截断孤立代理项，显示/查询不保留控制或孤立项。未触发粘贴/IME/代理边界UNKNOWN，长度不是UTF-8字节或可见字形数。
+9. 搜索隐藏的苹果/木石仍计完整容量、当前等级/单种上限和配方/缺口；工具/制作/修理/容量与工具升级区保留，原非法库存仍限制业务按钮，隐藏不恢复资格。服务器扣料/耐久/等级与SavePrepared顺序保持。
+10. 各搜索/分类/排序下Drop/All按行真实Name作用于原稳定Kind；按下到抬起之间查询或网络库存更新改变行身份/顺序/数目时取消未完成点击，新主动点击作用当前行。已排队/消费请求保持；未触发精确点击重排时序UNKNOWN。
+11. 点击文本框当帧及编辑中，WASD不移动、空格不攻击、E/R/F/G/F5、1～7不发新游戏命令、Z/X不新增镜头旋转；B可输入而不关面板。战斗与已提交动作继续、原按钮/鼠标规则保持；同帧输入与预测回放未触发则UNKNOWN。
+12. Enter/小键盘Enter/Esc结束编辑，获得/释放帧仍屏蔽键盘，之后B可关闭、WASD和原快捷键恢复。IME候选活跃时Enter/Esc先保留候选处理，实际中文提交、选词、取消与下一次退出分别核对，未触发则UNKNOWN。
+13. 点面板其他区域释放文本焦点并沿原鼠标隔离；点面板外的当次左键只释放焦点，不同时攻击，后续左键沿原攻击。原面板滚轮不缩放镜头，面板外滚轮保持；尚在编辑时按钮与关闭点击不吞已排队原请求。未触发释放/点击同帧边界UNKNOWN。
+14. 同一绑定关闭重开保留已应用词和模式，未应用文本回退、焦点/滚动释放；死亡/断线、源或玩家变化、World/Scene停止释放后新绑定词为空，按原initiallyOpen/默认模式。无有效绑定R仍沿原复活；未触发生命周期/GUI焦点释放分支UNKNOWN。
+15. searchEnabled=false隐藏两行且不过滤/隔离键盘，sort/filter可独立使用；面板关闭及全部显示关闭沿原快捷键玩法。关闭仍完整验证七字段，缺失/null/错类型/重复未知键、0/65/浮点长度、空白/控制/超61字节文案与旧v1～v28明确失败，无补默认/回退/热重载。未触发独立导入故障UNKNOWN。
+16. 不同客户端仅改变本人的词/模式/焦点，未新增输入/Ghost/档案字段；回归F采集/砍伐/采矿/再生、G部分拾取/合并/寿命/反馈、B业务/丢弃、E/R/F5、战斗/镜头/阻挡和正常保存恢复。未触发多人/联网/预测/异常保存及性能/平台/线上UNKNOWN。
+
+完整规则归[搜索](MapInventorySearch.md)，原模式归[排序筛选](MapInventoryListView.md)，全量统计与业务归[B面板](MapInventoryPanel.md)/[容量](MapInventoryCapacity.md)，输入归[玩家](Player.md)。共419项，本阶段静态通过、人工GamePlayer待验收，旧403项结论保留原版本/清单。AI未执行搜索/排序/库存/焦点/GUI业务、GamePlayer/PlayMode、逻辑单元测试、真实存档业务I/O、命令行构建/发布、采样/图片，未创建子Agent/提交Git；未触发交互/时序/字形/排版/联网/生命周期及性能/平台/线上仍UNKNOWN。

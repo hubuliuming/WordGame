@@ -8,7 +8,8 @@
 |---|---|
 | [MapInventoryPanelConfig](../../Assets/Scripts/CombatPrototype/Map/MapInventoryPanelConfig.cs) | inventoryPanel 的严格 JSON DTO |
 | [InventoryPanelData](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapInventoryPanelData.cs) | 原地图根上的固定显示 Settings；无 GhostField/新玩家数据 |
-| [InventoryPanelSnapshot](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapInventoryPanelSnapshot.cs) | 原库存缓冲的只读展示投影及材料计数 |
+| [InventoryPanelSnapshot](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapInventoryPanelSnapshot.cs) | 完整库存原顺序缓存、材料计数及本地行Revision |
+| [ListView](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapInventoryPanelListView.cs) | [排序筛选](MapInventoryListView.md)的可见行、顺序及本地选择缓存 |
 | [InventoryPanel](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapInventoryPanel.cs) | GUI 列表/滚动/按钮、本地开关和待提交按钮请求 |
 | [Map Baker](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapAuthoring.cs) | 原根追加 InventoryPanelSettings 烘焙数据 |
 | [HUD 绑定](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapInteractionHudBindingSystem.cs) | 所属玩家/连接检查、配置、投影与输入交接 |
@@ -19,7 +20,7 @@
 
 ## 【FACT】JSON 契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 当前一致为 schemaVersion=27/configRevision=30。必填 inventoryPanel 共30字段，沿原严格UTF-8、完整字段/类型及未知/重复键检查；即使关闭面板也校验全部字段。旧地图v1～v26明确失败，不补段/默认值或回退来源；正常导入/烘焙后生效，无运行热重载。Lv1配方/定义仍从gatherTools读取，当前级上限/倍率归[gatherToolUpgrade](MapGatherToolUpgrade.md)，面板不复制配置真值。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 当前一致为 schemaVersion=28/configRevision=31。必填 inventoryPanel 共44字段，原30字段加[排序筛选](MapInventoryListView.md)十四字段，沿原严格UTF-8、完整字段/类型及未知/重复键检查；即使关闭面板也校验全部字段。旧地图v1～v27明确失败，不补段/默认值或回退来源；正常导入/烘焙后生效，无运行热重载。Lv1配方/定义仍从gatherTools读取，当前级上限/倍率归[gatherToolUpgrade](MapGatherToolUpgrade.md)，面板不复制配置真值。
 
 | 字段 | 默认值 | 契约 |
 |---|---|---|
@@ -54,17 +55,19 @@
 | repairButtonLabel | Repair |
 | fullDurabilityLabel | Full durability |
 
-全部22文案须非空白、无控制字符且最多61个UTF-8字节，烘焙为FixedString64Bytes。内置GUI字体和白色纹理复用；当前英文文案，中文接口保留，字体/字形覆盖为UNKNOWN，没有读取图片或界面截图。
+全部32文案（上表原22项加排序筛选十项）须非空白、无控制字符且最多61个UTF-8字节，烘焙为FixedString64Bytes。内置GUI字体和白色纹理复用；当前英文文案，中文接口保留，字体/字形覆盖为UNKNOWN，没有读取图片或界面截图。
 
 ## 【CURRENT STRATEGY】库存、工具与配方显示
 
-客户端仅枚举启用GhostOwnerIsLocal的一个玩家，并核对其GhostOwner对应Connected/InGame且无断线请求的连接；没有有效本地Ghost/连接时清空显示。展示原CombatPrototypeInventoryItem的正数量条目及原顺序，不设第二份可变库存，不按99拆格、不排序；零数量不列出。材料标题后增加一行总量/上限，受管材料行显示数量/单种上限，关闭限制显示Unlimited，规则归[容量](MapInventoryCapacity.md)。木材/石材/活力苹果/小块肉映射上述Wood/Stone/Apple/Meat文案，其余合法名称直接按原ItemName显示。ToolId/Durability/Level来自原所属工具缓冲，工具独立于库存，两槽显示当前等级/本级最大耐久、未持有或功能关闭状态；预警开启时状态文字与颜色归[耐久预警](MapToolDurabilityHud.md)，关闭时沿原损坏显示。
+客户端仅枚举启用GhostOwnerIsLocal的一个玩家，并核对其GhostOwner对应Connected/InGame且无断线请求的连接；没有有效本地Ghost/连接时清空显示。Snapshot按原CombatPrototypeInventoryItem顺序缓存全部正数量条目，[排序筛选](MapInventoryListView.md)只生成材料列表的可见行；不设第二份可变库存或99拆格，零数量不列出。材料标题后增加一行总量/上限，受管材料行显示数量/单种上限，关闭限制显示Unlimited，规则归[容量](MapInventoryCapacity.md)。木材/石材/活力苹果/小块肉映射上述Wood/Stone/Apple/Meat文案，其余合法名称直接按原ItemName显示。ToolId/Durability/Level来自原所属工具缓冲，工具独立于库存，两槽显示当前等级/本级最大耐久、未持有或功能关闭状态；预警开启时状态文字与颜色归[耐久预警](MapToolDurabilityHud.md)，关闭时沿原损坏显示。
 
-新Snapshot只缓存显示文本/数量；条目名称空白/控制字符、负数量或重复名称按索引/地图/玩家记录错误并跳过该项，其余独立条目继续，当前快照有错误时禁用制作、修理和丢弃按钮，不用展示数据修正库存。原工具网络数据仍由原HUD统一校验。必需地图配置、客户端绑定/宿主缺失明确暴露错误，不查找或创建组件兜底。
+Snapshot缓存完整显示文本/数量，行内容、数量/顺序或容量等级变化时更新本地Revision；条目名称空白/控制字符、负数量或重复名称按索引/地图/玩家记录错误并跳过该项，其余独立条目继续，当前快照有错误时禁用制作、修理和丢弃按钮，不用展示数据修正库存。原工具网络数据仍由原HUD统一校验。必需地图配置、客户端绑定/宿主缺失明确暴露错误，不查找或创建组件兜底。
 
 两条配方直接读取原definitions：斧头木3/石2、镐子木2/石3；分别列出现有/需要与max(需要-现有,0)缺少数量。只有工具开关启用、库存展示快照合法、材料充足且工具未持有或耐久小于单次成本时按钮可用。Ready仅是当前客户端材料/耐久预览，连接、生命、静止、无攻击、近战Ready、资源预约互斥及同tick优先仍由原服务端制作系统决定；网络快照滞后时服务器可拒绝，不按客户端预览扣料/发工具。工具功能关闭保留已有耐久/等级并禁用按钮；制作/重做满耐久Lv1，损坏高等级工具的按钮明确显示Recraft at Lv1。
 
-面板右上，按min(屏幕宽/1920,屏幕高/1080)等比缩放。标题和共享反馈/关闭按钮固定，中间列表滚动；背景alpha=0.85。缓存条目/配方/按钮文本和GUI样式；GUI绘制后恢复matrix/color/enabled。新的按钮/滚动参与正常GUI事件，原F提示/进度仍仅Repaint且保持底部320×104。
+面板右上，按min(屏幕宽/1920,屏幕高/1080)等比缩放。标题和共享反馈/关闭按钮固定，中间列表滚动；背景alpha=0.85。缓存条目/配方/按钮文本和GUI样式；GUI绘制后恢复matrix/color/enabled。按钮/滚动参与正常GUI事件，原F提示/进度仍仅Repaint且保持底部320×104。排序、筛选两个完整宽度控制行位于材料标题/容量行之后，同处原滚动区；滚动内容高度按可见行与启用的0～2控制行计算。无库存沿原Empty，完整库存有条目但筛选无匹配显示No matching items；完整容量统计、工具及制作/修理/升级区不受筛选影响。
+
+排序/筛选按钮仅记录客户端布尔切换，在Show捕获库存后应用一次并滚动归零；无输入/RPC或存档新增字段。可见行身份/顺序/数目变化只清本次行丢弃的鼠标按下许可，防止按下至抬起间重排丢错行；已排队Kind/Mode保持，制作/修理/升级沿原完整Snapshot资格。详细规则与v28静态/人工边界归[排序筛选](MapInventoryListView.md)。
 
 ## 【CURRENT STRATEGY】输入、请求与生命周期
 
@@ -74,7 +77,7 @@ B单次按下在GhostInputSystemGroup内切换本地面板，同一渲染帧不�
 
 制作成功/拒绝/失败共享原所属Sequence/Kind/Result，当前2秒展示期限由原宿主处理，只用于显示；新绑定只观察现有Sequence，不重播旧反馈。interactionHud.enabled只关闭F提示/进度，inventoryPanel.enabled独立；关闭F HUD仍可B打开本面板/查看制作反馈，关闭本面板仍可用原1/2。F/G文字、面板、高亮及资源状态全关时宿主清空显示，工具玩法由原开关控制。
 
-死亡、断线/无本地Ghost、玩家或地图源变化、关闭面板、World/Scene停止或释放清掉未提交按钮请求；绑定释放同时清库存投影、滚动位置、鼠标按下标记及旧反馈。重建有效绑定按initiallyOpen应用初始状态，默认保持关闭。已经消费进原输入命令的请求仍由原服务器链处理，不通过关闭面板撤销已提交制作。面板不保存/修改库存、耐久、世界资源、再生期限、金币/经验或玩家档案，当前玩家v4与合法旧档迁移归[资源与数据](DataResources.md)。
+死亡、断线/无本地Ghost、玩家或地图源变化、关闭面板、World/Scene停止或释放清掉未提交按钮请求；绑定释放同时清库存投影、滚动位置、鼠标按下标记及旧反馈。同一绑定内B或关闭按钮保留已应用的排序/筛选选择，只清本地未应用切换请求；重建有效绑定按initiallyOpen及两默认模式初始化，默认关闭/type/all，原滚动归零。已经消费进原输入命令的请求仍由原服务器链处理，不通过关闭面板撤销已提交制作。面板不保存/修改库存、耐久、世界资源、再生期限、金币/经验或玩家档案，当前玩家v4与合法旧档迁移归[资源与数据](DataResources.md)。
 
 ## 【KNOWN ISSUES】静态核对与人工边界
 
@@ -118,4 +121,8 @@ v25/revision28阶段的[拾取反馈](MapPickupFeedbackHud.md)独立显示在原
 
 ## 【FACT】丢弃后合并与面板边界
 
-v26/revision29的[地面合并](MapDropMerge.md)在已保存激活的丢弃物落地后执行，不改变B列表、Drop/All按钮、原请求/数量或丢弃反馈；原All可产生超99大堆，新链不拆分或钳制它。合并本身不修改库存/工具/等级或追加玩家保存；之后G按[部分拾取](MapDropPartialPickup.md)开关计算本次可接收量，库存投影显示实际入包数量。原面板尺寸/滚动/鼠标隔离及制作/修理/升级保持；合并链静态及用户人工通过限v26/revision29十六项，部分拾取人工待验收；未触发独立用例UNKNOWN，旧B通过保持原版本/清单。
+v26/revision29的[地面合并](MapDropMerge.md)在已保存激活的丢弃物落地后执行，不改变B列表、Drop/All按钮、原请求/数量或丢弃反馈；原All可产生超99大堆，新链不拆分或钳制它。合并本身不修改库存/工具/等级或追加玩家保存；之后G按[部分拾取](MapDropPartialPickup.md)开关计算本次可接收量，库存投影显示实际入包数量。原面板尺寸/滚动/鼠标隔离及制作/修理/升级保持；合并链静态及用户人工通过限v26/revision29十六项，部分拾取用户人工通过限v27/revision30十六项；未触发独立用例UNKNOWN，旧B通过保持原版本/清单。
+
+## 【KNOWN ISSUES】排序筛选边界
+
+v28/revision31排序筛选已落地，正常Unity编译、1078份非法配置拒绝/62组合法读取、64次隔离Editor Bake及44配置/Settings、0 GhostField静态核对通过。原输入19/G7/其他Ghost字段、玩家v4/世界v2与资源布局签名保持；人工GamePlayer待验收，归[排序筛选](MapInventoryListView.md)与[运行入口](Runtime.md)新增十六项。旧面板及部分拾取通过仍限各原版本/清单；AI未执行排序/筛选/库存Capture、面板/HUD/GUI、GamePlayer/PlayMode、逻辑单元测试、构建/发布、真实存档业务I/O、采样/图片或子Agent/Git提交，实际交互/时序、字体/排版/缩放、联网/生命周期及性能仍UNKNOWN。

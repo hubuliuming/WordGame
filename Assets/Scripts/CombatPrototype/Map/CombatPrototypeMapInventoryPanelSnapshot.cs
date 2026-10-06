@@ -46,6 +46,7 @@ namespace Code_01.CombatPrototype.Map
         private long _lastTotal = -1;
 
         public IReadOnlyList<Row> Items => _items;
+        public uint Revision { get; private set; }
         public int WoodQuantity { get; private set; }
         public int StoneQuantity { get; private set; }
         public int AxeDurability { get; private set; } = -1;
@@ -82,7 +83,7 @@ namespace Code_01.CombatPrototype.Map
         public void Capture(DynamicBuffer<CombatPrototypeInventoryItem> inventory, int axeDurability,
             int pickaxeDurability, Entity source, Entity player, int capacityLevel)
         {
-            ApplyLevel(capacityLevel);
+            var changed = ApplyLevel(capacityLevel);
             WoodQuantity = StoneQuantity = 0;
             AxeDurability = axeDurability;
             PickaxeDurability = pickaxeDurability;
@@ -115,10 +116,16 @@ namespace Code_01.CombatPrototype.Map
                         _capacityEnabled ? maximum : 0);
                     if (count < _items.Count) _items[count] = row;
                     else _items.Add(row);
+                    changed = true;
                 }
                 count++;
             }
-            if (count < _items.Count) _items.RemoveRange(count, _items.Count - count);
+            if (count < _items.Count)
+            {
+                _items.RemoveRange(count, _items.Count - count);
+                changed = true;
+            }
+            if (changed) Revision = unchecked(Revision + 1);
             if (total != _lastTotal)
             {
                 _lastTotal = total;
@@ -126,9 +133,9 @@ namespace Code_01.CombatPrototype.Map
             }
         }
 
-        private void ApplyLevel(int level)
+        private bool ApplyLevel(int level)
         {
-            if (_capacityLevel == level) return;
+            if (_capacityLevel == level) return false;
             CombatPrototypeMapInventoryCapacityUtility.ValidateLevel(level);
             var upgrade = level == 2 ? _second : _third;
             _totalMaximum = level == 1 ? _baseTotal : upgrade.MaxTotalQuantity;
@@ -138,6 +145,7 @@ namespace Code_01.CombatPrototype.Map
             _capacityLevel = level;
             _items.Clear();
             _lastTotal = -1;
+            return true;
         }
 
         private int Maximum(FixedString64Bytes name)
@@ -169,6 +177,7 @@ namespace Code_01.CombatPrototype.Map
         {
             _items.Clear();
             _names.Clear();
+            Revision = 0;
             WoodQuantity = StoneQuantity = 0;
             AxeDurability = PickaxeDurability = -1;
             InventoryValid = false;

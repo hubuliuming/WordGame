@@ -17,7 +17,7 @@ namespace Code_01.CombatPrototype.Map
             {
                 map = new MapDefinitionConfig
                 {
-                    schemaVersion = 27, configRevision = 30,
+                    schemaVersion = 28, configRevision = 31,
                     mapDefinitionId = mapDefinitionId, defaultSeed = 12345,
                     resourcePersistence = new MapResourcePersistenceConfig
                     {
@@ -199,7 +199,19 @@ namespace Code_01.CombatPrototype.Map
                         notOwnedLabel = "Not owned",
                         disabledLabel = "Disabled",
                         readyLabel = "Ready",
-                        repairLabel = "Repair", repairButtonLabel = "Repair", fullDurabilityLabel = "Full durability"
+                        repairLabel = "Repair", repairButtonLabel = "Repair", fullDurabilityLabel = "Full durability",
+                        sortEnabled = true, filterEnabled = true,
+                        defaultSortMode = "type", defaultFilterMode = "all",
+                        sortLabel = "Sort",
+                        originalOrderLabel = "Original",
+                        typeOrderLabel = "Type",
+                        quantityOrderLabel = "Quantity",
+                        filterLabel = "Filter",
+                        allFilterLabel = "All",
+                        resourcesFilterLabel = "Resources",
+                        suppliesFilterLabel = "Supplies",
+                        otherFilterLabel = "Other",
+                        noMatchingItemsLabel = "No matching items"
                     },
                     inventoryCapacity = new MapInventoryCapacityConfig
                     {

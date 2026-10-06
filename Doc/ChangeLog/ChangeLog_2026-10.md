@@ -867,3 +867,15 @@
 - 两地图Json/BuiltIn升schema27/revision30，drops新增必填partialPickupEnabled=true、DTO12/Server Settings14且新增byte/0 GhostField；false恢复整堆，容量关闭仍沿原整堆/checked，旧v1～v26严格拒绝。先准备库存增量及原堆余量并SavePrepared，成功才库存/Quantity提交，领空Consumed；剩余身份/位置/期限保持，无新实体或编号，原世界快照保存剩余量与玩家v4/世界v2/资源签名保持。
 - G目标增加int PickupQuantity，七GhostField SendToOwner，真实Quantity保持；部分Ready显示可领量/地面量、零余量NoSpace及成功实际增量，原寿命/高亮/结果优先级与布局保持；采样/缓存/非法快照边界包含新字段。正常编译、258非法拒绝/42合法读取、40次隔离Bake与Serializer七字段/7 mask bits/88字节结构静态通过。Bake前后[0 Error,5 Warning,3 Log]一致，新增编译/桥接警告来自未修改PEListener/DOTween与MCP WebSocket，原Package/Input Manager警告保留，未清Console。
 - 增量同步新部分拾取专题、相关模块/玩家/导航/Runtime及策划模板；原371项人工内容/编号逐字保留，新16项后共387项，静态通过、本阶段v27/revision30人工待验收。旧合并用户通过仍限v26/revision29十六项、G结果v25/revision28十六项及其他旧范围。未新增脚本或修改Scene/SubScene/Prefab/Animator/meta/资源/包/构建配置，临时烘焙资源释放且主场景干净未Play；未执行接收数量/G/HUD/GUI逻辑、GamePlayer/PlayMode、逻辑单元测试、真实存档业务I/O、命令行构建/发布、采样/图片，未创建子Agent/提交Git。实际容量/时序/保存错误/合并寿命/恢复/多人展示与生命周期、意外ECS及跨文件、性能/平台/线上仍UNKNOWN。
+
+## 2026-10-06：掉落物按背包余量部分拾取人工验收通过
+
+- 用户反馈“我已验收通过，接下来下一阶段”；主线程结合既有静态核对与用户反馈判定通过，限CombatPrototypeNetCode、Forest/Grassland Json/BuiltIn v27/revision30及Runtime.md本阶段十六项清单，人工结论来自用户反馈。原387项人工内容/编号及其他旧阶段通过范围保持；未实际触发的独立用例、意外ECS恢复、跨文件事务、同槽并发、性能/平台/线上仍UNKNOWN。
+- 同步导航、地图、部分拾取及相关库存/容量/面板/G显示/剩余堆保存/玩家/配置/运行文档与策划模板的验收状态；仅文档修改，未执行游戏/GUI逻辑、GamePlayer/PlayMode、逻辑单元测试、真实存档业务I/O、构建/发布、采样或图片检查，未创建子Agent或提交Git。
+
+## 2026-10-06：背包材料排序与筛选落地
+
+- 用户确认执行方案；主线程仅改七个现有脚本，新增普通客户端CombatPrototypeMapInventoryPanelListView及Unity正常生成meta、两个byte枚举和两地图JSON。当前schema28/revision31，inventoryPanel新增十四必填字段，配置/Settings44、0 GhostField；默认type/all和两能力开启，关闭仍严格验证、旧v1～v27拒绝，无补齐/回退/热重载。
+- 完整Snapshot保留原顺序/合法性/容量及配方统计，仅追加本地行Revision；ListView缓存原顺序/类型/数量降序与全部/资源/补给/其他可见行。原B滚动区增加0～2控制行，本地切换在Show应用一次、滚动归零；行身份/顺序/数目变化取消未完成丢弃点击，已排队Kind/Mode和原业务事务保持。同绑定关闭保留已应用模式，原Reset/Configure重建默认与清缓存。
+- 正常Unity编译、1078份非法配置拒绝/62组合法读取、64次隔离Editor Bake及44字段/byte模式/0 GhostField元数据静态通过，原布局/资源签名/所有Settings与反馈/Prefab引用一致。初始Console[0,5,3]、Bake前后[0,4,3]一致且未主动清空；主场景干净未Play，临时资源释放。输入/Ghost/玩家v4与世界v2、宿主/绑定/服务器/存档及Scene/SubScene/Prefab/Animator/旧meta/资源/包/构建保持。
+- 增量同步新展示专题、直接受影响模块/导航/配置/运行及策划模板；原387人工项逐字保留，新增十六项后共403项，本阶段v28/revision31人工待验收。旧部分拾取用户通过仍限v27/revision30十六项及其他旧范围；AI未执行排序/筛选/Capture、面板/HUD/GUI、GamePlayer/PlayMode、逻辑单元测试、真实存档业务I/O、构建/发布、采样/图片，未创建子Agent或提交Git。实际交互/时序/字体/排版/联网/生命周期、异常存档一致/恢复与性能/平台/线上仍UNKNOWN。

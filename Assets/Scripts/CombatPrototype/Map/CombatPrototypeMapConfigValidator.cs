@@ -54,8 +54,8 @@ namespace Code_01.CombatPrototype.Map
             ValidateInventoryCapacityUpgrade(map.inventoryCapacityUpgrade, map.inventoryCapacity);
             ValidateInventoryDrop(map.inventoryDrop);
             Id(map.mapDefinitionId, "mapDefinitionId");
-            if (map.schemaVersion != 27 || map.configRevision < 1 || map.defaultSeed < 1)
-                throw new InvalidOperationException("Map requires schemaVersion=27, positive revision and seed.");
+            if (map.schemaVersion != 28 || map.configRevision < 1 || map.defaultSeed < 1)
+                throw new InvalidOperationException("Map requires schemaVersion=28, positive revision and seed.");
             var drops = map.drops;
             Id(drops.itemId, "drops.itemId");
             Id(drops.visualResourceKey, "drops.visualResourceKey");
@@ -587,6 +587,18 @@ namespace Code_01.CombatPrototype.Map
             HudLabel(panel.repairLabel, "inventoryPanel.repairLabel");
             HudLabel(panel.repairButtonLabel, "inventoryPanel.repairButtonLabel");
             HudLabel(panel.fullDurabilityLabel, "inventoryPanel.fullDurabilityLabel");
+            CombatPrototypeMapInventoryPanelListView.ResolveSortMode(panel.defaultSortMode);
+            CombatPrototypeMapInventoryPanelListView.ResolveFilterMode(panel.defaultFilterMode);
+            HudLabel(panel.sortLabel, "inventoryPanel.sortLabel");
+            HudLabel(panel.originalOrderLabel, "inventoryPanel.originalOrderLabel");
+            HudLabel(panel.typeOrderLabel, "inventoryPanel.typeOrderLabel");
+            HudLabel(panel.quantityOrderLabel, "inventoryPanel.quantityOrderLabel");
+            HudLabel(panel.filterLabel, "inventoryPanel.filterLabel");
+            HudLabel(panel.allFilterLabel, "inventoryPanel.allFilterLabel");
+            HudLabel(panel.resourcesFilterLabel, "inventoryPanel.resourcesFilterLabel");
+            HudLabel(panel.suppliesFilterLabel, "inventoryPanel.suppliesFilterLabel");
+            HudLabel(panel.otherFilterLabel, "inventoryPanel.otherFilterLabel");
+            HudLabel(panel.noMatchingItemsLabel, "inventoryPanel.noMatchingItemsLabel");
         }
 
         private static void HudLabel(string value, string field)

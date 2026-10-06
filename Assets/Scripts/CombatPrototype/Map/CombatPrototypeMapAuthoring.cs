@@ -292,7 +292,21 @@ namespace Code_01.CombatPrototype.Map
                     ReadyLabel = new FixedString64Bytes(inventoryPanel.readyLabel),
                     RepairLabel = new FixedString64Bytes(inventoryPanel.repairLabel),
                     RepairButtonLabel = new FixedString64Bytes(inventoryPanel.repairButtonLabel),
-                    FullDurabilityLabel = new FixedString64Bytes(inventoryPanel.fullDurabilityLabel)
+                    FullDurabilityLabel = new FixedString64Bytes(inventoryPanel.fullDurabilityLabel),
+                    SortEnabled = (byte)(inventoryPanel.sortEnabled ? 1 : 0),
+                    FilterEnabled = (byte)(inventoryPanel.filterEnabled ? 1 : 0),
+                    DefaultSortMode = CombatPrototypeMapInventoryPanelListView.ResolveSortMode(inventoryPanel.defaultSortMode),
+                    DefaultFilterMode = CombatPrototypeMapInventoryPanelListView.ResolveFilterMode(inventoryPanel.defaultFilterMode),
+                    SortLabel = new FixedString64Bytes(inventoryPanel.sortLabel),
+                    OriginalOrderLabel = new FixedString64Bytes(inventoryPanel.originalOrderLabel),
+                    TypeOrderLabel = new FixedString64Bytes(inventoryPanel.typeOrderLabel),
+                    QuantityOrderLabel = new FixedString64Bytes(inventoryPanel.quantityOrderLabel),
+                    FilterLabel = new FixedString64Bytes(inventoryPanel.filterLabel),
+                    AllFilterLabel = new FixedString64Bytes(inventoryPanel.allFilterLabel),
+                    ResourcesFilterLabel = new FixedString64Bytes(inventoryPanel.resourcesFilterLabel),
+                    SuppliesFilterLabel = new FixedString64Bytes(inventoryPanel.suppliesFilterLabel),
+                    OtherFilterLabel = new FixedString64Bytes(inventoryPanel.otherFilterLabel),
+                    NoMatchingItemsLabel = new FixedString64Bytes(inventoryPanel.noMatchingItemsLabel)
                 });
                 var inventoryDrop = config.map.inventoryDrop;
                 AddComponent(entity, new CombatPrototypeMapInventoryDropSettings

@@ -973,7 +973,7 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 
 ## 【KNOWN ISSUES】掉落物按背包余量部分拾取验收边界
 
-入口CombatPrototypeNetCode，Forest/Grassland Json/BuiltIn本阶段v27/revision30。正常脚本编译、258份非法配置拒绝/42组合法读取、40次隔离Editor Bake及G七字段Serializer静态通过；Bake Console前后[0 Error,5 Warning,3 Log]一致。以下十六项为新增人工GamePlayer清单，尚未获得用户通过反馈；原371项内容/编号逐字保留，各端同版重新烘焙，旧v1～v26明确拒绝。
+入口CombatPrototypeNetCode，Forest/Grassland Json/BuiltIn本阶段v27/revision30。正常脚本编译、258份非法配置拒绝/42组合法读取、40次隔离Editor Bake及G七字段Serializer静态通过；Bake Console前后[0 Error,5 Warning,3 Log]一致。用户已确认本阶段人工GamePlayer通过，主线程结合既有静态核对与用户反馈判定通过，范围限CombatPrototypeNetCode、v27/revision30及以下十六项，人工结论来自用户反馈；原371项内容/编号逐字保留，各端同版重新烘焙，旧v1～v26明确拒绝。
 
 1. 两地图Json/BuiltIn均v27/revision30，drops.partialPickupEnabled默认true，原Server Settings映射byte1；Player G七字段Hidden/零/空含PickupQuantity0，原输入19、DropGhost4、F/资源/结果及玩家v4/世界v2字段保持。
 2. 分别活力苹果/木材/石材，整堆可装下时一次G完整入包，实际增量等于原量，Consumed隐藏并沿原清理；PrepareReward/SavePrepared仍先于库存和地面提交，成功反馈显示实际增量而非累计库存。
@@ -992,4 +992,27 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 15. 单独关闭G文字/高亮通道/拾取结果、F/B/全部显示不改变服务器部分拾取；死亡/断线、无本地玩家、源/玩家/World/Scene变化沿原Hidden/Reset清新数量与缓存。回归F植物整批、砍树/采矿产出、工具扣耐久与再生、B制作/修理/Drop/All/等级、E/R/F5/战斗/镜头/阻挡，未触发生命周期UNKNOWN。
 16. 新bool缺失/null/错类型/重复未知键、drops根错误、旧v1～v26以及开关关闭仍非法配置明确失败，无补齐/来源回退/热重载；各端同版重新烘焙。新接收函数沿原库存/等级/定义错误日志边界隔离，无兜底服务或自动恢复，未实际触发独立配置/数据故障及性能/平台/线上UNKNOWN。
 
-完整事实归[部分拾取](MapDropPartialPickup.md)，数量/资格归[掉落](MapDrops.md)/[容量](MapInventoryCapacity.md)，展示归[G提示](MapPickupHud.md)/[结果](MapPickupFeedbackHud.md)，剩余量保存归[掉落存档](MapDropPersistence.md)。共387项，主线程静态通过，本阶段人工GamePlayer待验收；旧合并用户通过保持v26/revision29十六项、旧G结果v25/revision28十六项及其他旧范围。AI未执行接收数量/G/HUD/GUI逻辑、GamePlayer/PlayMode、逻辑单元测试、真实存档业务I/O、命令行构建/发布、采样/图片，未创建子Agent/提交Git。未触发运行/临界/异常/展示/联网/生命周期及意外ECS恢复、跨文件事务、同槽并发、性能/平台/线上仍UNKNOWN。
+完整事实归[部分拾取](MapDropPartialPickup.md)，数量/资格归[掉落](MapDrops.md)/[容量](MapInventoryCapacity.md)，展示归[G提示](MapPickupHud.md)/[结果](MapPickupFeedbackHud.md)，剩余量保存归[掉落存档](MapDropPersistence.md)。共387项，主线程静态及用户人工通过限CombatPrototypeNetCode、v27/revision30十六项；旧合并用户通过保持v26/revision29十六项、旧G结果v25/revision28十六项及其他旧范围。AI未执行接收数量/G/HUD/GUI逻辑、GamePlayer/PlayMode、逻辑单元测试、真实存档业务I/O、命令行构建/发布、采样/图片，未创建子Agent/提交Git。未触发运行/临界/异常/展示/联网/生命周期及意外ECS恢复、跨文件事务、同槽并发、性能/平台/线上仍UNKNOWN。
+
+## 【KNOWN ISSUES】背包材料排序与筛选验收边界
+
+入口CombatPrototypeNetCode，两地图Json/BuiltIn本阶段v28/revision31。正常Unity编译、1078份非法配置拒绝/62组合法读取、64次隔离Editor Bake及44配置/Settings、0 GhostField静态核对通过；Bake Console前后[0 Error,4 Warning,3 Log]相同。以下十六项为本阶段新增人工GamePlayer清单，尚未获得用户通过反馈；原387项内容/编号逐字保留，各端同版重新烘焙，旧v1～v27明确拒绝。
+
+1. 两地图Json/BuiltIn均v28/revision31，十四新字段必填，默认sortEnabled/filterEnabled=true、defaultSortMode=type/defaultFilterMode=all；原Settings44字段、0 GhostField，两个模式为byte枚举，ListView普通类及原主场景/Prefab绑定保持。
+2. 库存原插入顺序不同于类型顺序时，B默认显示木/石/苹果/肉/其他；其他合法正数量行按原名Ordinal排列，改显示文案不改分类/顺序，零数量不列出。原服务器库存缓冲及保存条目顺序不因展示重排而改变；未触发其他合法名称来源UNKNOWN。
+3. Sort循环type→quantity→original→type；quantity按正数量降序，同量按类型/原名，库存领取/丢弃/制作/修理更新数量后刷新，原排序下字段变化也更新文字。未触发正int极值、同量其他名或精确事件顺序UNKNOWN。
+4. original保留完整Snapshot原顺序，筛选后的original是该顺序子集；切回all恢复全部行，不重排真实库存，不拆99格、不扣料/奖励/保存或改变F/G工具行为。静态未变化时显示缓存复用；未采样性能UNKNOWN。
+5. Filter循环all→resources→supplies→other→all，分别全部、木/石、苹果/肉、四名以外合法条目；工具/耐久、配方、背包/工具升级与修理区保持显示，其他名不补造映射或丢弃能力。未获得其他合法条目来源的独立用例UNKNOWN。
+6. 真空库存显示原Empty；完整库存有正行但筛选无匹配显示No matching items，完整容量仍显示。负数/重复/空白控制名沿原错误隔离且InventoryValid=false，即使非法条目被筛选隐藏也不能放开业务按钮；未触发非法网络数据UNKNOWN。
+7. 仅看resources时隐藏的苹果仍占总量及单种容量；仅看supplies时隐藏木/石仍用于原配方/缺料/修理/升级资格。Lv1/2/3与容量关闭显示按原全量规则，制作/修理/升级的服务器最终校验、材料扣除与保存保持。
+8. 原380×640/右24顶64/字号18/行32及缩放、标题/页脚/反馈保持；原滚动区新增0～2个全宽控制行，内容高度按可见数更新。切换滚动归零，空结果仍可查看工具/配方；未触发中文/61字节文案字形、裁剪、不同缩放与精确命中边界UNKNOWN。
+9. 同一有效玩家/地图绑定B或关闭按钮关闭后再开，保留已应用模式，滚动与原业务/未应用模式请求清空；默认initiallyOpen=false。重新建立绑定恢复配置默认模式，initiallyOpen=true沿原打开规则；未触发关闭与按钮同帧UNKNOWN。
+10. 单独sortEnabled=false隐藏排序按钮且沿原顺序，其他筛选仍可用；filterEnabled=false隐藏筛选按钮且显示全部，排序仍可用；两者false恢复原列表，inventoryPanel.enabled=false关闭B/按钮且原1/2仍可用，F/G/HUD开关独立。
+11. 各排序/筛选下Drop/All按点击行真实ItemName解析原稳定Kind/Mode，只丢该物；Single不足/All关闭/不支持/库存非法沿原禁用与Unavailable。服务器生命/静止/互斥/实际库存/SavePrepared事务及反馈保持，不传可见索引或客户端数量。
+12. 按下Drop/All至抬起期间，领取/消耗引起行消失、顺序或身份改变时取消该次行丢弃，重新主动点击作用于当前行；单纯同位置文本/数量变化沿原资格。已经排队/消费的Kind/Mode不因展示重排撤回；未触发精确MouseDown/MouseUp/重排事件顺序UNKNOWN。
+13. 模式按钮只记录本地切换，下次Show/Capture每种最多应用一次，同次GUI列表保持稳定；不增加输入/RPC或发拾取/制作。面板内鼠标攻击/镜头滚轮隔离、外部原攻击/缩放、B关闭与鼠标同帧、原制作/修理/升级按下来源保持；未触发独立GUI事件UNKNOWN。
+14. 死亡/断线、无有效所属玩家/连接、源或玩家变化、World/Scene停止释放沿原Reset清可见行/模式/请求/文字/按下许可；重绑应用配置默认。缺必需HUD或配置仍明确报错，无组件搜索/创建或默认模式兜底；未触发独立生命周期/依赖失败UNKNOWN。
+15. 全部新字段及关闭能力/面板时缺失/null/错类型/重复未知键、非有限字面量、未知/大小写/空格模式、空白控制文案/超61字节，以及旧v1～v27明确失败，无补默认/回退或热重载；各端同版重新烘焙。未触发独立配置导入故障UNKNOWN。
+16. 不同客户端只改变本人的展示模式，原所属库存网络更新与G部分拾取/合并寿命/反馈/保存保持；回归F采集/砍伐/采矿/再生、B制作修理升级/丢弃、E/R/F5、战斗/镜头/阻挡和正常保存恢复。未触发多人/延迟/预测回放/异常保存/生命周期及性能/平台/线上UNKNOWN。
+
+完整显示规则归[排序筛选](MapInventoryListView.md)，完整统计/业务按钮归[B面板](MapInventoryPanel.md)/[容量](MapInventoryCapacity.md)，丢弃身份归[丢弃](MapInventoryDrop.md)，严格配置归[资源与数据](DataResources.md)。共403项，主线程实现及静态验收通过，本阶段人工GamePlayer待验收；旧部分拾取通过保持v27/revision30十六项及其他旧范围。AI未执行排序/筛选/Capture、面板/HUD/GUI、GamePlayer/PlayMode、逻辑单元测试、真实存档业务I/O、命令行构建/发布、采样/图片，未创建子Agent/提交Git。未触发交互/时序/字形/排版/联网/生命周期、意外ECS恢复/跨文件事务/同槽并发与性能/平台/线上仍UNKNOWN。

@@ -35,5 +35,19 @@ namespace Code_01.CombatPrototype.Map
         public FixedString64Bytes RepairLabel;
         public FixedString64Bytes RepairButtonLabel;
         public FixedString64Bytes FullDurabilityLabel;
+        public byte SortEnabled;
+        public byte FilterEnabled;
+        public CombatPrototypeMapInventorySortMode DefaultSortMode;
+        public CombatPrototypeMapInventoryFilterMode DefaultFilterMode;
+        public FixedString64Bytes SortLabel;
+        public FixedString64Bytes OriginalOrderLabel;
+        public FixedString64Bytes TypeOrderLabel;
+        public FixedString64Bytes QuantityOrderLabel;
+        public FixedString64Bytes FilterLabel;
+        public FixedString64Bytes AllFilterLabel;
+        public FixedString64Bytes ResourcesFilterLabel;
+        public FixedString64Bytes SuppliesFilterLabel;
+        public FixedString64Bytes OtherFilterLabel;
+        public FixedString64Bytes NoMatchingItemsLabel;
     }
 }

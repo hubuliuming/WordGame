@@ -21,7 +21,7 @@
 
 ## 【FACT】JSON契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=27/configRevision=30。inventoryDrop全部字段必填，沿原严格UTF-8/缺失/未知/重复字段及类型检查；旧v1～v26明确失败，不补段或回退来源。disabled仍校验全部字段与资源绑定；正常导入/烘焙后生效，没有运行热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=28/configRevision=31。inventoryDrop全部字段必填，沿原严格UTF-8/缺失/未知/重复字段及类型检查；旧v1～v27明确失败，不补段或回退来源。disabled仍校验全部字段与资源绑定；正常导入/烘焙后生效，没有运行热重载。
 
 | 字段 | 默认值 | 契约 |
 |---|---|---|
@@ -37,9 +37,9 @@
 
 ## 【CURRENT STRATEGY】按钮、命令与反馈
 
-B沿原规则打开380×640面板；每个正数量材料行下面增加操作行。配置支持的条目显示Drop x1（数量随配置）和All，单次数量不足或All关闭时对应按钮禁用；不支持或丢弃关闭时显示Unavailable。库存快照异常时禁用所有可丢弃按钮，原工具制作按钮资格保持。单个All创建一份承载全部数量的Ghost，不按99拆分；落地后参与[地面合并](MapDropMerge.md)，超合并上限的大堆仍独立保留。
+B沿原规则打开380×640面板；每个经[排序筛选](MapInventoryListView.md)后的正数量可见行下面仍有原操作行。配置支持的条目显示Drop x1（数量随配置）和All，单次数量不足或All关闭时对应按钮禁用；不支持或丢弃关闭时显示Unavailable。库存快照异常时禁用所有可丢弃按钮，原工具制作按钮资格保持。单个All创建一份承载全部数量的Ghost，不按99拆分；落地后参与[地面合并](MapDropMerge.md)，超合并上限的大堆仍独立保留。
 
-客户端仅缓存一个未提交Kind/Mode请求，不扣库存或创建掉落。按钮沿原鼠标按下来源检查，面板内左键/滚轮仍隔离攻击/镜头；下一输入采样重新核对World、地图、当前所属存活玩家和Connected/InGame连接，再消费并清空请求。原IInputComponentData新增DropInventory InputEvent、InventoryDropItem byte、InventoryDropMode byte，稳定物品码None/Apple/Wood/Stone=0/1/2/3，模式None/Single/All=0/1/2；不传库存索引、数量、位置或客户端目标。没有新增RPC。
+客户端仅缓存一个未提交Kind/Mode请求，不扣库存或创建掉落。按钮沿原鼠标按下来源检查，使用可见Row.Name解析原稳定物品码；按下至抬起间可见行身份/顺序/数目变化取消该次行点击，已经排队的Kind/Mode沿原消费，不撤回已提交请求。面板内左键/滚轮仍隔离攻击/镜头；下一输入采样重新核对World、地图、当前所属存活玩家和Connected/InGame连接，再消费并清空请求。原IInputComponentData新增DropInventory InputEvent、InventoryDropItem byte、InventoryDropMode byte，稳定物品码None/Apple/Wood/Stone=0/1/2/3，模式None/Single/All=0/1/2；不传库存索引、数量、位置或客户端目标。没有新增RPC。
 
 新增玩家反馈Sequence/Kind/Quantity/Result四个GhostField，仅SendToOwner，初值全零；Result为None/Success/Rejected/Failed。服务端每次本人的有效处理结果更新序号，非法所有权请求不覆盖真正所属者反馈，未知物品码在拒绝反馈中归None。面板页脚依次显示未到期丢弃、修理、制作反馈；成功包含物品和实际数量，拒绝/失败使用配置文案。新绑定只观察现有Sequence，不重播旧结果；F提示/进度和工具制作反馈组件保持。
 
@@ -98,4 +98,4 @@ v26/revision29的[地面合并](MapDropMerge.md)只处理已登记Landed物，�
 
 ## 【FACT】丢弃堆的按容量领取
 
-当前v27/revision30的[部分拾取](MapDropPartialPickup.md)适用于原Drop/All落地物；默认G只领取当前总量/单种余量可容纳的部分，原大堆不按99钳制或新建拆分实体，剩余量保留原身份/期限。丢弃数量、保存/激活/回滚与反馈保持；partialPickupEnabled独立于丢弃及敌人掉落开关，静态通过、人工待验收。
+当前v28/revision31的[部分拾取](MapDropPartialPickup.md)适用于原Drop/All落地物；默认G只领取当前总量/单种余量可容纳的部分，原大堆不按99钳制或新建拆分实体，剩余量保留原身份/期限。丢弃数量、保存/激活/回滚与反馈保持；partialPickupEnabled独立于丢弃及敌人掉落开关，静态及用户人工通过限v27/revision30十六项，未触发独立用例UNKNOWN。

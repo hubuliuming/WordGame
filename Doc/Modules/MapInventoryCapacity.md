@@ -20,7 +20,7 @@
 
 ## 【FACT】JSON 契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为 schemaVersion=27/configRevision=30。新增必填 inventoryCapacity：
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为 schemaVersion=28/configRevision=31。新增必填 inventoryCapacity：
 
 ```json
 "inventoryCapacity": {
@@ -43,9 +43,9 @@
 | items[].maxQuantity | 各为正整数 200；与总量上限同时生效，不要求小于总量上限 |
 | interactionHud.noSpaceLabel | 新增必填 Not enough space；F 配置/Settings 各10字段 |
 | pickupHud.noSpaceLabel | 新增必填 Not enough space；G 配置/Settings 各18字段 |
-| inventoryPanel.capacityLabel / unlimitedLabel | 新增必填 Capacity / Unlimited；面板配置/Settings 各30字段，其中22文案 |
+| inventoryPanel.capacityLabel / unlimitedLabel | 新增必填 Capacity / Unlimited；面板配置/Settings 当前各44字段，含32文案及两模式ID；新增项归[排序筛选](MapInventoryListView.md) |
 
-沿原严格 UTF-8、完整对象形状、字段/类型与未知/缺失/重复键校验；文案非空白、无控制字符、最多61个 UTF-8 字节。enabled=false 或显示关闭仍校验全部配置；旧地图 v1～v26 明确失败，没有补字段、来源回退或运行热重载。各端使用同版代码、配置并重新烘焙。
+沿原严格 UTF-8、完整对象形状、字段/类型与未知/缺失/重复键校验；文案非空白、无控制字符、最多61个 UTF-8 字节。enabled=false 或显示关闭仍校验全部配置；旧地图 v1～v27 明确失败，没有补字段、来源回退或运行热重载。各端使用同版代码、配置并重新烘焙。
 
 原地图根追加 CapacitySettings 的 Enabled(byte)/MaxTotalQuantity(int)，Definition 缓冲含 ItemId/ItemName(FixedString64Bytes)/MaxQuantity(int)，三条按原产出映射写入。配置通过正常 JSON/BuiltIn → 校验 → Map Baker 接入，不写玩家或世界档案。
 
@@ -91,4 +91,8 @@ v19容量阶段玩家/世界格式保持；当前玩家v4/两类等级规则归[
 
 ## 【FACT】合并后的接收量
 
-v26/revision29的[地面合并](MapDropMerge.md)只改原地面数量/期限；G按[部分拾取](MapDropPartialPickup.md)开关读取当前最近堆：默认领取容量可容纳的部分，零余量NoSpace；关闭开关恢复完整Quantity判定，不改选较远物。地面合并上限99不改inventoryCapacity/等级定义，也不拒绝、钳制或拆分已有大堆；合并本身不修改库存、容量Level或保存玩家。合并链静态及用户人工通过限v26/revision29十六项，部分拾取人工待验收；未触发独立用例UNKNOWN；旧容量/升级通过保持原版本/清单。
+v26/revision29的[地面合并](MapDropMerge.md)只改原地面数量/期限；G按[部分拾取](MapDropPartialPickup.md)开关读取当前最近堆：默认领取容量可容纳的部分，零余量NoSpace；关闭开关恢复完整Quantity判定，不改选较远物。地面合并上限99不改inventoryCapacity/等级定义，也不拒绝、钳制或拆分已有大堆；合并本身不修改库存、容量Level或保存玩家。合并链静态及用户人工通过限v26/revision29十六项，部分拾取用户人工通过限v27/revision30十六项；未触发独立用例UNKNOWN；旧容量/升级通过保持原版本/清单。
+
+## 【FACT】列表筛选与完整容量统计
+
+当前v28/revision31的[排序筛选](MapInventoryListView.md)只改变B材料列表可见行/顺序。Snapshot仍先校验全部原库存并统计受管苹果/木材/石材总量及当前等级上限，筛选资源时隐藏的苹果仍占容量；非法独立库存条目照原记录/跳过并置InventoryValid=false，筛选不能放开制作/修理/丢弃/升级资格。服务器F/G接收、部分拾取与容量等级/玩家保存链保持；本阶段静态通过，人工待验收。

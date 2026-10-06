@@ -15,7 +15,7 @@
 
 ## 【FACT】当前默认配置
 
-v27/30；旧通过限原范围；[合并](MapDropMerge.md)已验收；[部分拾取](MapDropPartialPickup.md)待验收。
+v28/31；[合并](MapDropMerge.md)/[部分拾取](MapDropPartialPickup.md)已验收；[排序筛选](MapInventoryListView.md)待验收，旧通过限原范围。
 
 | 配置字段 | 当前值与用途 |
 |---|---|
@@ -54,7 +54,7 @@ gather_apple 的 footprintRadiusMeters=0.3、minimumSameTypeSpacingMeters=1.5、
 
 ## 【FACT】JSON 文件与配置入口
 
-五份UTF-8无BOM JSON，地图v27/30；[存档](MapResourcePersistence.md)含[掉落](MapDropPersistence.md)；v15/18、v16/19各通过十二项。生态含treeObjectId/gatherObjectId/mineObjectId、mineDensityPer100m2，物体含mine_rock；原地表、空间、种子和出生保持。
+五份UTF-8无BOM JSON，地图v28/31；[存档](MapResourcePersistence.md)含[掉落](MapDropPersistence.md)；v15/18、v16/19各通过十二项。生态含treeObjectId/gatherObjectId/mineObjectId、mineDensityPer100m2，物体含mine_rock；原地表、空间、种子和出生保持。
 
 | MapAuthoring 字段 | 显式绑定文件 | JSON 根类型 |
 |---|---|---|

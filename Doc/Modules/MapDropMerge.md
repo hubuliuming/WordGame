@@ -1,6 +1,6 @@
 # 同类地面掉落物合并
 
-返回[地图](Map.md)、[掉落与拾取](MapDrops.md)、[掉落存档](MapDropPersistence.md)、[背包丢弃](MapInventoryDrop.md)与[运行入口](Runtime.md)。入口CombatPrototypeNetCode；Forest/Grassland Json与BuiltIn当前schemaVersion=27/configRevision=30。用户已确认本阶段人工GamePlayer通过，主线程结合既有代码、配置及隔离烘焙静态核对判定通过，限v26/revision29及运行入口十六项；人工结论来自用户反馈；旧G结果通过仍限v25/revision28十六项，其他旧通过保持原版本/清单。
+返回[地图](Map.md)、[掉落与拾取](MapDrops.md)、[掉落存档](MapDropPersistence.md)、[背包丢弃](MapInventoryDrop.md)与[运行入口](Runtime.md)。入口CombatPrototypeNetCode；Forest/Grassland Json与BuiltIn当前schemaVersion=28/configRevision=31。用户已确认本阶段人工GamePlayer通过，主线程结合既有代码、配置及隔离烘焙静态核对判定通过，限v26/revision29及运行入口十六项；人工结论来自用户反馈；旧G结果通过仍限v25/revision28十六项，其他旧通过保持原版本/清单。
 
 ## 【FACT】入口与文件
 
@@ -39,7 +39,7 @@
 | maxStackQuantity | 正32位int | 单对合计不能超过上限；不改库存容量或原生成数量 |
 | scanIntervalSeconds | 有限正float | 服务端模拟时间的扫描间隔；到时间才扫描，每次最多执行一轮 |
 
-原JsonReader严格检查UTF-8、完整形状、缺失/null/未知/重复键、标量类型及float可表示范围；Positive验证距离/间隔，数量必须大于0。关闭仍完整校验，旧地图v1～v26明确拒绝，没有迁移、补默认、来源回退或运行热重载。正常导入/烘焙后生效，各端使用同版代码/配置并重新烘焙。
+原JsonReader严格检查UTF-8、完整形状、缺失/null/未知/重复键、标量类型及float可表示范围；Positive验证距离/间隔，数量必须大于0。关闭仍完整校验，旧地图v1～v27明确拒绝，没有迁移、补默认、来源回退或运行热重载。正常导入/烘焙后生效，各端使用同版代码/配置并重新烘焙。
 
 根Baker写Enabled(byte)、MergeDistance(float)、MaxStackQuantity(int)、ScanInterval(float)四Settings。标注GhostPrefabType.Server且没有GhostField；地图根不是Ghost。原掉落DropId/ItemId/Quantity/Phase四GhostField及LocalTransform同步保持，没有新输入、RPC、玩家反馈、玩家/世界存档字段或联网配置协议。
 

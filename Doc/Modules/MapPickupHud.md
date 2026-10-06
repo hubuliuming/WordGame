@@ -21,7 +21,7 @@ v11/14阶段五个新脚本及meta、v17/20寿命接入两个普通助手及meta
 
 ## 【FACT】当前 JSON 契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为 schemaVersion=27/configRevision=30，pickupHud段及全部18字段必填，[interactionHighlight](MapInteractionHighlight.md)亦为必填地图段。沿原严格 UTF-8/缺失/未知/重复字段/类型和语义校验；旧 v1～v26 明确失败，不迁移、补默认段或回退来源。正常导入/烘焙后生效，没有运行热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为 schemaVersion=28/configRevision=31，pickupHud段及全部18字段必填，[interactionHighlight](MapInteractionHighlight.md)亦为必填地图段。沿原严格 UTF-8/缺失/未知/重复字段/类型和语义校验；旧 v1～v27 明确失败，不迁移、补默认段或回退来源。正常导入/烘焙后生效，没有运行热重载。
 
 | 字段 | 当前默认值 | 契约 |
 |---|---|---|
@@ -115,4 +115,4 @@ v25/revision28阶段接入必填[拾取反馈](MapPickupFeedbackHud.md)九字段
 
 ## 【FACT】合并后的真实G目标
 
-v26/revision29的[合并](MapDropMerge.md)在G前更新原掉落数量/期限并Consumed来源，服务端七字段采样读取当前真实地面Quantity、容量可领PickupQuantity及最早余时；来源不再可选，编号/位置保留的目标沿原高亮解析。G按[部分拾取](MapDropPartialPickup.md)开关结算，零余量NoSpace仍保留地面数量/寿命；新增所属PickupQuantity，目标仍由服务端重选。合并链静态及用户人工通过限v26/revision29十六项，部分拾取人工待验收；未触发独立用例UNKNOWN，旧G提示/寿命及v25拾取反馈通过限原版本/清单。
+v26/revision29的[合并](MapDropMerge.md)在G前更新原掉落数量/期限并Consumed来源，服务端七字段采样读取当前真实地面Quantity、容量可领PickupQuantity及最早余时；来源不再可选，编号/位置保留的目标沿原高亮解析。G按[部分拾取](MapDropPartialPickup.md)开关结算，零余量NoSpace仍保留地面数量/寿命；新增所属PickupQuantity，目标仍由服务端重选。合并链静态及用户人工通过限v26/revision29十六项，部分拾取用户人工通过限v27/revision30十六项；未触发独立用例UNKNOWN，旧G提示/寿命及v25拾取反馈通过限原版本/清单。

@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 27,
-  "configRevision": 30,
+  "schemaVersion": 28,
+  "configRevision": 31,
   "mapDefinitionId": "battle_forest_01",
   "defaultSeed": 12345,
   "resourcePersistence": {
@@ -310,7 +310,21 @@
     "readyLabel": "Ready",
     "repairLabel": "Repair",
     "repairButtonLabel": "Repair",
-    "fullDurabilityLabel": "Full durability"
+    "fullDurabilityLabel": "Full durability",
+    "sortEnabled": true,
+    "filterEnabled": true,
+    "defaultSortMode": "type",
+    "defaultFilterMode": "all",
+    "sortLabel": "Sort",
+    "originalOrderLabel": "Original",
+    "typeOrderLabel": "Type",
+    "quantityOrderLabel": "Quantity",
+    "filterLabel": "Filter",
+    "allFilterLabel": "All",
+    "resourcesFilterLabel": "Resources",
+    "suppliesFilterLabel": "Supplies",
+    "otherFilterLabel": "Other",
+    "noMatchingItemsLabel": "No matching items"
   },
   "inventoryCapacity": {
     "enabled": true,

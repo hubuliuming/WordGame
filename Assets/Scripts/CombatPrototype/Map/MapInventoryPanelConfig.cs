@@ -35,5 +35,19 @@ namespace Code_01.CombatPrototype.Map
         public string repairLabel;
         public string repairButtonLabel;
         public string fullDurabilityLabel;
+        public bool sortEnabled;
+        public bool filterEnabled;
+        public string defaultSortMode;
+        public string defaultFilterMode;
+        public string sortLabel;
+        public string originalOrderLabel;
+        public string typeOrderLabel;
+        public string quantityOrderLabel;
+        public string filterLabel;
+        public string allFilterLabel;
+        public string resourcesFilterLabel;
+        public string suppliesFilterLabel;
+        public string otherFilterLabel;
+        public string noMatchingItemsLabel;
     }
 }

@@ -258,7 +258,7 @@ v10/13接入的[背包丢弃](MapInventoryDrop.md)复用原PrepareItemConsumptio
 
 当前v23/26必填[resourceStatusHud](MapResourceStatusHud.md)11字段：true/400×52/底268/字号20和六文案；严格形状/类型、有限尺寸、字号容纳、G间隔16与61 UTF-8字节文案校验。五职责脚本及Unity生成meta、地图Settings和所属四字段已接入，无新输入或存档字段，原F/G与资源/再生/掉落契约保持。v13/16编译、Serializer/SendToOwner及14次隔离烘焙静态通过，用户确认人工通过限v13/16十项，未触发用例UNKNOWN；旧通过保持原版本/清单。
 
-当前v23/revision26的[工具修理](MapToolRepair.md)必填gatherTools.repairEnabled=true/repairFeedbackSeconds=2及每工具恢复20/15、木1石1；修理新增Repair/Repair/Full durability三文案；当前面板30字段，容量文案归[容量](MapInventoryCapacity.md)。四新脚本及正常生成meta、原工具Settings/Definitions和Player零所属修理反馈已接入，当前输入19、F4/G6/资源状态4字段；PrepareToolCraft候选投影和SavePrepared复用，当前候选写v4并保留工具/容量Level，合法旧档迁移归本节契约；路径/工具槽/世界状态保持。编译/Serializer/18次隔离Editor烘焙静态通过；用户确认修理人工通过，限v14/17及[运行入口](Runtime.md)十二项；未触发独立保存/恢复失败仍UNKNOWN，旧阶段通过保持原版本/清单。
+v23/revision26修理阶段的[工具修理](MapToolRepair.md)必填gatherTools.repairEnabled=true/repairFeedbackSeconds=2及每工具恢复20/15、木1石1；修理新增Repair/Repair/Full durability三文案；修理阶段面板30字段；当前面板44字段/32文案及两模式ID，排序筛选归[展示](MapInventoryListView.md)，容量文案归[容量](MapInventoryCapacity.md)。四新脚本及正常生成meta、原工具Settings/Definitions和Player零所属修理反馈已接入，该v23阶段输入19、F4/G6/资源状态4字段；PrepareToolCraft候选投影和SavePrepared复用，当前候选写v4并保留工具/容量Level，合法旧档迁移归本节契约；路径/工具槽/世界状态保持。编译/Serializer/18次隔离Editor烘焙静态通过；用户确认修理人工通过，限v14/17及[运行入口](Runtime.md)十二项；未触发独立保存/恢复失败仍UNKNOWN，旧阶段通过保持原版本/清单。
 
 ## 【FACT】地图资源状态持久化
 
@@ -298,10 +298,16 @@ v10/13接入的[背包丢弃](MapInventoryDrop.md)复用原PrepareItemConsumptio
 
 ## 【FACT】地面合并配置与原快照
 
-当前v27/revision30根必填[dropMerge](MapDropMerge.md)四字段，Json/BuiltIn默认true/0.8米/99份/0.2秒；原严格UTF-8/形状/完整字段/类型与语义检查保持，距离/间隔有限正float、上限正int，关闭仍校验，旧v1～v26拒绝，无补齐/回退/热重载。根Baker写四字段仅Server的Settings、0 GhostField；原掉落四同步字段、输入19、Tools3及所有所属反馈、玩家v4/世界v2路径/字段和资源布局/签名保持。世界快照沿原数量/期限/条目比较保存合并结果，来源Consumed排除、LastDropId不回退；Ready后的恢复物可参与，合法大堆不拒绝/拆分。合并v26阶段编译/元数据、194份非法配置拒绝、28组合法读取与64次隔离Bake静态通过；用户已确认合并人工GamePlayer通过，主线程结合既有静态核对判定通过，限v26/revision29十六项，未触发独立用例UNKNOWN；旧通过保持原范围。
+当前v28/revision31根必填[dropMerge](MapDropMerge.md)四字段，Json/BuiltIn默认true/0.8米/99份/0.2秒；原严格UTF-8/形状/完整字段/类型与语义检查保持，距离/间隔有限正float、上限正int，关闭仍校验，旧v1～v27拒绝，无补齐/回退/热重载。根Baker写四字段仅Server的Settings、0 GhostField；原掉落四同步字段、输入19、Tools3及所有所属反馈、玩家v4/世界v2路径/字段和资源布局/签名保持。世界快照沿原数量/期限/条目比较保存合并结果，来源Consumed排除、LastDropId不回退；Ready后的恢复物可参与，合法大堆不拒绝/拆分。合并v26阶段编译/元数据、194份非法配置拒绝、28组合法读取与64次隔离Bake静态通过；用户已确认合并人工GamePlayer通过，主线程结合既有静态核对判定通过，限v26/revision29十六项，未触发独立用例UNKNOWN；旧通过保持原范围。
 
 ## 【FACT】部分拾取配置与G布局
 
-当前v27/revision30在drops新增必填严格bool partialPickupEnabled=true，drops共12字段、原Server Settings共14字段，新增byte PartialPickupEnabled且0 GhostField；false恢复整堆规则，drops.enabled只控制敌人新物，容量关闭沿原整堆接收/checked边界。旧v1～v26、缺失/null/错类型/重复或未知键拒绝，关闭仍完整校验，无补默认/回退/热重载。两地图Json/BuiltIn一致，正常导入/烘焙后生效。
+当前v28/revision31的drops包含必填严格bool partialPickupEnabled=true，drops共12字段、原Server Settings共14字段，新增byte PartialPickupEnabled且0 GhostField；false恢复整堆规则，drops.enabled只控制敌人新物，容量关闭沿原整堆接收/checked边界。旧v1～v27、缺失/null/错类型/重复或未知键拒绝，关闭仍完整校验，无补默认/回退/热重载。两地图Json/BuiltIn一致，正常导入/烘焙后生效。
 
-G目标增加int PickupQuantity，当前七个SendToOwner GhostField，真实地面Quantity保持；生成Serializer/Snapshot七字段、7 mask bits/88字节结构已静态核对，实际收发/带宽不由结构大小推断。输入19、DropGhost4、Tools3/F4/资源状态4/世界保存3及原结果、玩家v4/世界v2字段和资源签名保持。258份非法配置拒绝、42组合法读取、40次隔离Bake通过；完整接收/提交规则归[部分拾取](MapDropPartialPickup.md)，人工待验收。
+G目标增加int PickupQuantity，当前七个SendToOwner GhostField，真实地面Quantity保持；生成Serializer/Snapshot七字段、7 mask bits/88字节结构已静态核对，实际收发/带宽不由结构大小推断。输入19、DropGhost4、Tools3/F4/资源状态4/世界保存3及原结果、玩家v4/世界v2字段和资源签名保持。部分拾取v27阶段258份非法配置拒绝、42组合法读取、40次隔离Bake通过；完整接收/提交规则归[部分拾取](MapDropPartialPickup.md)；用户人工通过限v27/revision30十六项，未触发独立用例UNKNOWN。
+
+## 【FACT】背包列表展示配置
+
+当前v28/revision31两地图Json/BuiltIn在inventoryPanel新增十四必填字段，配置/原Settings各44：严格bool sortEnabled/filterEnabled=true；defaultSortMode=type（original/type/quantity）、defaultFilterMode=all（all/resources/supplies/other）；十文案沿原非空白/无控制字符/61 UTF-8字节界限。开关映射byte、模式映射byte枚举、文案映射FixedString64Bytes，Settings无GhostComponent且0 GhostField；关闭仍完整校验，旧v1～v27拒绝，无补齐/回退或热重载。默认值/显示行为归[排序筛选](MapInventoryListView.md)。
+
+1078份非法配置拒绝、62组合法读取与64次隔离Editor Bake静态通过，全部44Settings及原布局/资源签名、输入19/G7/Drop4/Tools3和所有原反馈、玩家v4根7/工具项3、世界v2根9/掉落项8保持。本地选择不写输入或玩家/世界档案；实际排序/筛选/按下抬起与联网/生命周期、真实保存/恢复及性能结论仍UNKNOWN，人工清单归[运行入口](Runtime.md)。

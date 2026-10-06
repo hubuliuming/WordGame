@@ -1,0 +1,80 @@
+# 背包材料排序与筛选
+
+返回[地图](Map.md)、[背包](Inventory.md)、[B面板](MapInventoryPanel.md)、[容量](MapInventoryCapacity.md)、[丢弃](MapInventoryDrop.md)、[配置](DataResources.md)与[运行入口](Runtime.md)。入口CombatPrototypeNetCode，Forest/Grassland Json/BuiltIn当前schemaVersion=28/configRevision=31；主线程实现、编译、配置解析与隔离烘焙静态验收通过，本阶段人工GamePlayer待验收。旧部分拾取用户通过限v27/revision30十六项，旧面板/丢弃/容量/工具通过保持原版本/清单。
+
+## 【FACT】文件与配置
+
+| 职责 | 实际文件 |
+|---|---|
+| 严格JSON字段、原显示Settings | [MapInventoryPanelConfig](../../Assets/Scripts/CombatPrototype/Map/MapInventoryPanelConfig.cs)、[PanelData](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapInventoryPanelData.cs) |
+| 版本/语义、默认值及原Baker | [Validator](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapConfigValidator.cs)、[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)、[MapAuthoring](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapAuthoring.cs) |
+| 完整库存与本地行Revision | [Snapshot](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapInventoryPanelSnapshot.cs) |
+| 本地排序/筛选/可见行与选择 | [ListView](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapInventoryPanelListView.cs) |
+| 现有GUI、Show与行点击许可 | [Panel](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapInventoryPanel.cs) |
+| 显式来源 | [Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) |
+
+七个现有脚本接入，新ListView是普通客户端C#类，同文件含两个byte枚举；其meta由Unity正常导入生成，没有新MonoBehaviour/组件类型或挂载。主场景/SubScene/Prefab/Animator、旧meta/资源/字体、包/构建配置保持；原HUD宿主/绑定整体传递Settings，代码不变。正式Map的QFramework背包/99拆格与网络原型独立。
+
+以下为inventoryPanel新增字段摘录，原三十字段仍必填：
+
+```json
+{
+  "sortEnabled": true,
+  "filterEnabled": true,
+  "defaultSortMode": "type",
+  "defaultFilterMode": "all",
+  "sortLabel": "Sort",
+  "originalOrderLabel": "Original",
+  "typeOrderLabel": "Type",
+  "quantityOrderLabel": "Quantity",
+  "filterLabel": "Filter",
+  "allFilterLabel": "All",
+  "resourcesFilterLabel": "Resources",
+  "suppliesFilterLabel": "Supplies",
+  "otherFilterLabel": "Other",
+  "noMatchingItemsLabel": "No matching items"
+}
+```
+
+配置与原Settings各44字段：DTO四bool、五float、一int、两模式string和32文案string；Settings四byte、五float、一int、两byte枚举及32 FixedString64Bytes，0 GhostField且无GhostComponent。sortEnabled/filterEnabled只控制两种展示能力；关闭排序强制original并隐藏排序按钮，关闭筛选强制all并隐藏筛选按钮，两者关闭沿原完整列表顺序。地图Settings仍保存已配置默认模式，强制显示模式只在客户端Configure应用。
+
+defaultSortMode仅original/type/quantity，defaultFilterMode仅all/resources/supplies/other，大小写与空格严格匹配，不修剪/转换未知值。两模式ID通过共用Resolver校验/烘焙；十新文案沿原非空白、无控制字符且最多61 UTF-8字节。关闭任一能力、面板或全部显示仍检查全部字段与语义。原Reader保留UTF-8/完整对象、缺失/null/错误类型/未知或重复键检查；当前仅schema28，revision/seed须正数，旧v1～v27拒绝，无补默认、来源回退或运行热重载。正常导入/烘焙后生效，各端同版代码/配置并重新烘焙。
+
+## 【CURRENT STRATEGY】完整库存与显示投影
+
+原绑定枚举启用GhostOwnerIsLocal且Connected/InGame的有效所属玩家，Panel.Show调用Snapshot.Capture校验完整原库存。Snapshot继续按原顺序缓存正数量Name/OriginalName/Quantity/Text；零条目不显示，木/石材料数量及受管三种材料总量/本级上限仍基于全部库存。名称空白/控制字符、负数量或重复名称沿原索引/地图/玩家日志跳过独立条目，InventoryValid=false继续限制所有原业务按钮；筛选隐藏该条目不能恢复合法性。
+
+Snapshot的uint Revision仅为本地展示缓存：行名/数量/顺序/行数或容量等级改变时在Capture更新一次；等级变化仍沿原清行及文本重建，Reset归零。ListView消费该Revision或本地选择变化才重建可见行，复用列表、比较委托及文字缓存；没有复制可变游戏库存、LINQ集合转换、服务器库存写入、奖励或保存调用。未变化时原可见行继续使用，GUI不执行排序。
+
+类型顺序固定为木材、石材、活力苹果、小块肉、其他。依据原ItemName比较，不按可配置显示文案或本地语言排序；其他合法名称按OriginalName的StringComparer.Ordinal升序。quantity为正数量降序，用CompareTo避免相减溢出；相同数量按类型，再按原名确定顺序。original保留Snapshot原行顺序，各模式只作用于客户端副本，原缓冲顺序不改。
+
+| 筛选ID | 实际条目 |
+|---|---|
+| all | 所有合法正数量行 |
+| resources | 原ItemName木材、石材 |
+| supplies | 原ItemName活力苹果、小块肉 |
+| other | 上述四名称以外的合法正数量行，保持原名 |
+
+筛选只影响材料列表，工具不是库存材料行，不加入筛选。完整容量行、工具/耐久、配方/缺料、背包升级、工具修理/升级继续读取原Snapshot；例如只看资源时苹果仍占容量，只看补给时隐藏的木/石仍可供原制作与修理。新规则不改变服务器资格、库存/耐久/等级、F/G拾取与SavePrepared事务。
+
+## 【CURRENT STRATEGY】控件、点击与生命周期
+
+复用原380×640面板、边距右24/顶64、字号18/行高32、1920×1080比例、背景0.85、原标题/页脚/滚动区及鼠标隔离。材料标题、完整容量行后有0～2个全宽控制行，分别默认Sort: Type与Filter: All；滚动内容高度按max(可见数×2,1)+启用控制行+原固定区域计算。每个可见行仍有原Drop/All操作行。不改面板矩形、宿主或任何场景资源结构。
+
+GUI按钮仅QueueSort/QueueFilter，保持原有效鼠标按下来源检查，每种本地请求在下一Show/Capture最多应用一次；原列表在同次绘制中保持稳定。排序循环type→quantity→original→type，筛选循环all→resources→supplies→other→all；两类可同次应用，变化后更新缓存标题并滚动归零。不写输入事件/RPC、玩家Ghost或存档。完整库存为空沿原Empty；完整库存非空而筛选无可见行使用No matching items，不更改容量或配方显示。
+
+原丢弃DrawRow依照传入的真实Row.Name解析原稳定Kind/Mode，不把可见行索引当库存索引。鼠标按下时记录独立行许可；可见行名/顺序/数目改变时只取消尚未抬起的行丢弃点击，MouseUp清许可，新主动点击按当前行处理。相同身份/顺序下纯文本或数量更新沿原资格。已排队Kind/Mode保持，排序/筛选不撤回已经消费或提交的原请求；原制作/修理/升级鼠标许可与服务器资格保持。
+
+B/关闭按钮沿原Close清未提交业务请求及本地未应用模式请求、滚动归零；同一绑定已应用选择保留。死亡/断线、无有效所属玩家/连接、源或玩家变化及World/Scene停止释放沿原Reset清行/模式/请求/文字与按下许可。有效绑定重建按配置defaultSortMode/defaultFilterMode及initiallyOpen初始化；默认type/all且关闭。缺少必需依赖沿原明确错误边界，不查找或创建组件/默认配置兜底。选择只属于当前客户端绑定，未保存或跨绑定继承。
+
+## 【KNOWN ISSUES】静态与人工边界
+
+正常Unity脚本编译完成，当前无Error；初始Console[0 Error,5 Warning,3 Log]，两次正常刷新后Bake前后同[0,4,3]。未主动清空Console，当前四条为Package/Input Manager、PEListener及MCP WebSocket警告；新JSON导入没有Error记录。ListView与byte枚举已在当前程序集加载，44配置/Settings、0 GhostField与非MonoBehaviour属性通过反射核对。
+
+1078份非法配置全部拒绝（每地图539），62组合法读取通过（每地图31）：完整44字段缺失/null/数组/对象/错误标量/重复键、根错误/未知键/额外内容、十四新字段非有限字面量、布尔数字或字符串、未知/大小写/空格模式、空白/控制字符/超61字节文案、关闭仍必填/验证、旧v1～v27与原布局/部分拾取/合并约束。合法含默认Json/BuiltIn等价、三排序×四筛选、单独/同时关闭、面板/全部显示关闭、初始打开、61字节ASCII/中文边界、原最小几何、其他功能关闭及定义/等级换序。仅配置读取/语义校验，不调用排序/筛选/Capture或GUI作为单元测试。
+
+两地图各32次，共64次隔离Editor Bake通过：默认Json/BuiltIn、两能力开关/组合与十二模式组合、面板/全部显示/初始打开、61字节和中文文案、关闭能力仍配置其他模式、容量/部分拾取/合并/产出丢弃/世界与地面保存/G展示关闭及容量定义/等级换序。全部44字段、原所有Settings/反馈/Prefab引用、完整布置与资源签名匹配。Forest仍89树/36采集/20矿/109阻挡，Grassland53/38/18/71；只读源SubScene、临时TextAsset/克隆/Editor场景/World/BlobAssetStore释放，原主场景干净、未Play、一场景三根对象。
+
+输入19、DropGhost4、Tools3、F4/G7/资源状态4/世界保存3及原结果字段，玩家v4根7/工具项3与世界v2根9/掉落项8保持。原服务器采集/拾取/丢弃/制作/修理/升级/保存、Ghost Serializer、源绑定和资源结构代码保持；没有新增网络选择/存档布局或业务测试。
+
+原387项人工清单内容/编号逐字保留，追加本阶段十六项后共403项，归[运行入口](Runtime.md)。主线程实现及静态验收通过，本阶段v28/revision31人工GamePlayer待验收；实际排序/分类/循环、完整统计/按钮、重排按下抬起、快照/GUI/网络时序、字体/排版/缩放、关闭重开/重绑生命周期与性能仍UNKNOWN。旧部分拾取用户通过限v27/revision30十六项，其他旧通过保持原范围。AI未执行ListView排序/筛选/Capture、库存Capture、面板/HUD/GUI、GamePlayer/PlayMode、逻辑单元测试、真实存档业务I/O、命令行构建/发布、采样或图片，未创建子Agent/提交Git。

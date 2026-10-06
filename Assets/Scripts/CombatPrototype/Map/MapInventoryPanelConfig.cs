@@ -60,5 +60,7 @@ namespace Code_01.CombatPrototype.Map
         public bool preferencesSaveSearch;
         public string preferencesFileId;
         public float preferencesSaveDelaySeconds;
+        public bool preferencesResetEnabled;
+        public string preferencesResetLabel;
     }
 }

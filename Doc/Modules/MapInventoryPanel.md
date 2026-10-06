@@ -21,7 +21,7 @@
 
 ## 【FACT】JSON 契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 当前一致为 schemaVersion=30/configRevision=33。必填 inventoryPanel 共55字段，原30字段加[排序筛选](MapInventoryListView.md)十四、[搜索](MapInventorySearch.md)七及[本机偏好](MapInventoryPreferences.md)四字段，沿原严格UTF-8、完整字段/类型及未知/重复键检查；即使关闭面板也校验全部字段。旧地图v1～v29明确失败，不补段/默认值或回退来源；正常导入/烘焙后生效，无运行热重载。Lv1配方/定义仍从gatherTools读取，当前级上限/倍率归[gatherToolUpgrade](MapGatherToolUpgrade.md)，面板不复制配置真值。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) 与 [BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs) 当前一致为 schemaVersion=31/configRevision=34。必填 inventoryPanel 共57字段，原30字段加[排序筛选](MapInventoryListView.md)十四、[搜索](MapInventorySearch.md)七及[本机偏好与重置](MapInventoryPreferences.md)六字段，沿原严格UTF-8、完整字段/类型及未知/重复键检查；即使关闭面板也校验全部字段。旧地图v1～v30明确失败，不补段/默认值或回退来源；正常导入/烘焙后生效，无运行热重载。Lv1配方/定义仍从gatherTools读取，当前级上限/倍率归[gatherToolUpgrade](MapGatherToolUpgrade.md)，面板不复制配置真值。
 
 | 字段 | 默认值 | 契约 |
 |---|---|---|
@@ -66,7 +66,7 @@ Snapshot缓存完整显示文本/数量，行内容、数量/顺序或容量等�
 
 两条配方直接读取原definitions：斧头木3/石2、镐子木2/石3；分别列出现有/需要与max(需要-现有,0)缺少数量。只有工具开关启用、库存展示快照合法、材料充足且工具未持有或耐久小于单次成本时按钮可用。Ready仅是当前客户端材料/耐久预览，连接、生命、静止、无攻击、近战Ready、资源预约互斥及同tick优先仍由原服务端制作系统决定；网络快照滞后时服务器可拒绝，不按客户端预览扣料/发工具。工具功能关闭保留已有耐久/等级并禁用按钮；制作/重做满耐久Lv1，损坏高等级工具的按钮明确显示Recraft at Lv1。
 
-面板右上，按min(屏幕宽/1920,屏幕高/1080)等比缩放。标题和共享反馈/关闭按钮固定，中间列表滚动；背景alpha=0.85。缓存条目/配方/按钮文本和GUI样式；GUI绘制后恢复matrix/color/enabled。按钮/滚动参与正常GUI事件，原F提示/进度仍仅Repaint且保持底部320×104。排序、筛选两个完整宽度控制行位于材料标题/容量行之后，搜索开启再追加标题及文本框/清空按钮两行，同处原滚动区；内容高度计入可见行与全部启用控制行。无库存沿原Empty；完整库存有条目且有效搜索无可见行显示No search results，仅分类无匹配显示No matching items。完整容量统计、工具及制作/修理/升级区不受筛选或搜索影响。
+面板右上，按min(屏幕宽/1920,屏幕高/1080)等比缩放。标题和共享反馈/关闭按钮固定，中间列表滚动；背景alpha=0.85。缓存条目/配方/按钮文本和GUI样式；GUI绘制后恢复matrix/color/enabled。按钮/滚动参与正常GUI事件，原F提示/进度仍仅Repaint且保持底部320×104。排序、筛选两个完整宽度控制行位于材料标题/容量行之后，搜索开启再追加标题及文本框/清空按钮两行，同处原滚动区；其后有可配置重置按钮一行，规则归[偏好](MapInventoryPreferences.md)。内容高度计入可见行与全部启用控制行。无库存沿原Empty；完整库存有条目且有效搜索无可见行显示No search results，仅分类无匹配显示No matching items。完整容量统计、工具及制作/修理/升级区不受筛选或搜索影响。
 
 排序/筛选按钮仅记录客户端布尔切换，在Show捕获库存后应用一次并滚动归零；无输入/RPC或存档新增字段。可见行身份/顺序/数目变化只清本次行丢弃的鼠标按下许可，防止按下至抬起间重排丢错行；已排队Kind/Mode保持，制作/修理/升级沿原完整Snapshot资格。详细规则与v28静态/人工边界归[排序筛选](MapInventoryListView.md)。
 
@@ -130,4 +130,6 @@ v28/revision31排序筛选已落地，正常Unity编译、1078份非法配置拒
 
 本阶段搜索配置、输入调用链与静态证据归[搜索](MapInventorySearch.md)：v29搜索阶段51配置/Settings；用户已确认人工GamePlayer通过，限v29/revision32及运行入口十六项，结论来自用户反馈；未实际触发的独立用例UNKNOWN，旧面板与排序筛选通过仍限各自原版本/清单。
 
-当前v30/revision33的[本机偏好](MapInventoryPreferences.md)新增四必填字段，配置/Settings各55；八现有脚本与三普通类、两JSON接入，原HUD/Binding与十九输入不变。正常编译、1612份非法配置拒绝/96组合法读取及98次隔离Editor Bake静态通过，原库存/工具/服务器保存保持；人工十六项待验收。
+v30/revision33保存阶段的[本机偏好](MapInventoryPreferences.md)新增四必填字段，配置/Settings各55；八现有脚本与三普通类、两JSON接入，原HUD/Binding与十九输入不变。正常编译、1612份非法配置拒绝/96组合法读取及98次隔离Editor Bake静态通过，原库存/工具/服务器保存保持；人工十六项已获用户通过反馈，范围见[运行入口](Runtime.md)，未实际触发的独立用例仍UNKNOWN。
+
+当前v31/revision34的显示重置在原GUI排队，在有效Show的Snapshot之后、ListView刷新及Preferences观察之前恢复配置默认模式/空查询，归零滚动、释放焦点并取消旧行按下许可。Close/Reset及无效ReadInput清未应用重置；不调用保存类重建或服务器业务。57字段、严格配置读取和112组隔离Bake静态通过，新增十六项人工待验收，范围见[运行入口](Runtime.md)。

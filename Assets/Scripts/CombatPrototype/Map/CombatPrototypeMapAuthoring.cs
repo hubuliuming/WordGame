@@ -317,7 +317,9 @@ namespace Code_01.CombatPrototype.Map
                     PreferencesEnabled = (byte)(inventoryPanel.preferencesEnabled ? 1 : 0),
                     PreferencesSaveSearch = (byte)(inventoryPanel.preferencesSaveSearch ? 1 : 0),
                     PreferencesFileId = new FixedString64Bytes(inventoryPanel.preferencesFileId),
-                    PreferencesSaveDelaySeconds = inventoryPanel.preferencesSaveDelaySeconds
+                    PreferencesSaveDelaySeconds = inventoryPanel.preferencesSaveDelaySeconds,
+                    PreferencesResetEnabled = (byte)(inventoryPanel.preferencesResetEnabled ? 1 : 0),
+                    PreferencesResetLabel = new FixedString64Bytes(inventoryPanel.preferencesResetLabel)
                 });
                 var inventoryDrop = config.map.inventoryDrop;
                 AddComponent(entity, new CombatPrototypeMapInventoryDropSettings

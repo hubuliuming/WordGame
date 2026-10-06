@@ -1,10 +1,10 @@
 # 背包显示偏好本地保存
 
-返回[地图](Map.md)、[背包](Inventory.md)、[B面板](MapInventoryPanel.md)、[排序筛选](MapInventoryListView.md)、[搜索](MapInventorySearch.md)、[配置与存档](DataResources.md)及[运行验收](Runtime.md)。入口CombatPrototypeNetCode，原B面板；Forest/Grassland Json/BuiltIn当前v30/revision33。主线程按确认方案完成代码、配置及静态核对，本阶段十六项人工GamePlayer待验收；搜索已验收仅限v29/revision32原十六项。
+返回[地图](Map.md)、[背包](Inventory.md)、[B面板](MapInventoryPanel.md)、[排序筛选](MapInventoryListView.md)、[搜索](MapInventorySearch.md)、[配置与存档](DataResources.md)及[运行验收](Runtime.md)。入口CombatPrototypeNetCode，原B面板；Forest/Grassland Json/BuiltIn当前v31/revision34，重置阶段人工待验收。主线程按确认方案完成代码、配置及静态核对；用户已确认v30保存阶段人工GamePlayer验收通过，主线程结合既有静态核对与用户反馈判定通过，限CombatPrototypeNetCode、v30/revision33及运行入口十六项清单。人工结论来自用户反馈；搜索已验收仅限v29/revision32原十六项。
 
 ## 【FACT】文件与配置
 
-八现有脚本修改：原Panel、ListView、Search、MapInventoryPanelConfig、PanelData、Validator、BuiltIn、MapAuthoring；两地图JSON追加四必填字段。三个新增普通C#类及其meta由正常Unity导入生成，没有新MonoBehaviour/组件类型或挂载：
+重置接入修改原Panel、ListView、Search、MapInventoryPanelConfig、PanelData、Validator、BuiltIn、MapAuthoring八个脚本；两地图JSON在原四个保存字段之外增加两个必填重置字段。三个普通C#类及其meta已由正常Unity导入生成，没有新MonoBehaviour/组件类型或挂载：
 
 | 文件 | 职责 |
 |---|---|
@@ -18,8 +18,10 @@
 | preferencesSaveSearch | true | 必填严格bool→byte；false允许临时搜索但不恢复/更新文件中的词 |
 | preferencesFileId | inventory_display | 必填小写ASCII/数字/下划线，1～61字符→FixedString64Bytes |
 | preferencesSaveDelaySeconds | 0.5 | 必填有限正float；客户端unscaledTime延迟 |
+| preferencesResetEnabled | true | 必填严格bool→byte；原面板中的重置按钮开关 |
+| preferencesResetLabel | Reset view | 必填非空白、无控制字符、最多61 UTF-8字节→FixedString64Bytes |
 
-原51字段保留，当前DTO八bool、六float、两int、两模式string、36文案string及一文件ID，共55；Settings八byte、六float、两int、两byte枚举及37 FixedString64Bytes，共55，0 GhostField/无GhostComponent。关闭偏好/搜索/排序/筛选/面板仍完整校验。地图Reader只接受schema30和正revision/seed，旧v1～v29拒绝；无补默认、来源回退或热重载，正常导入/烘焙生效，各端同版。
+原55字段保留，当前DTO九bool、六float、两int、两模式string、37文案string及一文件ID，共57；Settings九byte、六float、两int、两byte枚举及38 FixedString64Bytes，共57，0 GhostField/无GhostComponent。关闭重置/偏好/搜索/排序/筛选/面板仍完整校验。地图Reader只接受schema31和正revision/seed，旧v1～v30拒绝；无补默认、来源回退或热重载，正常导入/烘焙生效，各端同版。
 
 ## 【CURRENT STRATEGY】读取、应用与生命周期
 
@@ -37,9 +39,19 @@ Panel.Show在Snapshot之后由ListView.Capture应用待处理模式/搜索，Pre
 
 只FileNotFound/DirectoryNotFound视为首次使用；其他读取错误由协调边界记录模块/Load/地图/路径/原异常，本绑定偏好I/O暂停，不覆盖文件，临时模式/搜索仍可使用。写入UTF-8无BOM的.json.tmp并Flush(true)，再File.Replace正式文件或File.Move首次文件；Save失败同样暂停本绑定，不自动重试。可能残留.tmp不作为正式数据读入；重建绑定可重新读取/尝试后续保存。没有云同步、游戏库存写入或玩家/世界事务调用。
 
-## 【KNOWN ISSUES】静态证据与人工边界
+## 【CURRENT STRATEGY】背包显示偏好重置
 
-正常Unity编译/重载完成，55配置/Settings、三个普通类及五字段协议元数据已核对；三个脚本均被AssetDatabase注册并加载。1612份非法地图配置全部拒绝（每地图806），96组合法读取通过（每地图48），覆盖全部55字段/原规则、新开关、ID/延迟、关闭仍验证及旧/未来地图版本；只配置读取/校验，不调用偏好读写或界面业务。
+原Panel在排序/分类/搜索区之后、材料可见行之前绘制一行全宽preferencesResetLabel按钮；preferencesResetEnabled=false隐藏该行，面板关闭时沿原隐藏。按钮沿原_mousePressAccepted校验只排队本地请求，不在GUI内改列表或写文件；不依赖preferencesEnabled，所有显示能力关闭时也只按原关闭能力规则恢复临时显示。
+
+下一次原有效Panel.Show先捕获完整Snapshot，再消费重置：ListView.ResetDisplay清未应用模式请求，按当前Settings.DefaultSortMode/DefaultFilterMode恢复，关闭能力保持original/all，并使缓存重新建立；Search.ResetDisplay清已应用词/草稿/待编辑请求，仅原已应用文本非空时增加Revision，沿原ReleaseFocus/FlushGUIFocus释放焦点。之后原ListView.Capture按当前完整库存重新生成可见行，滚动归零、旧行按下许可取消，面板保持打开；原SearchField几何不变，内容高度增加启用的重置行。
+
+Preferences.Capture仍在可见行刷新后观察已应用值，默认0.5秒unscaledTime保存；Close/Reset提交已应用待写值。重复默认值不制造新的待写或重置计时，回到上次已写值取消待写；首次无文件且显示值未变化不创建目录/文件。preferencesEnabled=false或本绑定I/O暂停时仅临时重置；关闭排序/筛选/搜索能力或preferencesSaveSearch=false仍保留文件中对应原值，不删除偏好文件、不重建保存协调类、不自动修复坏档或重试失败。
+
+Close/Reset及原无效ReadInput分支清未应用重置，逐帧Clear仍只隐藏，已应用值沿原保存边界处理。业务库存/统计、容量/配方/工具、已排队的真实Name丢弃与制作/修理/升级请求及已提交服务器动作保持；只取消未应用显示切换/编辑和旧行按下许可。无新输入/RPC/Ghost字段，Store/Data/Preferences三个保存类及版本1五字段协议保持。
+
+## 【KNOWN ISSUES】v30保存阶段静态证据与人工边界
+
+以下静态证据和十六项人工通过仅限v30/revision33保存阶段；该阶段正常Unity编译/重载完成，55配置/Settings、三个普通类及五字段协议元数据已核对；三个脚本均被AssetDatabase注册并加载。1612份非法地图配置全部拒绝（每地图806），96组合法读取通过（每地图48），覆盖全部55字段/原规则、新开关、ID/延迟、关闭仍验证及旧/未来地图版本；只配置读取/校验，不调用偏好读写或界面业务。
 
 两地图各49次，共98次隔离Editor Bake通过，原41变体保留，增加偏好关闭、不保存搜索、自定义/1/61字符ID、0.1/2秒延迟、面板/全部展示关闭组合。全部55Settings和原Settings/零反馈/Prefab引用、完整布置/资源签名匹配；Forest89树/36采集/20矿/109阻挡，Grassland53/38/18/71。只读源SubScene、临时克隆/TextAsset/Scene/World/BlobAssetStore释放，主场景干净、3根对象、未Play。
 
@@ -47,4 +59,14 @@ Panel.Show在Snapshot之后由ListView.Capture应用待处理模式/搜索，Pre
 
 原Input19、DropGhost4、Tools3、F4/G7/资源状态4/世界保存3及全部反馈、玩家v4根7/工具项3、世界v2根9/掉落项8保持。Scene/SubScene/Prefab/Animator/旧meta/资源/字体/包/构建配置、HUD/Binding、PlayerInput/服务器采集/拾取/丢弃/制作/修理/升级/游戏保存未修改。
 
-原419项人工内容/编号保留，追加十六项后435项，清单归[运行入口](Runtime.md)。本阶段GamePlayer/偏好实际文件I/O、重启/生命周期、坏档/权限/替换失败、GUI/焦点/字形/联网/预测、同机多进程并发、断电和平台Flush/Replace语义及性能均UNKNOWN；旧阶段用户通过保持原版本/清单。AI未执行Preference Configure/Load/Save/Capture/Flush、搜索/排序/库存/GUI业务、GamePlayer/PlayMode、逻辑单元测试、命令行构建/发布、真实游戏存档I/O、采样或图片，未创建子Agent或提交Git。
+原419项人工内容/编号保留，追加十六项后435项，清单归[运行入口](Runtime.md)。本阶段人工通过范围限上述版本和十六项清单，未实际触发的独立文件I/O、重启/生命周期、坏档/权限/替换失败、GUI/焦点/字形/联网/预测场景仍UNKNOWN；同机多进程并发、断电和平台Flush/Replace语义及性能未获单独验收结论，仍UNKNOWN。旧阶段用户通过保持原版本/清单。AI未执行Preference Configure/Load/Save/Capture/Flush、搜索/排序/库存/GUI业务、GamePlayer/PlayMode、逻辑单元测试、命令行构建/发布、真实游戏存档I/O、采样或图片，未创建子Agent或提交Git。
+
+## 【KNOWN ISSUES】v31重置阶段验收边界
+
+当前v31/revision34、57配置/Settings及0 GhostField已正常Unity编译/重载并核对；1716份非法地图配置拒绝（每地图858），112组合法读取通过（每地图56），包括新开关标量/完整57字段/新文案和关闭仍验证、旧v1～v30/未来版本及原规则。
+
+两地图各56次，共112次隔离Editor Bake通过：保留原49变体，增加重置关闭、ASCII/中文61字节/中文文案、显示与重置关闭、面板与重置关闭及自定义默认模式/初始打开/保存关闭组合。全部57Settings与原Settings/零反馈/Prefab引用、完整布置/资源签名匹配；Forest89树/36采集/20矿/109阻挡，Grassland53/38/18/71保持。Bake Console前后均[0 Error,2 Warning,0 Log]，两条PEListener/DOTween源码警告，未清空Console；临时资源释放，主场景干净、3根对象、未Play。
+
+原输入19/DropGhost4/Tools3和全部所属反馈、玩家v4根7/工具项3、世界v2根9/掉落项8及本机偏好v1五字段保持。重置阶段仅八现有脚本、两JSON与文档修改，Scene/SubScene/Prefab/Animator/全部meta/资源/字体/包/构建配置、HUD/Binding/PlayerInput及服务器业务保持。原435项人工内容/编号保留，新增十六项后451项，清单归[运行入口](Runtime.md)；本阶段人工待验收，既有用户通过仍限各阶段原版本/清单。
+
+重置实际点击/列表刷新/焦点与输入、关闭/重绑/重启恢复、文件写入/失败、多人/时序/字形/分辨率、同机并发/断电/平台语义及性能仍UNKNOWN。AI未执行ResetDisplay/面板/偏好/GUI业务、实际偏好或游戏存档I/O、GamePlayer/PlayMode、逻辑单元测试、命令行构建/发布、采样或图片，未创建子Agent或提交Git。

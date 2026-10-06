@@ -27,7 +27,7 @@ namespace Code_01.CombatPrototype.Map
         private GUIStyle _labelStyle;
         private GUIStyle _buttonStyle;
         private Vector2 _scroll;
-        private string _title, _materials, _tools, _craft, _craftButton, _empty, _close;
+        private string _title, _materials, _tools, _craft, _craftButton, _empty, _close, _preferencesResetLabel;
         private string _wood, _stone, _missing, _usable, _broken, _notOwned, _disabled, _readyLabel;
         private string _axeName, _pickaxeName, _axeStatus, _pickaxeStatus, _axeRecipe, _pickaxeRecipe;
         private string _axeMissing, _pickaxeMissing, _axeCraftTitle, _pickaxeCraftTitle, _axeButton, _pickaxeButton, _feedback;
@@ -35,7 +35,9 @@ namespace Code_01.CombatPrototype.Map
         private int _lastInputFrame = -1;
         private bool _configured, _ready, _open, _craftAxe, _craftPickaxe, _mousePressAccepted;
         private bool _canCraftAxe, _canCraftPickaxe, _lastInventoryValid;
-        private bool _rowMousePressAccepted;
+        private bool _rowMousePressAccepted, _preferencesResetPending;
+
+        private bool PreferencesResetEnabled => _settings.PreferencesResetEnabled != 0;
 
         public void Configure(CombatPrototypeMapInventoryPanelSettings settings, CombatPrototypeMapGatherToolSettings toolSettings,
             CombatPrototypeMapGatherToolDefinition axe, CombatPrototypeMapGatherToolDefinition pickaxe,
@@ -60,6 +62,7 @@ namespace Code_01.CombatPrototype.Map
             _craftButton = settings.CraftButtonLabel.ToString();
             _empty = settings.EmptyInventoryLabel.ToString();
             _close = settings.CloseLabel.ToString();
+            _preferencesResetLabel = settings.PreferencesResetLabel.ToString();
             _wood = settings.WoodLabel.ToString();
             _stone = settings.StoneLabel.ToString();
             _missing = settings.MissingLabel.ToString();
@@ -93,6 +96,14 @@ namespace Code_01.CombatPrototype.Map
             if (_settings.Enabled == 0) return;
             _axeDurabilityStatus = axeStatus; _pickaxeDurabilityStatus = pickaxeStatus;
             _snapshot.Capture(inventory, axeDurability, pickaxeDurability, source, player, capacityLevel);
+            if (_preferencesResetPending)
+            {
+                _preferencesResetPending = false;
+                _listView.ResetDisplay(_settings.DefaultSortMode, _settings.DefaultFilterMode);
+                _search.ResetDisplay();
+                _scroll = Vector2.zero;
+                _rowMousePressAccepted = false;
+            }
             if (_listView.Capture(_snapshot, _search, out var selectionChanged)) _rowMousePressAccepted = false;
             if (selectionChanged) _scroll = Vector2.zero;
             _preferences.Capture(_listView, _search);
@@ -166,7 +177,7 @@ namespace Code_01.CombatPrototype.Map
             upgrade = upgradeAxe = upgradePickaxe = blocksKeyboard = false;
             if (!_configured || !_ready || _settings.Enabled == 0)
             {
-                _craftAxe = _craftPickaxe = _mousePressAccepted = _rowMousePressAccepted = false;
+                _craftAxe = _craftPickaxe = _mousePressAccepted = _rowMousePressAccepted = _preferencesResetPending = false;
                 _search.ReleaseFocus();
                 _drop.ClearPending();
                 _repair.ClearPending();
@@ -256,7 +267,7 @@ namespace Code_01.CombatPrototype.Map
                 GUI.color = Color.white;
                 GUI.Label(new Rect(panel.x + 12f, panel.y + 12f, panel.width - 24f, _settings.RowHeightPixels), _title, _labelStyle);
                 var viewport = Viewport(panel);
-                var rows = Mathf.Max(_listView.Items.Count * 2, 1) + _listView.ControlRowCount + _search.RowCount + 14 + CombatPrototypeMapGatherToolRepairPanel.RowCount + CombatPrototypeMapInventoryCapacityUpgradePanel.RowCount + CombatPrototypeMapGatherToolUpgradePanel.RowCount + (_durabilityEnabled ? 2 : 0);
+                var rows = Mathf.Max(_listView.Items.Count * 2, 1) + _listView.ControlRowCount + _search.RowCount + (PreferencesResetEnabled ? 1 : 0) + 14 + CombatPrototypeMapGatherToolRepairPanel.RowCount + CombatPrototypeMapInventoryCapacityUpgradePanel.RowCount + CombatPrototypeMapGatherToolUpgradePanel.RowCount + (_durabilityEnabled ? 2 : 0);
                 var content = new Rect(0f, 0f, viewport.width - 18f, rows * _settings.RowHeightPixels);
                 _scroll = GUI.BeginScrollView(viewport, _scroll, content);
                 try { DrawBody(content.width); }
@@ -287,6 +298,7 @@ namespace Code_01.CombatPrototype.Map
                 _search.Draw(width, y, _settings.RowHeightPixels, _labelStyle, _buttonStyle, _mousePressAccepted);
                 y += _settings.RowHeightPixels;
             }
+            DrawPreferencesReset(width, ref y);
             if (_listView.Items.Count == 0)
                 Label(width, ref y, _snapshot.Items.Count == 0 ? _empty : _search.HasQuery ? _search.NoResultsText : _listView.NoMatchingItemsText);
             foreach (var item in _listView.Items)
@@ -323,6 +335,14 @@ namespace Code_01.CombatPrototype.Map
                     _listView.FilterText, _buttonStyle) && _mousePressAccepted) _listView.QueueFilter();
                 y += _settings.RowHeightPixels;
             }
+        }
+
+        private void DrawPreferencesReset(float width, ref float y)
+        {
+            if (!PreferencesResetEnabled) return;
+            if (GUI.Button(new Rect(0f, y, width, _settings.RowHeightPixels - 4f),
+                _preferencesResetLabel, _buttonStyle) && _mousePressAccepted) _preferencesResetPending = true;
+            y += _settings.RowHeightPixels;
         }
 
         private void Label(float width, ref float y, string text)
@@ -362,7 +382,7 @@ namespace Code_01.CombatPrototype.Map
         private void Close()
         {
             _preferences.Flush();
-            _open = _craftAxe = _craftPickaxe = _mousePressAccepted = _rowMousePressAccepted = false;
+            _open = _craftAxe = _craftPickaxe = _mousePressAccepted = _rowMousePressAccepted = _preferencesResetPending = false;
             _listView.ClearPending();
             _search.Close();
             _drop.ClearPending();
@@ -388,7 +408,7 @@ namespace Code_01.CombatPrototype.Map
             _upgrade.Reset();
             _toolUpgrade.Reset();
             _labelStyle = _buttonStyle = null;
-            _feedback = string.Empty;
+            _feedback = _preferencesResetLabel = string.Empty;
             _woodQuantity = _stoneQuantity = -1;
             _axeDurability = _pickaxeDurability = int.MinValue;
             _lastInputFrame = -1;

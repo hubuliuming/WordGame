@@ -115,6 +115,15 @@ namespace Code_01.CombatPrototype.Map
             Revision = unchecked(Revision + 1);
         }
 
+        // 清已应用查询和草稿；焦点释放仍走原GUI边界。
+        public void ResetDisplay()
+        {
+            if (_applied.Length != 0) Revision = unchecked(Revision + 1);
+            _draft = _applied = _query = string.Empty;
+            _pending = false;
+            ReleaseFocus();
+        }
+
         public bool ApplyPending()
         {
             if (!_pending) return false;

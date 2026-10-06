@@ -903,3 +903,15 @@
 - inventoryPanel追加四必填字段，DTO/Settings51→55；两地图Json/BuiltIn30/33一致，旧v1～v29拒绝，文件ID沿原1～61小写ID规则、延迟有限正float，关闭仍验证。八现有脚本、三普通偏好类及Unity正常生成meta接入；独立客户端目录采用版本1五字段JSON、严格读取、.tmp/Flush(true)/Replace或Move提交，坏档/写失败明确日志且暂停本绑定I/O。
 - 正常编译、55Settings/五字段协议/普通类元数据、1612份非法地图配置拒绝/96组合法读取及98次隔离Editor Bake静态通过；输入19/Drop4/Tools3/全部反馈、玩家v4/世界v2格式及完整布置/资源签名保持。更新时旧Worker留下两条未知新字段导入错误；当前程序集读取/Bake与正常再导入完成，Bake/再导入计数均[2,7,47]，未清空Console、未宣称0 Error，主场景干净、临时资源释放。
 - 增量同步偏好专题、受影响模块/导航与策划模板第7节JSON/第39节；原419项人工内容/编号保留，新增十六项后435项，本阶段人工待验收。Scene/SubScene/Prefab/Animator/旧meta/资源/包/构建结构与HUD/Binding/PlayerInput/服务器业务保持；未执行偏好或GUI业务/真实偏好及游戏存档I/O、GamePlayer/PlayMode、逻辑单元测试、命令行构建/发布、采样/图片，未创建子Agent或提交Git。
+
+## 2026-10-06 背包显示偏好本地保存人工验收确认
+
+- 用户反馈“我已验收通过，接下来下一阶段”；主线程结合既有编译/配置/隔离烘焙静态核对及用户反馈判定通过，限CombatPrototypeNetCode、Forest/Grassland Json/BuiltIn v30/revision33与Runtime.md本阶段十六项。人工结论来自用户反馈，原435项内容/编号和旧阶段通过范围保持，未实际触发的独立用例、同机并发/断电、平台与性能/线上仍UNKNOWN。
+- 增量同步导航、地图、偏好与相关B面板/排序筛选/搜索/库存/HUD/玩家/配置/运行文档及策划模板第39节验收状态；核对当前两份地图JSON和专题后，将地图默认配置表遗留29/32更正为30/33。仅文档修改，未执行偏好或GUI业务/真实偏好及游戏存档I/O、GamePlayer/PlayMode、逻辑单元测试、编译/烘焙/构建/发布、采样或图片检查，未创建子Agent或提交Git。
+
+## 2026-10-06 背包显示偏好重置（v31/revision34）
+
+- 按用户确认方案，由主线程在CombatPrototypeNetCode原B面板接入显示重置按钮：GUI只排队，下一有效Show在完整Snapshot之后恢复当前配置默认模式/空查询，清未应用显示请求、归零滚动/释放焦点/取消旧行按下许可，随后原ListView重建及Preferences观察。原业务库存/统计/请求与面板打开状态保持，关闭或绑定释放取消未应用重置。
+- inventoryPanel追加preferencesResetEnabled=true/preferencesResetLabel=Reset view，DTO/Settings55→57；两地图Json/BuiltIn31/34一致，旧v1～v30拒绝，关闭仍严格完整验证，文案沿非空白/无控制字符/61 UTF-8字节规则。仅八现有脚本、两JSON接入，无新文件/meta或资源结构；保存协调类、v1五字段/路径/延迟及失败隔离保持，保存关闭或错误暂停只临时重置，关闭能力/禁止保存搜索不覆盖原字段。
+- 正常编译/元数据、1716份非法配置拒绝/112组合法读取及112次隔离Editor Bake静态通过；57Settings、输入19/Drop4/Tools3及原所有所属反馈、玩家v4/世界v2、原完整布置/资源签名保持。Bake Console前后[0,2,0]一致，仅PEListener/DOTween源码Warning，未清空，主场景干净、3根对象、临时资源释放。
+- 增量同步偏好专题、受影响模块/导航与策划模板第7节JSON/第40节；原435项人工内容/编号保留，新增十六项后451项，本阶段人工待验收，旧保存阶段通过仍限v30/revision33原清单。Scene/SubScene/Prefab/Animator/所有meta/资源/包/构建配置与HUD/Binding/PlayerInput/服务器业务保持；未执行重置/面板/偏好/GUI业务、真实偏好或游戏存档I/O、GamePlayer/PlayMode、逻辑单元测试、命令行构建/发布、采样或图片，未创建子Agent或提交Git。

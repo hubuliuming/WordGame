@@ -99,6 +99,16 @@ namespace Code_01.CombatPrototype.Map
             UpdateLabels();
         }
 
+        // 已确认的显示重置在Panel.Show中应用，不改库存或重建配置。
+        public void ResetDisplay(CombatPrototypeMapInventorySortMode sortMode, CombatPrototypeMapInventoryFilterMode filterMode)
+        {
+            ClearPending();
+            _sortMode = SortEnabled ? sortMode : CombatPrototypeMapInventorySortMode.Original;
+            _filterMode = FilterEnabled ? filterMode : CombatPrototypeMapInventoryFilterMode.All;
+            _hasSnapshot = false;
+            UpdateLabels();
+        }
+
         public bool Capture(CombatPrototypeMapInventoryPanelSnapshot snapshot, CombatPrototypeMapInventoryPanelSearch search, out bool selectionChanged)
         {
             var searchChanged = search.ApplyPending();

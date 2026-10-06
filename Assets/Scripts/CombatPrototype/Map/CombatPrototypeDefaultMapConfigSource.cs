@@ -17,7 +17,7 @@ namespace Code_01.CombatPrototype.Map
             {
                 map = new MapDefinitionConfig
                 {
-                    schemaVersion = 30, configRevision = 33,
+                    schemaVersion = 31, configRevision = 34,
                     mapDefinitionId = mapDefinitionId, defaultSeed = 12345,
                     resourcePersistence = new MapResourcePersistenceConfig
                     {
@@ -216,7 +216,8 @@ namespace Code_01.CombatPrototype.Map
                         searchLabel = "Search", searchPlaceholderLabel = "Name keyword",
                         clearSearchLabel = "Clear", noSearchResultsLabel = "No search results",
                         preferencesEnabled = true, preferencesSaveSearch = true,
-                        preferencesFileId = "inventory_display", preferencesSaveDelaySeconds = 0.5f
+                        preferencesFileId = "inventory_display", preferencesSaveDelaySeconds = 0.5f,
+                        preferencesResetEnabled = true, preferencesResetLabel = "Reset view"
                     },
                     inventoryCapacity = new MapInventoryCapacityConfig
                     {

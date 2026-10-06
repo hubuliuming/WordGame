@@ -1044,7 +1044,7 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 
 入口CombatPrototypeNetCode，原B面板；两地图Json/BuiltIn本阶段v30/revision33。正常编译/55配置与Settings/三普通类/五字段协议元数据、1612份非法地图配置拒绝/96组合法读取及98次隔离Editor Bake静态核对通过。Bake及重新正常导入前后Console均[2 Error,7 Warning,47 Log]；保留更新时旧导入Worker读取新字段的两条未知preferencesEnabled记录，当前读取/Bake通过，没有清空Console或宣称0 Error。主场景干净、3根对象、未Play，原输入/Ghost/游戏档案及完整布局/签名保持。
 
-本阶段十六项人工GamePlayer待验收；原419项内容/编号与旧搜索v29/revision32及其他用户通过原范围保持，各端同版并正常导入/烘焙。
+用户明确反馈“我已验收通过，接下来下一阶段”；主线程结合既有静态核对与用户反馈判定本阶段通过，限CombatPrototypeNetCode、v30/revision33及下述十六项人工GamePlayer清单。人工结论来自用户反馈，未实际触发的独立用例仍UNKNOWN；原419项内容/编号与旧搜索v29/revision32及其他用户通过原范围保持，各端同版并正常导入/烘焙。
 
 1. 两地图Json/BuiltIn均v30/revision33，四字段必填并默认true/true/inventory_display/0.5；Settings55字段、0 GhostField及三个普通类，十九输入、原Ghost/档案与资源绑定保持。旧v1～v29、缺失/null/错类型/重复未知键、非法ID或非正/非有限延迟明确失败，关闭仍验证，无补齐/回退/热重载。
 2. 在无正式偏好文件的本机/地图首次绑定时，按配置默认type/all及空查询，面板沿initiallyOpen、滚动归零且不聚焦；仅绑定/开关面板/原库存刷新不创建文件，已应用展示值发生变化后才保存。独立路径/首次创建未触发则UNKNOWN。
@@ -1063,4 +1063,29 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 15. 写入/Flush/替换失败明确记录Save并暂停本绑定，旧正式文件保留；临时.tmp不作为正式恢复来源，不自动重试，重建绑定可重新读取。首次创建/已有替换、权限/平台异常、断电及同机并发未实际触发分别UNKNOWN。
 16. 恢复选择/查询后Drop/All仍按真实Name，完整库存/容量/配方与制作/修理/升级资格保持；回归F采集/再生、G部分拾取/合并/寿命/反馈、B业务、E/R/F5、战斗/镜头/阻挡与原保存恢复。偏好不新增网络/玩家世界档案字段；多人/延迟/预测、性能/平台/线上未触发则UNKNOWN。
 
-完整本机协议/生命周期归[偏好](MapInventoryPreferences.md)，模式归[排序筛选](MapInventoryListView.md)，文本/焦点归[搜索](MapInventorySearch.md)，游戏库存/业务归[B面板](MapInventoryPanel.md)/[容量](MapInventoryCapacity.md)，存档边界归[资源与数据](DataResources.md)。共435项；本阶段待用户人工GamePlayer反馈，静态通过不替代实际偏好文件读写/恢复验收。AI未调用偏好业务/真实文件I/O、搜索/排序/库存/GUI逻辑、GamePlayer/PlayMode、逻辑单元测试、命令行构建/发布、采样或图片，未创建子Agent或提交Git；未触发的独立失败/联网/生命周期与性能/平台/线上仍UNKNOWN。
+完整本机协议/生命周期归[偏好](MapInventoryPreferences.md)，模式归[排序筛选](MapInventoryListView.md)，文本/焦点归[搜索](MapInventorySearch.md)，游戏库存/业务归[B面板](MapInventoryPanel.md)/[容量](MapInventoryCapacity.md)，存档边界归[资源与数据](DataResources.md)。共435项；本阶段已获用户人工GamePlayer通过反馈，限本节版本与十六项清单，静态通过不替代实际偏好文件读写/恢复验收。AI未调用偏好业务/真实文件I/O、搜索/排序/库存/GUI逻辑、GamePlayer/PlayMode、逻辑单元测试、命令行构建/发布、采样或图片，未创建子Agent或提交Git；未触发的独立失败/联网/生命周期与性能/平台/线上仍UNKNOWN。
+
+## 【KNOWN ISSUES】背包显示偏好重置验收边界
+
+入口CombatPrototypeNetCode，原B面板；本阶段两地图Json/BuiltIn为v31/revision34，57配置/Settings和0 GhostField正常编译/元数据核对通过；1716份非法地图配置全部拒绝/112组合法读取通过，112次隔离Editor Bake静态通过。完整57Settings、原全部Settings/零反馈/Prefab引用、资源布置/签名、原十九输入与Ghost/玩家v4/世界v2及偏好v1五字段保持，Bake Console前后[0 Error,2 Warning,0 Log]一致；主场景干净、3根对象，临时资源释放，未Play。
+
+本阶段十六项人工GamePlayer待验收；原435项内容/编号及偏好保存v30/revision33、搜索v29/revision32与其他用户通过原范围保持。各端同版代码/配置并正常导入/烘焙，静态通过不替代实际重置点击与偏好文件恢复验收。
+
+1. 两地图Json/BuiltIn均v31/revision34，preferencesResetEnabled=true、preferencesResetLabel=Reset view必填，DTO/Settings57字段且0 GhostField；旧v1～v30、缺失/null/错类型/未知或重复键、空白/控制/超61字节文案明确失败，关闭重置/保存/面板仍验证。
+2. B面板在排序/分类/搜索之后、材料列表之前显示一行重置按钮；沿原有效面板鼠标按下许可触发，无额外快捷键。关闭preferencesResetEnabled后按钮及内容高度中的该行消失；关闭面板仍沿原隐藏，未触发边界UNKNOWN。
+3. 从非默认排序/分类及非空搜索点击重置，下一有效刷新恢复配置默认type/all与空查询，材料可见列表正确重建；面板保持打开、滚动归零，真实库存数量/顺序及完整容量统计不变。
+4. 在PlayMode前将defaultSortMode/defaultFilterMode配置成其他合法值并正常导入/烘焙，重置采用当前配置值；保持未热重载，恢复原配置后采用原值，未实际触发自定义或导入故障UNKNOWN。
+5. GUI点击只排队，当前绘制列表保持稳定；下一有效Show在Snapshot后消费一次，清未应用排序/分类与搜索编辑，连续点击不重复排队多次。应用前关闭或释放绑定取消请求，仅提交此前已应用值；独立同帧/时序未触发UNKNOWN。
+6. 搜索正在编辑或有IME候选时点击重置，已应用词和草稿清空，焦点释放沿原OnGUI执行，释放帧键盘隔离保持；之后B及原键盘恢复，不触发面板外Attack。输入法/字形/焦点独立组合未触发UNKNOWN。
+7. 重置前后行身份/顺序/数量改变时取消旧行按下许可，按下至抬起期间不会丢错材料；重置后的Drop/All仍按真实Name发请求。已排队业务或已提交服务器动作保持，未触发独立点击时序UNKNOWN。
+8. 重置实际改变已应用偏好后按默认0.5秒unscaledTime保存；在延迟结束前关闭面板立即提交已应用默认值，重开及重启/重绑后恢复。首次创建/已有正式文件替换、精确计时与关闭同帧未触发UNKNOWN。
+9. 连续点击已处于默认值的重置不产生新的待写或刷新保存计时；回到上次已写值取消待写。首次无正式文件且显示值未变化时，不创建目录/文件；独立文件时间戳/计时情形未触发UNKNOWN。
+10. Forest/Grassland及不同preferencesFileId仍独立，重置只影响当前本机/地图记录，其他地图/设备值保持；同机同目录/地图仍不按玩家ID分档，多设备/多身份未实际触发UNKNOWN。
+11. 关闭sortEnabled/filterEnabled后重置显示original/all，改变其他允许保存项仍不覆盖文件中关闭能力的原模式；重新开启后恢复保留值，单独/同时关闭与交集组合未遍历UNKNOWN。
+12. preferencesSaveSearch=false或searchEnabled=false时，重置清临时搜索但不更新正式文件原searchText；重新启用能力和保存后按原规则恢复保存词，长词截断及未遍历组合UNKNOWN。
+13. preferencesEnabled=false时按钮仍可恢复当前临时显示默认值，整个绑定不访问偏好文件；重新开启后读取原正式记录。关闭保存不暗中清文件或重建保存协调类，独立配置/生命周期未触发UNKNOWN。
+14. 坏正式文件或先前Save失败已暂停本绑定I/O时，重置只临时生效，旧正式文件保留、不删除、不重新启用I/O或自动重试；原模块/Load或Save/地图/路径日志保持，故障类型/权限/平台/断电未触发UNKNOWN。
+15. 重置排队或已应用后死亡/断线、源或玩家变化、无有效所属Ghost/连接以及World/Scene释放，未应用请求清除、已应用待写值沿原Close提交，新绑定读取合法记录；无效ReadInput取消待应用重置，未触发生命周期时序UNKNOWN。
+16. 重置开关、新控制行/滚动高度与搜索框命中几何、Empty/无分类/无搜索结果文案回归；原制作/修理/升级、F/G/B/E/R/F5、采集再生/掉落拾取/战斗镜头/阻挡及游戏存档保持。多人/延迟/预测、分辨率/字形/性能/平台/线上未触发UNKNOWN。
+
+共451项；完整重置规则及保存失败/关闭能力边界归[偏好](MapInventoryPreferences.md)，可见行/缓存归[排序筛选](MapInventoryListView.md)，文本/焦点归[搜索](MapInventorySearch.md)，原业务归[B面板](MapInventoryPanel.md)，配置/协议归[资源与数据](DataResources.md)。AI未执行ResetDisplay/面板/偏好/GUI业务、实际偏好或游戏存档I/O、GamePlayer/PlayMode、逻辑单元测试、命令行构建/发布、性能采样或图片，未创建子Agent或提交Git；独立失败/联网/生命周期、并发/断电、性能/平台/线上仍UNKNOWN。

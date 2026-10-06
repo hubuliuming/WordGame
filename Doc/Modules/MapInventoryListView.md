@@ -1,6 +1,6 @@
 # 背包材料排序与筛选
 
-返回[地图](Map.md)、[背包](Inventory.md)、[B面板](MapInventoryPanel.md)、[容量](MapInventoryCapacity.md)、[丢弃](MapInventoryDrop.md)、[配置](DataResources.md)与[运行入口](Runtime.md)。入口CombatPrototypeNetCode，Forest/Grassland Json/BuiltIn当前schemaVersion=30/configRevision=33；下述排序筛选静态及人工结论来自v28/revision31阶段。用户已确认该阶段人工GamePlayer通过，主线程结合既有静态核对与用户反馈判定通过，限v28/revision31及运行入口十六项，人工结论来自用户反馈。旧部分拾取用户通过限v27/revision30十六项，旧面板/丢弃/容量/工具通过保持原版本/清单。
+返回[地图](Map.md)、[背包](Inventory.md)、[B面板](MapInventoryPanel.md)、[容量](MapInventoryCapacity.md)、[丢弃](MapInventoryDrop.md)、[配置](DataResources.md)与[运行入口](Runtime.md)。入口CombatPrototypeNetCode，Forest/Grassland Json/BuiltIn当前schemaVersion=31/configRevision=34；下述排序筛选静态及人工结论来自v28/revision31阶段。用户已确认该阶段人工GamePlayer通过，主线程结合既有静态核对与用户反馈判定通过，限v28/revision31及运行入口十六项，人工结论来自用户反馈。旧部分拾取用户通过限v27/revision30十六项，旧面板/丢弃/容量/工具通过保持原版本/清单。
 
 ## 【FACT】文件与配置
 
@@ -36,15 +36,15 @@ v28排序筛选阶段七个现有脚本接入，新ListView是普通客户端C#�
 }
 ```
 
-当前配置与原Settings各55字段：DTO八bool、六float、两int、两模式string、36文案string及一文件ID；Settings八byte、六float、两int、两byte枚举及37 FixedString64Bytes；搜索七字段归[搜索](MapInventorySearch.md)，偏好四字段归[本机偏好](MapInventoryPreferences.md)，0 GhostField且无GhostComponent。sortEnabled/filterEnabled只控制两种展示能力；关闭排序强制original并隐藏排序按钮，关闭筛选强制all并隐藏筛选按钮，两者关闭沿原完整列表顺序。地图Settings仍保存已配置默认模式，强制显示模式只在客户端Configure应用。
+当前配置与原Settings各57字段：DTO九bool、六float、两int、两模式string、37文案string及一文件ID；Settings九byte、六float、两int、两byte枚举及38 FixedString64Bytes；搜索七字段归[搜索](MapInventorySearch.md)，偏好四字段及重置两字段归[本机偏好](MapInventoryPreferences.md)，0 GhostField且无GhostComponent。sortEnabled/filterEnabled只控制两种展示能力；关闭排序强制original并隐藏排序按钮，关闭筛选强制all并隐藏筛选按钮，两者关闭沿原完整列表顺序。地图Settings仍保存已配置默认模式，强制显示模式在客户端Configure及显式ResetDisplay应用。
 
-defaultSortMode仅original/type/quantity，defaultFilterMode仅all/resources/supplies/other，大小写与空格严格匹配，不修剪/转换未知值。两模式ID通过共用Resolver校验/烘焙；十新文案沿原非空白、无控制字符且最多61 UTF-8字节。关闭任一能力、面板或全部显示仍检查全部字段与语义。原Reader保留UTF-8/完整对象、缺失/null/错误类型/未知或重复键检查；当前仅schema30，revision/seed须正数，旧v1～v29拒绝，无补默认、来源回退或运行热重载。正常导入/烘焙后生效，各端同版代码/配置并重新烘焙。
+defaultSortMode仅original/type/quantity，defaultFilterMode仅all/resources/supplies/other，大小写与空格严格匹配，不修剪/转换未知值。两模式ID通过共用Resolver校验/烘焙；十新文案沿原非空白、无控制字符且最多61 UTF-8字节。关闭任一能力、面板或全部显示仍检查全部字段与语义。原Reader保留UTF-8/完整对象、缺失/null/错误类型/未知或重复键检查；当前仅schema31，revision/seed须正数，旧v1～v30拒绝，无补默认、来源回退或运行热重载。正常导入/烘焙后生效，各端同版代码/配置并重新烘焙。
 
 ## 【CURRENT STRATEGY】完整库存与显示投影
 
 原绑定枚举启用GhostOwnerIsLocal且Connected/InGame的有效所属玩家，Panel.Show调用Snapshot.Capture校验完整原库存。Snapshot继续按原顺序缓存正数量Name/OriginalName/DisplayName/Quantity/Text；零条目不显示，木/石材料数量及受管三种材料总量/本级上限仍基于全部库存。名称空白/控制字符、负数量或重复名称沿原索引/地图/玩家日志跳过独立条目，InventoryValid=false继续限制所有原业务按钮；筛选隐藏该条目不能恢复合法性。
 
-Snapshot的uint Revision仅为本地展示缓存：行名/数量/顺序/行数或容量等级改变时在Capture更新一次；等级变化仍沿原清行及文本重建，Reset归零。ListView消费该Revision、搜索Revision或本地选择变化才重建可见行，复用列表、比较委托及文字缓存；没有复制可变游戏库存、LINQ集合转换、服务器库存写入、奖励或保存调用。未变化时原可见行继续使用，GUI不执行排序。
+Snapshot的uint Revision仅为本地展示缓存：行名/数量/顺序/行数或容量等级改变时在Capture更新一次；等级变化仍沿原清行及文本重建，Reset归零。ListView消费该Revision、搜索Revision、本地选择变化或显式显示重置才重建可见行，复用列表、比较委托及文字缓存；没有复制可变游戏库存、LINQ集合转换、服务器库存写入、奖励或保存调用。未变化时原可见行继续使用，GUI不执行排序。
 
 类型顺序固定为木材、石材、活力苹果、小块肉、其他。依据原ItemName比较，不按可配置显示文案或本地语言排序；其他合法名称按OriginalName的StringComparer.Ordinal升序。quantity为正数量降序，用CompareTo避免相减溢出；相同数量按类型，再按原名确定顺序。original保留Snapshot原行顺序，各模式只作用于客户端副本，原缓冲顺序不改。分类与[搜索](MapInventorySearch.md)条件取交集后才排序，清空搜索不清当前模式。
 
@@ -79,4 +79,6 @@ B/关闭按钮沿原Close清未提交业务请求及本地未应用模式请求�
 
 原387项人工清单内容/编号逐字保留，追加本阶段十六项后共403项，归[运行入口](Runtime.md)。用户已确认本阶段人工GamePlayer通过，主线程结合既有静态核对与用户反馈判定通过，限CombatPrototypeNetCode、v28/revision31及十六项清单，人工结论来自用户反馈；未实际触发的独立排序/分类/循环、完整统计/按钮、重排按下抬起、快照/GUI/网络时序、字体/排版/缩放、关闭重开/重绑生命周期及性能/平台/线上仍UNKNOWN。旧部分拾取用户通过限v27/revision30十六项，其他旧通过保持原范围。AI未执行ListView排序/筛选/Capture、库存Capture、面板/HUD/GUI、GamePlayer/PlayMode、逻辑单元测试、真实存档业务I/O、命令行构建/发布、采样或图片，未创建子Agent/提交Git。
 
-v29/revision32搜索阶段只进一步筛选材料可见行并控制本地文本输入焦点；当前v30/revision33的[偏好保存](MapInventoryPreferences.md)人工待验收。v28/revision31排序筛选用户通过不覆盖新搜索；用户已确认搜索人工GamePlayer通过，限v29/revision32及[运行入口](Runtime.md)十六项，结论来自用户反馈；未实际触发的独立用例UNKNOWN。
+v29/revision32搜索阶段只进一步筛选材料可见行并控制本地文本输入焦点；v30/revision33保存阶段的[偏好保存](MapInventoryPreferences.md)人工已获用户通过反馈，限运行入口本阶段十六项，未实际触发的独立用例仍UNKNOWN。v28/revision31排序筛选用户通过不覆盖新搜索；用户已确认搜索人工GamePlayer通过，限v29/revision32及[运行入口](Runtime.md)十六项，结论来自用户反馈；未实际触发的独立用例UNKNOWN。
+
+当前v31/revision34显式重置在原Panel.Show中调用ResetDisplay：清未应用模式请求，恢复当前配置默认排序/分类，关闭能力仍original/all，令_hasSnapshot=false并更新文案；随后原Capture重建可见行，不修改原库存。搜索词/焦点及保存边界归[偏好](MapInventoryPreferences.md)，重置阶段静态通过、人工十六项待验收。

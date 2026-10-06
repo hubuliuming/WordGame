@@ -1,6 +1,6 @@
 # 掉落物按背包余量部分拾取
 
-返回[地图](Map.md)、[掉落](MapDrops.md)、[容量](MapInventoryCapacity.md)、[G提示](MapPickupHud.md)、[拾取结果](MapPickupFeedbackHud.md)、[掉落存档](MapDropPersistence.md)与[运行入口](Runtime.md)。入口CombatPrototypeNetCode；Forest/Grassland Json与BuiltIn当前schemaVersion=30/configRevision=33。部分拾取v27/revision30的代码/配置/烘焙/Serializer静态核对通过，用户已确认该阶段人工GamePlayer通过，范围见运行入口十六项。旧合并用户通过限v26/revision29十六项，旧G结果限v25/revision28十六项，其余旧范围保持。
+返回[地图](Map.md)、[掉落](MapDrops.md)、[容量](MapInventoryCapacity.md)、[G提示](MapPickupHud.md)、[拾取结果](MapPickupFeedbackHud.md)、[掉落存档](MapDropPersistence.md)与[运行入口](Runtime.md)。入口CombatPrototypeNetCode；Forest/Grassland Json与BuiltIn当前schemaVersion=31/configRevision=34。部分拾取v27/revision30的代码/配置/烘焙/Serializer静态核对通过，用户已确认该阶段人工GamePlayer通过，范围见运行入口十六项。旧合并用户通过限v26/revision29十六项，旧G结果限v25/revision28十六项，其余旧范围保持。
 
 ## 【FACT】文件与配置
 
@@ -26,7 +26,7 @@
 
 strict bool，Json/BuiltIn默认true；Baker写原DropSettings.PartialPickupEnabled(byte)，Settings共14字段、PrefabType.Server且0 GhostField。开关独立于敌人新掉落drops.enabled、inventoryDrop、dropMerge、容量付费升级及所有显示开关。false恢复原整堆接收；inventoryCapacity.enabled=false时两种开关均沿原整堆接收及checked边界。
 
-原Reader按DTO严格检查UTF-8/完整形状、缺失/null/重复或未知字段、标量类型；当前仅schema30，revision/seed仍须正数。旧v1～v29拒绝，关闭仍验证，无默认补齐/来源回退/运行热重载。正常导入/烘焙后生效，各端须同版代码/配置并重新烘焙。寿命、产出/丢弃数量、合并默认0.8米/99份/0.2秒及其他原字段保持。
+原Reader按DTO严格检查UTF-8/完整形状、缺失/null/重复或未知字段、标量类型；当前仅schema30，revision/seed仍须正数。旧v1～v30拒绝，关闭仍验证，无默认补齐/来源回退/运行热重载。正常导入/烘焙后生效，各端须同版代码/配置并重新烘焙。寿命、产出/丢弃数量、合并默认0.8米/99份/0.2秒及其他原字段保持。
 
 ## 【CURRENT STRATEGY】容量与本次数量
 

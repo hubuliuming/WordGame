@@ -1,6 +1,6 @@
 # 背包仅看收藏筛选
 
-返回[地图](Map.md)、[背包](Inventory.md)、[B面板](MapInventoryPanel.md)、[列表](MapInventoryListView.md)、[收藏](MapInventoryFavorites.md)、[搜索](MapInventorySearch.md)、[详情](MapInventoryDetails.md)、[本机偏好](MapInventoryPreferences.md)、[配置](DataResources.md)与[运行验收](Runtime.md)。入口CombatPrototypeNetCode、原B面板；两地图Json/BuiltIn当前v36/revision39。主线程按已确认方案完成接入及静态范围核对；用户已确认本阶段十六项人工GamePlayer验收通过，主线程结合既有静态核对与用户反馈判定通过，限CombatPrototypeNetCode、v34/revision37及运行入口清单，人工结论来自用户反馈；收藏旧通过限v33/revision36十六项，其他旧阶段保持各自版本/清单。
+返回[地图](Map.md)、[背包](Inventory.md)、[B面板](MapInventoryPanel.md)、[列表](MapInventoryListView.md)、[收藏](MapInventoryFavorites.md)、[搜索](MapInventorySearch.md)、[详情](MapInventoryDetails.md)、[本机偏好](MapInventoryPreferences.md)、[配置](DataResources.md)与[运行验收](Runtime.md)。入口CombatPrototypeNetCode、原B面板；两地图Json/BuiltIn当前v37/revision40。主线程按已确认方案完成接入及静态范围核对；用户已确认本阶段十六项人工GamePlayer验收通过，主线程结合既有静态核对与用户反馈判定通过，限CombatPrototypeNetCode、v34/revision37及运行入口清单，人工结论来自用户反馈；收藏旧通过限v33/revision36十六项，其他旧阶段保持各自版本/清单。
 
 ## 【FACT】入口与文件
 
@@ -27,7 +27,7 @@
 | favoritesFilterOnlyLabel | Favorites only | 必填文案→FixedString64Bytes |
 | noMatchingFavoritesLabel | No matching favorites | 必填文案→FixedString64Bytes |
 
-原83字段保留，[收藏计数](MapInventoryFavoritesCount.md)与[收藏保护](MapInventoryFavoritesDropProtection.md)各追加两字段，当前87：DTO十五bool、六float、三int、两模式string、60文案string及一文件ID；Settings十五byte、六float、三int、两byte枚举及61 FixedString64Bytes，零GhostField/无GhostComponent。四文案非空白、无控制字符、最多61 UTF-8字节；关闭收藏/新筛选/面板仍全量验证。仅地图schema36、正revision/seed；默认revision39，旧地图v1～v35、缺失/null/错类型/未知或重复键拒绝，无补默认/来源回退/热重载，正常导入/烘焙生效，各端同版。
+原83字段保留，[收藏计数](MapInventoryFavoritesCount.md)、[收藏保护](MapInventoryFavoritesDropProtection.md)与[收藏提示](MapInventoryFavoritesConsumptionHint.md)各追加两字段，当前89：DTO十六bool、六float、三int、两模式string、61文案string及一文件ID；Settings十六byte、六float、三int、两byte枚举及62 FixedString64Bytes，零GhostField/无GhostComponent。四文案非空白、无控制字符、最多61 UTF-8字节；关闭收藏/新筛选/面板仍全量验证。仅地图schema37、正revision/seed；默认revision40，旧地图v1～v36、缺失/null/错类型/未知或重复键拒绝，无补默认/来源回退/热重载，正常导入/烘焙生效，各端同版。
 
 ## 【CURRENT STRATEGY】显示交集与点击
 
@@ -69,4 +69,8 @@ v35/revision38计数阶段的[收藏计数](MapInventoryFavoritesCount.md)独立
 
 ## 【FACT】收藏保护与仅看收藏
 
-当前v36/revision39的[收藏保护](MapInventoryFavoritesDropProtection.md)：收藏筛选所用ListView与本机偏好代码保持；仅看收藏不自动解锁Drop/All。过滤/隐藏不删Name，当前已应用集合由DropClient共享查询；取消收藏仍按原同次移除行与关闭隐藏详情，之后消费未提交丢弃按更新后的集合复核。 本阶段十六项人工GamePlayer待验收，完整静态证据与边界归保护专题及[运行入口](Runtime.md)；既有用户通过保持各自原版本/清单，未实际触发的独立用例仍UNKNOWN。
+v36/revision39保护阶段的[收藏保护](MapInventoryFavoritesDropProtection.md)：收藏筛选所用ListView与本机偏好代码保持；仅看收藏不自动解锁Drop/All。过滤/隐藏不删Name，当前已应用集合由DropClient共享查询；取消收藏仍按原同次移除行与关闭隐藏详情，之后消费未提交丢弃按更新后的集合复核。 本阶段十六项人工GamePlayer已获用户通过反馈，主线程结合既有静态核对判定通过，限CombatPrototypeNetCode、v36/revision39及运行入口清单，人工结论来自用户反馈；完整静态证据与边界归保护专题及[运行入口](Runtime.md)；既有用户通过保持各自原版本/清单，未实际触发的独立用例仍UNKNOWN。
+
+## 【CURRENT STRATEGY】收藏材料消耗提示
+
+当前v37/revision40的[收藏材料消耗提示](MapInventoryFavoritesConsumptionHint.md)复用原B面板七份木石配方和已应用Favorites.IsFavorite真实Name；只在对应操作有有效配方且正成本材料已收藏时，于配方下加一行缓存只读文字，材料不足仍提示。隐藏/数量归零/仅看收藏/搜索不改变配方提示，取消或Reset实际应用后下一有效Show刷新。共0～7行计入原滚动高度，提示总高度变化清旧鼠标许可，不清已排队业务请求；原按钮资格、1～7/E/F/G、服务端扣料/保存及全部反馈保持。本阶段人工GamePlayer待验收，旧保护通过限v36/revision39十六项，其他旧阶段保持原版本/清单。

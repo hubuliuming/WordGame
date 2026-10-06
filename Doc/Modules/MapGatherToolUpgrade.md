@@ -1,6 +1,6 @@
 # 采集工具升级与效率提升
 
-返回[采集工具](MapGatherTools.md)、[工具修理](MapToolRepair.md)与[材料面板](MapInventoryPanel.md)。本专题负责 CombatPrototypeNetCode 的工具 Lv1～Lv3、B/6/7 升级、有效耐久上限与采集耗时；玩家文件完整契约归[资源与数据](DataResources.md)，人工清单归[运行入口](Runtime.md)。当前地图 schemaVersion=36/configRevision=39，玩家存档 Version=4；用户已确认本阶段人工 GamePlayer 通过，主线程结合既有静态核对判定通过，限 v21/revision24 及[运行入口](Runtime.md)二十二项清单，结论来自用户反馈。未实际触发的独立边界仍为 UNKNOWN。背包升级及更早用户通过仍限各自原版本/清单。
+返回[采集工具](MapGatherTools.md)、[工具修理](MapToolRepair.md)与[材料面板](MapInventoryPanel.md)。本专题负责 CombatPrototypeNetCode 的工具 Lv1～Lv3、B/6/7 升级、有效耐久上限与采集耗时；玩家文件完整契约归[资源与数据](DataResources.md)，人工清单归[运行入口](Runtime.md)。当前地图 schemaVersion=37/configRevision=40，玩家存档 Version=4；用户已确认本阶段人工 GamePlayer 通过，主线程结合既有静态核对判定通过，限 v21/revision24 及[运行入口](Runtime.md)二十二项清单，结论来自用户反馈。未实际触发的独立边界仍为 UNKNOWN。背包升级及更早用户通过仍限各自原版本/清单。
 
 ## 【FACT】入口与职责
 
@@ -120,4 +120,8 @@ v35/revision38计数阶段的[收藏计数](MapInventoryFavoritesCount.md)：计
 
 ## 【FACT】收藏保护与工具升级
 
-当前v36/revision39的[收藏保护](MapInventoryFavoritesDropProtection.md)：收藏木材/石材仍参与完整升级配方与6/7资格，原等级/耐久/效率和服务端SavePrepared保持；收藏丢弃保护不限制原升级消耗。 本阶段十六项人工GamePlayer待验收，完整静态证据与边界归保护专题及[运行入口](Runtime.md)；既有用户通过保持各自原版本/清单，未实际触发的独立用例仍UNKNOWN。
+v36/revision39保护阶段的[收藏保护](MapInventoryFavoritesDropProtection.md)：收藏木材/石材仍参与完整升级配方与6/7资格，原等级/耐久/效率和服务端SavePrepared保持；收藏丢弃保护不限制原升级消耗。 本阶段十六项人工GamePlayer已获用户通过反馈，主线程结合既有静态核对判定通过，限CombatPrototypeNetCode、v36/revision39及运行入口清单，人工结论来自用户反馈；完整静态证据与边界归保护专题及[运行入口](Runtime.md)；既有用户通过保持各自原版本/清单，未实际触发的独立用例仍UNKNOWN。
+
+## 【CURRENT STRATEGY】升级配方的收藏提示
+
+[收藏提示](MapInventoryFavoritesConsumptionHint.md)沿原ToolUpgradePanel两份ToolPreview缓存，Capture传入同一已应用Favorites；工具及升级启用、已持有且未满级时，读取当前级对应下一定义WoodQuantity/StoneQuantity的正成本，缺材料仍显示。未持有/满级/关闭隐藏；原6/7请求、等级/耐久/效率与CanUpgrade保持。随原数量/等级/耐久及Favorites.Revision刷新，GUI仅读缓存，两条可选行计入原总高度；没有服务端收藏状态或新反馈。本阶段v37/revision40人工GamePlayer待验收，工具升级旧通过仍限v21/revision24二十二项。

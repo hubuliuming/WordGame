@@ -34,6 +34,9 @@ namespace Code_01.CombatPrototype.Map
         private string _axeName, _pickaxeName, _axeStatus, _pickaxeStatus, _axeRecipe, _pickaxeRecipe;
         private string _axeMissing, _pickaxeMissing, _axeCraftTitle, _pickaxeCraftTitle, _axeButton, _pickaxeButton, _feedback;
         private int _woodQuantity = -1, _stoneQuantity = -1, _axeDurability = int.MinValue, _pickaxeDurability = int.MinValue;
+        private string _axeConsumptionHint, _pickaxeConsumptionHint;
+        private uint _favoritesRevision;
+        private int _consumptionHintRows;
         private int _lastInputFrame = -1;
         private bool _configured, _ready, _open, _craftAxe, _craftPickaxe, _mousePressAccepted;
         private bool _canCraftAxe, _canCraftPickaxe, _lastInventoryValid;
@@ -119,15 +122,16 @@ namespace Code_01.CombatPrototype.Map
             if (_details.Capture(_snapshot, _listView, axeLevel, pickaxeLevel, effectiveAxe, effectivePickaxe, capacityLevel))
                 _mousePressAccepted = _rowMousePressAccepted = false;
             _preferences.Capture(_listView, _search, _favorites);
-            _upgrade.Capture(_snapshot, capacityLevel, upgradeFeedback);
+            _upgrade.Capture(_snapshot, capacityLevel, upgradeFeedback, _favorites);
             _canCraftAxe = CanCraft(_axe, axeDurability);
             _canCraftPickaxe = CanCraft(_pickaxe, pickaxeDurability);
             _repair.Capture(_snapshot.WoodQuantity, _snapshot.StoneQuantity, _snapshot.InventoryValid, axeDurability, pickaxeDurability,
-                axeLevel, pickaxeLevel, effectiveAxe, effectivePickaxe);
-            _toolUpgrade.Capture(_snapshot, axeLevel, pickaxeLevel, effectiveAxe, effectivePickaxe, toolUpgradeFeedback);
+                axeLevel, pickaxeLevel, effectiveAxe, effectivePickaxe, _favorites);
+            _toolUpgrade.Capture(_snapshot, axeLevel, pickaxeLevel, effectiveAxe, effectivePickaxe, toolUpgradeFeedback, _favorites);
             if (_woodQuantity != _snapshot.WoodQuantity || _stoneQuantity != _snapshot.StoneQuantity ||
                 _axeDurability != axeDurability || _pickaxeDurability != pickaxeDurability ||
-                _axeLevel != axeLevel || _pickaxeLevel != pickaxeLevel || _lastInventoryValid != _snapshot.InventoryValid)
+                _axeLevel != axeLevel || _pickaxeLevel != pickaxeLevel || _lastInventoryValid != _snapshot.InventoryValid ||
+                _favoritesRevision != _favorites.Revision)
             {
                 _woodQuantity = _snapshot.WoodQuantity;
                 _stoneQuantity = _snapshot.StoneQuantity;
@@ -137,6 +141,11 @@ namespace Code_01.CombatPrototype.Map
                 _axeLevel = axeLevel; _pickaxeLevel = pickaxeLevel;
                 _axeStatus = ToolStatus(effectiveAxe, _axeName, axeDurability, axeLevel, axeStatus);
                 _pickaxeStatus = ToolStatus(effectivePickaxe, _pickaxeName, pickaxeDurability, pickaxeLevel, pickaxeStatus);
+                _favoritesRevision = _favorites.Revision;
+                _axeConsumptionHint = _toolSettings.Enabled != 0 && axeDurability < _axe.DurabilityCostPerCompletion ?
+                    _favorites.ConsumptionHint(_axe.CraftWoodQuantity, _axe.CraftStoneQuantity) : string.Empty;
+                _pickaxeConsumptionHint = _toolSettings.Enabled != 0 && pickaxeDurability < _pickaxe.DurabilityCostPerCompletion ?
+                    _favorites.ConsumptionHint(_pickaxe.CraftWoodQuantity, _pickaxe.CraftStoneQuantity) : string.Empty;
                 _axeRecipe = Recipe(_axe);
                 _pickaxeRecipe = Recipe(_pickaxe);
                 _axeMissing = Missing(_axe);
@@ -146,6 +155,10 @@ namespace Code_01.CombatPrototype.Map
                 _pickaxeButton = "2: " + (pickaxeDurability >= 0 && pickaxeDurability < _pickaxe.DurabilityCostPerCompletion ? _recraftLabel : _craftButton) + " " + _pickaxeName;
                 _pickaxeCraftTitle = _pickaxeName + "  " + Availability(_pickaxe, pickaxeDurability);
             }
+            var hintRows = (_axeConsumptionHint.Length != 0 ? 1 : 0) + (_pickaxeConsumptionHint.Length != 0 ? 1 : 0) +
+                _repair.ConsumptionHintRowCount + _upgrade.ConsumptionHintRowCount + _toolUpgrade.ConsumptionHintRowCount;
+            if (_consumptionHintRows != hintRows) _mousePressAccepted = _rowMousePressAccepted = false;
+            _consumptionHintRows = hintRows;
             _drop.Observe(dropFeedback);
             _feedback = string.IsNullOrEmpty(_drop.Feedback) ? feedback : _drop.Feedback;
             _ready = true;
@@ -282,7 +295,7 @@ namespace Code_01.CombatPrototype.Map
                 GUI.color = Color.white;
                 GUI.Label(new Rect(panel.x + 12f, panel.y + 12f, panel.width - 24f, _settings.RowHeightPixels), _title, _labelStyle);
                 var viewport = Viewport(panel);
-                var rows = Mathf.Max(_listView.Items.Count * (_favorites.Enabled ? 3 : 2), 1) + _favorites.CountRowCount + _listView.ControlRowCount + _search.RowCount + (PreferencesResetEnabled ? 1 : 0) + 14 + CombatPrototypeMapGatherToolRepairPanel.RowCount + CombatPrototypeMapInventoryCapacityUpgradePanel.RowCount + CombatPrototypeMapGatherToolUpgradePanel.RowCount + (_durabilityEnabled ? 2 : 0);
+                var rows = Mathf.Max(_listView.Items.Count * (_favorites.Enabled ? 3 : 2), 1) + _favorites.CountRowCount + _listView.ControlRowCount + _search.RowCount + (PreferencesResetEnabled ? 1 : 0) + 14 + CombatPrototypeMapGatherToolRepairPanel.RowCount + CombatPrototypeMapInventoryCapacityUpgradePanel.RowCount + CombatPrototypeMapGatherToolUpgradePanel.RowCount + (_durabilityEnabled ? 2 : 0) + _consumptionHintRows;
                 var contentWidth = viewport.width - 18f;
                 var content = new Rect(0f, 0f, contentWidth, rows * _settings.RowHeightPixels +
                     _details.ExtraHeight(contentWidth, _settings.RowHeightPixels, _labelStyle));
@@ -335,8 +348,8 @@ namespace Code_01.CombatPrototype.Map
             ToolLabel(width, ref y, _pickaxeStatus, _pickaxeDurabilityStatus.TextColor);
             if (_durabilityEnabled) Label(width, ref y, _pickaxeDurabilityStatus.Detail);
             Label(width, ref y, _craft);
-            DrawRecipe(width, ref y, _axeCraftTitle, _axeButton, _axeRecipe, _axeMissing, _canCraftAxe, true);
-            DrawRecipe(width, ref y, _pickaxeCraftTitle, _pickaxeButton, _pickaxeRecipe, _pickaxeMissing, _canCraftPickaxe, false);
+            DrawRecipe(width, ref y, _axeCraftTitle, _axeButton, _axeRecipe, _axeConsumptionHint, _axeMissing, _canCraftAxe, true);
+            DrawRecipe(width, ref y, _pickaxeCraftTitle, _pickaxeButton, _pickaxeRecipe, _pickaxeConsumptionHint, _pickaxeMissing, _canCraftPickaxe, false);
             _repair.Draw(width, ref y, _settings.RowHeightPixels, _labelStyle, _buttonStyle, _mousePressAccepted);
             _toolUpgrade.Draw(width, ref y, _settings.RowHeightPixels, _labelStyle, _buttonStyle, _mousePressAccepted);
         }
@@ -384,11 +397,12 @@ namespace Code_01.CombatPrototype.Map
             finally { GUI.color = oldColor; }
         }
 
-        private void DrawRecipe(float width, ref float y, string title, string button, string recipe, string missing,
+        private void DrawRecipe(float width, ref float y, string title, string button, string recipe, string consumptionHint, string missing,
             bool enabled, bool axe)
         {
             Label(width, ref y, title);
             Label(width, ref y, recipe);
+            if (consumptionHint.Length != 0) Label(width, ref y, consumptionHint);
             Label(width, ref y, missing);
             var oldEnabled = GUI.enabled;
             try
@@ -441,6 +455,8 @@ namespace Code_01.CombatPrototype.Map
             _feedback = _preferencesResetLabel = string.Empty;
             _woodQuantity = _stoneQuantity = -1;
             _axeDurability = _pickaxeDurability = int.MinValue;
+            _axeConsumptionHint = _pickaxeConsumptionHint = string.Empty;
+            _favoritesRevision = 0; _consumptionHintRows = 0;
             _lastInputFrame = -1;
             _lastInventoryValid = false;
             _levelLabel = _recraftLabel = string.Empty; _axeLevel = _pickaxeLevel = -1;

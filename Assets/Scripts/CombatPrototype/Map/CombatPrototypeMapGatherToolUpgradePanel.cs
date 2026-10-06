@@ -13,12 +13,14 @@ namespace Code_01.CombatPrototype.Map
         private readonly ToolPreview _pickaxe = new ToolPreview();
         private readonly CombatPrototypeMapGatherToolUpgradeFeedbackClient _feedback = new CombatPrototypeMapGatherToolUpgradeFeedbackClient();
         private string _heading, _levelLabel, _maxLevel, _buttonLabel, _woodLabel, _stoneLabel, _missing, _disabled, _notOwned, _ready;
+        public int ConsumptionHintRowCount => (_axe.ConsumptionHint.Length != 0 ? 1 : 0) + (_pickaxe.ConsumptionHint.Length != 0 ? 1 : 0);
         private bool _enabled;
 
         private sealed class ToolPreview
         {
             internal CombatPrototypeMapGatherToolUpgradeDefinition Second, Third;
-            internal string Name, Key, Title, DurabilityText, DurationText, Recipe, Missing, Button;
+            internal string Name, Key, Title, DurabilityText, DurationText, Recipe, Missing, Button, ConsumptionHint;
+            internal uint FavoritesRevision;
             internal float BaseDuration;
             internal int Level = -1, Durability = int.MinValue, Wood = -1, Stone = -1;
             internal bool InventoryValid, CanUpgrade, Pending;
@@ -51,23 +53,27 @@ namespace Code_01.CombatPrototype.Map
 
         public void Capture(CombatPrototypeMapInventoryPanelSnapshot snapshot, int axeLevel, int pickaxeLevel,
             CombatPrototypeMapGatherToolDefinition axe, CombatPrototypeMapGatherToolDefinition pickaxe,
-            CombatPrototypeMapToolUpgradeFeedback feedback)
+            CombatPrototypeMapToolUpgradeFeedback feedback, CombatPrototypeMapInventoryPanelFavorites favorites)
         {
             _feedback.Observe(feedback);
-            CaptureTool(_axe, snapshot, axeLevel, snapshot.AxeDurability, axe);
-            CaptureTool(_pickaxe, snapshot, pickaxeLevel, snapshot.PickaxeDurability, pickaxe);
+            CaptureTool(_axe, snapshot, axeLevel, snapshot.AxeDurability, axe, favorites);
+            CaptureTool(_pickaxe, snapshot, pickaxeLevel, snapshot.PickaxeDurability, pickaxe, favorites);
         }
 
         private void CaptureTool(ToolPreview preview, CombatPrototypeMapInventoryPanelSnapshot snapshot, int level, int durability,
-            CombatPrototypeMapGatherToolDefinition current)
+            CombatPrototypeMapGatherToolDefinition current, CombatPrototypeMapInventoryPanelFavorites favorites)
         {
             if (preview.Level == level && preview.Durability == durability && preview.Wood == snapshot.WoodQuantity &&
-                preview.Stone == snapshot.StoneQuantity && preview.InventoryValid == snapshot.InventoryValid) return;
+                preview.Stone == snapshot.StoneQuantity && preview.InventoryValid == snapshot.InventoryValid &&
+                preview.FavoritesRevision == favorites.Revision) return;
             preview.Level = level; preview.Durability = durability;
             preview.Wood = snapshot.WoodQuantity; preview.Stone = snapshot.StoneQuantity; preview.InventoryValid = snapshot.InventoryValid;
             var owned = durability >= 0;
             var max = level == CombatPrototypeMapGatherToolUtility.MaximumLevel;
             var next = level == 1 ? preview.Second : preview.Third;
+            preview.FavoritesRevision = favorites.Revision;
+            preview.ConsumptionHint = owned && !max && _enabled ?
+                favorites.ConsumptionHint(next.WoodQuantity, next.StoneQuantity) : string.Empty;
             preview.CanUpgrade = owned && !max && _enabled && snapshot.InventoryValid &&
                 preview.Wood >= next.WoodQuantity && preview.Stone >= next.StoneQuantity;
             var state = !_enabled || !snapshot.InventoryValid ? _disabled : !owned ? _notOwned :
@@ -103,6 +109,7 @@ namespace Code_01.CombatPrototype.Map
             Label(width, ref y, rowHeight, labelStyle, preview.DurabilityText);
             Label(width, ref y, rowHeight, labelStyle, preview.DurationText);
             Label(width, ref y, rowHeight, labelStyle, preview.Recipe);
+            if (preview.ConsumptionHint.Length != 0) Label(width, ref y, rowHeight, labelStyle, preview.ConsumptionHint);
             Label(width, ref y, rowHeight, labelStyle, preview.Missing);
             var oldEnabled = GUI.enabled;
             try
@@ -133,7 +140,8 @@ namespace Code_01.CombatPrototype.Map
         private static void ResetTool(ToolPreview preview)
         {
             preview.Second = preview.Third = default;
-            preview.Name = preview.Key = preview.Title = preview.DurabilityText = preview.DurationText = preview.Recipe = preview.Missing = preview.Button = string.Empty;
+            preview.Name = preview.Key = preview.Title = preview.DurabilityText = preview.DurationText = preview.Recipe = preview.Missing = preview.Button = preview.ConsumptionHint = string.Empty;
+            preview.FavoritesRevision = 0;
             preview.BaseDuration = 0f; preview.Level = preview.Wood = preview.Stone = -1; preview.Durability = int.MinValue;
             preview.InventoryValid = preview.CanUpgrade = preview.Pending = false;
         }

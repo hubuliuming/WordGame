@@ -92,5 +92,7 @@ namespace Code_01.CombatPrototype.Map
         public string favoritesCountLabel;
         public bool favoritesDropProtectionEnabled;
         public string favoritesProtectedLabel;
+        public bool favoritesConsumptionHintEnabled;
+        public string favoritesConsumptionHintLabel;
     }
 }

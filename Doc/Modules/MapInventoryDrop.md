@@ -21,7 +21,7 @@
 
 ## 【FACT】JSON契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=36/configRevision=39。inventoryDrop全部字段必填，沿原严格UTF-8/缺失/未知/重复字段及类型检查；旧v1～v35明确失败，不补段或回退来源。disabled仍校验全部字段与资源绑定；正常导入/烘焙后生效，没有运行热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=37/configRevision=40。inventoryDrop全部字段必填，沿原严格UTF-8/缺失/未知/重复字段及类型检查；旧v1～v36明确失败，不补段或回退来源。disabled仍校验全部字段与资源绑定；正常导入/烘焙后生效，没有运行热重载。
 
 | 字段 | 默认值 | 契约 |
 |---|---|---|
@@ -98,7 +98,7 @@ v26/revision29的[地面合并](MapDropMerge.md)只处理已登记Landed物，�
 
 ## 【FACT】丢弃堆的按容量领取
 
-当前v36/revision39的[部分拾取](MapDropPartialPickup.md)适用于原Drop/All落地物；默认G只领取当前总量/单种余量可容纳的部分，原大堆不按99钳制或新建拆分实体，剩余量保留原身份/期限。丢弃数量、保存/激活/回滚与反馈保持；partialPickupEnabled独立于丢弃及敌人掉落开关，静态及用户人工通过限v27/revision30十六项，未触发独立用例UNKNOWN。
+当前v37/revision40的[部分拾取](MapDropPartialPickup.md)适用于原Drop/All落地物；默认G只领取当前总量/单种余量可容纳的部分，原大堆不按99钳制或新建拆分实体，剩余量保留原身份/期限。丢弃数量、保存/激活/回滚与反馈保持；partialPickupEnabled独立于丢弃及敌人掉落开关，静态及用户人工通过限v27/revision30十六项，未触发独立用例UNKNOWN。
 
 搜索仅改变可见行，原DrawRow继续按真实Row.Name解析Kind/Mode；搜索变化引起身份/顺序/数目变化时沿原许可取消未完成行点击，搜索不清已排队请求；未消费请求另按[收藏保护](MapInventoryFavoritesDropProtection.md)复核，已消费到PlayerInput的请求保持。搜索静态及用户人工GamePlayer通过，限v29/revision32及运行入口十六项，结论来自用户反馈；未实际触发的独立点击/丢弃用例UNKNOWN，服务端丢弃事务保持。
 
@@ -106,4 +106,8 @@ v26/revision29的[地面合并](MapDropMerge.md)只处理已登记Landed物，�
 
 ## 【CURRENT STRATEGY】收藏保护与已提交请求
 
-当前v36/revision39的[收藏保护](MapInventoryFavoritesDropProtection.md)：保护在客户端原B面板绘制和未消费请求两处执行，优先保留丢弃关闭/不支持条目的Unavailable。保护拦截不调用服务器、不产生新丢弃反馈，也不扣库存或创建地面物；已经写入PlayerInput的请求由原服务端资格、保存/准备态事务与反馈最终处理。 本阶段十六项人工GamePlayer待验收，完整静态证据与边界归保护专题及[运行入口](Runtime.md)；既有用户通过保持各自原版本/清单，未实际触发的独立用例仍UNKNOWN。
+v36/revision39保护阶段的[收藏保护](MapInventoryFavoritesDropProtection.md)：保护在客户端原B面板绘制和未消费请求两处执行，优先保留丢弃关闭/不支持条目的Unavailable。保护拦截不调用服务器、不产生新丢弃反馈，也不扣库存或创建地面物；已经写入PlayerInput的请求由原服务端资格、保存/准备态事务与反馈最终处理。 本阶段十六项人工GamePlayer已获用户通过反馈，主线程结合既有静态核对判定通过，限CombatPrototypeNetCode、v36/revision39及运行入口清单，人工结论来自用户反馈；完整静态证据与边界归保护专题及[运行入口](Runtime.md)；既有用户通过保持各自原版本/清单，未实际触发的独立用例仍UNKNOWN。
+
+## 【CURRENT STRATEGY】收藏材料消耗提示
+
+当前v37/revision40的[收藏材料消耗提示](MapInventoryFavoritesConsumptionHint.md)复用原B面板七份木石配方和已应用Favorites.IsFavorite真实Name；只在对应操作有有效配方且正成本材料已收藏时，于配方下加一行缓存只读文字，材料不足仍提示。隐藏/数量归零/仅看收藏/搜索不改变配方提示，取消或Reset实际应用后下一有效Show刷新。共0～7行计入原滚动高度，提示总高度变化清旧鼠标许可，不清已排队业务请求；原按钮资格、1～7/E/F/G、服务端扣料/保存及全部反馈保持。本阶段人工GamePlayer待验收，旧保护通过限v36/revision39十六项，其他旧阶段保持原版本/清单。

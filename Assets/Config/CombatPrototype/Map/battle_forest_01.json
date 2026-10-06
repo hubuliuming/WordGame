@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 36,
-  "configRevision": 39,
+  "schemaVersion": 37,
+  "configRevision": 40,
   "mapDefinitionId": "battle_forest_01",
   "defaultSeed": 12345,
   "resourcePersistence": {
@@ -367,7 +367,9 @@
     "favoritesCountEnabled": true,
     "favoritesCountLabel": "Favorites",
     "favoritesDropProtectionEnabled": true,
-    "favoritesProtectedLabel": "Favorite protected"
+    "favoritesProtectedLabel": "Favorite protected",
+    "favoritesConsumptionHintEnabled": true,
+    "favoritesConsumptionHintLabel": "Uses favorites"
   },
   "inventoryCapacity": {
     "enabled": true,

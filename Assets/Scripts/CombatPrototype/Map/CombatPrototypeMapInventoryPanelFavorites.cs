@@ -13,10 +13,13 @@ namespace Code_01.CombatPrototype.Map
         private readonly List<CombatPrototypeMapInventoryPanelSnapshot.Row> _ordinary =
             new List<CombatPrototypeMapInventoryPanelSnapshot.Row>();
         private readonly Dictionary<FixedString64Bytes, string> _markedText = new Dictionary<FixedString64Bytes, string>();
+        private static readonly FixedString64Bytes Wood = new FixedString64Bytes(Msg.ItemName.木材);
+        private static readonly FixedString64Bytes Stone = new FixedString64Bytes(Msg.ItemName.石材);
         private FixedString64Bytes _pendingName;
         private string _favorite, _unfavorite, _tag, _full, _countLabel;
         private int _maximum;
-        private bool _pending, _countEnabled;
+        private bool _pending, _countEnabled, _consumptionHintEnabled;
+        private string _consumptionHintLabel, _woodLabel, _stoneLabel;
 
         public bool Enabled { get; private set; }
         public bool HasPending => _pending;
@@ -36,6 +39,9 @@ namespace Code_01.CombatPrototype.Map
             _full = settings.FavoritesFullLabel.ToString();
             _countEnabled = Enabled && settings.FavoritesCountEnabled != 0;
             _countLabel = settings.FavoritesCountLabel.ToString();
+            _consumptionHintEnabled = Enabled && settings.FavoritesConsumptionHintEnabled != 0;
+            _consumptionHintLabel = settings.FavoritesConsumptionHintLabel.ToString();
+            _woodLabel = settings.WoodLabel.ToString(); _stoneLabel = settings.StoneLabel.ToString();
             UpdateCountText();
         }
 
@@ -96,6 +102,17 @@ namespace Code_01.CombatPrototype.Map
         public string ItemText(CombatPrototypeMapInventoryPanelSnapshot.Row row) =>
             Enabled && _names.Contains(row.Name) ? _markedText[row.Name] : row.Text;
 
+        // Called by cached recipe previews during Capture; GUI only reads the resulting text.
+        public string ConsumptionHint(int woodCost, int stoneCost)
+        {
+            if (!_consumptionHintEnabled) return string.Empty;
+            var wood = woodCost > 0 && IsFavorite(Wood);
+            var stone = stoneCost > 0 && IsFavorite(Stone);
+            if (!wood && !stone) return string.Empty;
+            return _consumptionHintLabel + ": " + (wood ? _woodLabel : _stoneLabel) +
+                (wood && stone ? ", " + _stoneLabel : string.Empty);
+        }
+
         public void CopyNames(List<string> destination)
         {
             destination.Clear();
@@ -147,10 +164,11 @@ namespace Code_01.CombatPrototype.Map
         {
             ClearPending();
             _names.Clear(); _ordinary.Clear(); _markedText.Clear();
-            Enabled = _countEnabled = false;
+            Enabled = _countEnabled = _consumptionHintEnabled = false;
             Revision = 0;
             _maximum = 0;
             _favorite = _unfavorite = _tag = _full = _countLabel = CountText = string.Empty;
+            _consumptionHintLabel = _woodLabel = _stoneLabel = string.Empty;
         }
     }
 }

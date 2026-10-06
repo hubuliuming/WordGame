@@ -1,6 +1,6 @@
 # 背包容量扩展与升级
 
-返回[背包](Inventory.md)、[地图](Map.md)与[材料容量](MapInventoryCapacity.md)。本专题负责 CombatPrototypeNetCode 的个人永久容量等级、升级配方、所属反馈和 B/5 输入。玩家文件的唯一契约归[资源与数据](DataResources.md)，人工清单归[运行入口](Runtime.md)。当前地图 schemaVersion=36/configRevision=39；用户已确认人工GamePlayer通过，限v20/revision23升级十六项。
+返回[背包](Inventory.md)、[地图](Map.md)与[材料容量](MapInventoryCapacity.md)。本专题负责 CombatPrototypeNetCode 的个人永久容量等级、升级配方、所属反馈和 B/5 输入。玩家文件的唯一契约归[资源与数据](DataResources.md)，人工清单归[运行入口](Runtime.md)。当前地图 schemaVersion=37/configRevision=40；用户已确认人工GamePlayer通过，限v20/revision23升级十六项。
 
 ## 【FACT】入口与职责
 
@@ -110,4 +110,8 @@ v35/revision38计数阶段的[收藏计数](MapInventoryFavoritesCount.md)：计
 
 ## 【FACT】收藏保护与容量升级
 
-当前v36/revision39的[收藏保护](MapInventoryFavoritesDropProtection.md)：收藏材料仍计完整容量并参与原扩容配方/5资格，容量等级与服务端保存链保持；收藏丢弃保护不限制原扩容消耗。 本阶段十六项人工GamePlayer待验收，完整静态证据与边界归保护专题及[运行入口](Runtime.md)；既有用户通过保持各自原版本/清单，未实际触发的独立用例仍UNKNOWN。
+v36/revision39保护阶段的[收藏保护](MapInventoryFavoritesDropProtection.md)：收藏材料仍计完整容量并参与原扩容配方/5资格，容量等级与服务端保存链保持；收藏丢弃保护不限制原扩容消耗。 本阶段十六项人工GamePlayer已获用户通过反馈，主线程结合既有静态核对判定通过，限CombatPrototypeNetCode、v36/revision39及运行入口清单，人工结论来自用户反馈；完整静态证据与边界归保护专题及[运行入口](Runtime.md)；既有用户通过保持各自原版本/清单，未实际触发的独立用例仍UNKNOWN。
+
+## 【CURRENT STRATEGY】容量升级配方的收藏提示
+
+[收藏提示](MapInventoryFavoritesConsumptionHint.md)沿原CapacityUpgradePanel.Capture读取实际当前级的下一定义WoodQuantity/StoneQuantity和同一已应用Favorites。容量与升级均开启、未满级且正成本材料已收藏时显示一行缓存文字，材料不足仍显示；满级/关闭隐藏。原等级/配方/CanUpgrade、5与一次按钮请求/所属结果及完整候选保存保持；GUI行与Panel滚动总高度共用可选行计数。当前v37/revision40人工GamePlayer待验收，升级旧通过仍限v20/revision23十六项。

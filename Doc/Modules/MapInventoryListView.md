@@ -1,6 +1,6 @@
 # 背包材料排序与筛选
 
-返回[地图](Map.md)、[背包](Inventory.md)、[B面板](MapInventoryPanel.md)、[容量](MapInventoryCapacity.md)、[丢弃](MapInventoryDrop.md)、[配置](DataResources.md)与[运行入口](Runtime.md)。入口CombatPrototypeNetCode，Forest/Grassland Json/BuiltIn当前schemaVersion=36/configRevision=39；下述排序筛选静态及人工结论来自v28/revision31阶段。用户已确认该阶段人工GamePlayer通过，主线程结合既有静态核对与用户反馈判定通过，限v28/revision31及运行入口十六项，人工结论来自用户反馈。旧部分拾取用户通过限v27/revision30十六项，旧面板/丢弃/容量/工具通过保持原版本/清单。
+返回[地图](Map.md)、[背包](Inventory.md)、[B面板](MapInventoryPanel.md)、[容量](MapInventoryCapacity.md)、[丢弃](MapInventoryDrop.md)、[配置](DataResources.md)与[运行入口](Runtime.md)。入口CombatPrototypeNetCode，Forest/Grassland Json/BuiltIn当前schemaVersion=37/configRevision=40；下述排序筛选静态及人工结论来自v28/revision31阶段。用户已确认该阶段人工GamePlayer通过，主线程结合既有静态核对与用户反馈判定通过，限v28/revision31及运行入口十六项，人工结论来自用户反馈。旧部分拾取用户通过限v27/revision30十六项，旧面板/丢弃/容量/工具通过保持原版本/清单。
 
 ## 【FACT】文件与配置
 
@@ -36,9 +36,9 @@ v28排序筛选阶段七个现有脚本接入，新ListView是普通客户端C#�
 }
 ```
 
-当前配置与原Settings各87字段：DTO十五bool、六float、三int、两模式string、60文案string及一文件ID；Settings十五byte、六float、三int、两byte枚举及61 FixedString64Bytes；搜索七字段归[搜索](MapInventorySearch.md)，偏好四字段及重置两字段归[本机偏好](MapInventoryPreferences.md)，0 GhostField且无GhostComponent。sortEnabled/filterEnabled只控制两种展示能力；关闭排序强制original并隐藏排序按钮，关闭筛选强制all并隐藏筛选按钮，两者关闭时分类为all、排序为original，仍应用搜索和启用的独立收藏条件。地图Settings仍保存已配置默认模式，强制显示模式在客户端Configure及显式ResetDisplay应用。
+当前配置与原Settings各89字段：DTO十六bool、六float、三int、两模式string、61文案string及一文件ID；Settings十六byte、六float、三int、两byte枚举及62 FixedString64Bytes；搜索七字段归[搜索](MapInventorySearch.md)，偏好四字段及重置两字段归[本机偏好](MapInventoryPreferences.md)，0 GhostField且无GhostComponent。sortEnabled/filterEnabled只控制两种展示能力；关闭排序强制original并隐藏排序按钮，关闭筛选强制all并隐藏筛选按钮，两者关闭时分类为all、排序为original，仍应用搜索和启用的独立收藏条件。地图Settings仍保存已配置默认模式，强制显示模式在客户端Configure及显式ResetDisplay应用。
 
-defaultSortMode仅original/type/quantity，defaultFilterMode仅all/resources/supplies/other，大小写与空格严格匹配，不修剪/转换未知值。两模式ID通过共用Resolver校验/烘焙；十新文案沿原非空白、无控制字符且最多61 UTF-8字节。关闭任一能力、面板或全部显示仍检查全部字段与语义。原Reader保留UTF-8/完整对象、缺失/null/错误类型/未知或重复键检查；当前仅schema36，revision/seed须正数，旧v1～v35拒绝，无补默认、来源回退或运行热重载。正常导入/烘焙后生效，各端同版代码/配置并重新烘焙。
+defaultSortMode仅original/type/quantity，defaultFilterMode仅all/resources/supplies/other，大小写与空格严格匹配，不修剪/转换未知值。两模式ID通过共用Resolver校验/烘焙；十新文案沿原非空白、无控制字符且最多61 UTF-8字节。关闭任一能力、面板或全部显示仍检查全部字段与语义。原Reader保留UTF-8/完整对象、缺失/null/错误类型/未知或重复键检查；当前仅schema37，revision/seed须正数，旧v1～v36拒绝，无补默认、来源回退或运行热重载。正常导入/烘焙后生效，各端同版代码/配置并重新烘焙。
 
 ## 【CURRENT STRATEGY】完整库存与显示投影
 
@@ -93,7 +93,7 @@ v33/revision36收藏阶段在最新分类/搜索可见行建立后消费收藏�
 
 ## 【CURRENT STRATEGY】收藏条件与刷新
 
-当前v36/revision39增加独立FavoritesOnly布尔值；GUI QueueFavoritesFilter只排队，下一有效Capture在搜索/原模式应用后切换一次。先建立最新分类×搜索×收藏条件可见行，再消费同Name收藏请求；仅看收藏时再原地移除取消收藏的行，随后原排序、稳定收藏分组及标记缓存照常运行。待Name不在最新交集则丢弃，身份比较及Details.Capture沿原真实Name规则；收藏Revision或模式实际变化使缓存重建。
+当前v37/revision40增加独立FavoritesOnly布尔值；GUI QueueFavoritesFilter只排队，下一有效Capture在搜索/原模式应用后切换一次。先建立最新分类×搜索×收藏条件可见行，再消费同Name收藏请求；仅看收藏时再原地移除取消收藏的行，随后原排序、稳定收藏分组及标记缓存照常运行。待Name不在最新交集则丢弃，身份比较及Details.Capture沿原真实Name规则；收藏Revision或模式实际变化使缓存重建。
 
 控制开启条件为FavoritesEnabled且FavoritesFilterEnabled，与原分类开关无依赖；关闭强制FavoritesOnly=false。模式实际变化归零滚动并取消两种旧鼠标许可，原排序/搜索许可保持；ClearPending同时清新待切换，原无效ReadInput只额外清新请求。Close保留已应用值，ResetDisplay恢复配置默认值；绑定Reset清缓存。完整本机保存与人工范围归[收藏筛选](MapInventoryFavoritesFilter.md)，当前阶段十六项已获用户通过反馈，限v34/revision37及运行入口清单；未触发独立用例仍UNKNOWN。
 
@@ -103,4 +103,8 @@ v35/revision38计数阶段的[收藏计数](MapInventoryFavoritesCount.md)由原
 
 ## 【FACT】收藏保护与可见身份
 
-当前v36/revision39的[收藏保护](MapInventoryFavoritesDropProtection.md)：ListView代码保持，分类/搜索/仅看收藏交集与稳定置顶仍只决定可见行。DropClient以可见Row.Name检查原IsFavorite，操作行固定高度；排序/行身份变化不会把保护绑定到显示名或索引。显示方法不清已排队业务，消费前复核归DropClient。 本阶段十六项人工GamePlayer待验收，完整静态证据与边界归保护专题及[运行入口](Runtime.md)；既有用户通过保持各自原版本/清单，未实际触发的独立用例仍UNKNOWN。
+v36/revision39保护阶段的[收藏保护](MapInventoryFavoritesDropProtection.md)：ListView代码保持，分类/搜索/仅看收藏交集与稳定置顶仍只决定可见行。DropClient以可见Row.Name检查原IsFavorite，操作行固定高度；排序/行身份变化不会把保护绑定到显示名或索引。显示方法不清已排队业务，消费前复核归DropClient。 本阶段十六项人工GamePlayer已获用户通过反馈，主线程结合既有静态核对判定通过，限CombatPrototypeNetCode、v36/revision39及运行入口清单，人工结论来自用户反馈；完整静态证据与边界归保护专题及[运行入口](Runtime.md)；既有用户通过保持各自原版本/清单，未实际触发的独立用例仍UNKNOWN。
+
+## 【CURRENT STRATEGY】收藏材料消耗提示
+
+当前v37/revision40的[收藏材料消耗提示](MapInventoryFavoritesConsumptionHint.md)复用原B面板七份木石配方和已应用Favorites.IsFavorite真实Name；只在对应操作有有效配方且正成本材料已收藏时，于配方下加一行缓存只读文字，材料不足仍提示。隐藏/数量归零/仅看收藏/搜索不改变配方提示，取消或Reset实际应用后下一有效Show刷新。共0～7行计入原滚动高度，提示总高度变化清旧鼠标许可，不清已排队业务请求；原按钮资格、1～7/E/F/G、服务端扣料/保存及全部反馈保持。本阶段人工GamePlayer待验收，旧保护通过限v36/revision39十六项，其他旧阶段保持原版本/清单。

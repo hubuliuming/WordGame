@@ -14,6 +14,9 @@ namespace Code_01.CombatPrototype.Map
         private string _heading, _levelLabel, _maxLevel, _capacity, _unlimited, _appleLabel, _woodLabel, _stoneLabel;
         private string _missingLabel, _disabledLabel, _readyLabel, _buttonLabel;
         private string _levelText, _totalText, _appleText, _woodText, _stoneText, _recipeText, _missingText, _button;
+        private string _consumptionHint;
+        private uint _favoritesRevision;
+        public int ConsumptionHintRowCount => _consumptionHint.Length != 0 ? 1 : 0;
         private int _level = -1, _wood = -1, _stone = -1;
         private bool _capacityEnabled, _upgradeEnabled, _inventoryValid, _canUpgrade, _request;
 
@@ -37,15 +40,18 @@ namespace Code_01.CombatPrototype.Map
         }
 
         public void Capture(CombatPrototypeMapInventoryPanelSnapshot snapshot, int level,
-            CombatPrototypeMapInventoryCapacityUpgradeFeedback feedback)
+            CombatPrototypeMapInventoryCapacityUpgradeFeedback feedback, CombatPrototypeMapInventoryPanelFavorites favorites)
         {
             _feedback.Observe(feedback);
             if (_level == level && _wood == snapshot.WoodQuantity && _stone == snapshot.StoneQuantity &&
-                _inventoryValid == snapshot.InventoryValid) return;
+                _inventoryValid == snapshot.InventoryValid && _favoritesRevision == favorites.Revision) return;
             CombatPrototypeMapInventoryCapacityUtility.ValidateLevel(level);
             _level = level; _wood = snapshot.WoodQuantity; _stone = snapshot.StoneQuantity; _inventoryValid = snapshot.InventoryValid;
             var max = level == CombatPrototypeMapInventoryCapacityUtility.MaximumLevel;
             var next = level == 1 ? _second : _third;
+            _favoritesRevision = favorites.Revision;
+            _consumptionHint = !max && _capacityEnabled && _upgradeEnabled ?
+                favorites.ConsumptionHint(next.WoodQuantity, next.StoneQuantity) : string.Empty;
             _canUpgrade = !max && _capacityEnabled && _upgradeEnabled && _inventoryValid &&
                 _wood >= next.WoodQuantity && _stone >= next.StoneQuantity;
             var state = !_capacityEnabled || !_upgradeEnabled || !_inventoryValid ? _disabledLabel :
@@ -74,6 +80,7 @@ namespace Code_01.CombatPrototype.Map
             Label(width, ref y, rowHeight, labelStyle, _woodText);
             Label(width, ref y, rowHeight, labelStyle, _stoneText);
             Label(width, ref y, rowHeight, labelStyle, _recipeText);
+            if (_consumptionHint.Length != 0) Label(width, ref y, rowHeight, labelStyle, _consumptionHint);
             Label(width, ref y, rowHeight, labelStyle, _missingText);
             var oldEnabled = GUI.enabled;
             try
@@ -101,6 +108,7 @@ namespace Code_01.CombatPrototype.Map
             _heading = _levelLabel = _maxLevel = _capacity = _unlimited = _appleLabel = _woodLabel = _stoneLabel = string.Empty;
             _missingLabel = _disabledLabel = _readyLabel = _buttonLabel = string.Empty;
             _levelText = _totalText = _appleText = _woodText = _stoneText = _recipeText = _missingText = _button = string.Empty;
+            _consumptionHint = string.Empty; _favoritesRevision = 0;
             _level = _wood = _stone = -1;
             _capacityEnabled = _upgradeEnabled = _inventoryValid = _canUpgrade = _request = false;
         }

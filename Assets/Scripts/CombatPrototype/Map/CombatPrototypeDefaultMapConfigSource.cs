@@ -17,7 +17,7 @@ namespace Code_01.CombatPrototype.Map
             {
                 map = new MapDefinitionConfig
                 {
-                    schemaVersion = 36, configRevision = 39,
+                    schemaVersion = 37, configRevision = 40,
                     mapDefinitionId = mapDefinitionId, defaultSeed = 12345,
                     resourcePersistence = new MapResourcePersistenceConfig
                     {
@@ -247,7 +247,9 @@ namespace Code_01.CombatPrototype.Map
                         favoritesCountEnabled = true,
                         favoritesCountLabel = "Favorites",
                         favoritesDropProtectionEnabled = true,
-                        favoritesProtectedLabel = "Favorite protected"
+                        favoritesProtectedLabel = "Favorite protected",
+                        favoritesConsumptionHintEnabled = true,
+                        favoritesConsumptionHintLabel = "Uses favorites"
                     },
                     inventoryCapacity = new MapInventoryCapacityConfig
                     {

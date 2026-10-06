@@ -1204,9 +1204,9 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 
 共515项；完整计数/配置/生命周期归[收藏计数](MapInventoryFavoritesCount.md)，收藏容量归[收藏](MapInventoryFavorites.md)，交集归[收藏筛选](MapInventoryFavoritesFilter.md)，业务入口归[B面板](MapInventoryPanel.md)。本阶段十六项人工GamePlayer已获用户通过反馈，主线程结合既有静态核对判定通过，限CombatPrototypeNetCode、v35/revision38及运行入口清单，人工结论来自用户反馈；未实际触发的独立用例仍UNKNOWN；AI未执行计数/Favorites/ListView/Panel/Preferences/GUI业务、真实偏好或游戏存档I/O、GamePlayer/PlayMode、逻辑单元测试、命令行构建/发布、采样或图片，未创建子Agent、暂存或提交Git；独立交互/生命周期/文件/故障/字形/联网用例及性能/平台/线上仍UNKNOWN。
 
-## 【KNOWN ISSUES】收藏材料丢弃保护人工GamePlayer清单（v36/revision39，待验收）
+## 【KNOWN ISSUES】收藏材料丢弃保护人工GamePlayer清单（v36/revision39，人工验收通过）
 
-入口CombatPrototypeNetCode、原B面板；本阶段十六项尚未获人工通过结论。此前515项内容/编号及用户通过范围保持，收藏计数通过仍限v35/revision38十六项；未实际触发的独立用例为UNKNOWN。
+入口CombatPrototypeNetCode、原B面板；本阶段十六项人工GamePlayer已获用户通过反馈，主线程结合既有静态核对判定通过，限CombatPrototypeNetCode、v36/revision39及运行入口清单，人工结论来自用户反馈。此前515项内容/编号及用户通过范围保持，收藏计数通过仍限v35/revision38十六项；未实际触发的独立用例为UNKNOWN。
 
 1. 两地图Json/BuiltIn一致v36/revision39，inventoryPanel87字段；新保护开关严格bool、文案非空白/无控制且最多61 UTF-8字节，旧v1～v35/未来版本及缺失/错类型失败，关闭仍完整验证；各端同版导入/烘焙。
 2. 默认收藏支持的活力苹果/木材/石材，在收藏实际应用后的有效Show以只读Favorite protected替代原Drop/All行，不排队丢弃、不扣库存或新增地面物；不支持或丢弃关闭优先沿Unavailable，未触发UNKNOWN。
@@ -1225,4 +1225,27 @@ Unity 编译、树木显式资源绑定、两种模板的隔离 Editor 烘焙、
 15. 原操作行固定高度、材料滚动/搜索IME/焦点/指针隔离、收藏/详情按钮与固定页脚正确；默认/最小面板、字号/行高及保护文案ASCII61/UTF-8 61/中文、真实字形/裁切/分辨率未遍历UNKNOWN。
 16. 原F/G/B/E/R/F5/1～7、采集/砍树/采矿/再生、掉落合并/部分拾取、制作/修理/两升级与战斗/镜头回归；输入19/Drop请求2/偏好v3七字段/玩家v4/世界v2保持，保护仅本机已应用集合，多人/预测/延迟与性能/平台/线上未触发UNKNOWN。
 
-共531项；完整配置/行绘制/消费前检查/生命周期归[收藏保护](MapInventoryFavoritesDropProtection.md)，原丢弃事务归[丢弃](MapInventoryDrop.md)。当前十六项人工GamePlayer待验收；AI未执行保护/收藏/列表/面板/偏好/GUI业务、实际偏好或游戏存档I/O、GamePlayer/PlayMode、逻辑单元测试、命令行构建/发布、采样或图片，未创建子Agent、暂存或提交Git。
+共531项；完整配置/行绘制/消费前检查/生命周期归[收藏保护](MapInventoryFavoritesDropProtection.md)，原丢弃事务归[丢弃](MapInventoryDrop.md)。本阶段十六项人工GamePlayer已获用户通过反馈，主线程结合既有静态核对判定通过，限CombatPrototypeNetCode、v36/revision39及运行入口清单，人工结论来自用户反馈；未实际触发的独立用例仍UNKNOWN；AI未执行保护/收藏/列表/面板/偏好/GUI业务、实际偏好或游戏存档I/O、GamePlayer/PlayMode、逻辑单元测试、命令行构建/发布、采样或图片，未创建子Agent、暂存或提交Git。
+
+## 【KNOWN ISSUES】收藏材料消耗提示人工GamePlayer清单（v37/revision40，待验收）
+
+入口CombatPrototypeNetCode、原B面板；本阶段十六项尚未获人工通过结论。原531项内容/编号及各阶段用户通过范围保持，收藏保护通过仍限v36/revision39十六项；未实际触发的独立用例UNKNOWN。
+
+1. 两地图Json/BuiltIn一致v37/revision40、inventoryPanel89字段；提示开关严格bool、文案非空白/无控制且最多61 UTF-8字节，缺失/null/错类型/未知或重复键、旧v1～v36/未来版本失败，关闭仍全量验证；各端同版导入/烘焙。
+2. 仅收藏木材时，七份适用配方中正木材成本显示Uses favorites: Wood；仅收藏石材显示Stone、两者均收藏显示Wood, Stone；真实Name决定匹配，显示别名/同显示标签不串材料，实际组合未触发UNKNOWN。
+3. 未持有/损坏斧头和镐子按原Lv1制作/重做成本显示；已持有可用工具或工具关闭隐藏制作提示，损坏高等级重做仍为满Lv1原配方，1/2与按钮资格/反馈保持，独立状态未触发UNKNOWN。
+4. 修理按当前实际级Repair成本/MaxDurability显示；已持有且未满耐久适用，未持有/满耐久/工具或修理关闭隐藏，耐久0仍沿原修理，3/4不新增确认/拦截，独立状态未触发UNKNOWN。
+5. 背包升级按实际当前级下一容量定义显示，Lv1→2与Lv2→3成本正确；满级/容量关闭/升级关闭隐藏，5与候选保存/等级/容量规则保持，独立分支未触发UNKNOWN。
+6. 工具升级按各工具当前级下一定义成本显示，Lv1→2与Lv2→3正确；未持有/满级/工具或升级关闭隐藏，已持有损坏工具沿原升级资格，6/7与实际耐久/效率保持，独立状态未触发UNKNOWN。
+7. 原配方正成本材料已收藏但库存不足/归零仍显示提示，原Missing数量及按钮禁用保持；非法库存仍沿原Snapshot错误与资格处理，不用提示修正材料，独立条目失败未触发UNKNOWN。
+8. 配置某材料成本为0时不把该材料计入收藏提示；仍按各原配方合法性规则导入，同份配方只显示另一正成本收藏材料，没有正成本收藏材料时隐藏，独立合法配方组合未触发UNKNOWN。
+9. 分类/排序/搜索/仅看收藏/隐藏行只改变材料列表，七份配方读完整库存及原已应用集合；收藏Name暂不存在/数量归零仍保留并提示原正成本，显示别名、行重排与重复标签未触发UNKNOWN。
+10. 实际取消收藏或Reset view清启用集合后，下一有效Show刷新全部相关缓存/可选行；GUI收藏/重置仅排队、未应用前读旧集合，默认筛选/空态/详情/原偏好提交保持，时序未触发UNKNOWN。
+11. favoritesConsumptionHintEnabled=false或favoritesEnabled=false隐藏全部新增行；关闭计数/收藏筛选/丢弃保护/排序/分类/搜索/详情/偏好/重置按钮仍可提示启用收藏配方，各组合未遍历UNKNOWN。
+12. favoritesDropProtectionEnabled=true继续保护原收藏材料Drop/All及未消费丢弃请求；提示不解除保护、不阻止原制作/修理/两升级消耗收藏木石，成功/失败仍沿原保存事务及反馈，独立事务分支未触发UNKNOWN。
+13. 合法偏好恢复/当前绑定临时已应用集合均用于提示，读取不新增写盘；原v1/v2/v3兼容、偏好关闭或I/O暂停、Reset原延迟提交/故障规则保持，真实迁移/I/O用例未触发UNKNOWN。
+14. 0～7新增固定行放在对应配方下、缺料行前；滚动可到末尾，固定标题/页脚及搜索字段命中正确。提示总高度变化取消旧鼠标许可，不清已排队业务请求，按下/抬起跨Show时序未触发UNKNOWN。
+15. B关闭/逐帧Clear/死亡/断线/地图源或所属玩家变化/World或Scene释放沿原生命周期处理，新绑定清缓存后按合法配置/偏好重建；默认/最小面板、字号/行高/ASCII61/UTF-8 61/中文文案、字形/裁切/分辨率未遍历UNKNOWN。
+16. 原B/1～7/E/F/G/R/F5、采集/砍树/采矿/再生、掉落合并/部分拾取、战斗/镜头回归；提示只覆盖B七份配方，无新弹窗/二次确认/RPC/输入/Ghost/保存字段。输入19/Tools3/Drop请求2/偏好v3七字段/玩家v4/世界v2保持，多人/预测/延迟与性能/平台/线上未触发UNKNOWN。
+
+共547项；完整当前契约、缓存/行数/业务边界及静态证据归[收藏提示](MapInventoryFavoritesConsumptionHint.md)，本阶段十六项人工GamePlayer待验收。AI未执行收藏/配方/面板/GUI业务、实际偏好或游戏存档I/O、GamePlayer/PlayMode、逻辑单元测试、命令行构建/发布、性能采样或图片，未创建子Agent、暂存或提交Git。

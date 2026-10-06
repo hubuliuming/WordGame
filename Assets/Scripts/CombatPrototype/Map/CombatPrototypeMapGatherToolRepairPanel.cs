@@ -7,6 +7,9 @@ namespace Code_01.CombatPrototype.Map
     internal sealed class CombatPrototypeMapGatherToolRepairPanel
     {
         public const int RowCount = 11;
+        private string _axeConsumptionHint, _pickaxeConsumptionHint;
+        private uint _favoritesRevision;
+        public int ConsumptionHintRowCount => (_axeConsumptionHint.Length != 0 ? 1 : 0) + (_pickaxeConsumptionHint.Length != 0 ? 1 : 0);
         private string _levelLabel;
         private int _axeLevel = -1, _pickaxeLevel = -1;
         private CombatPrototypeMapGatherToolSettings _settings;
@@ -33,13 +36,23 @@ namespace Code_01.CombatPrototype.Map
         }
 
         public void Capture(int wood, int stone, bool inventoryValid, int axeDurability, int pickaxeDurability,
-            int axeLevel, int pickaxeLevel, CombatPrototypeMapGatherToolDefinition axe, CombatPrototypeMapGatherToolDefinition pickaxe)
+            int axeLevel, int pickaxeLevel, CombatPrototypeMapGatherToolDefinition axe, CombatPrototypeMapGatherToolDefinition pickaxe,
+            CombatPrototypeMapInventoryPanelFavorites favorites)
         {
             if (_wood == wood && _stone == stone && _inventoryValid == inventoryValid &&
-                _axeDurability == axeDurability && _pickaxeDurability == pickaxeDurability && _axeLevel == axeLevel && _pickaxeLevel == pickaxeLevel) return;
+                _axeDurability == axeDurability && _pickaxeDurability == pickaxeDurability && _axeLevel == axeLevel && _pickaxeLevel == pickaxeLevel &&
+                _favoritesRevision == favorites.Revision && _axe.RepairWoodQuantity == axe.RepairWoodQuantity &&
+                _axe.RepairStoneQuantity == axe.RepairStoneQuantity && _axe.MaxDurability == axe.MaxDurability &&
+                _pickaxe.RepairWoodQuantity == pickaxe.RepairWoodQuantity && _pickaxe.RepairStoneQuantity == pickaxe.RepairStoneQuantity &&
+                _pickaxe.MaxDurability == pickaxe.MaxDurability) return;
             _wood = wood; _stone = stone; _inventoryValid = inventoryValid;
             _axeDurability = axeDurability; _pickaxeDurability = pickaxeDurability;
             _axeLevel = axeLevel; _pickaxeLevel = pickaxeLevel; _axe = axe; _pickaxe = pickaxe;
+            _favoritesRevision = favorites.Revision;
+            _axeConsumptionHint = _settings.Enabled != 0 && _settings.RepairEnabled != 0 && axeDurability >= 0 &&
+                axeDurability < _axe.MaxDurability ? favorites.ConsumptionHint(_axe.RepairWoodQuantity, _axe.RepairStoneQuantity) : string.Empty;
+            _pickaxeConsumptionHint = _settings.Enabled != 0 && _settings.RepairEnabled != 0 && pickaxeDurability >= 0 &&
+                pickaxeDurability < _pickaxe.MaxDurability ? favorites.ConsumptionHint(_pickaxe.RepairWoodQuantity, _pickaxe.RepairStoneQuantity) : string.Empty;
             _canAxe = CanRepair(_axe, axeDurability); _canPickaxe = CanRepair(_pickaxe, pickaxeDurability);
             _axeTitle = _axeName + (axeLevel > 0 ? " " + _levelLabel + " " + axeLevel : string.Empty) + "  " + Availability(_axe, axeDurability);
             _pickaxeTitle = _pickaxeName + (pickaxeLevel > 0 ? " " + _levelLabel + " " + pickaxeLevel : string.Empty) + "  " + Availability(_pickaxe, pickaxeDurability);
@@ -80,17 +93,18 @@ namespace Code_01.CombatPrototype.Map
         {
             Label(width, ref y, rowHeight, labelStyle, _heading);
             DrawTool(width, ref y, rowHeight, labelStyle, buttonStyle, mousePressAccepted,
-                _axeTitle, _axePreview, _axeRecipe, _axeMissing, _axeButton, _canAxe, true);
+                _axeTitle, _axePreview, _axeRecipe, _axeConsumptionHint, _axeMissing, _axeButton, _canAxe, true);
             DrawTool(width, ref y, rowHeight, labelStyle, buttonStyle, mousePressAccepted,
-                _pickaxeTitle, _pickaxePreview, _pickaxeRecipe, _pickaxeMissing, _pickaxeButton, _canPickaxe, false);
+                _pickaxeTitle, _pickaxePreview, _pickaxeRecipe, _pickaxeConsumptionHint, _pickaxeMissing, _pickaxeButton, _canPickaxe, false);
         }
 
         private void DrawTool(float width, ref float y, float rowHeight, GUIStyle labelStyle, GUIStyle buttonStyle,
-            bool mousePressAccepted, string title, string preview, string recipe, string missing, string button, bool enabled, bool axe)
+            bool mousePressAccepted, string title, string preview, string recipe, string consumptionHint, string missing, string button, bool enabled, bool axe)
         {
             Label(width, ref y, rowHeight, labelStyle, title);
             Label(width, ref y, rowHeight, labelStyle, preview);
             Label(width, ref y, rowHeight, labelStyle, recipe);
+            if (consumptionHint.Length != 0) Label(width, ref y, rowHeight, labelStyle, consumptionHint);
             Label(width, ref y, rowHeight, labelStyle, missing);
             var oldEnabled = GUI.enabled;
             try
@@ -124,6 +138,7 @@ namespace Code_01.CombatPrototype.Map
         {
             ClearPending();
             _settings = default; _axe = _pickaxe = default;
+            _axeConsumptionHint = _pickaxeConsumptionHint = string.Empty; _favoritesRevision = 0;
             _wood = _stone = -1; _axeDurability = _pickaxeDurability = int.MinValue;
             _inventoryValid = _canAxe = _canPickaxe = false;
             _levelLabel = string.Empty; _axeLevel = _pickaxeLevel = -1;

@@ -12,13 +12,13 @@ namespace Code_01.CombatPrototype.Map
     // 文件协议和读写独立于界面状态；只有客户端偏好协调类调用。
     internal static class CombatPrototypeMapInventoryPanelPreferencesStore
     {
-        public const int CurrentVersion = 3;
+        public const int CurrentVersion = 4;
         private static readonly UTF8Encoding Encoding = new UTF8Encoding(false, true);
 
         public static string PathFor(string fileId, string mapId) => Path.Combine(Application.persistentDataPath,
             "CombatPrototype", "Client", "InventoryDisplay", fileId, mapId + ".json");
 
-        public static CombatPrototypeMapInventoryPanelPreferencesData Load(string path, string mapId)
+        public static CombatPrototypeMapInventoryPanelPreferencesData Load(string path, string mapId, CombatPrototypeMapInventoryRecipeFilterMode legacyRecipeMode)
         {
             byte[] bytes;
             try { bytes = File.ReadAllBytes(path); }
@@ -42,15 +42,17 @@ namespace Code_01.CombatPrototype.Map
             var version = root["version"];
             if (version == null || version.Type != JTokenType.Integer ||
                 !int.TryParse(version.ToString(Formatting.None), NumberStyles.Integer, CultureInfo.InvariantCulture, out var value) ||
-                (value != 1 && value != 2 && value != CurrentVersion))
-                throw new InvalidDataException("Preferences require version=1, 2 or 3: " + path);
-            if (root.Count != (value == 1 ? 5 : value == 2 ? 6 : 7))
-                throw new InvalidDataException("Preferences require exactly five v1, six v2 or seven v3 fields: " + path);
+                (value != 1 && value != 2 && value != 3 && value != CurrentVersion))
+                throw new InvalidDataException("Preferences require version=1, 2, 3 or 4: " + path);
+            if (root.Count != (value == 1 ? 5 : value == 2 ? 6 : value == 3 ? 7 : 9))
+                throw new InvalidDataException("Preferences require exactly five v1, six v2, seven v3 or nine v4 fields: " + path);
             var storedMap = ReadString(root, "mapDefinitionId", path);
             if (!string.Equals(storedMap, mapId, StringComparison.Ordinal))
                 throw new InvalidDataException("Preferences mapDefinitionId mismatch: " + path);
             var search = ReadString(root, "searchText", path);
-            ValidateSearch(search, path);
+            ValidateSearch(search, path, "searchText");
+            var recipeSearch = value == CurrentVersion ? ReadString(root, "recipeSearchText", path) : string.Empty;
+            ValidateSearch(recipeSearch, path, "recipeSearchText");
             return new CombatPrototypeMapInventoryPanelPreferencesData
             {
                 Version = CurrentVersion,
@@ -59,7 +61,9 @@ namespace Code_01.CombatPrototype.Map
                 FilterMode = CombatPrototypeMapInventoryPanelListView.ResolveFilterMode(ReadString(root, "filterMode", path)),
                 SearchText = search,
                 FavoriteItemNames = value == 1 ? new List<string>() : ReadFavorites(root, path),
-                FavoritesOnly = value == CurrentVersion && ReadBool(root, "favoritesOnly", path)
+                FavoritesOnly = value >= 3 && ReadBool(root, "favoritesOnly", path),
+                RecipeFilterMode = value == CurrentVersion ? CombatPrototypeMapInventoryRecipeFilter.ResolveMode(ReadString(root, "recipeFilterMode", path), "recipeFilterMode") : legacyRecipeMode,
+                RecipeSearchText = recipeSearch
             };
         }
 
@@ -75,7 +79,9 @@ namespace Code_01.CombatPrototype.Map
                 ["filterMode"] = data.FilterMode.ToString().ToLowerInvariant(),
                 ["searchText"] = data.SearchText,
                 ["favoriteItemNames"] = favorites,
-                ["favoritesOnly"] = data.FavoritesOnly
+                ["favoritesOnly"] = data.FavoritesOnly,
+                ["recipeFilterMode"] = data.RecipeFilterMode.ToString().ToLowerInvariant(),
+                ["recipeSearchText"] = data.RecipeSearchText
             };
             var bytes = Encoding.GetBytes(root.ToString(Formatting.Indented) + "\n");
             var temporaryPath = path + ".tmp";
@@ -127,17 +133,17 @@ namespace Code_01.CombatPrototype.Map
             return names;
         }
 
-        private static void ValidateSearch(string text, string path)
+        private static void ValidateSearch(string text, string path, string name)
         {
-            if (text.Length > 64) throw new InvalidDataException("searchText exceeds 64 UTF-16 units: " + path);
+            if (text.Length > 64) throw new InvalidDataException(name + " exceeds 64 UTF-16 units: " + path);
             for (var index = 0; index < text.Length; index++)
             {
                 var character = text[index];
                 if (char.IsControl(character) || char.IsLowSurrogate(character))
-                    throw new InvalidDataException("searchText contains a control or isolated surrogate: " + path);
+                    throw new InvalidDataException(name + " contains a control or isolated surrogate: " + path);
                 if (!char.IsHighSurrogate(character)) continue;
                 if (index + 1 >= text.Length || !char.IsLowSurrogate(text[index + 1]))
-                    throw new InvalidDataException("searchText contains an isolated surrogate: " + path);
+                    throw new InvalidDataException(name + " contains an isolated surrogate: " + path);
                 index++;
             }
         }

@@ -21,7 +21,7 @@
 
 ## 【FACT】当前配置契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=40/configRevision=43。resourcePersistence/geometry/layout/movement/drops/treeHarvest/mining/gatherTools/interactionHud/pickupHud/interactionHighlight/resourceStatusHud/worldSaveHud/inventoryPanel/inventoryDrop/population/spawn均必填；新增字段沿原严格UTF-8、对象形状、缺失/未知/重复字段与标量类型校验。旧v1～v39明确拒绝，不迁移、补默认或回退来源；正常导入/烘焙后生效，无热重载。
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为schemaVersion=41/configRevision=44。resourcePersistence/geometry/layout/movement/drops/treeHarvest/mining/gatherTools/interactionHud/pickupHud/interactionHighlight/resourceStatusHud/worldSaveHud/inventoryPanel/inventoryDrop/population/spawn均必填；新增字段沿原严格UTF-8、对象形状、缺失/未知/重复字段与标量类型校验。旧v1～v40明确拒绝，不迁移、补默认或回退来源；正常导入/烘焙后生效，无热重载。
 
 | 配置位置/字段 | 默认值 | 校验或行为 |
 |---|---|---|
@@ -35,7 +35,7 @@
 | inventoryPanel.repairButtonLabel | Repair | 同上 |
 | inventoryPanel.fullDurabilityLabel | Full durability | 同上 |
 
-gatherTools根5字段、tools每条11字段，修理所用字段保持；当前inventoryPanel107字段/73文案、三模式ID及一偏好文件ID，新增展示项归[排序筛选](MapInventoryListView.md)、[搜索](MapInventorySearch.md)与[本机偏好](MapInventoryPreferences.md)，容量文案归[容量](MapInventoryCapacity.md)。关闭修理、工具或面板仍校验全部字段；不以开关补参数。0木材或0石材成本合法，但两者不可同时为0。工具ID、槽数、Lv1最大耐久60/40（升级后按本级上限）、制作配方木3石2/木2石3、成功消耗1/Lv1倍率0.75、原F/B/高亮默认值、三类600秒再生及地图空间/种子/32敌人/出生保持。
+gatherTools根5字段、tools每条11字段，修理所用字段保持；当前inventoryPanel109字段/73文案、三模式ID及一偏好文件ID，新增展示项归[排序筛选](MapInventoryListView.md)、[搜索](MapInventorySearch.md)与[本机偏好](MapInventoryPreferences.md)，容量文案归[容量](MapInventoryCapacity.md)。关闭修理、工具或面板仍校验全部字段；不以开关补参数。0木材或0石材成本合法，但两者不可同时为0。工具ID、槽数、Lv1最大耐久60/40（升级后按本级上限）、制作配方木3石2/木2石3、成功消耗1/Lv1倍率0.75、原F/B/高亮默认值、三类600秒再生及地图空间/种子/32敌人/出生保持。
 
 ## 【CURRENT STRATEGY】服务端资格与事务
 
@@ -69,9 +69,9 @@ Result依次为None、Success、Disabled、NotOwned、AlreadyFull、Insufficient
 
 非法修理网络反馈在新缓存边界记录地图/Sequence/Kind/Result与原异常，只清修理反馈，原制作/F/G/B/圆环/资源状态保持；Configure/Reset清文案、观察序号、期限与工具身份。没有本地补耐久、按键自动重试、客户端保存或新的GameObject组件挂载。
 
-## 【CURRENT STRATEGY】配方分类与搜索关联
+## 【CURRENT STRATEGY】配方分类、搜索与偏好关联
 
-当前v40/revision43的[配方搜索](MapInventoryRecipeSearch.md)在原分类上按配置名称/操作文案匹配七项配方，复用独立搜索实例与焦点隔离；单项显隐及高度、文本变化清七请求/待确认归专题。材料与工具状态、原输入/事务/存档链保持；关键词仅本绑定内存，不入偏好v3。本阶段待人工，分类已通过仍限v39/revision42原清单，其他旧通过保持原范围。
+当前v41/revision44的[配方偏好](MapInventoryRecipePreferences.md)把配方类别与已应用关键词接入本机偏好v4九字段；独立保存开关、严格v1/v2/v3迁移、关闭项保留和重置/延迟/失败规则归专题。材料与工具状态、原输入/Ghost及服务器事务/玩家和世界档案保持；本阶段待人工。搜索用户通过仍限v40/revision43十六项，分类仍限v39/revision42原清单，其他旧通过保持原范围，未触发独立用例仍UNKNOWN。
 
 ## 【KNOWN ISSUES】静态证据与人工边界
 

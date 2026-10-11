@@ -25,7 +25,7 @@ namespace Code_01.CombatPrototype.Map
         public bool ShowRepair => Mode == CombatPrototypeMapInventoryRecipeFilterMode.All || Mode == CombatPrototypeMapInventoryRecipeFilterMode.Repair;
         public bool ShowUpgrade => Mode == CombatPrototypeMapInventoryRecipeFilterMode.All || Mode == CombatPrototypeMapInventoryRecipeFilterMode.Upgrade;
 
-        internal static CombatPrototypeMapInventoryRecipeFilterMode ResolveMode(string value)
+        internal static CombatPrototypeMapInventoryRecipeFilterMode ResolveMode(string value, string source = "inventoryPanel.defaultRecipeFilterMode")
         {
             switch (value)
             {
@@ -33,7 +33,7 @@ namespace Code_01.CombatPrototype.Map
                 case "craft": return CombatPrototypeMapInventoryRecipeFilterMode.Craft;
                 case "repair": return CombatPrototypeMapInventoryRecipeFilterMode.Repair;
                 case "upgrade": return CombatPrototypeMapInventoryRecipeFilterMode.Upgrade;
-                default: throw new InvalidOperationException("inventoryPanel.defaultRecipeFilterMode requires all, craft, repair or upgrade; value=" + value + ".");
+                default: throw new InvalidOperationException(source + " requires all, craft, repair or upgrade; value=" + value + ".");
             }
         }
 
@@ -48,6 +48,15 @@ namespace Code_01.CombatPrototype.Map
             _craftLabel = settings.CraftRecipesLabel.ToString();
             _repairLabel = settings.RepairRecipesLabel.ToString();
             _upgradeLabel = settings.UpgradeRecipesLabel.ToString();
+            UpdateLabel();
+        }
+
+        // Preferences restore an already validated selection before the first snapshot; no GUI request is queued.
+        public void Restore(CombatPrototypeMapInventoryRecipeFilterMode mode)
+        {
+            if (!Enabled) return;
+            ClearPending();
+            Mode = mode;
             UpdateLabel();
         }
 

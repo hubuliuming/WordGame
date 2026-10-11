@@ -20,7 +20,7 @@
 
 ## 【FACT】JSON 契约与默认值
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为 schemaVersion=40/configRevision=43。新增必填 inventoryCapacity：
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)一致为 schemaVersion=41/configRevision=44。新增必填 inventoryCapacity：
 
 ```json
 "inventoryCapacity": {
@@ -79,9 +79,9 @@ B 材料标题下显示 Capacity 当前总量/当前等级总上限，受管行�
 
 F/G/B 显示开关仍独立。无本地玩家、死亡、断线、玩家/地图源变化、World/Scene停止时沿原绑定清显示、投影和未提交按钮请求；没有新监听、客户端计时器或保存入口。提示仅代表最近所属快照，延迟或同 tick 其他入包可使显示与实际按键结果不同，服务端完成检查为准。F预约/完成、G及F/G采样均读取个人CapacityLevel；升级关闭保留已有等级上限，容量关闭显示Unlimited并禁用付费升级，永久等级仍保留。
 
-## 【CURRENT STRATEGY】配方分类与搜索关联
+## 【CURRENT STRATEGY】配方分类、搜索与偏好关联
 
-当前v40/revision43的[配方搜索](MapInventoryRecipeSearch.md)在原分类上按配置名称/操作文案匹配七项配方，复用独立搜索实例与焦点隔离；单项显隐及高度、文本变化清七请求/待确认归专题。材料与工具状态、原输入/事务/存档链保持；关键词仅本绑定内存，不入偏好v3。本阶段待人工，分类已通过仍限v39/revision42原清单，其他旧通过保持原范围。
+当前v41/revision44的[配方偏好](MapInventoryRecipePreferences.md)把配方类别与已应用关键词接入本机偏好v4九字段；独立保存开关、严格v1/v2/v3迁移、关闭项保留和重置/延迟/失败规则归专题。材料与工具状态、原输入/Ghost及服务器事务/玩家和世界档案保持；本阶段待人工。搜索用户通过仍限v40/revision43十六项，分类仍限v39/revision42原清单，其他旧通过保持原范围，未触发独立用例仍UNKNOWN。
 
 ## 【KNOWN ISSUES】静态核对与人工边界
 
@@ -99,6 +99,6 @@ v26/revision29的[地面合并](MapDropMerge.md)只改原地面数量/期限；G
 
 ## 【FACT】列表筛选与完整容量统计
 
-当前v40/revision43的[排序筛选](MapInventoryListView.md)只改变B材料列表可见行/顺序。Snapshot仍先校验全部原库存并统计受管苹果/木材/石材总量及当前等级上限，筛选资源时隐藏的苹果仍占容量；非法独立库存条目照原记录/跳过并置InventoryValid=false，筛选不能放开制作/修理/丢弃/升级资格。服务器F/G接收、部分拾取与容量等级/玩家保存链保持；静态及用户人工通过限v28/revision31十六项，人工结论来自用户反馈；未触发的独立用例UNKNOWN。
+当前v41/revision44的[排序筛选](MapInventoryListView.md)只改变B材料列表可见行/顺序。Snapshot仍先校验全部原库存并统计受管苹果/木材/石材总量及当前等级上限，筛选资源时隐藏的苹果仍占容量；非法独立库存条目照原记录/跳过并置InventoryValid=false，筛选不能放开制作/修理/丢弃/升级资格。服务器F/G接收、部分拾取与容量等级/玩家保存链保持；静态及用户人工通过限v28/revision31十六项，人工结论来自用户反馈；未触发的独立用例UNKNOWN。
 
 当前[搜索](MapInventorySearch.md)与分类取交集后再排序，仍只投影B材料可见行；完整Snapshot先校验全部库存并统计容量，隐藏材料继续参与受管总量与原配方/业务资格。搜索静态及用户人工GamePlayer通过，限v29/revision32及运行入口十六项，结论来自用户反馈；未实际触发的独立用例UNKNOWN。

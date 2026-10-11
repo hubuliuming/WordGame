@@ -92,7 +92,7 @@ namespace Code_01.CombatPrototype.Map
             _confirmation.Configure(settings);
             _recipeFilter.Configure(settings);
             _recipeSearch.Configure(settings, axe, pickaxe, upgradeSettings, toolUpgradeSettings);
-            _preferences.Configure(settings, mapId, _listView, _search, _favorites);
+            _preferences.Configure(settings, mapId, _listView, _search, _favorites, _recipeFilter, _recipeSearch.Editor);
             _details.Configure(settings, toolSettings, axe, pickaxe, capacity, upgradeSettings, upgradeDefinitions,
                 toolUpgradeSettings, toolUpgradeDefinitions);
             _upgrade.Configure(settings, capacity, upgradeSettings, upgradeDefinitions, mapId);
@@ -140,7 +140,7 @@ namespace Code_01.CombatPrototype.Map
             if (favoritesRevision != _favorites.Revision || favoritesOnly != _listView.FavoritesOnly) _mousePressAccepted = _rowMousePressAccepted = false;
             if (_details.Capture(_snapshot, _listView, axeLevel, pickaxeLevel, effectiveAxe, effectivePickaxe, capacityLevel))
                 _mousePressAccepted = _rowMousePressAccepted = false;
-            _preferences.Capture(_listView, _search, _favorites);
+            _preferences.Capture(_listView, _search, _favorites, _recipeFilter, _recipeSearch.Editor);
             _upgrade.Capture(_snapshot, capacityLevel, upgradeFeedback, _favorites, _confirmation);
             _canCraftAxe = CanCraft(_axe, axeDurability);
             _canCraftPickaxe = CanCraft(_pickaxe, pickaxeDurability);

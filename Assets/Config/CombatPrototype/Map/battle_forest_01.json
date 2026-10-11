@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 40,
-  "configRevision": 43,
+  "schemaVersion": 41,
+  "configRevision": 44,
   "mapDefinitionId": "battle_forest_01",
   "defaultSeed": 12345,
   "resourcePersistence": {
@@ -387,7 +387,9 @@
     "recipeSearchLabel": "Recipe search",
     "recipeSearchPlaceholderLabel": "Name or action",
     "clearRecipeSearchLabel": "Clear",
-    "noRecipeSearchResultsLabel": "No matching recipes"
+    "noRecipeSearchResultsLabel": "No matching recipes",
+    "preferencesSaveRecipeFilter": true,
+    "preferencesSaveRecipeSearch": true
   },
   "inventoryCapacity": {
     "enabled": true,

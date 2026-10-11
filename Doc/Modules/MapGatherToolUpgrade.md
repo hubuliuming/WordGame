@@ -1,6 +1,6 @@
 # 采集工具升级与效率提升
 
-返回[采集工具](MapGatherTools.md)、[工具修理](MapToolRepair.md)与[材料面板](MapInventoryPanel.md)。本专题负责 CombatPrototypeNetCode 的工具 Lv1～Lv3、B/6/7 升级、有效耐久上限与采集耗时；玩家文件完整契约归[资源与数据](DataResources.md)，人工清单归[运行入口](Runtime.md)。当前地图 schemaVersion=40/configRevision=43，玩家存档 Version=4；用户已确认本阶段人工 GamePlayer 通过，主线程结合既有静态核对判定通过，限 v21/revision24 及[运行入口](Runtime.md)二十二项清单，结论来自用户反馈。未实际触发的独立边界仍为 UNKNOWN。背包升级及更早用户通过仍限各自原版本/清单。
+返回[采集工具](MapGatherTools.md)、[工具修理](MapToolRepair.md)与[材料面板](MapInventoryPanel.md)。本专题负责 CombatPrototypeNetCode 的工具 Lv1～Lv3、B/6/7 升级、有效耐久上限与采集耗时；玩家文件完整契约归[资源与数据](DataResources.md)，人工清单归[运行入口](Runtime.md)。当前地图 schemaVersion=41/configRevision=44，玩家存档 Version=4；用户已确认本阶段人工 GamePlayer 通过，主线程结合既有静态核对判定通过，限 v21/revision24 及[运行入口](Runtime.md)二十二项清单，结论来自用户反馈。未实际触发的独立边界仍为 UNKNOWN。背包升级及更早用户通过仍限各自原版本/清单。
 
 ## 【FACT】入口与职责
 
@@ -88,9 +88,9 @@ HUD统一校验所属工具ID/重复/Level/本级耐久上限，只读缓存四�
 
 按钮沿原可见有效绑定的鼠标按下标记提交一次；关闭B清待提交请求/滚动位置，已进入命令的请求由服务器判断。无有效帧、死亡/断线、玩家/地图源/World/Scene失效沿原Reset清投影/旧文字/序号/期限，不重置服务器工具。关闭B或全部显示不关闭数字6/7；客户端没有扣料、保级、恢复耐久或存档写入入口。原380×640、字号18/行高32、指针/滚轮隔离及F/G/高亮/资源状态显示规则保持。
 
-## 【CURRENT STRATEGY】配方分类与搜索关联
+## 【CURRENT STRATEGY】配方分类、搜索与偏好关联
 
-当前v40/revision43的[配方搜索](MapInventoryRecipeSearch.md)在原分类上按配置名称/操作文案匹配七项配方，复用独立搜索实例与焦点隔离；单项显隐及高度、文本变化清七请求/待确认归专题。材料与工具状态、原输入/事务/存档链保持；关键词仅本绑定内存，不入偏好v3。本阶段待人工，分类已通过仍限v39/revision42原清单，其他旧通过保持原范围。
+当前v41/revision44的[配方偏好](MapInventoryRecipePreferences.md)把配方类别与已应用关键词接入本机偏好v4九字段；独立保存开关、严格v1/v2/v3迁移、关闭项保留和重置/延迟/失败规则归专题。材料与工具状态、原输入/Ghost及服务器事务/玩家和世界档案保持；本阶段待人工。搜索用户通过仍限v40/revision43十六项，分类仍限v39/revision42原清单，其他旧通过保持原范围，未触发独立用例仍UNKNOWN。
 
 ## 【KNOWN ISSUES】静态证据与人工范围
 

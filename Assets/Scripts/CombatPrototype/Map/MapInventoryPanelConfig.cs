@@ -112,5 +112,7 @@ namespace Code_01.CombatPrototype.Map
         public string recipeSearchPlaceholderLabel;
         public string clearRecipeSearchLabel;
         public string noRecipeSearchResultsLabel;
+        public bool preferencesSaveRecipeFilter;
+        public bool preferencesSaveRecipeSearch;
     }
 }

@@ -112,5 +112,7 @@ namespace Code_01.CombatPrototype.Map
         public FixedString64Bytes RecipeSearchPlaceholderLabel;
         public FixedString64Bytes ClearRecipeSearchLabel;
         public FixedString64Bytes NoRecipeSearchResultsLabel;
+        public byte PreferencesSaveRecipeFilter;
+        public byte PreferencesSaveRecipeSearch;
     }
 }

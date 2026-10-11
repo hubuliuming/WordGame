@@ -17,7 +17,7 @@ namespace Code_01.CombatPrototype.Map
             {
                 map = new MapDefinitionConfig
                 {
-                    schemaVersion = 40, configRevision = 43,
+                    schemaVersion = 41, configRevision = 44,
                     mapDefinitionId = mapDefinitionId, defaultSeed = 12345,
                     resourcePersistence = new MapResourcePersistenceConfig
                     {
@@ -267,7 +267,9 @@ namespace Code_01.CombatPrototype.Map
                         recipeSearchLabel = "Recipe search",
                         recipeSearchPlaceholderLabel = "Name or action",
                         clearRecipeSearchLabel = "Clear",
-                        noRecipeSearchResultsLabel = "No matching recipes"
+                        noRecipeSearchResultsLabel = "No matching recipes",
+                        preferencesSaveRecipeFilter = true,
+                        preferencesSaveRecipeSearch = true
                     },
                     inventoryCapacity = new MapInventoryCapacityConfig
                     {

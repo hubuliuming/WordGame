@@ -1,6 +1,6 @@
 # 掉落物按背包余量部分拾取
 
-返回[地图](Map.md)、[掉落](MapDrops.md)、[容量](MapInventoryCapacity.md)、[G提示](MapPickupHud.md)、[拾取结果](MapPickupFeedbackHud.md)、[掉落存档](MapDropPersistence.md)与[运行入口](Runtime.md)。入口CombatPrototypeNetCode；Forest/Grassland Json与BuiltIn当前schemaVersion=40/configRevision=43。部分拾取v27/revision30的代码/配置/烘焙/Serializer静态核对通过，用户已确认该阶段人工GamePlayer通过，范围见运行入口十六项。旧合并用户通过限v26/revision29十六项，旧G结果限v25/revision28十六项，其余旧范围保持。
+返回[地图](Map.md)、[掉落](MapDrops.md)、[容量](MapInventoryCapacity.md)、[G提示](MapPickupHud.md)、[拾取结果](MapPickupFeedbackHud.md)、[掉落存档](MapDropPersistence.md)与[运行入口](Runtime.md)。入口CombatPrototypeNetCode；Forest/Grassland Json与BuiltIn当前schemaVersion=41/configRevision=44。部分拾取v27/revision30的代码/配置/烘焙/Serializer静态核对通过，用户已确认该阶段人工GamePlayer通过，范围见运行入口十六项。旧合并用户通过限v26/revision29十六项，旧G结果限v25/revision28十六项，其余旧范围保持。
 
 ## 【FACT】文件与配置
 
@@ -62,9 +62,9 @@ StateSystem采样实际库存/等级及新开关，和G共用GetPickupQuantity�
 
 原世界快照已比较Quantity，成功部分领取后的剩余量沿原保存点写入；领空Consumed排除。世界v2根九/掉落八字段、LastDropId空号、路径/资源签名与离线暂停保持，恢复仍原编号/数量/余时，Ready后再参与合并。玩家v4/Tools/容量等级格式与原保存方式保持；世界写失败保留旧正式档而不回滚本局拾取。玩家与世界分别保存，跨文件一致/防重复、同槽并发及异常中断恢复仍原UNKNOWN。
 
-## 【CURRENT STRATEGY】配方分类与搜索关联
+## 【CURRENT STRATEGY】配方分类、搜索与偏好关联
 
-当前v40/revision43的[配方搜索](MapInventoryRecipeSearch.md)在原分类上按配置名称/操作文案匹配七项配方，复用独立搜索实例与焦点隔离；单项显隐及高度、文本变化清七请求/待确认归专题。材料与工具状态、原输入/事务/存档链保持；关键词仅本绑定内存，不入偏好v3。本阶段待人工，分类已通过仍限v39/revision42原清单，其他旧通过保持原范围。
+当前v41/revision44的[配方偏好](MapInventoryRecipePreferences.md)把配方类别与已应用关键词接入本机偏好v4九字段；独立保存开关、严格v1/v2/v3迁移、关闭项保留和重置/延迟/失败规则归专题。材料与工具状态、原输入/Ghost及服务器事务/玩家和世界档案保持；本阶段待人工。搜索用户通过仍限v40/revision43十六项，分类仍限v39/revision42原清单，其他旧通过保持原范围，未触发独立用例仍UNKNOWN。
 
 ## 【KNOWN ISSUES】静态与人工边界
 

@@ -11,6 +11,9 @@ namespace Code_01.CombatPrototype.Map
         private CombatPrototypeMapInventorySortMode _observedSort, _writtenSort;
         private CombatPrototypeMapInventoryFilterMode _observedFilter, _writtenFilter;
         private string _observedSearch, _writtenSearch, _mapId, _path;
+        private CombatPrototypeMapInventoryRecipeFilterMode _observedRecipeFilter, _writtenRecipeFilter;
+        private string _observedRecipeSearch, _writtenRecipeSearch;
+        private bool _saveRecipeFilter, _saveRecipeSearch;
         private readonly HashSet<string> _writtenFavorites = new HashSet<string>(StringComparer.Ordinal);
         private uint _observedFavoritesRevision;
         private float _delay, _changedAt;
@@ -18,7 +21,8 @@ namespace Code_01.CombatPrototype.Map
         private bool _observedFavoritesOnly, _writtenFavoritesOnly;
 
         public void Configure(CombatPrototypeMapInventoryPanelSettings settings, string mapId,
-            CombatPrototypeMapInventoryPanelListView view, CombatPrototypeMapInventoryPanelSearch search, CombatPrototypeMapInventoryPanelFavorites favorites)
+            CombatPrototypeMapInventoryPanelListView view, CombatPrototypeMapInventoryPanelSearch search, CombatPrototypeMapInventoryPanelFavorites favorites,
+            CombatPrototypeMapInventoryRecipeFilter recipeFilter, CombatPrototypeMapInventoryPanelSearch recipeSearch)
         {
             // Panel先Reset并提交旧绑定，再配置本绑定；关闭功能时不访问文件。
             if (settings.Enabled == 0 || settings.PreferencesEnabled == 0) return;
@@ -26,13 +30,15 @@ namespace Code_01.CombatPrototype.Map
             _sortEnabled = view.SortEnabled;
             _filterEnabled = view.FilterEnabled;
             _saveSearch = settings.PreferencesSaveSearch != 0 && search.Enabled;
+            _saveRecipeFilter = settings.PreferencesSaveRecipeFilter != 0 && recipeFilter.Enabled;
+            _saveRecipeSearch = settings.PreferencesSaveRecipeSearch != 0 && recipeSearch.Enabled;
             _saveFavorites = favorites.Enabled;
             _saveFavoritesFilter = view.FavoritesFilterEnabled;
             _delay = settings.PreferencesSaveDelaySeconds;
             try
             {
                 _path = CombatPrototypeMapInventoryPanelPreferencesStore.PathFor(settings.PreferencesFileId.ToString(), mapId);
-                _data = CombatPrototypeMapInventoryPanelPreferencesStore.Load(_path, mapId);
+                _data = CombatPrototypeMapInventoryPanelPreferencesStore.Load(_path, mapId, settings.DefaultRecipeFilterMode);
                 if (_data == null)
                     _data = new CombatPrototypeMapInventoryPanelPreferencesData
                     {
@@ -41,7 +47,9 @@ namespace Code_01.CombatPrototype.Map
                         SortMode = settings.DefaultSortMode,
                         FilterMode = settings.DefaultFilterMode,
                         SearchText = string.Empty,
-                        FavoritesOnly = settings.DefaultFavoritesOnly != 0
+                        FavoritesOnly = settings.DefaultFavoritesOnly != 0,
+                        RecipeFilterMode = settings.DefaultRecipeFilterMode,
+                        RecipeSearchText = string.Empty
                     };
                 else
                 {
@@ -49,16 +57,22 @@ namespace Code_01.CombatPrototype.Map
                     if (_saveSearch) search.Restore(_data.SearchText);
                     if (_saveFavorites) favorites.Restore(_data.FavoriteItemNames);
                     if (_saveFavoritesFilter) view.RestoreFavoritesOnly(_data.FavoritesOnly);
+                    if (_saveRecipeFilter) recipeFilter.Restore(_data.RecipeFilterMode);
+                    if (_saveRecipeSearch) recipeSearch.Restore(_data.RecipeSearchText);
                 }
                 _writtenSort = _data.SortMode;
                 _writtenFilter = _data.FilterMode;
                 _writtenSearch = _data.SearchText;
+                _writtenRecipeFilter = _data.RecipeFilterMode;
+                _writtenRecipeSearch = _data.RecipeSearchText;
                 _writtenFavoritesOnly = _data.FavoritesOnly;
                 _writtenFavorites.Clear();
                 _writtenFavorites.UnionWith(_data.FavoriteItemNames);
                 _observedSort = view.SortMode;
                 _observedFilter = view.FilterMode;
                 _observedSearch = search.AppliedText;
+                _observedRecipeFilter = recipeFilter.Mode;
+                _observedRecipeSearch = recipeSearch.AppliedText;
                 _observedFavoritesRevision = favorites.Revision;
                 _observedFavoritesOnly = view.FavoritesOnly;
                 _active = true;
@@ -66,7 +80,8 @@ namespace Code_01.CombatPrototype.Map
             catch (Exception exception) { Disable("Load", exception); }
         }
 
-        public void Capture(CombatPrototypeMapInventoryPanelListView view, CombatPrototypeMapInventoryPanelSearch search, CombatPrototypeMapInventoryPanelFavorites favorites)
+        public void Capture(CombatPrototypeMapInventoryPanelListView view, CombatPrototypeMapInventoryPanelSearch search, CombatPrototypeMapInventoryPanelFavorites favorites,
+            CombatPrototypeMapInventoryRecipeFilter recipeFilter, CombatPrototypeMapInventoryPanelSearch recipeSearch)
         {
             if (!_active) return;
             var changed = false;
@@ -96,10 +111,21 @@ namespace Code_01.CombatPrototype.Map
                 _data.FavoritesOnly = _observedFavoritesOnly = view.FavoritesOnly;
                 changed = true;
             }
+            if (_saveRecipeFilter && _observedRecipeFilter != recipeFilter.Mode)
+            {
+                _data.RecipeFilterMode = _observedRecipeFilter = recipeFilter.Mode;
+                changed = true;
+            }
+            if (_saveRecipeSearch && _observedRecipeSearch != recipeSearch.AppliedText)
+            {
+                _data.RecipeSearchText = _observedRecipeSearch = recipeSearch.AppliedText;
+                changed = true;
+            }
             if (changed)
             {
                 _changedAt = Time.unscaledTime;
-                _dirty = _data.SortMode != _writtenSort || _data.FilterMode != _writtenFilter || _data.SearchText != _writtenSearch || _data.FavoritesOnly != _writtenFavoritesOnly || FavoritesDiffer();
+                _dirty = _data.SortMode != _writtenSort || _data.FilterMode != _writtenFilter || _data.SearchText != _writtenSearch || _data.FavoritesOnly != _writtenFavoritesOnly ||
+                    _data.RecipeFilterMode != _writtenRecipeFilter || _data.RecipeSearchText != _writtenRecipeSearch || FavoritesDiffer();
             }
             if (_dirty && Time.unscaledTime - _changedAt >= _delay) Flush();
         }
@@ -113,6 +139,8 @@ namespace Code_01.CombatPrototype.Map
                 _writtenSort = _data.SortMode;
                 _writtenFilter = _data.FilterMode;
                 _writtenSearch = _data.SearchText;
+                _writtenRecipeFilter = _data.RecipeFilterMode;
+                _writtenRecipeSearch = _data.RecipeSearchText;
                 _writtenFavoritesOnly = _data.FavoritesOnly;
                 _writtenFavorites.Clear();
                 _writtenFavorites.UnionWith(_data.FavoriteItemNames);
@@ -139,12 +167,14 @@ namespace Code_01.CombatPrototype.Map
         public void Reset()
         {
             _active = _dirty = _sortEnabled = _filterEnabled = _saveSearch = _saveFavorites = _saveFavoritesFilter = false;
-            _observedFavoritesOnly = _writtenFavoritesOnly = false;
+            _observedFavoritesOnly = _writtenFavoritesOnly = _saveRecipeFilter = _saveRecipeSearch = false;
             _data = null;
             _writtenFavorites.Clear();
             _observedFavoritesRevision = 0;
             _observedSort = _writtenSort = CombatPrototypeMapInventorySortMode.Original;
             _observedFilter = _writtenFilter = CombatPrototypeMapInventoryFilterMode.All;
+            _observedRecipeFilter = _writtenRecipeFilter = CombatPrototypeMapInventoryRecipeFilterMode.All;
+            _observedRecipeSearch = _writtenRecipeSearch = string.Empty;
             _observedSearch = _writtenSearch = _mapId = _path = string.Empty;
             _delay = _changedAt = 0f;
         }

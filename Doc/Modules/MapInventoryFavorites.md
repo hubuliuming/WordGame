@@ -1,6 +1,6 @@
 # 背包材料收藏与置顶
 
-返回[地图](Map.md)、[背包](Inventory.md)、[B面板](MapInventoryPanel.md)、[排序筛选](MapInventoryListView.md)、[搜索](MapInventorySearch.md)、[材料详情](MapInventoryDetails.md)、[本机偏好](MapInventoryPreferences.md)、[配置与存档](DataResources.md)及[运行验收](Runtime.md)。入口CombatPrototypeNetCode，原B面板；Forest/Grassland Json/BuiltIn当前v40/revision43。主线程按用户已确认方案完成代码、配置和静态核对；用户已确认本阶段人工GamePlayer验收通过，主线程结合既有静态核对与用户反馈判定通过，限CombatPrototypeNetCode、v33/revision36及运行入口十六项清单；人工结论来自用户反馈。详情用户通过仍限v32/revision35十六项，其他旧通过保持各自版本/清单。
+返回[地图](Map.md)、[背包](Inventory.md)、[B面板](MapInventoryPanel.md)、[排序筛选](MapInventoryListView.md)、[搜索](MapInventorySearch.md)、[材料详情](MapInventoryDetails.md)、[本机偏好](MapInventoryPreferences.md)、[配置与存档](DataResources.md)及[运行验收](Runtime.md)。入口CombatPrototypeNetCode，原B面板；Forest/Grassland Json/BuiltIn当前v41/revision44。主线程按用户已确认方案完成代码、配置和静态核对；用户已确认本阶段人工GamePlayer验收通过，主线程结合既有静态核对与用户反馈判定通过，限CombatPrototypeNetCode、v33/revision36及运行入口十六项清单；人工结论来自用户反馈。详情用户通过仍限v32/revision35十六项，其他旧通过保持各自版本/清单。
 
 ## 【FACT】入口与职责
 
@@ -11,7 +11,7 @@
 | [ListView](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapInventoryPanelListView.cs) | 最新过滤行后应用收藏、原排序后置顶、收藏Revision缓存 |
 | [Details](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapInventoryPanelDetails.cs) | 名称标签接收收藏显示文字；选择仍按真实Name |
 | [Preferences](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapInventoryPanelPreferences.cs) | 恢复/观察已应用收藏、集合比较与原延迟/提交/失败边界 |
-| [Data](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapInventoryPanelPreferencesData.cs)/[Store](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapInventoryPanelPreferencesStore.cs) | 当前七实例字段，严格v3七字段及v1五字段/v2六字段兼容读取 |
+| [Data](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapInventoryPanelPreferencesData.cs)/[Store](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapInventoryPanelPreferencesStore.cs) | 当前七实例字段，严格v4九字段及v1五字段/v2六字段兼容读取 |
 | [DTO](../../Assets/Scripts/CombatPrototype/Map/MapInventoryPanelConfig.cs)/[Settings](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapInventoryPanelData.cs) | 原inventoryPanel增加六字段 |
 | [Validator](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapConfigValidator.cs)/[BuiltIn](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeDefaultMapConfigSource.cs)/[Baker](../../Assets/Scripts/CombatPrototype/Map/CombatPrototypeMapAuthoring.cs) | 全量校验、默认值、原地图根Settings映射 |
 | [Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)/[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json) | 显式Json来源，与BuiltIn一致 |
@@ -29,7 +29,7 @@ v33/revision36收藏阶段十一现有脚本、一新普通Favorites类及正常
 | favoriteTagLabel | Favorite | 必填文案→FixedString64Bytes |
 | favoritesFullLabel | Favorite limit | 必填文案→FixedString64Bytes |
 
-原收藏阶段六字段保留，追加[收藏筛选](MapInventoryFavoritesFilter.md)六字段、[收藏计数](MapInventoryFavoritesCount.md)两字段、[收藏保护](MapInventoryFavoritesDropProtection.md)两字段、[收藏提示](MapInventoryFavoritesConsumptionHint.md)两字段与[消耗确认](MapInventoryFavoritesConsumptionConfirm.md)四字段及[配方筛选](MapInventoryRecipeFilter.md)七字段及[配方搜索](MapInventoryRecipeSearch.md)七字段，当前共107：DTO二十bool、六float、四int、三模式string、73文案string及一文件ID；Settings二十byte、六float、四int、三byte枚举及74 FixedString64Bytes。Settings零GhostField/无GhostComponent。四文案非空白、无控制字符、最多61 UTF-8字节；关闭收藏/面板/原能力仍全量验证。地图schema40、revision43，各端同版；旧地图v1～v39或缺失/null/错类型/未知/重复键明确拒绝，无补默认、来源回退或热重载，正常导入/烘焙后生效。
+原收藏阶段六字段保留，追加[收藏筛选](MapInventoryFavoritesFilter.md)六字段、[收藏计数](MapInventoryFavoritesCount.md)两字段、[收藏保护](MapInventoryFavoritesDropProtection.md)两字段、[收藏提示](MapInventoryFavoritesConsumptionHint.md)两字段与[消耗确认](MapInventoryFavoritesConsumptionConfirm.md)四字段及[配方筛选](MapInventoryRecipeFilter.md)七字段及[配方搜索](MapInventoryRecipeSearch.md)七字段及[配方偏好](MapInventoryRecipePreferences.md)两字段，当前共109：DTO二十二bool、六float、四int、三模式string、73文案string及一文件ID；Settings二十二byte、六float、四int、三byte枚举及74 FixedString64Bytes。Settings零GhostField/无GhostComponent。四文案非空白、无控制字符、最多61 UTF-8字节；关闭收藏/面板/原能力仍全量验证。地图schema41、revision43，各端同版；旧地图v1～v40或缺失/null/错类型/未知/重复键明确拒绝，无补默认、来源回退或热重载，正常导入/烘焙后生效。
 
 ## 【CURRENT STRATEGY】可见行、置顶与点击
 
@@ -57,9 +57,9 @@ preferencesEnabled=false或本绑定偏好I/O暂停时，收藏仅在当前绑�
 
 Preferences只在已应用收藏Revision变化时将名称按Ordinal复制到Data；与上次成功写入的名称集合比较，数组顺序不制造变化，返回已写集合取消待写，库存刷新不写档。连续偏好变化复用unscaledTime默认0.5秒合并，Close/Reset提交已应用待写，未应用GUI请求不保存。UTF-8严格读可带BOM，写无BOM的.json.tmp、Flush(true)、File.Replace或首次File.Move沿原；Save失败暂停本绑定I/O，不自动重试，可能残留.tmp不作为正式数据读取。
 
-## 【CURRENT STRATEGY】配方分类与搜索关联
+## 【CURRENT STRATEGY】配方分类、搜索与偏好关联
 
-当前v40/revision43的[配方搜索](MapInventoryRecipeSearch.md)在原分类上按配置名称/操作文案匹配七项配方，复用独立搜索实例与焦点隔离；单项显隐及高度、文本变化清七请求/待确认归专题。材料与工具状态、原输入/事务/存档链保持；关键词仅本绑定内存，不入偏好v3。本阶段待人工，分类已通过仍限v39/revision42原清单，其他旧通过保持原范围。
+当前v41/revision44的[配方偏好](MapInventoryRecipePreferences.md)把配方类别与已应用关键词接入本机偏好v4九字段；独立保存开关、严格v1/v2/v3迁移、关闭项保留和重置/延迟/失败规则归专题。材料与工具状态、原输入/Ghost及服务器事务/玩家和世界档案保持；本阶段待人工。搜索用户通过仍限v40/revision43十六项，分类仍限v39/revision42原清单，其他旧通过保持原范围，未触发独立用例仍UNKNOWN。
 
 ## 【KNOWN ISSUES】静态核对与人工边界
 
@@ -89,4 +89,4 @@ v37/revision40提示阶段的[收藏材料消耗提示](MapInventoryFavoritesCon
 
 ## 【CURRENT STRATEGY】收藏材料消耗确认
 
-当前v40/revision43的[收藏材料消耗确认](MapInventoryFavoritesConsumptionConfirm.md)仅处理原B七个制作/修理/容量与工具升级按钮。首次有效按钮请求命中已应用收藏木石的正成本时暂存一个操作，在配方内显示数量提示，以Confirm/Cancel替换原按钮行；确认按最新已捕获候选和本地Revision复核后沿原请求提交一次，取消/关闭B/相关数量、等级、耐久、配方或已应用收藏变化/绑定失效清待确认。逐帧Clear仅隐藏，确认目标或高度变化清旧面板与行鼠标许可。确认独立于原消耗提示开关；数字1～7保持原直达链，偏好v3七字段、输入19、Ghost/服务器与保存入口保持。本阶段十六项人工GamePlayer已获用户通过反馈，主线程结合既有静态核对判定通过，限CombatPrototypeNetCode、v38/revision41及运行入口清单，人工结论来自用户反馈；未实际触发的独立用例仍UNKNOWN，已验收提示仍限v37/revision40，全部旧通过保持原版本/清单。
+当前v41/revision44的[收藏材料消耗确认](MapInventoryFavoritesConsumptionConfirm.md)仅处理原B七个制作/修理/容量与工具升级按钮。首次有效按钮请求命中已应用收藏木石的正成本时暂存一个操作，在配方内显示数量提示，以Confirm/Cancel替换原按钮行；确认按最新已捕获候选和本地Revision复核后沿原请求提交一次，取消/关闭B/相关数量、等级、耐久、配方或已应用收藏变化/绑定失效清待确认。逐帧Clear仅隐藏，确认目标或高度变化清旧面板与行鼠标许可。确认独立于原消耗提示开关；数字1～7保持原直达链，偏好v4九字段、输入19、Ghost/服务器与保存入口保持。本阶段十六项人工GamePlayer已获用户通过反馈，主线程结合既有静态核对判定通过，限CombatPrototypeNetCode、v38/revision41及运行入口清单，人工结论来自用户反馈；未实际触发的独立用例仍UNKNOWN，已验收提示仍限v37/revision40，全部旧通过保持原版本/清单。

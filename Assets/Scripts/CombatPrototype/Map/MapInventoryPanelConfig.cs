@@ -114,5 +114,14 @@ namespace Code_01.CombatPrototype.Map
         public string noRecipeSearchResultsLabel;
         public bool preferencesSaveRecipeFilter;
         public bool preferencesSaveRecipeSearch;
+        public bool recipeFavoritesEnabled;
+        public int recipeFavoritesMaxCount;
+        public string recipeFavoriteButtonLabel;
+        public string recipeUnfavoriteButtonLabel;
+        public string recipeFavoriteTagLabel;
+        public string recipeFavoritesFullLabel;
+        public string favoriteRecipesLabel;
+        public string otherRecipesLabel;
+        public bool preferencesSaveRecipeFavorites;
     }
 }

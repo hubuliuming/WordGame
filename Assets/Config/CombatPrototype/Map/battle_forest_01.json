@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 41,
-  "configRevision": 44,
+  "schemaVersion": 42,
+  "configRevision": 45,
   "mapDefinitionId": "battle_forest_01",
   "defaultSeed": 12345,
   "resourcePersistence": {
@@ -389,7 +389,16 @@
     "clearRecipeSearchLabel": "Clear",
     "noRecipeSearchResultsLabel": "No matching recipes",
     "preferencesSaveRecipeFilter": true,
-    "preferencesSaveRecipeSearch": true
+    "preferencesSaveRecipeSearch": true,
+    "recipeFavoritesEnabled": true,
+    "recipeFavoritesMaxCount": 7,
+    "recipeFavoriteButtonLabel": "Favorite",
+    "recipeUnfavoriteButtonLabel": "Unfavorite",
+    "recipeFavoriteTagLabel": "Favorite",
+    "recipeFavoritesFullLabel": "Favorite limit",
+    "favoriteRecipesLabel": "Favorite recipes",
+    "otherRecipesLabel": "Other recipes",
+    "preferencesSaveRecipeFavorites": true
   },
   "inventoryCapacity": {
     "enabled": true,

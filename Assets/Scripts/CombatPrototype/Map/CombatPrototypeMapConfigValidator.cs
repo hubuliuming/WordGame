@@ -54,8 +54,8 @@ namespace Code_01.CombatPrototype.Map
             ValidateInventoryCapacityUpgrade(map.inventoryCapacityUpgrade, map.inventoryCapacity);
             ValidateInventoryDrop(map.inventoryDrop);
             Id(map.mapDefinitionId, "mapDefinitionId");
-            if (map.schemaVersion != 41 || map.configRevision < 1 || map.defaultSeed < 1)
-                throw new InvalidOperationException("Map requires schemaVersion=41, positive revision and seed.");
+            if (map.schemaVersion != 42 || map.configRevision < 1 || map.defaultSeed < 1)
+                throw new InvalidOperationException("Map requires schemaVersion=42, positive revision and seed.");
             var drops = map.drops;
             Id(drops.itemId, "drops.itemId");
             Id(drops.visualResourceKey, "drops.visualResourceKey");
@@ -649,6 +649,14 @@ namespace Code_01.CombatPrototype.Map
             HudLabel(panel.recipeSearchPlaceholderLabel, "inventoryPanel.recipeSearchPlaceholderLabel");
             HudLabel(panel.clearRecipeSearchLabel, "inventoryPanel.clearRecipeSearchLabel");
             HudLabel(panel.noRecipeSearchResultsLabel, "inventoryPanel.noRecipeSearchResultsLabel");
+            if (panel.recipeFavoritesMaxCount < 1 || panel.recipeFavoritesMaxCount > CombatPrototypeMapInventoryRecipeFavorites.MaximumStoredCount)
+                throw new InvalidOperationException("inventoryPanel.recipeFavoritesMaxCount requires an integer from 1 to 7.");
+            HudLabel(panel.recipeFavoriteButtonLabel, "inventoryPanel.recipeFavoriteButtonLabel");
+            HudLabel(panel.recipeUnfavoriteButtonLabel, "inventoryPanel.recipeUnfavoriteButtonLabel");
+            HudLabel(panel.recipeFavoriteTagLabel, "inventoryPanel.recipeFavoriteTagLabel");
+            HudLabel(panel.recipeFavoritesFullLabel, "inventoryPanel.recipeFavoritesFullLabel");
+            HudLabel(panel.favoriteRecipesLabel, "inventoryPanel.favoriteRecipesLabel");
+            HudLabel(panel.otherRecipesLabel, "inventoryPanel.otherRecipesLabel");
         }
 
         private static void HudLabel(string value, string field)

@@ -1058,3 +1058,16 @@
 - 修改十个现有C#与两地图JSON，无新增C#/meta；schema40/revision43→schema41/revision44，inventoryPanel107→109，追加两必填严格bool及原Settings byte/Baker映射，关闭仍完整验证。本机偏好v3七→v4九字段，新增recipeFilterMode/recipeSearchText；严格兼容v1/v2/v3，原内容保留、新类别按当前配置默认/词为空，仅内存迁移，实际已应用变化才写v4。
 - 正常Unity编译/重载与109字段/零GhostField、偏好v4九字段/接口、原协议/GUID核对通过；4450份非法地图配置拒绝/526组合法读取及两地图各263次共526次隔离Editor Bake通过，原布局/引用/签名/反馈保持，临时资源释放，主场景干净/3根对象/单场景/未Play。Console前[0,2,4]、Bake前[0,4,4]、Bake后/结束[0,6,4]，没有Error；原Package Manager/Input Manager、PEListener/DOTween及两MCP连接Warning保留。工具空失败返回已核实完整落盘结果与结束状态，未重跑业务。
 - 增量同步配方偏好专题、导航/关联模块、策划模板第7节完整JSON及第50节；原595项人工内容/编号保留，追加十六项后611项。主线程实现/静态范围核对通过，人工GamePlayer待验收；搜索及旧通过保持原版本/清单，独立运行/GUI/真实I/O/联网/性能用例UNKNOWN。未执行偏好Load/Save/协调/GUI业务、逻辑单元测试、GamePlayer/PlayMode、构建/发布、采样或图片，无子Agent、暂存或提交Git；全部资源结构保持。
+
+## 2026-10-11 制作配方显示偏好本地保存验收通过
+
+- 用户明确反馈“我已验收通过，接下来下一阶段”；主线程结合既有编译/配置/元数据/隔离Editor Bake静态证据判定本阶段通过，限CombatPrototypeNetCode、v41/revision44及运行入口十六项人工GamePlayer清单，人工结论来自用户反馈；未实际触发的独立用例仍UNKNOWN。
+- 同步配方偏好专题、关联文档、导航、运行入口与策划模板第50节验收状态；全部611项人工内容/编号及各旧阶段原版本/清单保持，4450份非法配置拒绝/526组合法读取和526次隔离Bake的原静态证据保留。
+- 本次仅文档更新，代码、JSON、meta与Scene/SubScene/Prefab/Animator/资源结构保持；未重新执行编译、Bake、逻辑单元测试、GUI业务、真实偏好或游戏存档I/O、GamePlayer/PlayMode、命令行构建/发布、性能或图片核对，未创建子Agent、暂存或提交Git。
+
+## 2026-10-11 制作配方收藏与置顶
+
+- 按用户确认方案接入CombatPrototypeNetCode原B七项稳定操作收藏、两区置顶与独立控制；分类/查询交集后应用一次待操作，实际改变沿原取消七未消费请求/待确认/鼠标许可并归零滚动。工具摘要常驻，关闭收藏恢复原布局，材料收藏与原业务Capture/服务器事务保持。
+- 修改十二现有C#与两地图JSON，新增普通RecipeFavorites/正常Unity导入meta，GUID=607d3f39f419f634da3bffcc64ccbd0b；schema41/revision44→schema42/revision45，inventoryPanel109→118，九必填字段、上限1～7/六文案严格验证、原Baker映射。本机偏好v4九→v5十字段，追加favoriteRecipeIds，严格兼容v1～v4并保留原v4类别/词，旧档只内存迁移；独立开关关闭保留原数组。
+- 正常Unity编译/元数据、4920份非法配置拒绝/612组合法读取、两地图各306次共612次隔离Editor Bake静态通过，118Settings/原布局/签名/引用/反馈保持，临时资源释放，主场景干净/3根对象/单场景/未Play。Bake前后/结束Console[0,6,4]一致，保留原六Warning/四Log；两个核对工具空失败返回已核实完整落盘结果与结束状态，未重跑业务。写入前唯一匹配检查拦下一个重复匹配，收紧至Draw后完成，生产文件在此前未写入。
+- 同步配方收藏专题、关联模块/导航/策划模板第7节完整JSON与第51节；修正材料收藏专题旧当前v3七字段说明及关联模块的当前字段数/协议版本，保留旧版本静态及人工范围。原611项人工内容/编号保留，新增十六项后627项。主线程实现/静态范围核对通过，人工GamePlayer待验收，未触发独立GUI/真实I/O/生命周期/事务/联网/性能用例UNKNOWN。未执行真实偏好或游戏存档I/O、GUI/收藏业务、GamePlayer/PlayMode、逻辑单元测试、构建/发布、采样或图片，无子Agent、暂存或Git提交；Scene/SubScene/Prefab/Animator及旧meta/资源结构保持。

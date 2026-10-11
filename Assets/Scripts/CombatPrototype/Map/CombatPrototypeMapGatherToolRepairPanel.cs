@@ -99,29 +99,30 @@ namespace Code_01.CombatPrototype.Map
             (axe && _axeConsumptionHint.Length != 0 ? 1 : 0) + (pickaxe && _pickaxeConsumptionHint.Length != 0 ? 1 : 0);
 
         public void Draw(float width, ref float y, float rowHeight, GUIStyle labelStyle, GUIStyle buttonStyle, bool mousePressAccepted,
-            CombatPrototypeMapInventoryConsumptionConfirmation confirmation, bool axe, bool pickaxe)
+            CombatPrototypeMapInventoryConsumptionConfirmation confirmation, bool axe, bool pickaxe, CombatPrototypeMapInventoryRecipeFavorites recipeFavorites)
         {
             if (!axe && !pickaxe) return;
             Label(width, ref y, rowHeight, labelStyle, _heading);
             if (axe) DrawTool(width, ref y, rowHeight, labelStyle, buttonStyle, mousePressAccepted,
-                _axeTitle, _axePreview, _axeRecipe, _axeConsumptionHint, _axeMissing, _axeButton, _canAxe, true, confirmation);
+                _axeTitle, _axePreview, _axeRecipe, _axeConsumptionHint, _axeMissing, _axeButton, _canAxe, true, confirmation, recipeFavorites);
             if (pickaxe) DrawTool(width, ref y, rowHeight, labelStyle, buttonStyle, mousePressAccepted,
-                _pickaxeTitle, _pickaxePreview, _pickaxeRecipe, _pickaxeConsumptionHint, _pickaxeMissing, _pickaxeButton, _canPickaxe, false, confirmation);
+                _pickaxeTitle, _pickaxePreview, _pickaxeRecipe, _pickaxeConsumptionHint, _pickaxeMissing, _pickaxeButton, _canPickaxe, false, confirmation, recipeFavorites);
         }
 
         private void DrawTool(float width, ref float y, float rowHeight, GUIStyle labelStyle, GUIStyle buttonStyle,
-            bool mousePressAccepted, string title, string preview, string recipe, string consumptionHint, string missing, string button, bool enabled, bool axe, CombatPrototypeMapInventoryConsumptionConfirmation confirmation)
+            bool mousePressAccepted, string title, string preview, string recipe, string consumptionHint, string missing, string button, bool enabled, bool axe, CombatPrototypeMapInventoryConsumptionConfirmation confirmation, CombatPrototypeMapInventoryRecipeFavorites recipeFavorites)
         {
-            Label(width, ref y, rowHeight, labelStyle, title);
+            var operation = axe ? ConsumptionOperation.RepairAxe : ConsumptionOperation.RepairPickaxe;
+            Label(width, ref y, rowHeight, labelStyle, recipeFavorites.Title(operation, title));
             Label(width, ref y, rowHeight, labelStyle, preview);
             Label(width, ref y, rowHeight, labelStyle, recipe);
             if (consumptionHint.Length != 0) Label(width, ref y, rowHeight, labelStyle, consumptionHint);
-            var operation = axe ? ConsumptionOperation.RepairAxe : ConsumptionOperation.RepairPickaxe;
             confirmation.DrawPrompt(operation, width, ref y, rowHeight, labelStyle);
             Label(width, ref y, rowHeight, labelStyle, missing);
             if (confirmation.DrawButtons(operation, width, y, rowHeight, buttonStyle, mousePressAccepted))
             {
                 y += rowHeight;
+                recipeFavorites.DrawRow(operation, width, ref y, rowHeight, buttonStyle, mousePressAccepted);
                 return;
             }
             var oldEnabled = GUI.enabled;
@@ -136,6 +137,7 @@ namespace Code_01.CombatPrototype.Map
             }
             finally { GUI.enabled = oldEnabled; }
             y += rowHeight;
+            recipeFavorites.DrawRow(operation, width, ref y, rowHeight, buttonStyle, mousePressAccepted);
         }
 
         private static void Label(float width, ref float y, float rowHeight, GUIStyle style, string text)

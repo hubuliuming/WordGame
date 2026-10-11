@@ -371,7 +371,16 @@ namespace Code_01.CombatPrototype.Map
                     ClearRecipeSearchLabel = new FixedString64Bytes(inventoryPanel.clearRecipeSearchLabel),
                     NoRecipeSearchResultsLabel = new FixedString64Bytes(inventoryPanel.noRecipeSearchResultsLabel),
                     PreferencesSaveRecipeFilter = (byte)(inventoryPanel.preferencesSaveRecipeFilter ? 1 : 0),
-                    PreferencesSaveRecipeSearch = (byte)(inventoryPanel.preferencesSaveRecipeSearch ? 1 : 0)
+                    PreferencesSaveRecipeSearch = (byte)(inventoryPanel.preferencesSaveRecipeSearch ? 1 : 0),
+                    RecipeFavoritesEnabled = (byte)(inventoryPanel.recipeFavoritesEnabled ? 1 : 0),
+                    RecipeFavoritesMaxCount = inventoryPanel.recipeFavoritesMaxCount,
+                    RecipeFavoriteButtonLabel = new FixedString64Bytes(inventoryPanel.recipeFavoriteButtonLabel),
+                    RecipeUnfavoriteButtonLabel = new FixedString64Bytes(inventoryPanel.recipeUnfavoriteButtonLabel),
+                    RecipeFavoriteTagLabel = new FixedString64Bytes(inventoryPanel.recipeFavoriteTagLabel),
+                    RecipeFavoritesFullLabel = new FixedString64Bytes(inventoryPanel.recipeFavoritesFullLabel),
+                    FavoriteRecipesLabel = new FixedString64Bytes(inventoryPanel.favoriteRecipesLabel),
+                    OtherRecipesLabel = new FixedString64Bytes(inventoryPanel.otherRecipesLabel),
+                    PreferencesSaveRecipeFavorites = (byte)(inventoryPanel.preferencesSaveRecipeFavorites ? 1 : 0)
                 });
                 var inventoryDrop = config.map.inventoryDrop;
                 AddComponent(entity, new CombatPrototypeMapInventoryDropSettings

@@ -15,14 +15,16 @@ namespace Code_01.CombatPrototype.Map
         private string _observedRecipeSearch, _writtenRecipeSearch;
         private bool _saveRecipeFilter, _saveRecipeSearch;
         private readonly HashSet<string> _writtenFavorites = new HashSet<string>(StringComparer.Ordinal);
-        private uint _observedFavoritesRevision;
+        private uint _observedFavoritesRevision, _observedRecipeFavoritesRevision;
+        private bool _saveRecipeFavorites;
+        private readonly HashSet<string> _writtenRecipeFavorites = new HashSet<string>(StringComparer.Ordinal);
         private float _delay, _changedAt;
         private bool _active, _dirty, _sortEnabled, _filterEnabled, _saveSearch, _saveFavorites, _saveFavoritesFilter;
         private bool _observedFavoritesOnly, _writtenFavoritesOnly;
 
         public void Configure(CombatPrototypeMapInventoryPanelSettings settings, string mapId,
             CombatPrototypeMapInventoryPanelListView view, CombatPrototypeMapInventoryPanelSearch search, CombatPrototypeMapInventoryPanelFavorites favorites,
-            CombatPrototypeMapInventoryRecipeFilter recipeFilter, CombatPrototypeMapInventoryPanelSearch recipeSearch)
+            CombatPrototypeMapInventoryRecipeFilter recipeFilter, CombatPrototypeMapInventoryPanelSearch recipeSearch, CombatPrototypeMapInventoryRecipeFavorites recipeFavorites)
         {
             // Panel先Reset并提交旧绑定，再配置本绑定；关闭功能时不访问文件。
             if (settings.Enabled == 0 || settings.PreferencesEnabled == 0) return;
@@ -33,6 +35,7 @@ namespace Code_01.CombatPrototype.Map
             _saveRecipeFilter = settings.PreferencesSaveRecipeFilter != 0 && recipeFilter.Enabled;
             _saveRecipeSearch = settings.PreferencesSaveRecipeSearch != 0 && recipeSearch.Enabled;
             _saveFavorites = favorites.Enabled;
+            _saveRecipeFavorites = settings.PreferencesSaveRecipeFavorites != 0 && recipeFavorites.Enabled;
             _saveFavoritesFilter = view.FavoritesFilterEnabled;
             _delay = settings.PreferencesSaveDelaySeconds;
             try
@@ -59,6 +62,7 @@ namespace Code_01.CombatPrototype.Map
                     if (_saveFavoritesFilter) view.RestoreFavoritesOnly(_data.FavoritesOnly);
                     if (_saveRecipeFilter) recipeFilter.Restore(_data.RecipeFilterMode);
                     if (_saveRecipeSearch) recipeSearch.Restore(_data.RecipeSearchText);
+                    if (_saveRecipeFavorites) recipeFavorites.Restore(_data.FavoriteRecipeIds);
                 }
                 _writtenSort = _data.SortMode;
                 _writtenFilter = _data.FilterMode;
@@ -68,12 +72,15 @@ namespace Code_01.CombatPrototype.Map
                 _writtenFavoritesOnly = _data.FavoritesOnly;
                 _writtenFavorites.Clear();
                 _writtenFavorites.UnionWith(_data.FavoriteItemNames);
+                _writtenRecipeFavorites.Clear();
+                _writtenRecipeFavorites.UnionWith(_data.FavoriteRecipeIds);
                 _observedSort = view.SortMode;
                 _observedFilter = view.FilterMode;
                 _observedSearch = search.AppliedText;
                 _observedRecipeFilter = recipeFilter.Mode;
                 _observedRecipeSearch = recipeSearch.AppliedText;
                 _observedFavoritesRevision = favorites.Revision;
+                _observedRecipeFavoritesRevision = recipeFavorites.Revision;
                 _observedFavoritesOnly = view.FavoritesOnly;
                 _active = true;
             }
@@ -81,7 +88,7 @@ namespace Code_01.CombatPrototype.Map
         }
 
         public void Capture(CombatPrototypeMapInventoryPanelListView view, CombatPrototypeMapInventoryPanelSearch search, CombatPrototypeMapInventoryPanelFavorites favorites,
-            CombatPrototypeMapInventoryRecipeFilter recipeFilter, CombatPrototypeMapInventoryPanelSearch recipeSearch)
+            CombatPrototypeMapInventoryRecipeFilter recipeFilter, CombatPrototypeMapInventoryPanelSearch recipeSearch, CombatPrototypeMapInventoryRecipeFavorites recipeFavorites)
         {
             if (!_active) return;
             var changed = false;
@@ -121,11 +128,17 @@ namespace Code_01.CombatPrototype.Map
                 _data.RecipeSearchText = _observedRecipeSearch = recipeSearch.AppliedText;
                 changed = true;
             }
+            if (_saveRecipeFavorites && _observedRecipeFavoritesRevision != recipeFavorites.Revision)
+            {
+                recipeFavorites.CopyIds(_data.FavoriteRecipeIds);
+                _observedRecipeFavoritesRevision = recipeFavorites.Revision;
+                changed = true;
+            }
             if (changed)
             {
                 _changedAt = Time.unscaledTime;
                 _dirty = _data.SortMode != _writtenSort || _data.FilterMode != _writtenFilter || _data.SearchText != _writtenSearch || _data.FavoritesOnly != _writtenFavoritesOnly ||
-                    _data.RecipeFilterMode != _writtenRecipeFilter || _data.RecipeSearchText != _writtenRecipeSearch || FavoritesDiffer();
+                    _data.RecipeFilterMode != _writtenRecipeFilter || _data.RecipeSearchText != _writtenRecipeSearch || FavoritesDiffer() || RecipeFavoritesDiffer();
             }
             if (_dirty && Time.unscaledTime - _changedAt >= _delay) Flush();
         }
@@ -144,9 +157,19 @@ namespace Code_01.CombatPrototype.Map
                 _writtenFavoritesOnly = _data.FavoritesOnly;
                 _writtenFavorites.Clear();
                 _writtenFavorites.UnionWith(_data.FavoriteItemNames);
+                _writtenRecipeFavorites.Clear();
+                _writtenRecipeFavorites.UnionWith(_data.FavoriteRecipeIds);
                 _dirty = false;
             }
             catch (Exception exception) { Disable("Save", exception); }
+        }
+
+        private bool RecipeFavoritesDiffer()
+        {
+            if (_data.FavoriteRecipeIds.Count != _writtenRecipeFavorites.Count) return true;
+            foreach (var id in _data.FavoriteRecipeIds)
+                if (!_writtenRecipeFavorites.Contains(id)) return true;
+            return false;
         }
 
         private bool FavoritesDiffer()
@@ -170,7 +193,9 @@ namespace Code_01.CombatPrototype.Map
             _observedFavoritesOnly = _writtenFavoritesOnly = _saveRecipeFilter = _saveRecipeSearch = false;
             _data = null;
             _writtenFavorites.Clear();
-            _observedFavoritesRevision = 0;
+            _observedFavoritesRevision = _observedRecipeFavoritesRevision = 0;
+            _saveRecipeFavorites = false;
+            _writtenRecipeFavorites.Clear();
             _observedSort = _writtenSort = CombatPrototypeMapInventorySortMode.Original;
             _observedFilter = _writtenFilter = CombatPrototypeMapInventoryFilterMode.All;
             _observedRecipeFilter = _writtenRecipeFilter = CombatPrototypeMapInventoryRecipeFilterMode.All;

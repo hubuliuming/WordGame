@@ -1,6 +1,6 @@
 # 制作配方搜索
 
-返回[地图](Map.md)、[B面板](MapInventoryPanel.md)、[配方分类](MapInventoryRecipeFilter.md)、[材料搜索](MapInventorySearch.md)、[偏好](MapInventoryPreferences.md)、[消耗确认](MapInventoryFavoritesConsumptionConfirm.md)、[修理](MapToolRepair.md)、[工具升级](MapGatherToolUpgrade.md)、[配置](DataResources.md)与[运行入口](Runtime.md)。入口CombatPrototypeNetCode，原B面板；当前Forest/Grassland Json及BuiltIn均为v41/revision44。用户已确认本阶段人工GamePlayer验收通过，主线程结合既有静态核对与用户反馈判定通过，限CombatPrototypeNetCode、v40/revision43及运行入口十六项清单；人工结论来自用户反馈，未触发独立用例仍UNKNOWN。分类已验收仍限v39/revision42十六项，各旧通过保持原版本/清单。
+返回[地图](Map.md)、[B面板](MapInventoryPanel.md)、[配方分类](MapInventoryRecipeFilter.md)、[材料搜索](MapInventorySearch.md)、[偏好](MapInventoryPreferences.md)、[消耗确认](MapInventoryFavoritesConsumptionConfirm.md)、[修理](MapToolRepair.md)、[工具升级](MapGatherToolUpgrade.md)、[配置](DataResources.md)与[运行入口](Runtime.md)。入口CombatPrototypeNetCode，原B面板；当前Forest/Grassland Json及BuiltIn均为v42/revision45。用户已确认本阶段人工GamePlayer验收通过，主线程结合既有静态核对与用户反馈判定通过，限CombatPrototypeNetCode、v40/revision43及运行入口十六项清单；人工结论来自用户反馈，未触发独立用例仍UNKNOWN。分类已验收仍限v39/revision42十六项，各旧通过保持原版本/清单。
 
 ## 【FACT】职责与调用链
 
@@ -12,7 +12,7 @@
 
 ## 【FACT】JSON契约
 
-[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与BuiltIn一致schemaVersion=41/configRevision=44。inventoryPanel原100字段与搜索七字段保留，另有[配方偏好](MapInventoryRecipePreferences.md)两字段，当前109；搜索字段如下：
+[Forest](../../Assets/Config/CombatPrototype/Map/battle_forest_01.json)、[Grassland](../../Assets/Config/CombatPrototype/Map/battle_grassland_01.json)与BuiltIn一致schemaVersion=42/configRevision=45。inventoryPanel原100字段与搜索七字段保留，另有[配方偏好](MapInventoryRecipePreferences.md)两字段及[配方收藏](MapInventoryRecipeFavorites.md)九字段，当前118；搜索字段如下：
 
 | 字段 | 默认值 | 映射与校验 |
 |---|---|---|
@@ -24,9 +24,9 @@
 | clearRecipeSearchLabel | Clear | 文案→ClearRecipeSearchLabel FixedString64Bytes |
 | noRecipeSearchResultsLabel | No matching recipes | 文案→NoRecipeSearchResultsLabel FixedString64Bytes |
 
-四文案非空白、无控制字符、最多61 UTF-8字节。长度按UTF-16单位限制，复用原粘贴控制字符/破损代理清洗；合法代理对占两个单位。关闭搜索/面板或原显示能力仍完整验证。DTO/Settings各109字段：DTO二十二bool、六float、四int、三模式string、73文案string及一偏好文件ID；Settings二十二byte、六float、四int、三byte枚举及74 FixedString64Bytes，零GhostField/无GhostComponent。
+四文案非空白、无控制字符、最多61 UTF-8字节。长度按UTF-16单位限制，复用原粘贴控制字符/破损代理清洗；合法代理对占两个单位。关闭搜索/面板或原显示能力仍完整验证。DTO/Settings各118字段：DTO二十四bool、六float、五int、三模式string、79文案string及一偏好文件ID；Settings二十四byte、六float、五int、三byte枚举及80 FixedString64Bytes，零GhostField/无GhostComponent。
 
-原严格UTF-8、对象完整、缺失/null/错类型/未知/重复键与语义校验保持；只接受schema41，旧v1～v40及未来版本拒绝，不补默认或回退来源。正常导入/烘焙后生效，无热重载，各端同版。原设置、玩家存档v4、世界存档v2保持；偏好已为v4九字段并严格兼容v1/v2/v3，详见[配方偏好](MapInventoryRecipePreferences.md)。
+原严格UTF-8、对象完整、缺失/null/错类型/未知/重复键与语义校验保持；只接受schema42，旧v1～v41及未来版本拒绝，不补默认或回退来源。正常导入/烘焙后生效，无热重载，各端同版。原设置、玩家存档v4、世界存档v2保持；偏好已为v5十字段并严格兼容v1～v4，详见[配方偏好](MapInventoryRecipePreferences.md)。
 
 ## 【CURRENT STRATEGY】匹配与显示
 
@@ -53,7 +53,11 @@ ReadInput每帧采样两实例，BlocksKeyboard/BlocksMouse取并集；Draw在�
 
 实际已应用文本改变或分类切换清原七请求/待确认并归零滚动，即使匹配结果/高度相同也清旧鼠标许可；不撤销已提交服务器事务，不清Drop请求、已应用收藏或材料选择。Reset view清配方草稿/查询/待编辑并恢复配置默认类别；Close丢弃未应用草稿、释放焦点，保留同绑定已应用关键词和类别。逐帧Clear仅隐藏，不清查询/编辑；无效ReadInput释放焦点并沿原清请求。Reset/死亡/断线/源、玩家、World或Scene变化沿原绑定Reset清旧关键词，新绑定先初始化空查询，再按[配方偏好](MapInventoryRecipePreferences.md)开关/正式记录恢复。
 
-配方查询的已应用值传入Preferences，按PreferencesSaveRecipeSearch与RecipeSearchEnabled参与原延迟保存/恢复；原材料搜索仍由PreferencesSaveSearch独立控制。偏好v4九字段、严格v1/v2/v3兼容及关闭项保留归[配方偏好](MapInventoryRecipePreferences.md)。服务端资格/材料投影/SavePrepared顺序、输入/RPC/Ghost及玩家/世界存档协议保持。
+配方查询的已应用值传入Preferences，按PreferencesSaveRecipeSearch与RecipeSearchEnabled参与原延迟保存/恢复；原材料搜索仍由PreferencesSaveSearch独立控制。偏好v5十字段、严格v1～v4兼容及关闭项保留归[配方偏好](MapInventoryRecipePreferences.md)。服务端资格/材料投影/SavePrepared顺序、输入/RPC/Ghost及玩家/世界存档协议保持。
+
+## 【CURRENT STRATEGY】配方收藏与分区
+
+原分类/搜索交集保持，[配方收藏](MapInventoryRecipeFavorites.md)在其后按稳定操作ID分为收藏/其他两区，实际收藏变化沿原取消规则；原七项完整Capture保持，三个预览Draw追加独立收藏控制，偏好当前v5十字段。
 
 ## 【KNOWN ISSUES】静态核对与人工边界
 

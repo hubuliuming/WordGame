@@ -12,7 +12,7 @@ namespace Code_01.CombatPrototype.Map
     // 文件协议和读写独立于界面状态；只有客户端偏好协调类调用。
     internal static class CombatPrototypeMapInventoryPanelPreferencesStore
     {
-        public const int CurrentVersion = 4;
+        public const int CurrentVersion = 5;
         private static readonly UTF8Encoding Encoding = new UTF8Encoding(false, true);
 
         public static string PathFor(string fileId, string mapId) => Path.Combine(Application.persistentDataPath,
@@ -42,16 +42,16 @@ namespace Code_01.CombatPrototype.Map
             var version = root["version"];
             if (version == null || version.Type != JTokenType.Integer ||
                 !int.TryParse(version.ToString(Formatting.None), NumberStyles.Integer, CultureInfo.InvariantCulture, out var value) ||
-                (value != 1 && value != 2 && value != 3 && value != CurrentVersion))
-                throw new InvalidDataException("Preferences require version=1, 2, 3 or 4: " + path);
-            if (root.Count != (value == 1 ? 5 : value == 2 ? 6 : value == 3 ? 7 : 9))
-                throw new InvalidDataException("Preferences require exactly five v1, six v2, seven v3 or nine v4 fields: " + path);
+                (value != 1 && value != 2 && value != 3 && value != 4 && value != CurrentVersion))
+                throw new InvalidDataException("Preferences require version=1, 2, 3, 4 or 5: " + path);
+            if (root.Count != (value == 1 ? 5 : value == 2 ? 6 : value == 3 ? 7 : value == 4 ? 9 : 10))
+                throw new InvalidDataException("Preferences require exactly five v1, six v2, seven v3, nine v4 or ten v5 fields: " + path);
             var storedMap = ReadString(root, "mapDefinitionId", path);
             if (!string.Equals(storedMap, mapId, StringComparison.Ordinal))
                 throw new InvalidDataException("Preferences mapDefinitionId mismatch: " + path);
             var search = ReadString(root, "searchText", path);
             ValidateSearch(search, path, "searchText");
-            var recipeSearch = value == CurrentVersion ? ReadString(root, "recipeSearchText", path) : string.Empty;
+            var recipeSearch = value >= 4 ? ReadString(root, "recipeSearchText", path) : string.Empty;
             ValidateSearch(recipeSearch, path, "recipeSearchText");
             return new CombatPrototypeMapInventoryPanelPreferencesData
             {
@@ -62,8 +62,9 @@ namespace Code_01.CombatPrototype.Map
                 SearchText = search,
                 FavoriteItemNames = value == 1 ? new List<string>() : ReadFavorites(root, path),
                 FavoritesOnly = value >= 3 && ReadBool(root, "favoritesOnly", path),
-                RecipeFilterMode = value == CurrentVersion ? CombatPrototypeMapInventoryRecipeFilter.ResolveMode(ReadString(root, "recipeFilterMode", path), "recipeFilterMode") : legacyRecipeMode,
-                RecipeSearchText = recipeSearch
+                RecipeFilterMode = value >= 4 ? CombatPrototypeMapInventoryRecipeFilter.ResolveMode(ReadString(root, "recipeFilterMode", path), "recipeFilterMode") : legacyRecipeMode,
+                RecipeSearchText = recipeSearch,
+                FavoriteRecipeIds = value == CurrentVersion ? ReadRecipeFavorites(root, path) : new List<string>()
             };
         }
 
@@ -71,6 +72,8 @@ namespace Code_01.CombatPrototype.Map
         {
             var favorites = new JArray();
             foreach (var name in data.FavoriteItemNames) favorites.Add(name);
+            var recipeFavorites = new JArray();
+            foreach (var id in data.FavoriteRecipeIds) recipeFavorites.Add(id);
             var root = new JObject
             {
                 ["version"] = data.Version,
@@ -81,7 +84,8 @@ namespace Code_01.CombatPrototype.Map
                 ["favoriteItemNames"] = favorites,
                 ["favoritesOnly"] = data.FavoritesOnly,
                 ["recipeFilterMode"] = data.RecipeFilterMode.ToString().ToLowerInvariant(),
-                ["recipeSearchText"] = data.RecipeSearchText
+                ["recipeSearchText"] = data.RecipeSearchText,
+                ["favoriteRecipeIds"] = recipeFavorites
             };
             var bytes = Encoding.GetBytes(root.ToString(Formatting.Indented) + "\n");
             var temporaryPath = path + ".tmp";
@@ -93,6 +97,21 @@ namespace Code_01.CombatPrototype.Map
             }
             if (File.Exists(path)) File.Replace(temporaryPath, path, null);
             else File.Move(temporaryPath, path);
+        }
+
+        private static List<string> ReadRecipeFavorites(JObject root, string path)
+        {
+            if (!(root["favoriteRecipeIds"] is JArray values) || values.Count > CombatPrototypeMapInventoryRecipeFavorites.MaximumStoredCount)
+                throw new InvalidDataException("favoriteRecipeIds requires an array of at most seven stable recipe IDs: " + path);
+            var ids = new List<string>(values.Count);
+            var seen = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var value in values)
+            {
+                if (value.Type != JTokenType.String || !CombatPrototypeMapInventoryRecipeFavorites.TryResolveId(value.Value<string>(), out _) || !seen.Add(value.Value<string>()))
+                    throw new InvalidDataException("favoriteRecipeIds requires unique known recipe IDs: " + path);
+                ids.Add(value.Value<string>());
+            }
+            return ids;
         }
 
         private static string ReadString(JObject root, string name, string path)

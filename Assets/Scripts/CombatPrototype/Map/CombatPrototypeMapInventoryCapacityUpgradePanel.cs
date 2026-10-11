@@ -74,9 +74,9 @@ namespace Code_01.CombatPrototype.Map
         private string Limit(string label, int current, int next, bool max) =>
             label + "  " + (!_capacityEnabled ? _unlimited : current + (max ? string.Empty : " -> " + next));
 
-        public void Draw(float width, ref float y, float rowHeight, GUIStyle labelStyle, GUIStyle buttonStyle, bool mousePressAccepted, CombatPrototypeMapInventoryConsumptionConfirmation confirmation)
+        public void Draw(float width, ref float y, float rowHeight, GUIStyle labelStyle, GUIStyle buttonStyle, bool mousePressAccepted, CombatPrototypeMapInventoryConsumptionConfirmation confirmation, CombatPrototypeMapInventoryRecipeFavorites recipeFavorites)
         {
-            Label(width, ref y, rowHeight, labelStyle, _heading);
+            Label(width, ref y, rowHeight, labelStyle, recipeFavorites.Title(ConsumptionOperation.CapacityUpgrade, _heading));
             Label(width, ref y, rowHeight, labelStyle, _levelText);
             Label(width, ref y, rowHeight, labelStyle, _totalText);
             Label(width, ref y, rowHeight, labelStyle, _appleText);
@@ -97,6 +97,7 @@ namespace Code_01.CombatPrototype.Map
                 finally { GUI.enabled = oldEnabled; }
             }
             y += rowHeight;
+            recipeFavorites.DrawRow(ConsumptionOperation.CapacityUpgrade, width, ref y, rowHeight, buttonStyle, mousePressAccepted);
             Label(width, ref y, rowHeight, labelStyle, _feedback.Feedback);
         }
 

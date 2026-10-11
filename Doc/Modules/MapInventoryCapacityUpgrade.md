@@ -1,6 +1,6 @@
 # 背包容量扩展与升级
 
-返回[背包](Inventory.md)、[地图](Map.md)与[材料容量](MapInventoryCapacity.md)。本专题负责 CombatPrototypeNetCode 的个人永久容量等级、升级配方、所属反馈和 B/5 输入。玩家文件的唯一契约归[资源与数据](DataResources.md)，人工清单归[运行入口](Runtime.md)。当前地图 schemaVersion=41/configRevision=44；用户已确认人工GamePlayer通过，限v20/revision23升级十六项。
+返回[背包](Inventory.md)、[地图](Map.md)与[材料容量](MapInventoryCapacity.md)。本专题负责 CombatPrototypeNetCode 的个人永久容量等级、升级配方、所属反馈和 B/5 输入。玩家文件的唯一契约归[资源与数据](DataResources.md)，人工清单归[运行入口](Runtime.md)。当前地图 schemaVersion=42/configRevision=45；用户已确认人工GamePlayer通过，限v20/revision23升级十六项。
 
 ## 【FACT】入口与职责
 
@@ -80,9 +80,9 @@ inventoryCapacity.enabled=false 时 B 显示 Unlimited，F/G 原整批结算不�
 
 升级反馈只在本通道显示，客户端 unscaledTime 仅决定2秒期限。初次绑定只观察既有 Sequence，不重播旧结果；非法 Result 或 None搭配非零序号记录原异常并隐藏本反馈。关闭B清未提交请求和滚动位置；无有效玩家帧隐藏面板并清请求。死亡/断线及源/玩家/World/Scene变化沿原绑定Reset清投影、旧序号/文字/期限。等级永久状态由服务器/玩家档保留，不由显示清理重置；已进入 NetCode 命令的请求仍按服务端当次资格处理。
 
-## 【CURRENT STRATEGY】配方分类、搜索与偏好关联
+## 【CURRENT STRATEGY】配方分类、搜索、偏好与收藏关联
 
-当前v41/revision44的[配方偏好](MapInventoryRecipePreferences.md)把配方类别与已应用关键词接入本机偏好v4九字段；独立保存开关、严格v1/v2/v3迁移、关闭项保留和重置/延迟/失败规则归专题。材料与工具状态、原输入/Ghost及服务器事务/玩家和世界档案保持；本阶段待人工。搜索用户通过仍限v40/revision43十六项，分类仍限v39/revision42原清单，其他旧通过保持原范围，未触发独立用例仍UNKNOWN。
+当前v42/revision45的[配方收藏](MapInventoryRecipeFavorites.md)在原七项操作接入本机收藏/分区置顶，偏好v5十字段严格兼容v1～v4；独立保存、关闭项保留、上限/重置/延迟/失败规则归专题。材料收藏/工具状态、原输入/Ghost及服务器事务/玩家和世界档案保持；本阶段待人工。配方偏好用户通过仍限v41/revision44十六项，搜索仍限v40/revision43十六项，分类仍限v39/revision42原清单，各旧通过保持原范围，未触发独立用例仍UNKNOWN。
 
 ## 【KNOWN ISSUES】静态与人工边界
 

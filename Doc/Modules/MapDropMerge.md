@@ -1,6 +1,6 @@
 # 同类地面掉落物合并
 
-返回[地图](Map.md)、[掉落与拾取](MapDrops.md)、[掉落存档](MapDropPersistence.md)、[背包丢弃](MapInventoryDrop.md)与[运行入口](Runtime.md)。入口CombatPrototypeNetCode；Forest/Grassland Json与BuiltIn当前schemaVersion=41/configRevision=44。用户已确认本阶段人工GamePlayer通过，主线程结合既有代码、配置及隔离烘焙静态核对判定通过，限v26/revision29及运行入口十六项；人工结论来自用户反馈；旧G结果通过仍限v25/revision28十六项，其他旧通过保持原版本/清单。
+返回[地图](Map.md)、[掉落与拾取](MapDrops.md)、[掉落存档](MapDropPersistence.md)、[背包丢弃](MapInventoryDrop.md)与[运行入口](Runtime.md)。入口CombatPrototypeNetCode；Forest/Grassland Json与BuiltIn当前schemaVersion=42/configRevision=45。用户已确认本阶段人工GamePlayer通过，主线程结合既有代码、配置及隔离烘焙静态核对判定通过，限v26/revision29及运行入口十六项；人工结论来自用户反馈；旧G结果通过仍限v25/revision28十六项，其他旧通过保持原版本/清单。
 
 ## 【FACT】入口与文件
 
@@ -65,9 +65,9 @@ G仍由服务端按玩家距离/同距小DropId选择当前真实目标，Networ
 
 世界/掉落保存关闭时沿原不保存/不恢复规则，合并开关独立。世界写失败仍保留旧正式档、当前合并继续存在，沿原保存点重试；不回滚本局合并或追加玩家保存。玩家/世界跨文件一致性、防重复、同槽并发及异常ECS恢复没有新增保证。
 
-## 【CURRENT STRATEGY】配方分类、搜索与偏好关联
+## 【CURRENT STRATEGY】配方分类、搜索、偏好与收藏关联
 
-当前v41/revision44的[配方偏好](MapInventoryRecipePreferences.md)把配方类别与已应用关键词接入本机偏好v4九字段；独立保存开关、严格v1/v2/v3迁移、关闭项保留和重置/延迟/失败规则归专题。材料与工具状态、原输入/Ghost及服务器事务/玩家和世界档案保持；本阶段待人工。搜索用户通过仍限v40/revision43十六项，分类仍限v39/revision42原清单，其他旧通过保持原范围，未触发独立用例仍UNKNOWN。
+当前v42/revision45的[配方收藏](MapInventoryRecipeFavorites.md)在原七项操作接入本机收藏/分区置顶，偏好v5十字段严格兼容v1～v4；独立保存、关闭项保留、上限/重置/延迟/失败规则归专题。材料收藏/工具状态、原输入/Ghost及服务器事务/玩家和世界档案保持；本阶段待人工。配方偏好用户通过仍限v41/revision44十六项，搜索仍限v40/revision43十六项，分类仍限v39/revision42原清单，各旧通过保持原范围，未触发独立用例仍UNKNOWN。
 
 ## 【KNOWN ISSUES】错误隔离与静态证据
 

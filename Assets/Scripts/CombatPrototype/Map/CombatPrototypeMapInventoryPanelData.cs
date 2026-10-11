@@ -114,5 +114,14 @@ namespace Code_01.CombatPrototype.Map
         public FixedString64Bytes NoRecipeSearchResultsLabel;
         public byte PreferencesSaveRecipeFilter;
         public byte PreferencesSaveRecipeSearch;
+        public byte RecipeFavoritesEnabled;
+        public int RecipeFavoritesMaxCount;
+        public FixedString64Bytes RecipeFavoriteButtonLabel;
+        public FixedString64Bytes RecipeUnfavoriteButtonLabel;
+        public FixedString64Bytes RecipeFavoriteTagLabel;
+        public FixedString64Bytes RecipeFavoritesFullLabel;
+        public FixedString64Bytes FavoriteRecipesLabel;
+        public FixedString64Bytes OtherRecipesLabel;
+        public byte PreferencesSaveRecipeFavorites;
     }
 }

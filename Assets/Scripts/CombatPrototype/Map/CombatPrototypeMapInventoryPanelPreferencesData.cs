@@ -14,5 +14,6 @@ namespace Code_01.CombatPrototype.Map
         public bool FavoritesOnly;
         public CombatPrototypeMapInventoryRecipeFilterMode RecipeFilterMode;
         public string RecipeSearchText;
+        public List<string> FavoriteRecipeIds = new List<string>();
     }
 }

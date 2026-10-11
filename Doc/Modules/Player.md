@@ -58,9 +58,9 @@ ChangeAll 先得到本次最终上限，再据其约束本次有非零增量的�
 
 `EnableAttack(CostPower)` 检查玩家未死亡、成本非负且不超过当前体力；等于当前体力可扣至 0，其后不能支付正成本。具体循环规则见[战斗](Combat.md)。
 
-## 【CURRENT STRATEGY】配方分类、搜索与偏好关联
+## 【CURRENT STRATEGY】配方分类、搜索、偏好与收藏关联
 
-当前v41/revision44的[配方偏好](MapInventoryRecipePreferences.md)把配方类别与已应用关键词接入本机偏好v4九字段；独立保存开关、严格v1/v2/v3迁移、关闭项保留和重置/延迟/失败规则归专题。材料与工具状态、原输入/Ghost及服务器事务/玩家和世界档案保持；本阶段待人工。搜索用户通过仍限v40/revision43十六项，分类仍限v39/revision42原清单，其他旧通过保持原范围，未触发独立用例仍UNKNOWN。
+当前v42/revision45的[配方收藏](MapInventoryRecipeFavorites.md)在原七项操作接入本机收藏/分区置顶，偏好v5十字段严格兼容v1～v4；独立保存、关闭项保留、上限/重置/延迟/失败规则归专题。材料收藏/工具状态、原输入/Ghost及服务器事务/玩家和世界档案保持；本阶段待人工。配方偏好用户通过仍限v41/revision44十六项，搜索仍限v40/revision43十六项，分类仍限v39/revision42原清单，各旧通过保持原范围，未触发独立用例仍UNKNOWN。
 
 ## 【KNOWN ISSUES】静态边界
 
@@ -295,7 +295,7 @@ v13/16的[资源状态](MapResourceStatusHud.md)由Player Baker追加所属Mode/
 
 ## 【FACT】G目标可领取数量
 
-当前v41/revision44的[部分拾取](MapDropPartialPickup.md)在原CombatPrototypeMapPickupHudState增加int PickupQuantity，第七个GhostField仍SendToOwner；Player Baker继续添加原Hidden默认值，七字段均零/空初态，组件挂载与Player Prefab保持。实际G读取本人的容量Level/库存决定本次量，所属结果仍原四字段且成功数量为实际增量。输入19、Tools3、F4/资源状态4/世界保存3及原反馈、生命/体力/R、玩家v4/世界v2保持；各端同版重新烘焙。部分拾取v27阶段编译、Serializer七字段/7 mask bits/88字节结构与40次隔离Bake静态通过；用户人工通过限v27/revision30十六项，未触发独立用例UNKNOWN；旧通过仍限原版本/清单。
+当前v42/revision45的[部分拾取](MapDropPartialPickup.md)在原CombatPrototypeMapPickupHudState增加int PickupQuantity，第七个GhostField仍SendToOwner；Player Baker继续添加原Hidden默认值，七字段均零/空初态，组件挂载与Player Prefab保持。实际G读取本人的容量Level/库存决定本次量，所属结果仍原四字段且成功数量为实际增量。输入19、Tools3、F4/资源状态4/世界保存3及原反馈、生命/体力/R、玩家v4/世界v2保持；各端同版重新烘焙。部分拾取v27阶段编译、Serializer七字段/7 mask bits/88字节结构与40次隔离Bake静态通过；用户人工通过限v27/revision30十六项，未触发独立用例UNKNOWN；旧通过仍限原版本/清单。
 
 ## 【CURRENT STRATEGY】B材料搜索的本地键盘采样
 
@@ -333,4 +333,4 @@ v37/revision40提示阶段的[收藏材料消耗提示](MapInventoryFavoritesCon
 
 ## 【CURRENT STRATEGY】收藏材料消耗确认
 
-当前v41/revision44的[收藏材料消耗确认](MapInventoryFavoritesConsumptionConfirm.md)仅处理原B七个制作/修理/容量与工具升级按钮。首次有效按钮请求命中已应用收藏木石的正成本时暂存一个操作，在配方内显示数量提示，以Confirm/Cancel替换原按钮行；确认按最新已捕获候选和本地Revision复核后沿原请求提交一次，取消/关闭B/相关数量、等级、耐久、配方或已应用收藏变化/绑定失效清待确认。逐帧Clear仅隐藏，确认目标或高度变化清旧面板与行鼠标许可。确认独立于原消耗提示开关；数字1～7保持原直达链，偏好v4九字段、输入19、Ghost/服务器与保存入口保持。本阶段十六项人工GamePlayer已获用户通过反馈，主线程结合既有静态核对判定通过，限CombatPrototypeNetCode、v38/revision41及运行入口清单，人工结论来自用户反馈；未实际触发的独立用例仍UNKNOWN，已验收提示仍限v37/revision40，全部旧通过保持原版本/清单。
+当前v42/revision45的[收藏材料消耗确认](MapInventoryFavoritesConsumptionConfirm.md)仅处理原B七个制作/修理/容量与工具升级按钮。首次有效按钮请求命中已应用收藏木石的正成本时暂存一个操作，在配方内显示数量提示，以Confirm/Cancel替换原按钮行；确认按最新已捕获候选和本地Revision复核后沿原请求提交一次，取消/关闭B/相关数量、等级、耐久、配方或已应用收藏变化/绑定失效清待确认。逐帧Clear仅隐藏，确认目标或高度变化清旧面板与行鼠标许可。确认独立于原消耗提示开关；数字1～7保持原直达链，偏好v5十字段、输入19、Ghost/服务器与保存入口保持。本阶段十六项人工GamePlayer已获用户通过反馈，主线程结合既有静态核对判定通过，限CombatPrototypeNetCode、v38/revision41及运行入口清单，人工结论来自用户反馈；未实际触发的独立用例仍UNKNOWN，已验收提示仍限v37/revision40，全部旧通过保持原版本/清单。

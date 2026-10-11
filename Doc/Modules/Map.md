@@ -15,7 +15,7 @@
 
 ## 【FACT】当前默认配置
 
-v41/44；[配方偏好](MapInventoryRecipePreferences.md)待验收；旧通过限原版本/清单。
+v42/45；[配方收藏](MapInventoryRecipeFavorites.md)待验收；旧通过限原版本/清单。
 
 | 配置字段 | 当前值与用途 |
 |---|---|
@@ -64,7 +64,7 @@ gather_apple 的 footprintRadiusMeters=0.3、minimumSameTypeSpacingMeters=1.5、
 | GroundsJson | [grounds.json](../../Assets/Config/CombatPrototype/Map/grounds.json) | GroundDefinitionConfig 数组 |
 | ObjectsJson | [objects.json](../../Assets/Config/CombatPrototype/Map/objects.json) | MapObjectDefinitionConfig 数组 |
 
-SourceMode=BuiltIn 时明确使用内置来源，SourceMode=Json 时使用选中地图 JSON 和三份共享 JSON；Json 来源失败不自动回退 BuiltIn。Preset=Grassland 要求地图 ID 为 battle_grassland_01，Preset=Forest 要求 battle_forest_01。schemaVersion=41为契约版本，configRevision须为正整数；旧v1～v40或缺少必填字段明确失败，不补字段或回退来源。
+SourceMode=BuiltIn 时明确使用内置来源，SourceMode=Json 时使用选中地图 JSON 和三份共享 JSON；Json 来源失败不自动回退 BuiltIn。Preset=Grassland 要求地图 ID 为 battle_grassland_01，Preset=Forest 要求 battle_forest_01。schemaVersion=42为契约版本，configRevision须为正整数；旧v1～v41或缺少必填字段明确失败，不补字段或回退来源。
 
 [MapMovementConfig.cs](../../Assets/Scripts/CombatPrototype/Map/MapMovementConfig.cs) 是地图定义的必填 movement 段：
 
